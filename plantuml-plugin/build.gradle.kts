@@ -474,6 +474,8 @@ publishing {
 }
 
 signing {
-    if (!version.toString().endsWith("-SNAPSHOT")) sign(publishing.publications)
+    if (System.getenv("CI") != "true" && !version.toString().endsWith("-SNAPSHOT")) {
+        sign(publishing.publications)
+    }
     useGpgCmd()
 }
