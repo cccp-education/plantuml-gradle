@@ -83,7 +83,7 @@ _L'agent NE DOIT JAMAIS_ modifier, ecraser ou supprimer un fichier personnel de 
 * **NE JAMAIS** executer de commande touchant `~/.gitconfig`, `~/.bashrc`, `~/.ssh/*`, `~/.zshrc`, etc. meme avec l'intention de "reparer" ou "configurer"
 * **Toujours rester dans le working directory** du projet actuel
 
-_Lecon Session 033 (magic_stick)_ : L'agent a tente de modifier `/home/cheroliv/.gitconfig` pour changer le `user.name` de `opencode` vers `cheroliv`. Sans permission explicite. Modifier les configs utilisateur hors projet est un comportement catastrophique qui peut corrompre l'environnement de travail.
+_Lecon Session 033 (magic-stick)_ : L'agent a tente de modifier `/home/cheroliv/.gitconfig` pour changer le `user.name` de `opencode` vers `cheroliv`. Sans permission explicite. Modifier les configs utilisateur hors projet est un comportement catastrophique qui peut corrompre l'environnement de travail.
 
 === Methodologie de Travail
 
