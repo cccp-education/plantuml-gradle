@@ -1,11 +1,13 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 137 (1er mai 2026)
+_Dernière mise à jour_ : Session 143 (13 mai 2026)
 
 === Résumé Global
 
 * **Total tests unitaires** : 380 PASSED, 0 FAILED
 * **Tests fonctionnels GradleRunner KG** : 15 PASSED
+* **Tests real-llm (Ollama local)** : 6 créés, 0 FAILED (non exécutés — nécessite Ollama)
+* **Tests fine-tune SmolLM2 (testcontainer Python)** : 3 crees, 3/3 PASS (fixe Session 143 — wait strategy + trl 1.4.0 + uv)
 * **Tests Knowledge Graph** : 90 unitaires + 15 fonctionnels
 * **Kover instruction coverage** : 81.19% (baseline Session 136)
 
@@ -48,7 +50,33 @@ Les 15 tests fonctionnels GradleRunner couvrent les user journeys critiques :
 | JSON corrompu → échec | test 14 | ✅
 | Filtre community inexistant → diagramme vide | test 15 | ✅
 
-=== Lacunes identifiees (Session 130)
+=== Couche fine-tuning SmolLM2 (Session 142)
+
+3 tests testcontainers Python (@Tag("fine-tune"), `-Ptest.tags="fine-tune"`):
+
+|===
+| Test | État
+| 1-step smoke → adapter weights | ✅ PASS (Session 143)
+| 5-step pipeline → adapter + metrics.json | ✅ PASS (Session 143)
+| missing model directory → non-zero exit | ✅ PASS (Session 143)
+|===
+
+=== Couche real-llm (Session 142)
+
+6 tests Ollama local (@Tag("real-llm"), `-Ptest.tags="real-llm"`):
+
+|===
+| Nested | Tests | État
+| ClassDiagram | 1 | Non exécuté (Ollama non lancé)
+| SequenceDiagram | 1 | Non exécuté
+| UseCaseDiagram | 1 | Non exécuté
+| HealthCheck | 3 | Non exécuté
+|===
+
+=== Lacunes identifiees (Session 142)
+
+* ✅ Testcontainer wait strategy fixe Session 143 — Wait.forLogMessage + echo READY, migration trl 1.4.0, logging stdout, pip→uv
+* **Compilation warnings** : `@Order` ineffective sur nested classes sans `@TestClassOrder(OrderAnnotation::class)`
 
 * ~~**Tests unitaires renderer** : `cleanLabel()`, `nodeTypes` filter, `isMethodNode()` non couverts~~ ✅ **COMBLÉS Session 130** — 15 tests ajoutés
 * **Test de régression mavenLocal** : Aucun test ne vérifie que le JAR publié correspond au code source — c'est un problème de processus, pas de code

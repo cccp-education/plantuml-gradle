@@ -1,0 +1,61 @@
+= Session 143 — Fix Testcontainer Fine-Tune SmolLM2 (wait strategy + API trl 1.4.0 + uv)
+
+_Date_ : 2026-05-13
+_Type_ : fix + refactor
+_Score_ : 9.0/10
+
+== Résumé
+
+Fix du `ContainerLaunchException: Timed out waiting for log output` sur les 3 tests
+fine-tune testcontainer de SmolLM2-135M-Instruct. Migration pipeline pip → uv.
+Mise à jour complète du script Python pour l'API `trl` 1.4.0.
+
+== Tâches réalisées
+
+=== 1. Fix wait strategy testcontainer
+- `Wait.forLogMessage(".*FINE_TUNE_READY.*", 1)` explicite dans `withContainer`
+- `withCommand("sh", "-c", "echo 'FINE_TUNE_READY' && tail -f /dev/null")`
+- Le conteneur signale sa readiness avant de passer en mode keep-alive
+
+=== 2. Migration API trl 0.x → 1.4.0 (script Python)
+
+| Ancien | Nouveau |
+|---|---|
+| `TrainingArguments(...)` | `SFTConfig(...)` |
+| `SFTTrainer(..., tokenizer=...)` | supprimé (déprécié) |
+| `SFTTrainer(..., max_seq_length=128)` | `SFTConfig(..., max_length=128)` |
+| `AutoModelForCausalLM.from_pretrained(..., torch_dtype=...)` | `..., dtype=...)` |
+
+=== 3. Refactor print() → logging
+- `logging.basicConfig` avec `stream=sys.stdout` (les tests lisent `stdout` pour "SUCCESS")
+- `log.info/log.error` sur toutes les sorties
+- Maintient la compatibilité avec `r.stdout.contains("SUCCESS")` du test Kotlin
+
+=== 4. Fix assertion missingModel
+- `r.stderr.contains(...)` → `r.stdout.contains(...)` aussi (car tout est stdout maintenant)
+
+=== 5. Migration pip → uv (Dockerfile)
+- Image : `python:3.12-slim` → ajout `pip install uv` + `uv pip install --system --no-cache -r requirements.txt`
+- `requirements.txt` : ajout `[hf_transfer]` sur `huggingface_hub` (aligné Dockerfile)
+- Image rebuildée (5m48s), tests PASS
+
+== Fichiers modifiés
+
+| Fichier | Action |
+|---|---|
+| `SmolLMFineTuneFunctionalTest.kt` | + `waitingFor(Wait.forLogMessage(...))`, + `withCommand` avec echo READY, fix assertion missingModel |
+| `python/fine_tune.py` | Migration API trl 1.4.0 + logging stdout |
+| `python/Dockerfile` | pip → uv |
+| `python/requirements.txt` | + `[hf_transfer]` sur huggingface_hub |
+
+== Résultat
+
+- **Tests fine-tune** : 3/3 PASS ✅
+- **Tests WireMock** : 74 PASS, 10 skipped ✅
+- **Total functionalTest** : 77 PASS, 10 skipped, 0 FAIL ✅
+
+== Prochaines étapes (Session 144)
+
+1. Exécuter `./gradlew functionalTest -Ptest.tags="real-llm"` (nécessite Ollama local)
+2. Nettoyer les warnings @Order ineffectifs sur `PlantumlRealLlmFunctionalTest` et `SmolLMFineTuneFunctionalTest`
+3. Nettoyer les imports inutilisés

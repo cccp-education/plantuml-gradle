@@ -79,5 +79,50 @@
 ==== Notes/Leçons
 * Les tests fonctionnels KG existaient déjà depuis la Session 128 — tout passait
 * Aucun nouveau code nécessaire, simple validation
-| 2026-05-04 | 139 | governance | Renommage openclaw-codingame → quizz-benchmark-gradle (gouvernance) |
-| 2026-05-07 | 141 | chore | Migration chemins foundry/ → foundry/OSS/ dans INDEX.adoc — granularisation OSS/CSS |
+| 2026-05-13 | 142 | feat+test | Pipeline fine-tuning SmolLM2-135M-Instruct (3 couches : WireMock instruct-v0.2, Real Ollama, Testcontainer Python + Gradle tasks + CI workflow) |
+
+=== Session 142 — 2026-05-13 : Pipeline Fine-tuning SmolLM2-135M-Instruct ⚠️
+
+==== ✅ Contexte
+* _Objectif_ : Ajouter 3ème couche de test fonctionnel (testcontainer Python) pour le pipeline fine-tuning LoRA SmolLM2
+* _Modèle_ : `HuggingFaceTB/SmolLM2-135M-Instruct` (135M params, CPU viable)
+
+==== ✅ Tâches réalisées
+* ✅ Migration WireMock (8 fichiers) : `smollm:135m` → `smollm:135m-instruct-v0.2-q8_0`
+* ✅ `PlantumlRealLlmFunctionalTest.kt` (couche 2) : 6 tests real-llm avec Ollama local (4 nested classes)
+* ✅ `python/fine_tune.py` : script LoRA autonome, dataset 4 entrées minimalistes
+* ✅ `python/requirements.txt` + `python/Dockerfile` : image pré-buildée PyTorch+PEFT+TRL
+* ✅ `downloadFineTuningModel` + `buildFineTuningImage` : 2 tâches Gradle avec dépendances functionalTest
+* ✅ `SmolLMFineTuneFunctionalTest.kt` (couche 3) : 3 tests testcontainers (@Tag("fine-tune"))
+* ✅ `.github/workflows/fine_tune_test.yml` : CI avec cache HF models
+* ✅ `.gitignore` : `models/` exclu
+* ✅ Gating `fine-tune` dans `functionalTest {}` (excluded by default)
+
+==== Bloqueur
+* `ContainerLaunchException` sur les 3 tests fine-tune : wait strategy incompatible avec l'image pré-buildée → à corriger Session 143
+
+==== Notes/Leçons
+* GGUF (Ollama) ≠ safetensors (HuggingFace) pour fine-tuning
+* `pip install torch` en conteneur prend 8-10 min → image pré-buildée obligatoire
+* `@EnabledIfSystemProperty` demande `-D`, pas `-P` Gradle → forward explicite nécessaire
+* Aucun path en dur — tout est résolu via `layout.projectDirectory`, `temporaryDir`, ou `classLoader.getResource()`
+
+
+=== Session 143 — 2026-05-13 : Fix Testcontainer Fine-Tune SmolLM2 ✅
+
+==== ✅ Contexte
+* _Session 142_ : 3 tests fine-tune FAIL (ContainerLaunchException timeout)
+* _Objectif_ : Fix wait strategy, mettre à jour le script Python pour trl 1.4.0, migrer pip→uv
+
+==== ✅ Tâches réalisées
+* ✅ Wait strategy : `Wait.forLogMessage(".*FINE_TUNE_READY.*", 1)` + `echo 'FINE_TUNE_READY' && tail -f /dev/null`
+* ✅ Migration API trl 1.4.0 : `SFTConfig` au lieu de `TrainingArguments`, `max_length` au lieu de `max_seq_length`, `dtype` au lieu de `torch_dtype`, `processing_class=tokenizer` au lieu de `tokenizer=`
+* ✅ Refactor `print()` → `logging` avec `stream=sys.stdout` (compatibilite assertions Kotlin)
+* ✅ Dockerfile : `pip` → `uv pip install --system`
+* ✅ `requirements.txt` : + `[hf_transfer]` sur `huggingface_hub`
+* ✅ Image rebuild (5m48s), tests 3/3 PASS
+
+==== Résultat
+* Tests fine-tune : 3/3 PASS ✅
+* Tests WireMock : 74 PASS, 10 skipped ✅
+* Total functionalTest : 77 PASS, 10 skipped, 0 FAIL ✅

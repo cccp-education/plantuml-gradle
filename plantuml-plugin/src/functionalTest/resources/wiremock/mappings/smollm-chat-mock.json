@@ -12,7 +12,7 @@
       "id": "chatcmpl-123",
       "object": "chat.completion",
       "created": 1677652288,
-      "model": "smollm:135m",
+      "model": "smollm:135m-instruct-v0.2-q8_0",
       "choices": [{
         "index": 0,
         "message": {

@@ -1,0 +1,93 @@
+= Session 142 — Pipeline Fine-tuning SmolLM2-135M-Instruct (testcontainer Python)
+
+_Date_ : 2026-05-13
+_Type_ : feat + test
+_Score_ : 8.0/10
+
+== Résumé
+
+Mise en place d'une 3ème couche de test fonctionnel (testcontainer Python Docker)
+pour valider le pipeline fine-tuning LoRA sur `HuggingFaceTB/SmolLM2-135M-Instruct`,
+sans dépendance au système hôte (ni venv, ni Python, ni packages).
+
+== Contexte de départ
+
+- Session ouverte dans plantuml-gradle (pas de projet gouverné désigné)
+- WireMock → couche 1 (Gradle + LangChain4j mocké) ✅
+- Real Ollama → couche 2 (intégration LLM réel @Tag("real-llm")) déjà faite
+- Objectif : ajouter couche 3 (testcontainer Python fine-tuning)
+
+== Tâches réalisées
+
+=== 1. Correction WireMock — modèle smollm:135m-instruct-v0.2-q8_0
+- 8 fichiers WireMock (4 test + 4 functionalTest) : `"smollm:135m"` → `"smollm:135m-instruct-v0.2-q8_0"`
+- Fichier `PlantumlFunctionalSuite.kt` : `ollamaModel = "smollm:135m"` → `"smollm:135m-instruct-v0.2-q8_0"`
+
+=== 2. Couche real-llm (Ollama local, sans WireMock)
+- Créé `PlantumlRealLlmFunctionalTest.kt` : 4 nested classes, 6 tests
+  - ClassDiagram / SequenceDiagram / UseCaseDiagram — génération puml via `processPlantumlPrompts`
+  - HealthCheck — smoke /api/tags, présence modèle, création ChatModel
+- @Tag("real-llm"), gating via `-Ptest.tags="real-llm"`
+
+=== 3. Script Python fine-tuning + dataset minimaliste
+- Créé `python/fine_tune.py` : script autonome LoRA/QLoRA SFTTrainer
+- Dataset inline 4 exemples (~10-15 tokens chacun) : Paris, 4, Hola, Water
+- `python/requirements.txt` : torch, transformers, datasets, peft, trl, accelerate
+
+=== 4. Tâche Gradle downloadFineTuningModel + buildFineTuningImage
+- `downloadFineTuningModel` : télécharge `HuggingFaceTB/SmolLM2-135M-Instruct` via `docker run`
+- `buildFineTuningImage` : build image `plantuml-fine-tune:latest` avec Dockerfile custom (PyTorch + PEFT + TRL préinstallés)
+- Les deux tâches s'attachent en dépendance de `functionalTest` + `processFunctionalTestResources`
+
+=== 5. Test Kotlin testcontainers — SmolLMFineTuneFunctionalTest
+- 3 tests (@Tag("fine-tune"), gating `-Ptest.tags="fine-tune"`):
+  - smokeTest (1 step) → vérifie adapter_model.safetensors
+  - fullPipeline (5 steps) → vérifie adapter + adapter_config.json + metrics.json
+  - missingModel → exit code ≠ 0 avec message d'erreur clair
+- Utilise `plantuml-fine-tune:latest` (image pré-buildée, pas de pip install au startup)
+- Résolution de ressources via classloader (`getResource`), aucun path en dur
+
+=== 6. Workflow CI — `.github/workflows/fine_tune_test.yml`
+- Cache HF models (`~/.cache/huggingface`) pour éviter re-téléchargement
+- Cache Gradle (wrapper + dependencies)
+- Étapes : `downloadFineTuningModel` → `functionalTest -Ptest.tags="fine-tune"`
+- Upload des rapports de test
+
+=== 7. .gitignore — exclusion models/
+- `models/` ajouté au `.gitignore` racine
+
+== Problèmes rencontrés
+
+1. **GGUF inutilisable pour fine-tuning** : le blob Ollama local (144 Mo) est format GGUF, utilisable uniquement en inférence. Le fine-tuning nécessite les poids HuggingFace (safetensors, ~270 Mo).
+2. **pip install dans testcontainer trop lent** : `pip install torch transformers peft trl` prend 8-10 min en CPU → timeout des tests. Résolu avec une image Docker pré-buildée (`plantuml-fine-tune:latest`).
+3. **Path en dur du venv local** : première version de `downloadFineTuningModel` utilisait `/home/cheroliv/workspace/runtimes/venv/bin/python3`. Corrigé : tout passe par `docker run`.
+4. **@EnabledIfSystemProperty vs -P Gradle** : les propriétés Gradle (`-P`) ne sont pas des propriétés système Java (`-D`). Corrigé en forwardant `test.tags` dans `systemProperty()` du block `functionalTest {}`.
+5. **NPE avec ToStringConsumer + followOutput** : conflit entre `withLogConsumer(ToStringConsumer())` et `followOutput()`. Simplifié en lambda `withLogConsumer { frame -> log.debug(...) }`.
+
+== Fichiers créés/modifiés
+
+| Fichier | Action |
+|---|---|
+| `.gitignore` | + `models/` |
+| `build.gradle.kts` | + `downloadFineTuningModel` + `buildFineTuningImage` + gating `fine-tune` |
+| `PlantumlFunctionalSuite.kt` | ollamaModel → instruct-v0.2-q8_0 |
+| `PlantumlRealLlmFunctionalTest.kt` | **NEW** — 6 tests real-llm |
+| `SmolLMFineTuneFunctionalTest.kt` | **NEW** — 3 tests fine-tune testcontainers |
+| `python/fine_tune.py` | **NEW** — script LoRA autonome |
+| `python/requirements.txt` | **NEW** — dépendances Python |
+| `python/Dockerfile` | **NEW** — image pré-buildée |
+| `.github/workflows/fine_tune_test.yml` | **NEW** — CI fine-tuning |
+| 8 wiremock/*.json | `smollm:135m` → `smollm:135m-instruct-v0.2-q8_0` |
+
+== État à la clôture
+
+- **Tests WireMock existants** : 77 tests, 10 skipped, 0 failed ✅
+- **Tests real-llm** : non exécutés (Ollama non lancé)
+- **Tests fine-tune** : FAILED — `ContainerLaunchException: Timed out waiting for log output`. Le `plantuml-fine-tune:latest` est buildé (8m41s) mais les tests timeout car l'image est utilisée comme `GenericContainer` avec `tail -f /dev/null` — le wait strategy ne détecte pas le démarrage. À corriger session 143.
+
+== Prochaines étapes (Session 143)
+
+1. Fixer le timeout testcontainer : remplacer `tail -f /dev/null` par une wait strategy adaptée à l'image pré-buildée
+2. Exécuter `./gradlew functionalTest -Ptest.tags="fine-tune"` et valider les 3 tests
+3. Exécuter `./gradlew functionalTest -Ptest.tags="real-llm"` (nécessite Ollama local)
+4. Nettoyer les imports inutilisés et les warnings de compilation

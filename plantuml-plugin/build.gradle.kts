@@ -173,6 +173,7 @@ dependencies {
 
     // Add testcontainers for RAG integration tests
     add(functionalTest.implementationConfigurationName, libs.testcontainers.pg)
+    add(functionalTest.implementationConfigurationName, "org.testcontainers:testcontainers:1.21.4")
 }
 
 // 3. Task for functional tests
@@ -181,8 +182,16 @@ val functionalTestTask = tasks.register<Test>("functionalTest") {
     group = "verification"
     testClassesDirs = functionalTest.output.classesDirs
     classpath = configurations[functionalTest.runtimeClasspathConfigurationName] + functionalTest.output
-    useJUnitPlatform()
-//    useJUnitPlatform { includeTags("real-llm") }
+    useJUnitPlatform {
+        val runRealLlm = project.findProperty("test.tags")?.toString()?.contains("real-llm") == true
+        val runFineTune = project.findProperty("test.tags")?.toString()?.contains("fine-tune") == true
+        if (!runRealLlm) {
+            excludeTags("real-llm")
+        }
+        if (!runFineTune) {
+            excludeTags("fine-tune")
+        }
+    }
     testLogging {
         events("passed", "skipped", "failed")
         showStandardStreams = true
@@ -191,6 +200,11 @@ val functionalTestTask = tasks.register<Test>("functionalTest") {
 
     // Timeout for functional tests - WireMock mocks prevent real network calls
     timeout.set(Duration.ofMinutes(5))
+
+    // Forward gradle project property to system property for @EnabledIfSystemProperty
+    project.findProperty("test.tags")?.toString()?.let { tags ->
+        systemProperty("test.tags", tags)
+    }
 
     // Add system properties for permission tests
     systemProperty("test.timeout.multiplier", "2")
@@ -333,6 +347,117 @@ tasks.check {
     dependsOn(functionalTestTask)
     dependsOn(cucumberTest)
 }
+
+// ------------------------------------------------------------------ //
+//  Fine-tuning model download (pre-requisite for real fine-tune test) //
+// ------------------------------------------------------------------ //
+
+val fineTuningModelDir = layout.projectDirectory
+    .dir("src/functionalTest/resources/models/SmolLM2-135M-Instruct")
+
+val pythonResourceDir = layout.projectDirectory
+    .dir("src/functionalTest/resources/python")
+
+val buildFineTuningImage by tasks.registering {
+    description = "Builds the Docker image for SmolLM2 fine-tuning tests"
+    group = "verification"
+
+    inputs.dir(pythonResourceDir)
+    outputs.upToDateWhen {
+        val result = ProcessBuilder("docker", "image", "inspect", "plantuml-fine-tune:latest")
+            .redirectErrorStream(true)
+            .start()
+            .inputStream
+            .bufferedReader()
+            .use { it.readText() }
+        result.contains("plantuml-fine-tune:latest")
+    }
+
+    doLast {
+        val dockerfile = pythonResourceDir.asFile.resolve("Dockerfile")
+        val pb = ProcessBuilder(
+            "docker", "build",
+            "-t", "plantuml-fine-tune:latest",
+            "-f", dockerfile.absolutePath,
+            dockerfile.parent,
+        ).inheritIO()
+        val exit = pb.start().waitFor()
+        if (exit != 0) {
+            throw GradleException("Docker build failed with exit code $exit")
+        }
+    }
+}
+
+val downloadFineTuningModel by tasks.registering {
+    description = "Downloads HuggingFaceTB/SmolLM2-135M-Instruct for fine-tuning tests"
+    group = "verification"
+
+    outputs.dir(fineTuningModelDir)
+
+    doLast {
+        val modelDir = fineTuningModelDir.asFile
+        val safetensors = File(modelDir, "model.safetensors")
+        if (safetensors.exists()) {
+            logger.lifecycle("Model already present at ${modelDir.absolutePath} — skipping download")
+            return@doLast
+        }
+        logger.lifecycle("Downloading HuggingFaceTB/SmolLM2-135M-Instruct with plantuml-fine-tune:latest ...")
+        modelDir.mkdirs()
+
+        val downloadScript = File(temporaryDir, "download.py")
+        downloadScript.writeText("""
+import sys, time
+from huggingface_hub import snapshot_download
+for attempt in range(1, 4):
+    try:
+        snapshot_download(
+            "HuggingFaceTB/SmolLM2-135M-Instruct",
+            local_dir="/out",
+            ignore_patterns=["onnx/**","runs/**","*.bin","*.msgpack",
+                             "all_results.json","eval_results.json",
+                             "train_results.json","trainer_state.json","training_args.bin"],
+            max_workers=2,
+        )
+        print("Model downloaded to /out")
+        sys.exit(0)
+    except Exception as e:
+        print(f"Attempt {attempt}/3 failed: {e}")
+        if attempt == 3:
+            sys.exit(1)
+        time.sleep(5)
+        """.trimIndent())
+
+        val hfCache = File(temporaryDir, "hf-cache").also { it.mkdirs() }
+
+        val dockerCmd = listOf(
+            "docker", "run", "--rm",
+            "-v", "${modelDir.absolutePath}:/out",
+            "-v", "${hfCache.absolutePath}:/root/.cache/huggingface",
+            "-v", "${downloadScript.absolutePath}:/scripts/download.py:ro",
+            "-e", "HF_HUB_ENABLE_HF_TRANSFER=1",
+            "plantuml-fine-tune:latest",
+            "python3", "/scripts/download.py",
+        )
+
+        val pb = ProcessBuilder(dockerCmd).inheritIO()
+        val exit = pb.start().waitFor()
+        if (exit != 0) {
+            throw GradleException("Model download failed with exit code $exit")
+        }
+        check(safetensors.exists()) {
+            "Download failed — model.safetensors missing in ${modelDir.absolutePath}"
+        }
+    }
+}
+
+// Attach model + image build as dependencies of functionalTest
+tasks.named("functionalTest") {
+    dependsOn(buildFineTuningImage, downloadFineTuningModel)
+}
+tasks.named(functionalTest.processResourcesTaskName) {
+    dependsOn(buildFineTuningImage, downloadFineTuningModel)
+}
+
 
 kover {
     currentProject {

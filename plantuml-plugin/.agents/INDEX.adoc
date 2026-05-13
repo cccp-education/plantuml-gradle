@@ -2,9 +2,9 @@
 
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
-_Derniere mise a jour_ : 2026-05-07  
-_Session en cours_ : 138 — Maintenance (12 EPICs terminées, définition prochaines priorités)  
-_Session inter-session_ : 141 (chore migration chemins foundry/ → foundry/OSS/ dans INDEX.adoc)
+_Derniere mise a jour_ : 2026-05-13  
+_Session en cours_ : 144 — Tests real-llm + cleanup warnings @Order  
+_Session terminee_ : 142 — Pipeline Fine-tuning SmolLM2-135M-Instruct (3 couches : WireMock, Real Ollama, Testcontainer Python) ⚠️
 _Session terminee_ : 137 (EPIC 12 Clôture — BACKLOG + INDEX)  
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
@@ -120,6 +120,9 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 
 |===
 | # | Date | Type | Sujet | Fichier | Score
+.1+^.^| 143 | 2026-05-13 | fix+refactor | Fix testcontainer fine-tune (wait strategy, trl 1.4.0, uv) | `143-fix-fine-tune-testcontainer.adoc` | 9.0/10
+.1+^.^| 142 | 2026-05-13 | feat+test | Pipeline Fine-tuning SmolLM2-135M-Instruct (testcontainer Python) | `142-smollm2-fine-tuning-pipeline.adoc` | 8.0/10
+.1+^.^| 141 | 2026-05-07 | chore | Migration chemins foundry/ → foundry/OSS/ (granularisation OSS/CSS) | — | —
 .1+^.^| 137 | 2026-05-01 | chore | EPIC 12 Cloture (BACKLOG 🟢 + INDEX incohérence corrigée) | `137-epic12-cloture-backlog-index.adoc` | 9.0/10
 .1+^.^| 136 | 2026-05-01 | chore+test | EPIC 12 Execution (6/6 tâches, PROCEDURES, Kover 81.19%) | `136-epic12-consolidation-execution.adoc` | 9.0/10
 .1+^.^| 135 | 2026-05-01 | chore | EPIC 12 Définition Consolidation (Audit + 6 tâches) | `135-epic12-consolidation-definition.adoc` | 9.0/10

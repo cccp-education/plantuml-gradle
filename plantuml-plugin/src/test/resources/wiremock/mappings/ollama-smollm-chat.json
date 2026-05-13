@@ -9,7 +9,7 @@
       "Content-Type": "application/json"
     },
     "jsonBody": {
-      "model": "smollm:135m",
+      "model": "smollm:135m-instruct-v0.2-q8_0",
       "created_at": "2023-12-01T00:00:00Z",
       "message": {
         "role": "assistant",

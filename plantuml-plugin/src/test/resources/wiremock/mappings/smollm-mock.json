@@ -9,7 +9,7 @@
       "Content-Type": "application/json"
     },
     "jsonBody": {
-      "model": "smollm:135m",
+      "model": "smollm:135m-instruct-v0.2-q8_0",
       "response": "@startuml\nactor User\nUser --> (Use Application)\n@enduml",
       "done": true
     }
