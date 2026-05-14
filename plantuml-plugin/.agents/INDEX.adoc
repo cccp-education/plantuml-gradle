@@ -2,9 +2,9 @@
 
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
-_Derniere mise a jour_ : 2026-05-13  
-_Session en cours_ : 144 — Tests real-llm + cleanup warnings @Order  
-_Session terminee_ : 142 — Pipeline Fine-tuning SmolLM2-135M-Instruct (3 couches : WireMock, Real Ollama, Testcontainer Python) ⚠️
+_Derniere mise a jour_ : 2026-05-14  
+_Session en cours_ : 145 — Tests real-llm + cleanup warnings @Order  
+_Session terminee_ : 144 — CI Template (EPIC F — engine orchestration)
 _Session terminee_ : 137 (EPIC 12 Clôture — BACKLOG + INDEX)  
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
@@ -136,6 +136,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 | 127 | 2026-04-22 | test+fix | EPIC 10 Tests Integration Graphify (380/380 PASS) | `127-epic10-graphify-tests.adoc` | 9.0/10
 | 126 | 2026-04-22 | docs | Article blog fg (0104) + reflexion distillation IA | `126-blog-fg-command.adoc` | 9.0/10
 | 141 | 2026-05-07 | chore | Migration chemins foundry/ → foundry/OSS/ (granularisation OSS/CSS) | — | —
+| 144 | 2026-05-14 | infra | CI Template test.yml deploye, build OK, EPIC F cross-boroughs | `144-ci-template.adoc` | 10/10
 |===
 
 → _Sessions 1-126_ : `.agents/backup/Y2026-sessions-001-126/`

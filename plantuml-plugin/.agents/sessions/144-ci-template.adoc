@@ -1,0 +1,20 @@
+= Session 144 — CI Template (EPIC F — engine orchestration)
+:date: 2026-05-14
+:type: infra
+:score: 10/10
+
+== Objectif
+
+Deploiement du template CI standard `.github/workflows/test.yml` (JDK 24, Gradle, JUnit)
+sur plantuml-gradle via la session engine 013 (EPIC F cross-boroughs).
+
+== Actions
+
+* `plantuml-gradle/.github/workflows/test.yml` cree — template standard
+* Build local verifie : `./gradlew build` BUILD SUCCESSFUL (en plus du ci.yml existant)
+* Aucune modification de code source plantuml-plugin
+
+== Contexte
+
+Session 013 engine (2026-05-14) : EPIC F Template CI unifie deploye sur 5 boroughs restants.
+Plantuml-gradle est un des 5. Il avait deja un `ci.yml` specialise mais pas de test.yml standard.

@@ -1,5 +1,6 @@
 = Historique des Sessions
 
+_Session 144_ (2026-05-14) : CI Template .github/workflows/test.yml deploye, build OK, EPIC F cross-boroughs ✅
 _Session 143_ (2026-05-13) : Fix testcontainer fine-tune SmolLM2 — wait strategy, API trl 1.4.0, logging Python, pip→uv, 3/3 PASS ✅
 _Session 142_ (2026-05-13) : Pipeline Fine-tuning SmolLM2-135M-Instruct — 3ème couche test (testcontainer Python), WireMock instruct-v0.2, real-llm, Dockerfile, Gradle tasks, CI workflow ⚠️
 _Session 141_ (2026-05-07) : Migration chemins foundry/ → foundry/OSS/ dans INDEX.adoc — granularisation OSS/CSS ✅
