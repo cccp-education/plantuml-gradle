@@ -187,8 +187,8 @@ class ConfigurationSteps(private val world: PlantumlWorld) {
         )
     }
 
-    @When("I run processPlantumlPrompts task with -Pplantuml.langchain4j.maxIterations={int}")
-    fun runProcessPlantumlPromptsTaskWithCliOverride(maxIterations: Int) = runBlocking {
+    @When("I run generatePlantumlDiagrams task with -Pplantuml.langchain4j.maxIterations={int}")
+    fun runGeneratePlantumlDiagramsTaskWithCliOverride(maxIterations: Int) = runBlocking {
         val properties = mutableMapOf<String, String>()
         world.mockServerPort?.let {
             properties["plantuml.langchain4j.model"] = "ollama"
@@ -203,14 +203,14 @@ class ConfigurationSteps(private val world: PlantumlWorld) {
         properties["plantuml.test.mode"] = "true"
 
         try {
-            world.executeGradle("processPlantumlPrompts", properties = properties, systemProperties = systemProperties)
+            world.executeGradle("generatePlantumlDiagrams", properties = properties, systemProperties = systemProperties)
         } catch (e: Exception) {
             world.exception = e
         }
     }
 
-    @When("I run processPlantumlPrompts task")
-    fun runProcessPlantumlPromptsTask() = runBlocking {
+    @When("I run generatePlantumlDiagrams task")
+    fun runGeneratePlantumlDiagramsTask() = runBlocking {
         val properties = mutableMapOf<String, String>()
         world.mockServerPort?.let {
             properties["plantuml.langchain4j.model"] = "ollama"
@@ -224,7 +224,7 @@ class ConfigurationSteps(private val world: PlantumlWorld) {
         properties["plantuml.test.mode"] = "true"
 
         try {
-            world.executeGradle("processPlantumlPrompts", properties = properties, systemProperties = systemProperties)
+            world.executeGradle("generatePlantumlDiagrams", properties = properties, systemProperties = systemProperties)
         } catch (e: Exception) {
             world.exception = e
         }

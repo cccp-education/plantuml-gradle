@@ -1,0 +1,23 @@
+= Session 145 — EPIC K-1 Renommage taxonomie (generatePlantumlDiagrams, collectPlantumlIndex)
+:type: migration
+:date: 2026-05-19
+:score: 10/10
+
+== Résumé
+
+Renommage de 2 tâches conformément à la taxonomie workspace (GENERER/COLLECTER).
+
+- `processPlantumlPrompts` → `generatePlantumlDiagrams` (+ renommage classe associée)
+- `reindexPlantumlRag` → `collectPlantumlIndex` (+ renommage classe associée)
+
+== Fichiers modifiés
+
+18 fichiers dans `plantuml-plugin/` :
+- Renommage des classes de tâches
+- Mise à jour des registrations dans le plugin
+- Mise à jour des tests et références
+- Mise à jour de la documentation
+
+== Build
+
+Build OK.

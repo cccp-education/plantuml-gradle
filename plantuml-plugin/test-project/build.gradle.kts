@@ -1,1 +1,1 @@
-plugins { id("com.cheroliv.plantuml") }
+plugins { id("education.cccp.plantuml") }

@@ -1,32 +1,21 @@
-= PROMPT_REPRISE — Session 144 — PlantUML Plugin
-:jbake-status: draft
+= PROMPT_REPRISE — Session 145 terminée (K-1)
 
-== Contexte de Reprise
+== Mission accomplie
 
-Session 143 : Fix des 3 tests fine-tune testcontainer (wait strategy, API trl 1.4.0, pip→uv).
-3/3 PASS — pipeline SmolLM2-135M-Instruct fonctionnel en conteneur isolé.
+Renommage taxonomie :
+- `processPlantumlPrompts`→`generatePlantumlDiagrams` (+ renommage classe)
+- `reindexPlantumlRag`→`collectPlantumlIndex` (+ renommage classe)
 
-== État actuel
+18 fichiers modifiés. Build OK.
 
-- WireMock (couche 1) : 74 tests ✅
-- Real Ollama (couche 2) : `PlantumlRealLlmFunctionalTest.kt` (6 tests) — non exécutés
-- Testcontainer Python (couche 3) : 3/3 ✅
-- Image `plantuml-fine-tune:latest` : uv (was pip), build 5m48s ✅
-- CI : `.github/workflows/fine_tune_test.yml` prêt
+== Prochaine mission (146)
 
-== Prochaines étapes
+- EPIC 13 — Multi-provider API Pool (tiers)
+- Ou K-2 — Format pivot metadata.json
+- Ou tests real-llm + cleanup warnings @Order
 
-. **Exécuter les tests real-llm** : `./gradlew functionalTest -Ptest.tags="real-llm"` (Ollama local requis)
-. **Nettoyer warnings @Order** : `ClassOrderer.OrderAnnotation/MethodOrderer.OrderAnnotation` non enregistrés → annotations @Order ineffectives sur RealLlm + SmolLM
-. **Nettoyer imports inutilisés** dans les 2 nouveaux fichiers de test
-. **Vérifier CI** : lancer `fine_tune_test.yml` manuellement pour valider le pipeline CI
+== Rappels
 
-== Fichiers clés
-
-- `SmolLMFineTuneFunctionalTest.kt` — fixé (wait strategy)
-- `PlantumlRealLlmFunctionalTest.kt` — à tester
-- `python/Dockerfile` — uv OK
-- `.github/workflows/fine_tune_test.yml` — CI pipeline
-
-[.text-right]
-*Session 2026-05-13 — post fix testcontainer.*
+- GroupId: cccp.education.plantuml
+- Plugin ID: cccp.education.plantuml
+- Procédure publishToMavenLocal après chaque modification du code source

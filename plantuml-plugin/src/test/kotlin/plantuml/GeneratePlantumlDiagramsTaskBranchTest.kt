@@ -9,21 +9,21 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.io.TempDir
-import plantuml.tasks.ProcessPlantumlPromptsTask
+import plantuml.tasks.GeneratePlantumlDiagramsTask
 import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
- * Unit tests for ProcessPlantumlPromptsTask - Branch Coverage
+ * Unit tests for GeneratePlantumlDiagramsTask - Branch Coverage
  * 
- * Tests branches not covered by ProcessPlantumlPromptsTaskTest:
+ * Tests branches not covered by GeneratePlantumlDiagramsTaskTest:
  * - Override of plantuml.langchain4j.model
  * - Syntax validation errors (Invalid result)
  * - Error handling (catch blocks)
  */
-class ProcessPlantumlPromptsTaskBranchTest {
+class GeneratePlantumlDiagramsTaskBranchTest {
 
     @TempDir
     lateinit var tempDir: File
@@ -35,7 +35,7 @@ class ProcessPlantumlPromptsTaskBranchTest {
         .build()
 
     private lateinit var project: Project
-    private lateinit var task: ProcessPlantumlPromptsTask
+    private lateinit var task: GeneratePlantumlDiagramsTask
 
     @BeforeEach
     fun setup() {
@@ -44,7 +44,7 @@ class ProcessPlantumlPromptsTaskBranchTest {
             .build()
         
         project.pluginManager.apply("com.cheroliv.plantuml")
-        task = project.tasks.getByName("processPlantumlPrompts") as ProcessPlantumlPromptsTask
+        task = project.tasks.getByName("generatePlantumlDiagrams") as GeneratePlantumlDiagramsTask
         
         // Configure WireMock to return a valid response
         wireMock.stubFor(

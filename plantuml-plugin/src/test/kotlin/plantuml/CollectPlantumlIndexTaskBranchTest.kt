@@ -5,14 +5,14 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import plantuml.tasks.ReindexPlantumlRagTask
+import plantuml.tasks.CollectPlantumlIndexTask
 import java.io.File
 import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
- * Unit tests for ReindexPlantumlRagTask - Branch Coverage
+ * Unit tests for CollectPlantumlIndexTask - Branch Coverage
  * 
  * Tests branches not covered:
  * - Path is not a directory
@@ -21,13 +21,13 @@ import kotlin.test.assertTrue
  * - Database path (useDatabase = true)
  * - Error connecting to database (fallback simulation)
  */
-class ReindexPlantumlRagTaskBranchTest {
+class CollectPlantumlIndexTaskBranchTest {
 
     @TempDir
     lateinit var tempDir: File
 
     private lateinit var project: Project
-    private lateinit var task: ReindexPlantumlRagTask
+    private lateinit var task: CollectPlantumlIndexTask
 
     @BeforeEach
     fun setup() {
@@ -36,7 +36,7 @@ class ReindexPlantumlRagTaskBranchTest {
             .build()
         
         project.pluginManager.apply("com.cheroliv.plantuml")
-        task = project.tasks.getByName("reindexPlantumlRag") as ReindexPlantumlRagTask
+        task = project.tasks.getByName("collectPlantumlIndex") as CollectPlantumlIndexTask
     }
 
     @Test

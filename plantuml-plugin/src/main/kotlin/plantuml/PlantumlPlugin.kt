@@ -23,11 +23,11 @@ class PlantumlPlugin : Plugin<Project> {
             PlantumlManager.Tasks.registerTasks(this)
 
             project.tasks.register("docs") {
-                it.group = "plantuml"
+                it.group = "info"
                 it.description = "Full documentation pipeline: knowledge graph + generate prompts + process + validate"
                 it.dependsOn("generateKnowledgeGraphDiagram")
                 it.dependsOn("generateDiagramDocs")
-                it.dependsOn("processPlantumlPrompts")
+                it.dependsOn("generatePlantumlDiagrams")
                 it.finalizedBy("validatePlantumlSyntax")
             }
         }

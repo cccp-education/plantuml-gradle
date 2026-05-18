@@ -3,7 +3,7 @@ package plantuml
 import java.io.File
 
 /**
- * Business logic for RAG indexing, extracted from ReindexPlantumlRagTask.
+ * Business logic for RAG indexing, extracted from CollectPlantumlIndexTask.
  *
  * Receives only the RAG directory — no reference to Project or Task.
  */

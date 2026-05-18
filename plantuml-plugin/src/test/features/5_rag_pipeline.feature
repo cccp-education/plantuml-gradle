@@ -8,7 +8,7 @@ Feature: RAG Pipeline
   @rag
   Scenario: Reindex RAG creates embeddings in pgvector
     Given a running pgvector container
-    When I run reindexPlantumlRag task
+    When I run collectPlantumlIndex task
     Then embeddings should be stored in pgvector
     And the embedding count should match prompt count
 
@@ -16,7 +16,7 @@ Feature: RAG Pipeline
   Scenario: RAG context is injected in LLM prompts
     Given a running pgvector container with existing embeddings
     And a mock LLM that captures the user message
-    When I run processPlantumlPrompts task
+    When I run generatePlantumlDiagrams task
     Then the LLM request should contain RAG context chunks
     And the RAG similarity score should be logged
 
@@ -24,7 +24,7 @@ Feature: RAG Pipeline
   Scenario: Incremental reindex skips unchanged prompts
     Given a running pgvector container with existing embeddings
     And the prompt file has not been modified
-    When I run reindexPlantumlRag task
+    When I run collectPlantumlIndex task
     Then unchanged prompts should be skipped
     And only new or modified prompts should be indexed
 
@@ -32,6 +32,6 @@ Feature: RAG Pipeline
   Scenario: RAG cleanup removes deleted prompt embeddings
     Given a running pgvector container with embeddings for 3 prompts
     And one prompt file is deleted
-    When I run reindexPlantumlRag task
+    When I run collectPlantumlIndex task
     Then the deleted prompt embeddings should be removed
     And the embedding count should decrease by one

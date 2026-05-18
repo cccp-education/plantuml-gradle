@@ -14,7 +14,7 @@ import java.io.File
 abstract class GenerateKnowledgeGraphDiagramTask : DefaultTask() {
 
     init {
-        group = "plantuml"
+        group = "generate"
         description = "Generate Knowledge Graph diagram from graphify-out/graph.json (deterministic, no LLM)"
     }
 

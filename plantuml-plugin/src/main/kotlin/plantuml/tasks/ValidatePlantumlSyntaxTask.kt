@@ -31,7 +31,7 @@ import plantuml.service.PlantumlService
 abstract class ValidatePlantumlSyntaxTask : DefaultTask() {
 
     init {
-        group = "plantuml"
+        group = "verify"
         description = "Validates PlantUML syntax for debugging"
     }
 

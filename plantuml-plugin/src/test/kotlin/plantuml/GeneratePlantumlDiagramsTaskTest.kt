@@ -9,14 +9,14 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.io.TempDir
-import plantuml.tasks.ProcessPlantumlPromptsTask
+import plantuml.tasks.GeneratePlantumlDiagramsTask
 import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
- * Unit tests for ProcessPlantumlPromptsTask
+ * Unit tests for GeneratePlantumlDiagramsTask
  * 
  * Tests covered:
  * - Early exit when prompts directory does not exist
@@ -25,7 +25,7 @@ import kotlin.test.assertTrue
  * - Override of plantuml.prompts.dir
  * - Override of plantuml.langchain4j.model
  */
-class ProcessPlantumlPromptsTaskTest {
+class GeneratePlantumlDiagramsTaskTest {
 
     @TempDir
     lateinit var tempDir: File
@@ -37,7 +37,7 @@ class ProcessPlantumlPromptsTaskTest {
         .build()
 
     private lateinit var project: Project
-    private lateinit var task: ProcessPlantumlPromptsTask
+    private lateinit var task: GeneratePlantumlDiagramsTask
 
     @BeforeEach
     fun setup() {
@@ -46,7 +46,7 @@ class ProcessPlantumlPromptsTaskTest {
             .build()
         
         project.pluginManager.apply("com.cheroliv.plantuml")
-        task = project.tasks.getByName("processPlantumlPrompts") as ProcessPlantumlPromptsTask
+        task = project.tasks.getByName("generatePlantumlDiagrams") as GeneratePlantumlDiagramsTask
         
         // Configure WireMock to return a valid response
         wireMock.stubFor(

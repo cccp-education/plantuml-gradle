@@ -8,8 +8,8 @@ import java.io.File
 
 class PlantUmlProcessingSteps(private val world: PlantumlWorld) {
 
-    @When("I run processPlantumlPrompts task with max {int} iterations")
-    fun runProcessPlantumlPromptsTaskWithMaxIterations(maxIterations: Int) = runBlocking {
+    @When("I run generatePlantumlDiagrams task with max {int} iterations")
+    fun runGeneratePlantumlDiagramsTaskWithMaxIterations(maxIterations: Int) = runBlocking {
         val properties = mutableMapOf<String, String>()
         world.mockServerPort?.let {
             properties["plantuml.langchain4j.model"] = "ollama"
@@ -25,7 +25,7 @@ class PlantUmlProcessingSteps(private val world: PlantumlWorld) {
         }
 
         try {
-            world.executeGradle("processPlantumlPrompts", properties = properties, systemProperties = systemProperties)
+            world.executeGradle("generatePlantumlDiagrams", properties = properties, systemProperties = systemProperties)
         } catch (e: Exception) {
             world.exception = e
         }

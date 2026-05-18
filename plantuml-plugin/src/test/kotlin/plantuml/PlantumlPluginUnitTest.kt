@@ -10,8 +10,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
 import plantuml.PlantumlPlugin.PlantumlExtension
-import plantuml.tasks.ProcessPlantumlPromptsTask
-import plantuml.tasks.ReindexPlantumlRagTask
+import plantuml.tasks.GeneratePlantumlDiagramsTask
+import plantuml.tasks.CollectPlantumlIndexTask
 import plantuml.tasks.ValidatePlantumlSyntaxTask
 import kotlin.test.assertNotNull
 import kotlin.test.assertEquals
@@ -59,9 +59,9 @@ class PlantumlPluginUnitTest {
         plugin.apply(project)
 
         // Then
-        verify(tasks).register("processPlantumlPrompts", ProcessPlantumlPromptsTask::class.java)
+        verify(tasks).register("generatePlantumlDiagrams", GeneratePlantumlDiagramsTask::class.java)
         verify(tasks).register("validatePlantumlSyntax", ValidatePlantumlSyntaxTask::class.java)
-        verify(tasks).register("reindexPlantumlRag", ReindexPlantumlRagTask::class.java)
+        verify(tasks).register("collectPlantumlIndex", CollectPlantumlIndexTask::class.java)
     }
 
     @Test

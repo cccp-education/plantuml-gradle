@@ -8,8 +8,8 @@ import plantuml.PlantumlManager.Configuration
 import plantuml.PlantumlManager.Extensions
 import plantuml.PlantumlManager.Tasks
 import plantuml.PlantumlPlugin.PlantumlExtension
-import plantuml.tasks.ProcessPlantumlPromptsTask
-import plantuml.tasks.ReindexPlantumlRagTask
+import plantuml.tasks.GeneratePlantumlDiagramsTask
+import plantuml.tasks.CollectPlantumlIndexTask
 import plantuml.tasks.ValidatePlantumlSyntaxTask
 import java.io.File
 import kotlin.test.assertEquals
@@ -127,9 +127,9 @@ class PlantumlManagerTest {
 
         Tasks.registerTasks(project)
 
-        assertNotNull(project.tasks.findByName("processPlantumlPrompts"))
+        assertNotNull(project.tasks.findByName("generatePlantumlDiagrams"))
         assertNotNull(project.tasks.findByName("validatePlantumlSyntax"))
-        assertNotNull(project.tasks.findByName("reindexPlantumlRag"))
+        assertNotNull(project.tasks.findByName("collectPlantumlIndex"))
     }
 
     @Test
@@ -140,9 +140,9 @@ class PlantumlManagerTest {
 
         Tasks.registerTasks(project)
 
-        assertTrue(project.tasks.findByName("processPlantumlPrompts") is ProcessPlantumlPromptsTask)
+        assertTrue(project.tasks.findByName("generatePlantumlDiagrams") is GeneratePlantumlDiagramsTask)
         assertTrue(project.tasks.findByName("validatePlantumlSyntax") is ValidatePlantumlSyntaxTask)
-        assertTrue(project.tasks.findByName("reindexPlantumlRag") is ReindexPlantumlRagTask)
+        assertTrue(project.tasks.findByName("collectPlantumlIndex") is CollectPlantumlIndexTask)
     }
 
     @Test

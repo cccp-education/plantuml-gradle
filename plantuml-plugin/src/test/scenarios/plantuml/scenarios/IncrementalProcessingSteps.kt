@@ -44,8 +44,8 @@ class IncrementalProcessingSteps(private val world: PlantumlWorld) {
         promptFile.setLastModified(System.currentTimeMillis() - 10000)
     }
 
-    @When("I run processPlantumlPrompts task again")
-    fun runProcessPlantumlPromptsTaskAgain() = runBlocking {
+    @When("I run generatePlantumlDiagrams task again")
+    fun runGeneratePlantumlDiagramsTaskAgain() = runBlocking {
         val properties = mutableMapOf<String, String>()
         world.mockServerPort?.let {
             properties["plantuml.langchain4j.model"] = "ollama"
@@ -59,7 +59,7 @@ class IncrementalProcessingSteps(private val world: PlantumlWorld) {
         properties["plantuml.test.mode"] = "true"
 
         try {
-            world.executeGradle("processPlantumlPrompts", properties = properties, systemProperties = systemProperties)
+            world.executeGradle("generatePlantumlDiagrams", properties = properties, systemProperties = systemProperties)
         } catch (e: Exception) {
             world.exception = e
         }
@@ -248,8 +248,8 @@ class IncrementalProcessingSteps(private val world: PlantumlWorld) {
         }
     }
 
-    @When("I run processPlantumlPrompts task with --rerun-tasks")
-    fun runProcessPlantumlPromptsTaskWithRerunTasks() = runBlocking {
+    @When("I run generatePlantumlDiagrams task with --rerun-tasks")
+    fun runGeneratePlantumlDiagramsTaskWithRerunTasks() = runBlocking {
         val properties = mutableMapOf<String, String>()
         world.mockServerPort?.let {
             properties["plantuml.langchain4j.model"] = "ollama"
@@ -263,7 +263,7 @@ class IncrementalProcessingSteps(private val world: PlantumlWorld) {
         properties["plantuml.test.mode"] = "true"
 
         try {
-            world.executeGradle("processPlantumlPrompts", "--rerun-tasks", properties = properties, systemProperties = systemProperties)
+            world.executeGradle("generatePlantumlDiagrams", "--rerun-tasks", properties = properties, systemProperties = systemProperties)
         } catch (e: Exception) {
             world.exception = e
         }

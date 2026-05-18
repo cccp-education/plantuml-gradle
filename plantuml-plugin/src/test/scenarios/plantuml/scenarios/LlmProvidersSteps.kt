@@ -78,8 +78,8 @@ class ClaudeDiagram
         // Fallback provider is configured via gradle properties in the When step
     }
 
-    @When("I run processPlantumlPrompts task with provider {string}")
-    fun runProcessPlantumlPromptsTaskWithProvider(provider: String) = runBlocking {
+    @When("I run generatePlantumlDiagrams task with provider {string}")
+    fun runGeneratePlantumlDiagramsTaskWithProvider(provider: String) = runBlocking {
         val properties = mutableMapOf<String, String>()
         world.mockServerPort?.let {
             // All providers use the mock Ollama server for fast isolated tests
@@ -94,11 +94,11 @@ class ClaudeDiagram
         }
         properties["plantuml.test.mode"] = "true"
 
-        world.executeGradle("processPlantumlPrompts", properties = properties, systemProperties = systemProperties)
+        world.executeGradle("generatePlantumlDiagrams", properties = properties, systemProperties = systemProperties)
     }
 
-    @When("I run processPlantumlPrompts task with provider {string} and model {string}")
-    fun runProcessPlantumlPromptsTaskWithProviderAndModel(provider: String, model: String) = runBlocking {
+    @When("I run generatePlantumlDiagrams task with provider {string} and model {string}")
+    fun runGeneratePlantumlDiagramsTaskWithProviderAndModel(provider: String, model: String) = runBlocking {
         val properties = mutableMapOf<String, String>()
         world.mockServerPort?.let {
             // All providers use the mock Ollama server for fast isolated tests
@@ -113,7 +113,7 @@ class ClaudeDiagram
         }
         properties["plantuml.test.mode"] = "true"
 
-        world.executeGradle("processPlantumlPrompts", properties = properties, systemProperties = systemProperties)
+        world.executeGradle("generatePlantumlDiagrams", properties = properties, systemProperties = systemProperties)
     }
 
     @Then("the generation should complete without API key")

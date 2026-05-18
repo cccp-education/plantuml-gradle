@@ -6,17 +6,17 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import plantuml.tasks.ReindexPlantumlRagTask
+import plantuml.tasks.CollectPlantumlIndexTask
 import java.io.File
 import kotlin.test.assertTrue
 
-class ReindexPlantumlRagIntegrationTest {
+class CollectPlantumlIndexIntegrationTest {
 
     @TempDir
     lateinit var tempDir: File
 
     private lateinit var project: Project
-    private lateinit var task: ReindexPlantumlRagTask
+    private lateinit var task: CollectPlantumlIndexTask
 
     @BeforeEach
     fun setup() {
@@ -28,7 +28,7 @@ class ReindexPlantumlRagIntegrationTest {
             .build()
 
         project.pluginManager.apply("com.cheroliv.plantuml")
-        task = project.tasks.getByName("reindexPlantumlRag") as ReindexPlantumlRagTask
+        task = project.tasks.getByName("collectPlantumlIndex") as CollectPlantumlIndexTask
     }
 
     @AfterEach

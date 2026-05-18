@@ -11,7 +11,7 @@ import java.io.File
 abstract class GenerateDiagramDocsTask : DefaultTask() {
 
     init {
-        group = "plantuml"
+        group = "generate"
         description = "Auto-generate PlantUML documentation diagrams from Graphify knowledge graph"
     }
 
@@ -57,7 +57,7 @@ abstract class GenerateDiagramDocsTask : DefaultTask() {
         }
 
         logger.lifecycle(
-            "Generated {} prompt(s). Run 'processPlantumlPrompts' to render diagrams.",
+            "Generated {} prompt(s). Run 'generatePlantumlDiagrams' to render diagrams.",
             results.size
         )
     }

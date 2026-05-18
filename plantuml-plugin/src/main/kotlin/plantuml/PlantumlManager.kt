@@ -5,8 +5,8 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import org.gradle.api.Project
 import plantuml.PlantumlPlugin.PlantumlExtension
-import plantuml.tasks.ProcessPlantumlPromptsTask
-import plantuml.tasks.ReindexPlantumlRagTask
+import plantuml.tasks.GeneratePlantumlDiagramsTask
+import plantuml.tasks.CollectPlantumlIndexTask
 import plantuml.tasks.ValidatePlantumlSyntaxTask
 import plantuml.tasks.GenerateDiagramDocsTask
 import plantuml.tasks.GenerateKnowledgeGraphDiagramTask
@@ -80,9 +80,9 @@ object PlantumlManager {
      */
     object Tasks {
         fun registerTasks(project: Project) {
-            project.tasks.register("processPlantumlPrompts", ProcessPlantumlPromptsTask::class.java)
+            project.tasks.register("generatePlantumlDiagrams", GeneratePlantumlDiagramsTask::class.java)
             project.tasks.register("validatePlantumlSyntax", ValidatePlantumlSyntaxTask::class.java)
-            project.tasks.register("reindexPlantumlRag", ReindexPlantumlRagTask::class.java)
+            project.tasks.register("collectPlantumlIndex", CollectPlantumlIndexTask::class.java)
             project.tasks.register("generateDiagramDocs", GenerateDiagramDocsTask::class.java)
             project.tasks.register("generateKnowledgeGraphDiagram", GenerateKnowledgeGraphDiagramTask::class.java)
         }

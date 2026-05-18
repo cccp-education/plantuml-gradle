@@ -9,7 +9,7 @@ import java.nio.file.Path
 enum class ProcessResult { SUCCESS, SKIPPED, FAILED }
 
 /**
- * Business logic for prompt processing, extracted from ProcessPlantumlPromptsTask.
+ * Business logic for prompt processing, extracted from GeneratePlantumlDiagramsTask.
  *
  * This class knows nothing about Gradle — it receives its dependencies via injection,
  * making it directly testable with JUnit without starting a Gradle process.

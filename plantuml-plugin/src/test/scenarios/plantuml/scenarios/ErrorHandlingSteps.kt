@@ -213,8 +213,8 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
         configFile.writeText(invalidYaml)
     }
 
-    @When("I run processPlantumlPrompts task with timeout {int} seconds")
-    fun runProcessPlantumlPromptsTaskWithTimeout(timeoutSeconds: Int) = runBlocking {
+    @When("I run generatePlantumlDiagrams task with timeout {int} seconds")
+    fun runGeneratePlantumlDiagramsTaskWithTimeout(timeoutSeconds: Int) = runBlocking {
         val properties = mutableMapOf<String, String>()
         properties["plantuml.langchain4j.model"] = "ollama"
         properties["plantuml.langchain4j.ollama.baseUrl"] = "http://localhost:9999"
@@ -227,14 +227,14 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
         }
 
         try {
-            world.executeGradle("processPlantumlPrompts", properties = properties, systemProperties = systemProperties)
+            world.executeGradle("generatePlantumlDiagrams", properties = properties, systemProperties = systemProperties)
         } catch (e: Exception) {
             world.exception = e
         }
     }
 
-    @When("I run reindexPlantumlRag task with port conflict simulation")
-    fun runReindexPlantumlRagTaskWithPortConflict() = runBlocking {
+    @When("I run collectPlantumlIndex task with port conflict simulation")
+    fun runCollectPlantumlIndexTaskWithPortConflict() = runBlocking {
         val properties = mutableMapOf<String, String>()
         val systemProperties = mutableMapOf<String, String>()
         world.projectDir?.let {
@@ -245,14 +245,14 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
         systemProperties["plantuml.test.simulate.port.conflict"] = "true"
 
         try {
-            world.executeGradle("reindexPlantumlRag", properties = properties, systemProperties = systemProperties)
+            world.executeGradle("collectPlantumlIndex", properties = properties, systemProperties = systemProperties)
         } catch (e: Exception) {
             world.exception = e
         }
     }
 
-    @When("I run processPlantumlPrompts task with invalid config")
-    fun runProcessPlantumlPromptsTaskWithInvalidConfig() = runBlocking {
+    @When("I run generatePlantumlDiagrams task with invalid config")
+    fun runGeneratePlantumlDiagramsTaskWithInvalidConfig() = runBlocking {
         val properties = mutableMapOf<String, String>()
         properties["plantuml.test.mode"] = "true"
         val systemProperties = mutableMapOf<String, String>()
@@ -266,7 +266,7 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
         }
 
         try {
-            world.executeGradle("processPlantumlPrompts", properties = properties, systemProperties = systemProperties)
+            world.executeGradle("generatePlantumlDiagrams", properties = properties, systemProperties = systemProperties)
         } catch (e: Exception) {
             world.exception = e
         }

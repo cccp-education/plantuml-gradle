@@ -3,6 +3,6 @@ plantuml = "1.2026.0"
 [libraries]
 
 [plugins]
-plantuml-plugin = { id = "com.cheroliv.plantuml", version.ref = "plantuml" }
+plantuml-plugin = { id = "education.cccp.plantuml", version.ref = "plantuml" }
 
 [bundles]

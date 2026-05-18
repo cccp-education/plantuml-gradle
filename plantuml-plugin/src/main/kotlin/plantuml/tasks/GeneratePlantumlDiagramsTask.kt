@@ -14,7 +14,7 @@ import plantuml.service.PlantumlService
 import java.io.File
 
 /**
- * Gradle task: `processPlantumlPrompts`
+ * Gradle task: `generatePlantumlDiagrams`
  *
  * Processes `.prompt` files to generate PlantUML diagrams through AI-powered LLM interaction.
  *
@@ -35,18 +35,18 @@ import java.io.File
  *
  * **Usage**:
  * ```bash
- * ./gradlew processPlantumlPrompts
+ * ./gradlew generatePlantumlDiagrams
  * ```
  */
 @DisableCachingByDefault(because = "PlantUML generation involves randomness and AI interaction")
-abstract class ProcessPlantumlPromptsTask : DefaultTask() {
+abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
 
     private val objectMapper: ObjectMapper = ObjectMapper()
         .registerModule(JavaTimeModule())
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
     init {
-        group = "plantuml"
+        group = "generate"
         description = "Process PlantUML prompts and generate diagrams with LLM assistance"
     }
 

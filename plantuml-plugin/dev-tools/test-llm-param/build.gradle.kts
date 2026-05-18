@@ -1,5 +1,5 @@
 plugins {
-    id("com.cheroliv.plantuml")
+    id("education.cccp.plantuml")
 }
 
 plantuml {

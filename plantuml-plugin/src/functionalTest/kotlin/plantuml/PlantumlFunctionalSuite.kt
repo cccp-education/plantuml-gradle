@@ -169,7 +169,7 @@ class PlantumlFunctionalSuite {
             // Initial config pointing to WireMock
             writeConfigYaml(model = "ollama")
 
-            // Directories required for processPlantumlPrompts
+            // Directories required for generatePlantumlDiagrams
             File(sharedProjectDir, "test-prompts").mkdirs()
             File(sharedProjectDir, "test-prompts/test.prompt")
                 .writeText("Create a simple class diagram with one class named Car")
@@ -279,16 +279,16 @@ class PlantumlFunctionalSuite {
 
             assertTrue(result.output.contains("BUILD SUCCESSFUL"))
             assertTrue(
-                result.output.contains("processPlantumlPrompts"),
-                "processPlantumlPrompts must be registered",
+                result.output.contains("generatePlantumlDiagrams"),
+                "generatePlantumlDiagrams must be registered",
             )
             assertTrue(
                 result.output.contains("validatePlantumlSyntax"),
                 "validatePlantumlSyntax must be registered",
             )
             assertTrue(
-                result.output.contains("reindexPlantumlRag"),
-                "reindexPlantumlRag must be registered",
+                result.output.contains("collectPlantumlIndex"),
+                "collectPlantumlIndex must be registered",
             )
         }
 
@@ -361,16 +361,16 @@ class PlantumlFunctionalSuite {
         @Tag("quick")
         fun `dry-run should list all plantuml tasks without executing them`() {
             val result = runner(
-                "processPlantumlPrompts",
+                "generatePlantumlDiagrams",
                 "validatePlantumlSyntax",
-                "reindexPlantumlRag",
+                "collectPlantumlIndex",
                 "--dry-run",
                 "--console=plain",
             ).build()
 
-            assertTrue(result.output.contains("processPlantumlPrompts"))
+            assertTrue(result.output.contains("generatePlantumlDiagrams"))
             assertTrue(result.output.contains("validatePlantumlSyntax"))
-            assertTrue(result.output.contains("reindexPlantumlRag"))
+            assertTrue(result.output.contains("collectPlantumlIndex"))
         }
     }
 
@@ -409,7 +409,7 @@ class PlantumlFunctionalSuite {
             writeConfigYaml(model = "ollama")
 
             val result = runner(
-                "processPlantumlPrompts",
+                "generatePlantumlDiagrams",
                 "-Dplantuml.test.mode=true",
                 "--stacktrace",
             ).build()
@@ -436,7 +436,7 @@ class PlantumlFunctionalSuite {
         fun `should handle Gemini configuration and report meaningful auth error`() {
             writeConfigYaml(model = "gemini")
 
-            val result = runner("processPlantumlPrompts", "--stacktrace").buildAndFail()
+            val result = runner("generatePlantumlDiagrams", "--stacktrace").buildAndFail()
 
             assertTrue(
                 result.output.contains("401") ||
@@ -454,7 +454,7 @@ class PlantumlFunctionalSuite {
         fun `should handle Mistral configuration and report meaningful auth error`() {
             writeConfigYaml(model = "mistral")
 
-            val result = runner("processPlantumlPrompts", "--stacktrace").buildAndFail()
+            val result = runner("generatePlantumlDiagrams", "--stacktrace").buildAndFail()
 
             assertTrue(
                 result.output.contains("401") ||
@@ -472,7 +472,7 @@ class PlantumlFunctionalSuite {
         fun `should handle OpenAI configuration and report meaningful auth error`() {
             writeConfigYaml(model = "openai")
 
-            val result = runner("processPlantumlPrompts", "--stacktrace").buildAndFail()
+            val result = runner("generatePlantumlDiagrams", "--stacktrace").buildAndFail()
 
             assertTrue(
                 result.output.contains("401") ||
@@ -490,7 +490,7 @@ class PlantumlFunctionalSuite {
         fun `should handle Claude configuration and report meaningful auth error`() {
             writeConfigYaml(model = "claude")
 
-            val result = runner("processPlantumlPrompts", "--stacktrace").buildAndFail()
+            val result = runner("generatePlantumlDiagrams", "--stacktrace").buildAndFail()
 
             assertTrue(
                 result.output.contains("401") ||
@@ -508,7 +508,7 @@ class PlantumlFunctionalSuite {
         fun `should handle HuggingFace configuration and report meaningful auth error`() {
             writeConfigYaml(model = "huggingface")
 
-            val result = runner("processPlantumlPrompts", "--stacktrace").buildAndFail()
+            val result = runner("generatePlantumlDiagrams", "--stacktrace").buildAndFail()
 
             assertTrue(
                 result.output.contains("401") ||
@@ -526,7 +526,7 @@ class PlantumlFunctionalSuite {
         fun `should handle Groq configuration and report meaningful auth error`() {
             writeConfigYaml(model = "groq")
 
-            val result = runner("processPlantumlPrompts", "--stacktrace").buildAndFail()
+            val result = runner("generatePlantumlDiagrams", "--stacktrace").buildAndFail()
 
             assertTrue(
                 result.output.contains("401") ||
@@ -546,7 +546,7 @@ class PlantumlFunctionalSuite {
             writeConfigYaml(model = "ollama")
 
             val result = runner(
-                "processPlantumlPrompts",
+                "generatePlantumlDiagrams",
                 "-Dplantuml.test.mode=true",
                 "--stacktrace",
             ).build()
@@ -593,9 +593,9 @@ class PlantumlFunctionalSuite {
         @Tag("quick")
         fun `tasks --all should list all plantuml tasks`() {
             val result = runner("tasks", "--all", "--console=plain").build()
-            assertTrue(result.output.contains("processPlantumlPrompts"))
+            assertTrue(result.output.contains("generatePlantumlDiagrams"))
             assertTrue(result.output.contains("validatePlantumlSyntax"))
-            assertTrue(result.output.contains("reindexPlantumlRag"))
+            assertTrue(result.output.contains("collectPlantumlIndex"))
         }
 
         /** SharedGradleInstanceFunctionalTest.test03 */
@@ -676,9 +676,9 @@ class PlantumlFunctionalSuite {
         @Tag("quick")
         fun `should register all three tasks`() {
             val result = runner("tasks", "--all").build()
-            assertTrue(result.output.contains("processPlantumlPrompts"))
+            assertTrue(result.output.contains("generatePlantumlDiagrams"))
             assertTrue(result.output.contains("validatePlantumlSyntax"))
-            assertTrue(result.output.contains("reindexPlantumlRag"))
+            assertTrue(result.output.contains("collectPlantumlIndex"))
         }
 
         @Test
@@ -686,12 +686,12 @@ class PlantumlFunctionalSuite {
         @Tag("quick")
         fun `dry-run should list all tasks without failing`() {
             val result = runner(
-                "processPlantumlPrompts",
+                "generatePlantumlDiagrams",
                 "validatePlantumlSyntax",
-                "reindexPlantumlRag",
+                "collectPlantumlIndex",
                 "--dry-run",
             ).build()
-            assertTrue(result.output.contains("processPlantumlPrompts"))
+            assertTrue(result.output.contains("generatePlantumlDiagrams"))
         }
 
         @Test
@@ -746,10 +746,10 @@ class PlantumlFunctionalSuite {
         @Tag("slow")
         fun `should succeed with pre-existing rag directory`() {
             val result = runner(
-                "reindexPlantumlRag",
+                "collectPlantumlIndex",
                 "-Dplantuml.test.mode=true",
             ).build()
-            assertEquals(SUCCESS, result.task(":reindexPlantumlRag")?.outcome)
+            assertEquals(SUCCESS, result.task(":collectPlantumlIndex")?.outcome)
             assertTrue(
                 result.output.contains("Found") ||
                         result.output.contains("Indexed") ||
@@ -792,8 +792,8 @@ class PlantumlFunctionalSuite {
             val freshRag = File(subDir, "fresh-rag")
             if (freshRag.exists()) freshRag.deleteRecursively()
 
-            val result = runner("reindexPlantumlRag", "-Dplantuml.test.mode=true").build()
-            assertEquals(SUCCESS, result.task(":reindexPlantumlRag")?.outcome)
+            val result = runner("collectPlantumlIndex", "-Dplantuml.test.mode=true").build()
+            assertEquals(SUCCESS, result.task(":collectPlantumlIndex")?.outcome)
         }
 
         @Test
@@ -804,10 +804,10 @@ class PlantumlFunctionalSuite {
             File(ragDir, "extra1.puml").writeText("@startuml\nclass Extra1\n@enduml")
             File(ragDir, "extra2.puml").writeText("@startuml\nclass Extra2\n@enduml")
             val result = runner(
-                "reindexPlantumlRag",
+                "collectPlantumlIndex",
                 "-Dplantuml.test.mode=true",
             ).build()
-            assertEquals(SUCCESS, result.task(":reindexPlantumlRag")?.outcome)
+            assertEquals(SUCCESS, result.task(":collectPlantumlIndex")?.outcome)
         }
 
         @Test
@@ -815,11 +815,11 @@ class PlantumlFunctionalSuite {
         @Tag("slow")
         fun `should complete in test mode without calling real llm`() {
             val result = runner(
-                "processPlantumlPrompts",
+                "generatePlantumlDiagrams",
                 "-Dplantuml.test.mode=true",
                 "--stacktrace",
             ).build()
-            assertEquals(SUCCESS, result.task(":processPlantumlPrompts")?.outcome)
+            assertEquals(SUCCESS, result.task(":generatePlantumlDiagrams")?.outcome)
             assertTrue(result.output.contains("Processing 1 prompt files"))
         }
 
@@ -828,11 +828,11 @@ class PlantumlFunctionalSuite {
         @Tag("slow")
         fun `command-line model parameter should override config`() {
             val result = runner(
-                "processPlantumlPrompts",
+                "generatePlantumlDiagrams",
                 "-Pplantuml.langchain4j.model=ollama",
                 "-Dplantuml.test.mode=true",
             ).build()
-            assertEquals(SUCCESS, result.task(":processPlantumlPrompts")?.outcome)
+            assertEquals(SUCCESS, result.task(":generatePlantumlDiagrams")?.outcome)
             assertTrue(!result.output.contains("Invalid model configuration"))
         }
 
@@ -851,8 +851,8 @@ class PlantumlFunctionalSuite {
             File(subDir, "ctx.yml").writeText("input:\n  prompts: \"empty-prompts\"")
             File(subDir, "empty-prompts").mkdirs()
 
-            val result = runner("processPlantumlPrompts", "-Dplantuml.test.mode=true").build()
-            assertEquals(SUCCESS, result.task(":processPlantumlPrompts")?.outcome)
+            val result = runner("generatePlantumlDiagrams", "-Dplantuml.test.mode=true").build()
+            assertEquals(SUCCESS, result.task(":generatePlantumlDiagrams")?.outcome)
         }
     }
 
@@ -1005,7 +1005,7 @@ class PlantumlFunctionalSuite {
 
             val result = GradleRunner.create()
                 .withProjectDir(sharedProjectDir)
-                .withArguments("reindexPlantumlRag", "-Dplantuml.test.mode=true")
+                .withArguments("collectPlantumlIndex", "-Dplantuml.test.mode=true")
                 .withPluginClasspath()
                 .build()
 
@@ -1031,7 +1031,7 @@ class PlantumlFunctionalSuite {
 
             val result = GradleRunner.create()
                 .withProjectDir(sharedProjectDir)
-                .withArguments("reindexPlantumlRag", "-Dplantuml.test.mode=true")
+                .withArguments("collectPlantumlIndex", "-Dplantuml.test.mode=true")
                 .withPluginClasspath()
                 .build()
 
@@ -1162,7 +1162,7 @@ class PlantumlFunctionalSuite {
             File(deepPromptsDir, "deep.prompt").writeText("Create a diagram")
 
             try {
-                runner("processPlantumlPrompts").build()
+                runner("generatePlantumlDiagrams").build()
             } finally {
                 if (deepPromptsDir.exists()) deepPromptsDir.deleteRecursively()
             }
@@ -1248,7 +1248,7 @@ class PlantumlFunctionalSuite {
 
             try {
                 Thread.sleep(100)
-                val result = runner("processPlantumlPrompts").buildAndFail()
+                val result = runner("generatePlantumlDiagrams").buildAndFail()
 
                 assertTrue(
                     result.output.contains("timeout", ignoreCase = true) ||
@@ -1296,7 +1296,7 @@ class PlantumlFunctionalSuite {
                 writeText("Create a simple class diagram")
             }
 
-            val result = runner("processPlantumlPrompts").buildAndFail()
+            val result = runner("generatePlantumlDiagrams").buildAndFail()
 
             assertTrue(
                 result.output.contains("Connection refused") ||
@@ -1334,7 +1334,7 @@ class PlantumlFunctionalSuite {
                 writeText("Create a simple class diagram")
             }
 
-            val result = runner("processPlantumlPrompts", "--stacktrace").buildAndFail()
+            val result = runner("generatePlantumlDiagrams", "--stacktrace").buildAndFail()
 
             assertTrue(
                 result.output.contains("UnresolvedAddressException") ||
@@ -1434,9 +1434,9 @@ class PlantumlFunctionalSuite {
             File(sharedProjectDir, "test-prompts/minimal.prompt").writeText("Simple diagram")
 
             val duration = kotlin.system.measureTimeMillis {
-                val result = runner("processPlantumlPrompts").build()
+                val result = runner("generatePlantumlDiagrams").build()
 
-                assertTrue(result.output.contains("processPlantumlPrompts"), "Task should run")
+                assertTrue(result.output.contains("generatePlantumlDiagrams"), "Task should run")
                 assertTrue(result.output.contains("BUILD SUCCESSFUL"), "Build should succeed")
             }
 
@@ -1544,9 +1544,9 @@ class PlantumlFunctionalSuite {
             File(sharedProjectDir, "min/x.prompt").writeText("Y")
 
             val duration = kotlin.system.measureTimeMillis {
-                val result = runner("processPlantumlPrompts").build()
+                val result = runner("generatePlantumlDiagrams").build()
 
-                assertTrue(result.output.contains("processPlantumlPrompts"), "Should run")
+                assertTrue(result.output.contains("generatePlantumlDiagrams"), "Should run")
                 assertTrue(result.output.contains("BUILD SUCCESSFUL"), "Build should succeed")
             }
 
@@ -1666,7 +1666,7 @@ class PlantumlFunctionalSuite {
             @Test
             @Ignore("Requires real Ollama model for prompt processing")
             fun `should generate a valid puml file from a real prompt`() {
-                val result = runner("processPlantumlPrompts").build()
+                val result = runner("generatePlantumlDiagrams").build()
 
                 val diagramsDir = File(sharedProjectDir, "generated/diagrams")
                 val generated = diagramsDir.listFiles { f -> f.extension == "puml" } ?: emptyArray()
@@ -1711,7 +1711,7 @@ class PlantumlFunctionalSuite {
 
                 val result = GradleRunner.create()
                     .withProjectDir(subDir)
-                    .withArguments("processPlantumlPrompts", "--stacktrace")
+                    .withArguments("generatePlantumlDiagrams", "--stacktrace")
                     .withPluginClasspath()
                     .buildAndFail()
 
@@ -1762,7 +1762,7 @@ class PlantumlFunctionalSuite {
     }
 
     // ==================================================================== //
-    //  Nested 10 : RAG task (ex-ReindexPlantumlRagTaskTest)                //
+    //  Nested 10 : RAG task (ex-CollectPlantumlIndex)                //
     // ==================================================================== //
 
     @Nested
@@ -1824,16 +1824,16 @@ class PlantumlFunctionalSuite {
                 createDiagramFile("diagram$i.puml", "@startuml\nclass Class$i\n@enduml")
             }
 
-            val result = runner("reindexPlantumlRag", "--stacktrace").build()
+            val result = runner("collectPlantumlIndex", "--stacktrace").build()
 
-            assertEquals(SUCCESS, result.task(":reindexPlantumlRag")?.outcome)
+            assertEquals(SUCCESS, result.task(":collectPlantumlIndex")?.outcome)
             assertTrue(result.output.contains("→ Found 5 PlantUML diagrams and 0 training histories for indexing"))
         }
 
         private fun testEmptyDirectory() {
-            val result = runner("reindexPlantumlRag", "--info").build()
+            val result = runner("collectPlantumlIndex", "--info").build()
 
-            assertEquals(SUCCESS, result.task(":reindexPlantumlRag")?.outcome)
+            assertEquals(SUCCESS, result.task(":collectPlantumlIndex")?.outcome)
             assertTrue(
                 result.output.contains("RAG") ||
                         result.output.contains("No PlantUML") ||
@@ -1847,9 +1847,9 @@ class PlantumlFunctionalSuite {
             createDiagramFile("valid.puml", "@startuml\nclass ValidClass\n@enduml")
             createDiagramFile("invalid.puml", "@startuml\nclass InvalidClass\n# This is invalid PlantUML syntax")
 
-            val result = runner("reindexPlantumlRag", "--info").build()
+            val result = runner("collectPlantumlIndex", "--info").build()
 
-            assertEquals(SUCCESS, result.task(":reindexPlantumlRag")?.outcome)
+            assertEquals(SUCCESS, result.task(":collectPlantumlIndex")?.outcome)
         }
 
         private fun testSubdirectories() {
@@ -1864,9 +1864,9 @@ class PlantumlFunctionalSuite {
             File(subdir1, "sub1.puml").writeText("@startuml\nclass Sub1\n@enduml")
             File(subdir2, "sub2.puml").writeText("@startuml\nclass Sub2\n@enduml")
 
-            val result = runner("reindexPlantumlRag", "--info").build()
+            val result = runner("collectPlantumlIndex", "--info").build()
 
-            assertEquals(SUCCESS, result.task(":reindexPlantumlRag")?.outcome)
+            assertEquals(SUCCESS, result.task(":collectPlantumlIndex")?.outcome)
         }
 
         private fun testEmptyFiles() {
@@ -1875,9 +1875,9 @@ class PlantumlFunctionalSuite {
             createDiagramFile("empty.puml", "")
             createDiagramFile("valid.puml", "@startuml\nclass Valid\n@enduml")
 
-            val result = runner("reindexPlantumlRag", "--info").build()
+            val result = runner("collectPlantumlIndex", "--info").build()
 
-            assertEquals(SUCCESS, result.task(":reindexPlantumlRag")?.outcome)
+            assertEquals(SUCCESS, result.task(":collectPlantumlIndex")?.outcome)
         }
 
         @Test
@@ -1887,9 +1887,9 @@ class PlantumlFunctionalSuite {
             createRagDirectory()
             createDiagramFile("test.puml", "@startuml\nclass TestContainer\n@enduml")
 
-            val result = runner("reindexPlantumlRag", "-Prag.mode=testcontainers").build()
+            val result = runner("collectPlantumlIndex", "-Prag.mode=testcontainers").build()
 
-            assertEquals(SUCCESS, result.task(":reindexPlantumlRag")?.outcome)
+            assertEquals(SUCCESS, result.task(":collectPlantumlIndex")?.outcome)
             assertTrue(result.output.contains("Using testcontainers PostgreSQL"))
             assertTrue(result.output.contains("PostgreSQL container started"))
         }
@@ -1913,7 +1913,7 @@ class PlantumlFunctionalSuite {
             createRagDirectory()
             createDiagramFile("test.puml", "@startuml\nclass DatabaseMode\n@enduml")
 
-            val result = runner("reindexPlantumlRag").buildAndFail()
+            val result = runner("collectPlantumlIndex").buildAndFail()
 
             assertTrue(result.output.contains("BUILD FAILED") || result.output.contains("FAILURE"))
         }
@@ -1925,7 +1925,7 @@ class PlantumlFunctionalSuite {
             createRagDirectory()
             createDiagramFile("test.puml", "@startuml\nclass Fallback\n@enduml")
 
-            val result = runner("reindexPlantumlRag", "-Prag.mode=database", "-Pplantuml.rag.databaseUrl=invalid-host", "-Pplantuml.rag.username=invalid", "-Pplantuml.rag.password=invalid").buildAndFail()
+            val result = runner("collectPlantumlIndex", "-Prag.mode=database", "-Pplantuml.rag.databaseUrl=invalid-host", "-Pplantuml.rag.username=invalid", "-Pplantuml.rag.password=invalid").buildAndFail()
 
             assertTrue(result.output.contains("BUILD FAILED") || result.output.contains("FAILURE"))
         }
@@ -1936,9 +1936,9 @@ class PlantumlFunctionalSuite {
             createRagDirectory()
             createDiagramFile("test.puml", "@startuml\nclass Simulation\n@enduml")
 
-            val result = runner("reindexPlantumlRag").build()
+            val result = runner("collectPlantumlIndex").build()
 
-            assertEquals(SUCCESS, result.task(":reindexPlantumlRag")?.outcome)
+            assertEquals(SUCCESS, result.task(":collectPlantumlIndex")?.outcome)
         }
     }
 
@@ -2007,12 +2007,12 @@ class PlantumlFunctionalSuite {
                 .writeText("Create a simple class diagram")
 
             val result = runner(
-                "processPlantumlPrompts",
+                "generatePlantumlDiagrams",
                 "-Dplantuml.test.mode=true",
                 "--stacktrace",
             ).build()
 
-            assertEquals(SUCCESS, result.task(":processPlantumlPrompts")?.outcome)
+            assertEquals(SUCCESS, result.task(":generatePlantumlDiagrams")?.outcome)
             assertTrue(
                 result.output.contains("BUILD SUCCESSFUL") ||
                         result.output.contains("Processing") ||
@@ -2076,12 +2076,12 @@ class PlantumlFunctionalSuite {
                 .writeText("Create a class diagram with rotation test")
 
             val result = runner(
-                "processPlantumlPrompts",
+                "generatePlantumlDiagrams",
                 "-Dplantuml.test.mode=true",
                 "--stacktrace",
             ).build()
 
-            assertEquals(SUCCESS, result.task(":processPlantumlPrompts")?.outcome)
+            assertEquals(SUCCESS, result.task(":generatePlantumlDiagrams")?.outcome)
             assertTrue(
                 wireMockServer.allServeEvents.size >= 1,
                 "WireMock doit avoir reçu au moins 1 requête pour la rotation",
@@ -2138,12 +2138,12 @@ class PlantumlFunctionalSuite {
                 .writeText("Create a diagram with fallback test")
 
             val result = runner(
-                "processPlantumlPrompts",
+                "generatePlantumlDiagrams",
                 "-Dplantuml.test.mode=true",
                 "--stacktrace",
             ).build()
 
-            assertEquals(SUCCESS, result.task(":processPlantumlPrompts")?.outcome)
+            assertEquals(SUCCESS, result.task(":generatePlantumlDiagrams")?.outcome)
         }
 
         @Test
@@ -2192,12 +2192,12 @@ class PlantumlFunctionalSuite {
                 .writeText("Create a diagram with logging test")
 
             val result = runner(
-                "processPlantumlPrompts",
+                "generatePlantumlDiagrams",
                 "-Dplantuml.test.mode=true",
                 "--info",
             ).build()
 
-            assertEquals(SUCCESS, result.task(":processPlantumlPrompts")?.outcome)
+            assertEquals(SUCCESS, result.task(":generatePlantumlDiagrams")?.outcome)
             assertTrue(
                 result.output.contains("Using API key") ||
                         result.output.contains("ollama-logged-key") ||
@@ -2270,12 +2270,12 @@ class PlantumlFunctionalSuite {
                 .writeText("Create a diagram with multi-provider config")
 
             val result = runner(
-                "processPlantumlPrompts",
+                "generatePlantumlDiagrams",
                 "-Dplantuml.test.mode=true",
                 "--stacktrace",
             ).build()
 
-            assertEquals(SUCCESS, result.task(":processPlantumlPrompts")?.outcome)
+            assertEquals(SUCCESS, result.task(":generatePlantumlDiagrams")?.outcome)
             assertTrue(
                 result.output.contains("BUILD SUCCESSFUL") ||
                         result.output.contains("Processing") ||
@@ -2344,12 +2344,12 @@ class PlantumlFunctionalSuite {
                 .writeText("Create a diagram with quota test")
 
             val result = runner(
-                "processPlantumlPrompts",
+                "generatePlantumlDiagrams",
                 "-Dplantuml.test.mode=true",
                 "--stacktrace",
             ).build()
 
-            assertEquals(SUCCESS, result.task(":processPlantumlPrompts")?.outcome)
+            assertEquals(SUCCESS, result.task(":generatePlantumlDiagrams")?.outcome)
             assertTrue(
                 result.output.contains("quota") ||
                         result.output.contains("Processing") ||

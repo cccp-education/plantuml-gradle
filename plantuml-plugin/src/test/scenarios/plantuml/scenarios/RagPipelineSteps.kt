@@ -160,8 +160,8 @@ class RagPipelineSteps(private val world: PlantumlWorld) {
         configPath.writeText(updatedConfig)
     }
 
-    @When("I run reindexPlantumlRag task")
-    fun runReindexPlantumlRagTask() = runBlocking {
+    @When("I run collectPlantumlIndex task")
+    fun runCollectPlantumlIndexTask() = runBlocking {
         val properties = mutableMapOf<String, String>()
         pgvectorContainer?.let {
             properties["plantuml.rag.databaseUrl"] = "localhost"
@@ -176,7 +176,7 @@ class RagPipelineSteps(private val world: PlantumlWorld) {
         }
         properties["plantuml.test.mode"] = "true"
 
-        world.executeGradle("reindexPlantumlRag", properties = properties, systemProperties = systemProperties)
+        world.executeGradle("collectPlantumlIndex", properties = properties, systemProperties = systemProperties)
     }
 
     @Then("embeddings should be stored in pgvector")

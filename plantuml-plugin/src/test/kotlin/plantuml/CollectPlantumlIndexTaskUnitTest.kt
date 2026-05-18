@@ -5,23 +5,23 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
-import plantuml.tasks.ReindexPlantumlRagTask
+import plantuml.tasks.CollectPlantumlIndexTask
 import java.io.File
 import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 /**
- * Unit tests for ReindexPlantumlRagTask
+ * Unit tests for CollectPlantumlIndexTask
  * 
  * Tests the RAG re-indexing task (simulation mode, without database)
  */
-class ReindexPlantumlRagTaskUnitTest {
+class CollectPlantumlIndexTaskUnitTest {
 
     @TempDir
     lateinit var tempDir: File
 
     private lateinit var project: Project
-    private lateinit var task: ReindexPlantumlRagTask
+    private lateinit var task: CollectPlantumlIndexTask
 
     @BeforeEach
     fun setup() {
@@ -29,7 +29,7 @@ class ReindexPlantumlRagTaskUnitTest {
             .withProjectDir(tempDir)
             .build()
 
-        task = project.tasks.register("reindexPlantumlRag", ReindexPlantumlRagTask::class.java).get()
+        task = project.tasks.register("collectPlantumlIndex", CollectPlantumlIndexTask::class.java).get()
     }
 
     @Test

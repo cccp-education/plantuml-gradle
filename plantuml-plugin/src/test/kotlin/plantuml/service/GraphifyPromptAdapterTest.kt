@@ -122,7 +122,7 @@ class GraphifyPromptAdapterTest {
         val communities = listOf(
             mapOf(
                 "name" to "task layer",
-                "nodes" to listOf("ProcessPlantumlPromptsTask", "ValidatePlantumlSyntaxTask"),
+                "nodes" to listOf("GeneratePlantumlDiagramsTask", "ValidatePlantumlSyntaxTask"),
                 "edges" to emptyList<String>()
             )
         )

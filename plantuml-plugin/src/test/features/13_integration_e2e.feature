@@ -13,9 +13,9 @@ Feature: End-to-End Integration Tests
       - Notification service
       Show the relationships and data flow between services.
       """
-    When I run processPlantumlPrompts task with provider "ollama"
+    When I run generatePlantumlDiagrams task with provider "ollama"
     And I run validatePlantumlSyntax task
-    And I run reindexPlantumlRag task
+    And I run collectPlantumlIndex task
     Then a valid PlantUML diagram should be generated
     And a PNG image should be created
     And embeddings should be stored in pgvector
@@ -25,9 +25,9 @@ Feature: End-to-End Integration Tests
   Scenario: Switch between multiple LLM providers
     Given prompts configured for different providers
     And API keys are configured for OpenAI and Gemini
-    When I run processPlantumlPrompts with provider "ollama"
-    And I run processPlantumlPrompts with provider "openai"
-    And I run processPlantumlPrompts with provider "gemini"
+    When I run generatePlantumlDiagrams with provider "ollama"
+    And I run generatePlantumlDiagrams with provider "openai"
+    And I run generatePlantumlDiagrams with provider "gemini"
     Then all three executions should succeed
     And each should use the correct provider
     And outputs should be in separate directories
@@ -45,7 +45,7 @@ Feature: End-to-End Integration Tests
   Scenario: Handle plugin version upgrade
     Given a project was built with plugin version 0.0.4
     When the project is upgraded to version 0.0.5
-    And processPlantumlPrompts task is run
+    And generatePlantumlDiagrams task is run
     Then the upgrade should complete without errors
     And existing outputs should be preserved or migrated
     And new features should be available

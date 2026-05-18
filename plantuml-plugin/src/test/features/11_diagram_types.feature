@@ -7,7 +7,7 @@ Feature: Diagram Types
       """
       Create a sequence diagram showing user login flow
       """
-    When I run processPlantumlPrompts task
+    When I run generatePlantumlDiagrams task
     Then the generated PlantUML should use sequence diagram syntax
     And contain "participant" or "actor" keywords
 
@@ -17,7 +17,7 @@ Feature: Diagram Types
       """
       Create a class diagram for a library management system
       """
-    When I run processPlantumlPrompts task
+    When I run generatePlantumlDiagrams task
     Then the generated PlantUML should use class diagram syntax
     And contain "class" definitions with relationships
 
@@ -27,7 +27,7 @@ Feature: Diagram Types
       """
       Create a component diagram for microservices architecture
       """
-    When I run processPlantumlPrompts task
+    When I run generatePlantumlDiagrams task
     Then the generated PlantUML should use component diagram syntax
     And contain "component" or "[component]" notation
 
@@ -37,7 +37,7 @@ Feature: Diagram Types
       """
       Create a use case diagram for an e-commerce system
       """
-    When I run processPlantumlPrompts task
+    When I run generatePlantumlDiagrams task
     Then the generated PlantUML should use use case diagram syntax
     And contain "usecase" and "actor" definitions
 
@@ -47,7 +47,7 @@ Feature: Diagram Types
       """
       Create an activity diagram for order processing workflow
       """
-    When I run processPlantumlPrompts task
+    When I run generatePlantumlDiagrams task
     Then the generated PlantUML should use activity diagram syntax
     And contain "start", "stop", and activity nodes
 
@@ -57,7 +57,7 @@ Feature: Diagram Types
       """
       Create a state diagram for a traffic light system
       """
-    When I run processPlantumlPrompts task
+    When I run generatePlantumlDiagrams task
     Then the generated PlantUML should use state diagram syntax
     And contain state definitions and transitions
 
@@ -67,6 +67,6 @@ Feature: Diagram Types
       """
       Create a deployment diagram for cloud infrastructure
       """
-    When I run processPlantumlPrompts task
+    When I run generatePlantumlDiagrams task
     Then the generated PlantUML should use deployment diagram syntax
     And contain "node" and deployment artifacts

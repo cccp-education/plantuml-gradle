@@ -29,7 +29,7 @@ import java.io.File
 enum class RagMode { SIMULATION, DATABASE, TESTCONTAINERS }
 
 /**
- * Gradle task: `reindexPlantumlRag`
+ * Gradle task: `collectPlantumlIndex`
  *
  * Rebuilds the RAG (Retrieval-Augmented Generation) index from collected PlantUML diagrams.
  *
@@ -48,25 +48,25 @@ enum class RagMode { SIMULATION, DATABASE, TESTCONTAINERS }
  * **Configuration**:
  * ```bash
  * # CLI parameter (highest priority)
- * ./gradlew reindexPlantumlRag -Prag.mode=database
+ * ./gradlew collectPlantumlIndex -Prag.mode=database
  *
  * # Environment variable
- * RAG_MODE=database ./gradlew reindexPlantumlRag
+ * RAG_MODE=database ./gradlew collectPlantumlIndex
  *
  * # Gradle property
- * ./gradlew reindexPlantumlRag -Prag.mode=database
+ * ./gradlew collectPlantumlIndex -Prag.mode=database
  * ```
  *
  * **Usage**:
  * ```bash
- * ./gradlew reindexPlantumlRag
+ * ./gradlew collectPlantumlIndex
  * ```
  */
 @DisableCachingByDefault(because = "RAG indexing processes all files and results depend on current state")
-abstract class ReindexPlantumlRagTask : DefaultTask() {
+abstract class CollectPlantumlIndexTask : DefaultTask() {
 
     init {
-        group = "plantuml"
+        group = "collect"
         description = "Rebuilds the RAG index with collected PlantUML diagrams"
     }
 
@@ -89,7 +89,7 @@ abstract class ReindexPlantumlRagTask : DefaultTask() {
             val message = """
                 Failed to start pgvector container: port 5432 is already in use.
                 Suggestions:
-                - Use a different port: ./gradlew reindexPlantumlRag -Pplantuml.rag.port=5433
+                - Use a different port: ./gradlew collectPlantumlIndex -Pplantuml.rag.port=5433
                 - Stop existing PostgreSQL: sudo systemctl stop postgresql
                 - Check running containers: docker ps | grep postgres
             """.trimIndent()
@@ -331,7 +331,7 @@ abstract class ReindexPlantumlRagTask : DefaultTask() {
                 val message = """
                     Failed to start pgvector container: port 5432 is already in use.
                     Suggestions:
-                    - Use a different port: ./gradlew reindexPlantumlRag -Pplantuml.rag.port=5433
+                    - Use a different port: ./gradlew collectPlantumlIndex -Pplantuml.rag.port=5433
                     - Stop existing PostgreSQL: sudo systemctl stop postgresql
                     - Check running containers: docker ps | grep postgres
                 """.trimIndent()

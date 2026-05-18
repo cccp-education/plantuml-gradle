@@ -28,6 +28,7 @@ langchain4j = "1.14.1"
 langchain4j-beta = "1.14.1-beta24"
 docker-java = "3.7.0"
 testcontainers-pg = "1.21.4"
+codebase = "0.0.1"
 logback = "1.5.32"
 groovy = "4.0.29"
 groovy-nio = "4.0.29"
@@ -91,11 +92,12 @@ wiremock = { module = "org.wiremock:wiremock", version.ref = "wiremock" }
 
 
 [plugins]
-#readme = { id = "com.cheroliv.readme", version.ref = "readme" }
+#readme = { id = "education.cccp.readme", version.ref = "readme" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 publish = { id = "com.gradle.plugin-publish", version.ref = "plugin-publish" }
-plantuml = { id = "com.cheroliv.plantuml", version.ref = "plantuml" }
+plantuml = { id = "education.cccp.plantuml", version.ref = "plantuml" }
 kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
+codebase = { id = "education.cccp.codebase", version.ref = "codebase" }
 
 
 [bundles]

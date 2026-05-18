@@ -123,8 +123,8 @@ class PlantumlRealLlmFunctionalTest {
         @Test
         @DisplayName("should generate a valid .puml file from a class-diagram prompt")
         fun `generate class diagram`() {
-            val result = gradleRunner("processPlantumlPrompts").build()
-            assertTrue(result.task(":processPlantumlPrompts")?.outcome == SUCCESS)
+            val result = gradleRunner("generatePlantumlDiagrams").build()
+            assertTrue(result.task(":generatePlantumlDiagrams")?.outcome == SUCCESS)
 
             val diagrams = projectDir.resolve("generated/diagrams")
             val pumls = diagrams.listFiles { f -> f.extension == "puml" } ?: emptyArray()
@@ -159,8 +159,8 @@ class PlantumlRealLlmFunctionalTest {
         @Test
         @DisplayName("should generate a valid .puml sequence diagram")
         fun `generate sequence diagram`() {
-            val result = gradleRunner("processPlantumlPrompts").build()
-            assertTrue(result.task(":processPlantumlPrompts")?.outcome == SUCCESS)
+            val result = gradleRunner("generatePlantumlDiagrams").build()
+            assertTrue(result.task(":generatePlantumlDiagrams")?.outcome == SUCCESS)
 
             val diagrams = projectDir.resolve("generated/diagrams")
             val pumls = diagrams.listFiles { f -> f.extension == "puml" } ?: emptyArray()
@@ -194,8 +194,8 @@ class PlantumlRealLlmFunctionalTest {
         @Test
         @DisplayName("should generate a valid .puml use-case diagram")
         fun `generate use-case diagram`() {
-            val result = gradleRunner("processPlantumlPrompts").build()
-            assertTrue(result.task(":processPlantumlPrompts")?.outcome == SUCCESS)
+            val result = gradleRunner("generatePlantumlDiagrams").build()
+            assertTrue(result.task(":generatePlantumlDiagrams")?.outcome == SUCCESS)
 
             val diagrams = projectDir.resolve("generated/diagrams")
             val pumls = diagrams.listFiles { f -> f.extension == "puml" } ?: emptyArray()
