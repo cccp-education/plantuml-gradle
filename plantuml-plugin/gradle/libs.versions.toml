@@ -15,7 +15,7 @@ junit-platform-launcher = "1.10.2"
 junit-platform-params = "6.0.3"
 mockito-kotlin = "6.2.3"
 mockito-jupiter = "5.23.0"
-gradle = "9.4.0"
+gradle = "9.5.1"
 assertj = "3.27.7"
 plugin-publish = "2.1.0"
 cucumber = "7.34.3"
@@ -33,7 +33,7 @@ logback = "1.5.32"
 groovy = "4.0.29"
 groovy-nio = "4.0.29"
 wiremock = "3.9.1"
-kover = "0.9.1"
+kover = "0.9.8"
 
 [libraries]
 
