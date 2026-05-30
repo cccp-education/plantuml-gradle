@@ -1,3 +1,13 @@
+// ── buildscript resolutionStrategy ────────────────────────────────────────────────
+// Gradle 9.5.1 pinne annotations:13.0 (Kotlin embedded) en strictly.
+// koog-agents 0.8.0 → koog-utils/koog-http-client-core/koog-prompt-llm →
+// annotations:26.0.2-1. Codebase-plugin exclut koog-agents mais les sous-modules
+// koog transitifs contournent l'exclusion. Solution : forcer annotations:26.0.2-1.
+buildscript {
+    repositories { mavenLocal(); mavenCentral() }
+    configurations.all { resolutionStrategy { force("org.jetbrains:annotations:26.0.2-1") } }
+}
+
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
 import org.gradle.plugin.compatibility.compatibility
 import java.time.Duration
