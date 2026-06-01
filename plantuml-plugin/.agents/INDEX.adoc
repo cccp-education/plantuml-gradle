@@ -3,7 +3,7 @@
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
 _Derniere mise a jour_ : 2026-05-19  
-_Session en cours_ : 146 — (à définir)  
+_Session en cours_ : 147 — (à définir)  
 _Session terminee_ : 145 — EPIC K-1 Renommage taxonomie (generatePlantumlDiagrams, collectPlantumlIndex)
 _Session terminee_ : 137 (EPIC 12 Clôture — BACKLOG + INDEX)  
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
@@ -137,6 +137,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 | 126 | 2026-04-22 | docs | Article blog fg (0104) + reflexion distillation IA | `126-blog-fg-command.adoc` | 9.0/10
 | 141 | 2026-05-07 | chore | Migration chemins foundry/ → foundry/OSS/ (granularisation OSS/CSS) | — | —
 | 144 | 2026-05-14 | infra | CI Template test.yml deploye, build OK, EPIC F cross-boroughs | `144-ci-template.adoc` | 10/10
+.1+^.^| 146 | 2026-06-02 | governance | Borough-isation — plantuml-gradle devient HTOWN 🚀, 23ème borough | `146-borough-isation-htown.adoc` | 10/10
 .1+^.^| 145 | 2026-05-19 | migration | EPIC K-1 Renommage taxonomie (generatePlantumlDiagrams, collectPlantumlIndex) — 18 fichiers modifiés, Build OK | `145-epic-k-k1-renommage-taxonomie.adoc` | 10/10
 |===
 

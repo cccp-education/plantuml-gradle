@@ -1,0 +1,31 @@
+= Session 146 — Borough-isation HTOWN 🚀
+:date: 2026-06-02
+:type: governance
+:score: 10/10
+:project: plantuml-gradle (HTOWN 🚀)
+:dashboard_number: 23
+
+== Contexte
+
+Borough-isation de plantuml-gradle dans le portefeuille workspace. Le projet `foundry/public/plantuml-gradle/` reçoit le borough HTOWN 🚀 et devient le 23ème borough gouverné.
+
+Cette session est purement gouvernance — aucun code source modifié.
+
+== Opérations réalisées
+
+. Création du rapport de session `146-borough-isation-htown.adoc`
+. Mise à jour `SESSIONS_HISTORY.adoc` — ajout session 146
+. Mise à jour `INDEX.adoc` — session en cours passe à 147
+
+== Artefacts modifiés
+
+|===
+| Fichier | Action
+| `.agents/sessions/146-borough-isation-htown.adoc` | Créé
+| `.agents/SESSIONS_HISTORY.adoc` | Mise à jour
+| `.agents/INDEX.adoc` | Mise à jour (session en cours → 147)
+|===
+
+== Résultat
+
+plantuml-gradle est désormais HTOWN 🚀, 23ème borough du workspace, N2 (génération PlantUML via LLM).
