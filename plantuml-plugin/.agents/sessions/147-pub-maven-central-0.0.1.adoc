@@ -1,0 +1,39 @@
+= Session 147 — Publication Maven Central 0.0.1
+:date: 2026-06-11
+:status: ✅ TERMINÉE
+
+== Contexte
+
+Publication du plugin plantuml-gradle sur Maven Central via nmcp.
+VAGUE 4.4 — HTOWN 🚀.
+
+== Changements réalisés
+
+* [x] Version `0.0.0` → `0.0.1` hardcodée dans `build.gradle.kts`
+* [x] Dépendance `codebase-plugin` → `0.0.2` (release Maven Central)
+* [x] POM sans guard — `withType<MavenPublication>` (pas seulement `pluginMaven`)
+  - nom, description, licence Apache 2.0, developer cccp-education, SCM
+* [x] Migration Sonatype staging → nmcp : `repositories { mavenCentral() }`
+* [x] `settings.gradle.kts` : plugin `com.gradleup.nmcp.settings` 1.5.0 +
+  `nmcpSettings { centralPortal { username/password depuis ~/.gradle/gradle.properties, publishingType = "AUTOMATIC" } }`
+* [x] `signing { useGpgCmd() }`
+* [x] Build vérifié : `./gradlew build -x functionalTest`
+
+== Publication
+
+`./gradlew publishAggregationToCentralPortal --no-daemon` — ✅ succès
+
+Artifact : `education.cccp:plantuml-gradle:0.0.1` sur Maven Central
+
+== Fichiers modifiés
+
+* `build.gradle.kts` — version 0.0.1, codebase 0.0.2, POM complet, nmcp, signing
+* `settings.gradle.kts` — nmcp plugin + nmcpSettings
+
+== Score
+
+9/10
+
+== Prochaine session (148)
+
+À définir — EPIC 13 Multi-provider API Pool, ou cleanup/tests.

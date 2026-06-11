@@ -1,21 +1,27 @@
-= PROMPT_REPRISE — Session 145 terminée (K-1)
+= PROMPT_REPRISE — Session 147 TERMINÉE (Publication Maven Central 0.0.1)
 
 == Mission accomplie
 
-Renommage taxonomie :
-- `processPlantumlPrompts`→`generatePlantumlDiagrams` (+ renommage classe)
-- `reindexPlantumlRag`→`collectPlantumlIndex` (+ renommage classe)
+Publication Maven Central réussie :
+- Version 0.0.1 hardcodée
+- codebase-contracts → 0.0.2
+- POM complet sans guard (withType<MavenPublication>)
+- Migration Sonatype → nmcp
+- settings.gradle.kts nmcp plugin 1.5.0
 
-18 fichiers modifiés. Build OK.
+Artifact `education.cccp:plantuml-gradle:0.0.1` publié sur Maven Central ✅
 
-== Prochaine mission (146)
+== Prochaine mission (148)
 
+À définir :
 - EPIC 13 — Multi-provider API Pool (tiers)
-- Ou K-2 — Format pivot metadata.json
-- Ou tests real-llm + cleanup warnings @Order
+- K-2 — Format pivot metadata.json
+- Tests real-llm + cleanup warnings @Order
+- CI workflow .github/workflows/test.yml
 
 == Rappels
 
-- GroupId: cccp.education.plantuml
-- Plugin ID: cccp.education.plantuml
+- GroupId: education.cccp.plantuml
+- Plugin ID: education.cccp.plantuml
+- Version publiée: 0.0.1 (Maven Central)
 - Procédure publishToMavenLocal après chaque modification du code source

@@ -1,0 +1,21 @@
+= Archive des Tâches Terminées — Juin 2026
+
+== Session 147 — 2026-06-11 — Publication Maven Central 0.0.1
+
+**Contexte** : Publication du plugin plantuml-gradle sur Maven Central via nmcp.
+VAGUE 4.4 — HTOWN.
+
+**Tâches réalisées** :
+
+* [x] Version `0.0.0` → `0.0.1` hardcodée dans `build.gradle.kts`
+* [x] Dépendance `codebase-plugin` → `0.0.2` (release Maven Central)
+* [x] POM sans guard — `withType<MavenPublication>` (nom, description, licence Apache 2.0, developer cccp-education, SCM)
+* [x] Migration Sonatype staging → nmcp : `repositories { mavenCentral() }`
+* [x] `settings.gradle.kts` : plugin `com.gradleup.nmcp.settings` 1.5.0 + `nmcpSettings { centralPortal { ... publishingType = "AUTOMATIC" } }`
+* [x] `signing { useGpgCmd() }`
+* [x] Build vérifié : `./gradlew build -x functionalTest`
+* [x] Publication : `./gradlew publishAggregationToCentralPortal --no-daemon` — ✅ succès
+
+**Fichiers modifiés** : `build.gradle.kts`, `settings.gradle.kts`
+
+**Résultats** : `education.cccp:plantuml-gradle:0.0.1` publié sur Maven Central ✅

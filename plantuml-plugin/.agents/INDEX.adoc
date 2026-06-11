@@ -2,10 +2,9 @@
 
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
-_Derniere mise a jour_ : 2026-05-19  
-_Session en cours_ : 147 — (à définir)  
-_Session terminee_ : 145 — EPIC K-1 Renommage taxonomie (generatePlantumlDiagrams, collectPlantumlIndex)
-_Session terminee_ : 137 (EPIC 12 Clôture — BACKLOG + INDEX)  
+_Derniere mise a jour_ : 2026-06-11  
+_Session en cours_ : 148 — (à définir)  
+_Session terminee_ : 147 — Publication Maven Central 0.0.1
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
 '''
@@ -120,25 +119,16 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 
 |===
 | # | Date | Type | Sujet | Fichier | Score
+.1+^.^| 147 | 2026-06-11 | publish | Publication Maven Central 0.0.1 (nmcp, POM sans guard, codebase→0.0.2) | `147-pub-maven-central-0.0.1.adoc` | 9/10
+.1+^.^| 146 | 2026-06-02 | governance | Borough-isation — plantuml-gradle devient HTOWN 🚀, 23ème borough | `146-borough-isation-htown.adoc` | 10/10
+.1+^.^| 145 | 2026-05-19 | migration | EPIC K-1 Renommage taxonomie (generatePlantumlDiagrams, collectPlantumlIndex) — 18 fichiers modifiés, Build OK | `145-epic-k-k1-renommage-taxonomie.adoc` | 10/10
+.1+^.^| 144 | 2026-05-14 | infra | CI Template test.yml deploye, build OK, EPIC F cross-boroughs | `144-ci-template.adoc` | 10/10
 .1+^.^| 143 | 2026-05-13 | fix+refactor | Fix testcontainer fine-tune (wait strategy, trl 1.4.0, uv) | `143-fix-fine-tune-testcontainer.adoc` | 9.0/10
 .1+^.^| 142 | 2026-05-13 | feat+test | Pipeline Fine-tuning SmolLM2-135M-Instruct (testcontainer Python) | `142-smollm2-fine-tuning-pipeline.adoc` | 8.0/10
 .1+^.^| 141 | 2026-05-07 | chore | Migration chemins foundry/ → foundry/OSS/ (granularisation OSS/CSS) | — | —
-.1+^.^| 137 | 2026-05-01 | chore | EPIC 12 Cloture (BACKLOG 🟢 + INDEX incohérence corrigée) | `137-epic12-cloture-backlog-index.adoc` | 9.0/10
+.1+^.^| 137 | 2026-05-01 | chore | EPIC 12 Cloture — BACKLOG + INDEX incohérence corrigée | `137-epic12-cloture-backlog-index.adoc` | 9.0/10
 .1+^.^| 136 | 2026-05-01 | chore+test | EPIC 12 Execution (6/6 tâches, PROCEDURES, Kover 81.19%) | `136-epic12-consolidation-execution.adoc` | 9.0/10
 .1+^.^| 135 | 2026-05-01 | chore | EPIC 12 Définition Consolidation (Audit + 6 tâches) | `135-epic12-consolidation-definition.adoc` | 9.0/10
-| 134 | 2026-05-01 | test | EPIC 11 Validation Tests Fonctionnels KG + Cloture | `134-epic11-kg-functional-tests.adoc` | 9.0/10
-| 133 | 2026-04-27 | docs | EPIC 11 Article Blog Knowledge Graph (0106) | `133-epic11-article-blog-kg.adoc` | 9.0/10
-| 132 | 2026-04-27 | chore | EPIC 10 Cloture + BACKLOG a jour | `132-epic10-cloture-backlog.adoc` | 9.0/10
-| 131 | 2026-04-23 | docs | EPIC 10 Diagrammes Architecture + Article Blog 0105 | `131-epic10-diagrammes-article-blog.adoc` | 8.0/10
-| 130 | 2026-04-23 | test | EPIC 10 Tests Unitaires Renderer (40/40 PASS) | `130-epic10-renderer-unit-tests.adoc` | 8.0/10
-| 129 | 2026-04-23 | chore | Git Commit graphify data (2 commits, 332 fichiers) | `129-chore-git-commit-graphify-data.adoc` | 5.0/10
-| 128 | 2026-04-23 | test+feat+docs | EPIC 10 Tests Fonctionnels + Renderer + Readmes | `128-epic10-functional-tests-renderer-docs.adoc` | 8.5/10
-| 127 | 2026-04-22 | test+fix | EPIC 10 Tests Integration Graphify (380/380 PASS) | `127-epic10-graphify-tests.adoc` | 9.0/10
-| 126 | 2026-04-22 | docs | Article blog fg (0104) + reflexion distillation IA | `126-blog-fg-command.adoc` | 9.0/10
-| 141 | 2026-05-07 | chore | Migration chemins foundry/ → foundry/OSS/ (granularisation OSS/CSS) | — | —
-| 144 | 2026-05-14 | infra | CI Template test.yml deploye, build OK, EPIC F cross-boroughs | `144-ci-template.adoc` | 10/10
-.1+^.^| 146 | 2026-06-02 | governance | Borough-isation — plantuml-gradle devient HTOWN 🚀, 23ème borough | `146-borough-isation-htown.adoc` | 10/10
-.1+^.^| 145 | 2026-05-19 | migration | EPIC K-1 Renommage taxonomie (generatePlantumlDiagrams, collectPlantumlIndex) — 18 fichiers modifiés, Build OK | `145-epic-k-k1-renommage-taxonomie.adoc` | 10/10
 |===
 
 → _Sessions 1-126_ : `.agents/backup/Y2026-sessions-001-126/`
@@ -147,6 +137,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 
 |===
 | Période | Sessions | Types dominants | Score moyen
+| Juin 2026 | 2 | publish, governance | 9.5/10
 | Avril 2026 (semaine 4) | 2 | docs (50%), feat (50%) | 9.0/10
 | Avril 2026 (semaine 3) | 10 | test (80%), fix (20%) | 9.0/10
 | Avril 2026 (semaine 1) | 5 | debug (60%), docs (40%) | 9.0/10
@@ -158,6 +149,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 == 🎯 Roadmap — État Actuel
 
 | EPIC 13 : Multi-provider API Pool (tiers) | 🟡 0% | —/10 | 🟡 EN COURS — Sessions 138-141
+| BKY-PUB-1 ✅ : Publication Maven Central | ✅ 100% | 9/10 | ✅ TERMINÉ — Session 147 (nmcp, 0.0.1)
 |===
 
 _Historique_ :
@@ -183,7 +175,7 @@ _Historique_ :
 == 📁 Archives
 
 * _Sessions 1-125_ : `.agents/backup/Y2026-sessions-001-125/` (INDEX, SESSIONS_HISTORY, COMPLETED_TASKS_ARCHIVE, sessions/)
-* _Sessions 126-137_ : Ce fichier + `.agents/sessions/`
+* _Sessions 126-147_ : Ce fichier + `.agents/sessions/`
 * _Localisation de la vague_ : `.agents/backup/Y2026-sessions-001-125/`
 
 '''
@@ -217,26 +209,9 @@ Projets gérant la même méthodologie opencode (EAGER/LAZY, procédure de fin d
 |===
 | Projet | Répertoire | Session en cours | Étape 5 spécifique | Dernière MAJ
 | magic-stick | `~/workspace/foundry/OSS/magic-stick` | 013 | SCRIPT_VERIFICATION.adoc | 2026-04-25
-| bakery-gradle | `~/workspace/foundry/OSS/bakery-gradle/bakery-plugin` | 5 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-23
+| bakery-gradle | `~/workspace/foundry/OSS/bakery-gradle/bakery-plugin` | 109 | TEST_COVERAGE_ANALYSIS.adoc | 2026-06-11
 | cheroliv.com | `~/workspace/foundry/OSS/cheroliv.com` | 4 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-25
-| plantuml-gradle | `~/workspace/foundry/OSS/plantuml-gradle/plantuml-plugin` | 138 | TEST_COVERAGE_ANALYSIS.adoc | 2026-05-01
-| jhipster-gradle-plugins | `~/workspace/foundry/OSS/jhipster-gradle-plugins` | 2 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-30
+| plantuml-gradle | `~/workspace/foundry/OSS/plantuml-gradle/plantuml-plugin` | 148 | TEST_COVERAGE_ANALYSIS.adoc | 2026-06-11
+| jhipster-gradle-plugins | `~/workspace/foundry/OSS/jhipster-gradle-plugins` | 9 | TEST_COVERAGE_ANALYSIS.adoc | 2026-06-11
 | quizz-benchmark-gradle | `~/workspace/foundry/OSS/quizz-benchmark-gradle/quizz-benchmark-plugin` | Audit session 053 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-30
 |===
-
-_Procédure de fin de session commune_ :
-
-. ✅ Créer l'archive `.agents/sessions/{N}-{titre}.adoc`
-. ✅ Mettre à jour `PROMPT_REPRISE.adoc` pour la session N+1
-. ✅ Mettre à jour `SESSIONS_HISTORY.adoc` avec la session N
-. ✅ Mettre à jour `INDEX.adoc` (session en cours, roadmap, fichiers)
-. ✅ Mettre à jour `SCRIPT_VERIFICATION.adoc` ou `TEST_COVERAGE_ANALYSIS.adoc` (selon le projet)
-. ✅ Mettre à jour `COMPLETED_TASKS_ARCHIVE_{mois}.adoc`
-
-_Incohérences détectées (session 012 magic-stick)_ :
-
-* **bakery-gradle** : COMPLETED_TASKS_ARCHIVE en retard (sessions 3-5 manquantes)
-* ~~**plantuml-gradle** : PROCEDURES.adoc decrit 5 etapes vs 6 etapes dans INDEX.adoc~~ ✅ **Résolu Session 136** (PROCEDURES aligné 8 étapes avec AGENT.adoc)
-* ~~**plantuml-gradle** : SESSIONS_HISTORY en format narratif au lieu de table~~ ✅ **Résolu Session 136** (format table)
-| 139 | 2026-05-04 | governance | Renommage openclaw→quizz-benchmark (gouvernance) | —
-| 141 | 2026-05-07 | chore | Migration chemins foundry/ → foundry/OSS/ dans INDEX.adoc — granularisation OSS/CSS | —
