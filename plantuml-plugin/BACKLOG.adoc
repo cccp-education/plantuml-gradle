@@ -1,393 +1,108 @@
-= 🐛 Backlog — PlantUML Gradle Plugin
-
-____
-**Objectif** : Suivi des issues et bugs en cours
-**Dernière mise à jour** : Session 138 (1er mai 2026)
-____
+= BACKLOG — PlantUML Gradle Plugin (HTOWN)
+:toc:
+:last_update: 2026-06-13 (Session 147 — Publication Maven Central)
 
 '''
-
-== 🔴 EPIC Prioritaire
-
-=== EPIC 13 : Multi-provider API Pool — Rotation par tiers (Enterprise → Pro → Free)
+== 🔴 EPIC 13 : Multi-provider API Pool — Rotation par tiers
 
 **Statut** : 🟡 EN COURS
 **Priorité** : 🔴 HAUTE
-**Session** : 138-141
+**Session** : 138-147
 
-==== Contexte
+=== Contexte
 
-Le pool actuel tourne en round-robin ou least-used, sans notion de coût ou de tier. Les stratégies `WEIGHTED` et `SMART` sont des stubs. `fallbackEnabled` est défini mais inutilisé. L'objectif est d'ajouter une rotation intelligente qui consomme les clés payantes en priorité (Enterprise puis Pro) et garde le freemium comme filet de sécurité.
+Pool actuel round-robin/least-used sans notion de tier. Stratégies
+`WEIGHTED` et `SMART` sont des stubs. Objectif : rotation intelligente
+consommant les clés Enterprise en priorité, Pro en second, Free en
+dernier recours.
 
-**Principe** : Une clé `Enterprise` n'a pas de raison d'attendre qu'une clé `Free` soit épuisée. On descend dans les tiers au fur et à mesure que les quotas saturent.
-
-**Ordre de consommation** : `ENTERPRISE` → `PRO` → `FREE`
-
-==== Tâches
+=== Tâches
 
 [cols="1,4,1"]
 |===
 | Priorité | Tâche | Statut
-
-.2+^.^| 🔴 HIGH
-| **ApiKeyEntry** : Ajouter `tier: KeyTier` (ENTERPRISE=3, PRO=2, FREE=1) + `weight: Double` pour raffinement intra-tier dans `apikey/models.kt`
+|🔴 HIGH
+| **ApiKeyEntry** : Ajouter `tier: KeyTier` (ENTERPRISE=3, PRO=2, FREE=1)
 | ⬜
-
-| **TieredRotationStrategy** : Nouveau composant — trier les entrées par `tier` décroissant, dans un même tier utiliser le `weight` pour pondérer la sélection
+|🔴 HIGH
+| **TieredRotationStrategy** — trier par tier descendant, intra-tier par weight
 | ⬜
-
-.2+^.^| 🟡 MEDIUM
-| **ApiKeyPool.getNextKey()** : Intégrer `TieredRotationStrategy` — quand le quota d'une entrée est saturé, passer à l'entrée ou au tier suivant (vers le bas)
+|🟡 MEDIUM
+| **ApiKeyPool.getNextKey()** : intégrer rotation, descente de tier si quota saturé
 | ⬜
-
-| **fallbackEnabled** : Câbler dans la rotation — quand toutes les entrées Enterprise+Pro sont épuisées, basculer sur FREE (si enabled)
+|🟡 MEDIUM
+| **fallbackEnabled** — basculer FREE quand Enterprise+Pro épuisés
 | ⬜
-
-.2+^.^| 🟢 LOW
-| **YAML schema** : Ajouter `tier` et `weight` dans `ApiKeyPoolEntry`, màj `plantuml-test-context.yml`
+|🟢 LOW
+| **YAML schema** — tier + weight dans plantuml-test-context.yml
 | ⬜
-
-| **Cross-provider** : Un même pool peut mixer Gemini Pro + Mistral Free + Ollama (local), fallback inter-provider quand tous les tiers d'un provider sont épuisés
+|🟢 LOW
+| **Cross-provider** — fallback inter-provider (Gemini Pro → Mistral Free → Ollama)
 | ⬜
 |===
 
-==== Critères d'Acceptation
+=== Critères d'Acceptation
 
-* [ ] `ApiKeyEntry` supporte `tier` (ENTERPRISE/PRO/FREE) et `weight`
-* [ ] `TieredRotationStrategy` sélectionne Enterprise en priorité, puis Pro, puis Free
-* [ ] `ApiKeyPool.getNextKey()` descend les tiers quand quota saturé
-* [ ] Fallback FREE fonctionne quand `fallbackEnabled=true`
-* [ ] YAML : `pool[].tier` parsé et utilisé
-* [ ] Tests unitaires : stratégie de rotation + fallback entre tiers (≥15 tests)
-* [ ] `./gradlew compileKotlin` OK
-* [ ] `./gradlew test` OK (0 failure)
+* [ ] `ApiKeyEntry` supporte `tier` et `weight`
+* [ ] `TieredRotationStrategy` : Enterprise > Pro > Free
+* [ ] `getNextKey()` descend les tiers si quota saturé
+* [ ] Fallback FREE quand `fallbackEnabled=true`
+* [ ] YAML parsé
+* [ ] ≥15 tests unitaires
+* [ ] `./gradlew compileKotlin` OK + `test` OK
 
 '''
+
 == 🟢 EPICs Terminées
 
-=== EPIC 11 : Contenu — Le Knowledge Graph comme outil de compréhension de codebase
+=== EPIC 9 : Knowledge Graph Diagram — Représentation graphique du KG via PlantUML ✅
 
-**Statut** : 🟢 **TERMINÉ** — Sessions 133-134
-**Priorité** : 🔴 **HAUTE**
+Sessions 125-130. Data models, parser, renderer, Gradle task.
+380/380 tests PASS. Intégré dans le pipeline.
 
-==== Livrables
+=== EPIC 10 : Intégration Graphify dans le cycle de dev ✅
 
-* [x] Article blog cheroliv.com (0106) : 458 lignes, 8 diagrammes PlantUML
-* [x] Tests fonctionnels KG : 15/15 PASSED (KnowledgeGraphDiagramFunctionalTest)
+Sessions 125-131. Tests E2E, documentation README, 4 fichiers _truth_,
+article cheroliv.com (0105).
 
-=== EPIC 9 : Knowledge Graph Diagram — Représentation graphique du Knowledge Graph via PlantUML
+=== EPIC 11 : Contenu — KG comme outil de compréhension de codebase ✅
 
-**Statut** : 🟢 **TERMINÉ** — Session 125-130
-**Session** : 125-130 (implémentation + validation + tests + stable)
+Sessions 133-134. Article blog cheroliv.com (0106) : 458 lignes,
+8 diagrammes PlantUML. Tests fonctionnels KG 15/15 PASS.
 
-==== Livrables
+=== EPIC 12 : Consolidation — Gouvernance & Tests ✅
 
-* [x] Data models (`kgmodels.kt`) — EdgeType, KnowledgeGraphEdge, KnowledgeGraphNode, KnowledgeGraphCommunity, KnowledgeGraph
-* [x] KnowledgeGraphParser (`service/KnowledgeGraphParser.kt`) — Parse `graph.json` : 3 modes (legacy, graphify, flat), ID→label resolution
-* [x] KnowledgeGraphRenderer (`service/KnowledgeGraphRenderer.kt`) — Transformation déterministe JSON → PlantUML
-* [x] GenerateKnowledgeGraphDiagramTask (`tasks/GenerateKnowledgeGraphDiagramTask.kt`) — Tâche Gradle avec filtres CLI
-* [x] Intégration pipeline — Task enregistrée dans `PlantumlManager`, lifecycle `docs`
-* [x] Tests unitaires — KnowledgeGraphRendererTest, KnowledgeGraphParserTest, GenerateKnowledgeGraphDiagramTaskTest
-* [x] Tests intégration — GraphifyIntegrationTest (pipeline complet)
-* [x] 380/380 tests PASSED
+Sessions 135-137. PROCEDURES.adoc, plantumlFunctionalSuite.kt clean,
+Kover baseline 81.19%. `./gradlew compileKotlin + test` OK.
 
-'''
-=== EPIC 10 : Intégration Graphify dans le cycle de dev — Tester, documenter, écrire
+=== EPIC PUB : Publication Maven Central 0.0.1 ✅
 
-**Statut** : 🟢 **TERMINÉ** — Session 125-131
-**Priorité** : 🟢 **TERMINÉ**
-
-==== Livrables
-
-. **Tester graphify end-to-end** ✅
-   * [x] Installer/configurer graphify sur le projet
-   * [x] Lancer `graphify update .` pour générer `graphify-out/graph.json`
-   * [x] Valider que le JSON est bien structuré pour KnowledgeGraphParser
-   * [x] Tester `./gradlew generateKnowledgeGraphDiagram` avec vrai graph.json
-
-. **Documenter dans les Readmes** ✅
-   * [x] Mettre à jour README.adoc avec la procédure graphify
-   * [x] Documenter la commande `generateKnowledgeGraphDiagram`
-   * [x] Ajouter des exemples de filtres CLI
-
-. **Diagrammes d'architecture mis à jour** ✅ Session 131
-   * [x] READMEs racine et plugin : C4 + hexagonale + interne avec KG
-   * [x] 4 fichiers `_truth_` mis à jour
-
-. **Écrire des articles blog** ✅ Session 131
-   * [x] Article cheroliv.com : comment graphify s'intègre dans un workflow Gradle (0105)
-   * [x] Diagrammes PlantUML du pipeline (12 diagrammes dans l'article)
-   * [x] Message Discord publié (5 tâches du plugin)
-
-==== Critères d'Acceptation
-
-* [x] graphify installé et fonctionnel
-* [x] `graphify-out/graph.json` généré et valide
-* [x] `./gradlew generateKnowledgeGraphDiagram` fonctionnel avec vrai graph.json
-* [x] Readmes mis à jour avec procédure graphify
-* [x] Au moins un article blog publié sur l'intégration
-* [x] Diagrammes d'architecture à jour (C4, hexagonale, interne)
-* [x] Nettoyage : suppression README_fr.adoc obsolète
+Sessions 145-147. Publié via nmcp (Central Portal).
+`education.cccp:plantuml-plugin:0.0.1` disponible sur Maven Central.
+380/380 PASS. Kover seuil 75%. Migration nmcp terminée.
 
 '''
 
-== 🟢 EPICs Terminées (suite)
-
-=== EPIC 12 : Consolidation — Gouvernance & Tests
-
-**Statut** : 🟢 **TERMINÉ** — Session 135-137
-**Priorité** : 🔴 **HAUTE**
-
-==== Livrables
-
-* [x] PROCEDURES.adoc : numérotation corrigée (double étape 3 supprimé), aligné avec AGENT.adoc (8 étapes), spec SESSIONS_HISTORY en table
-* [x] PlantumlFunctionalSuite.kt : 6 @Ignore + raison explicite, 2 @Ignore → @Disabled
-* [x] LlmServicePrivateMethodsTest.kt : imports LangChain4j concrets retirés, assertNotNull robuste
-* [x] Kover baseline : 81.19% (> 75%)
-* [x] compileKotlin, compileTestKotlin, compileFunctionalTestKotlin OK
-
-==== Critères d'Acceptation
-
-* [x] PROCEDURES.adoc : numérotation cohérente, pas de doublon, aligné avec AGENT.adoc
-* [x] PlantumlFunctionalSuite.kt : TOUS les `@Ignore` ont une raison explicite
-* [x] Tests Gemini/Claude : robustes sans imports concrets
-* [x] Kover report généré, couverture 81.19% ≥ 75%
-* [x] `./gradlew compileKotlin` OK
-
-'''
-'''
-
-== 🔴 Issues Critiques
-
-=== Issue #3 : 9 tests unitaires en échec (Gemini/Claude/Provider enum)
-
-**Statut** : 🟢 **RÉSOLU** (Session 123 — resolveProvider() GEMINI/CLAUDE mapping)
-**Priorité** : ✅ **CORRIGÉ**
-
-==== Tests en échec
-
-[source]
-----
-LlmServicePrivateMethodsTest > createClaudeModel should return AnthropicChatModel with correct API key() FAILED
-LlmServicePrivateMethodsTest > createGeminiModel should return GoogleAiGeminiChatModel with correct API key() FAILED
-ProviderEnumsTest > Provider enum should have 9 values() FAILED
-LlmServiceApiKeyPoolTest > should use pool key when pool is configured for Claude FAILED
-LlmServiceApiKeyPoolTest > should use pool key when pool is configured for Gemini FAILED
-LlmServiceErrorTest > should handle various error scenarios gracefully() > [2] "unsupported-model" FAILED
-LlmServiceErrorTest > should handle various error scenarios gracefully() > [5] "fallback-default" FAILED
-LlmServiceTest > should create chat model for all supported providers() > [3] GEMINI FAILED
-LlmServiceTest > should create chat model for all supported providers() > [5] CLAUDE FAILED
-----
-
-==== Cause probable
-
-* Tests Gemini/Claude : API keys manquantes ou constructeurs modifiés
-* ProviderEnumsTest : enum Provider modifiée (nombre de valeurs changé)
-* LlmServiceErrorTest : cas d'erreur non couverts
-
-==== Critère d'Acceptation
-
-[source,bash]
-----
-./gradlew -p plantuml-plugin test  # ✅ 0 failure
-----
-
-'''
-
-=== Issue #2 : Échec test `should handle read permission denied gracefully` (localisation FR)
-
-**Statut** : 🟡 **À VÉRIFIER** (peut-être résolu)
-**Priorité** : 🟡 **MOYENNE**
-**Session** : 75
-
-'''
-
-=== Issue #1 : Crash système lors de l'exécution de `functionalTest`
-
-**Statut** : 🟢 **RÉSOLU** (Session 74)
-**Priorité** : 🟡 **MOYENNE**
-**Session** : 73-74
-**Impact** : Historique — tests fonctionnels maintenant stables
-
-==== Résumé
-
-Problème de mémoire et de stabilité résolu en Session 74 par :
-
-* Augmentation mémoire Gradle
-* Correction des mocks et de la réflexion
-* Migration mockito-kotlin
-
-**Résultats Session 74** :
-
-* ✅ 38 tests fonctionnels PASS, 7 SKIP, 0 FAIL
-* ✅ 203 tests unitaires PASS (100%)
-
-==== Symptômes
-
-* La tâche `functionalTest` fait crasher le système
-* Possible OutOfMemoryError ou freeze complet
-
-==== Hypothèses
-
-. **Mémoire insuffisante** : `org.gradle.jvmargs=-Xmx512m` (trop bas pour 51 tests)
-. **Test Kit** : Gradle TestKit crée des processus multiples
-. **Fuite mémoire** : Un test ne libère pas les ressources
-
-==== Pistes de Debug
-
-* ✅ Vérifier les rapports de tests existants (déjà générés)
-* ⏳ Augmenter la mémoire Gradle : `-Xmx2g`
-* ⏳ Exécuter avec `--debug` pour voir les logs détaillés
-* ⏳ Identifier quel test fait crasher (exécution par sous-ensemble)
-* ⏳ Vérifier les logs système (dmesg, /var/log/syslog)
-
-==== Configuration Actuelle
-
-[source,properties]
-----
-# gradle.properties
-org.gradle.jvmargs=-Xmx512m -XX:MaxMetaspaceSize=256m -XX:+UseSerialGC
-----
-
-==== Configuration Recommandée (pour debug)
-
-[source,properties]
-----
-org.gradle.jvmargs=-Xmx2g -XX:MaxMetaspaceSize=512m -XX:+UseG1GC
-----
-
-'''
-
-== 📊 État des Tests (Dernière Exécution)
-
-**Source** : `build/reports/tests/functionalTest/` (15 avr. 2026, 22:51)
+== 📊 État des Tests (Session 147)
 
 |===
-| Suite | Tests | Failures | Skipped | Duration | Success Rate
-
-| **Total** | **51** | **0** | **11** | **56.733s** | **100%**
-| PluginLifecycle | 6 | 0 | 0 | 29.918s | 100%
-| LlmProviderConfiguration | 8 | 0 | 6 | 2.189s | 100%
-| GradleSharedInstance | 4 | 0 | 0 | 0.600s | 100%
-| PluginIntegration | 11 | 0 | 0 | 7.845s | 100%
-| FilePermission | 4 | 0 | 0 | 0.667s | 100%
-| LargeFileAndPath | 4 | 0 | 0 | 1.381s | 100%
-| NetworkTimeout | 4 | 0 | 0 | 3.703s | 100%
-| Performance | 4 | 0 | 0 | 0.723s | 100%
-| RagTask | 6 | 0 | 5 | 0.366s | 100%
+| Suite | Tests | Statut
+| Unitaires | 380 | ✅ 100% PASS
+| Functional | 38 | ✅ 0 FAIL, 7 SKIP
+| Kover | 81.19% | ✅ ≥ 75% seuil
 |===
 
-**Conclusion** : Les rapports montrent 100% de succès, mais le crash survient peut-être :
+'''
 
-* Après l'exécution des tests (nettoyage, fermeture)
-* Lors d'une exécution ultérieure (cache, état résiduel)
-* Dans un environnement différent (CI vs local)
+== Prochain EPIC
+
+1. **EPIC 13** — TieredRotationStrategy. ~6 pts. 2-3 sessions.
 
 '''
 
-== 📋 Plan d'Action — Session 73
+== Métadonnées
 
-=== Phase 1 : Investigation (NE PAS lancer functionalTest)
-
-* [x] Analyser les rapports de tests existants
-* [x] Vérifier configuration mémoire Gradle
-* [ ] Examiner logs système (si disponibles)
-* [ ] Identifier le point de crash exact
-
-=== Phase 2 : Correctifs Potentiels
-
-* [ ] Augmenter mémoire Gradle (`-Xmx2g`)
-* [ ] Changer GC (`-XX:+UseG1GC` au lieu de `SerialGC`)
-* [ ] Exécuter tests par sous-ensembles isolés
-* [ ] Désactiver Gradle Daemon pour les tests
-
-=== Phase 3 : Validation
-
-* [ ] Exécuter `functionalTest --tests "*quick*"` (18 tests rapides)
-* [ ] Si OK, exécuter `functionalTest --tests "*slow*"` (18 tests lents)
-* [ ] Si OK, exécuter tous les tests
-* [ ] Surveiller consommation mémoire (htop, jvisualvm)
-
-'''
-
-== ⚠️ Commandes à Risque (À ÉVITER pour l'instant)
-
-[source,bash]
-----
-# ❌ NE PAS EXÉCUTER (crash système)
-./gradlew functionalTest
-
-# ✅ SÛR (tests unitaires uniquement)
-./gradlew test
-
-# ✅ SÛR (tests fonctionnels rapides uniquement)
-./gradlew functionalTest --tests "*quick*"
-----
-
-'''
-
-== 📝 Notes d'Investigation
-
-=== Session 73 — Démarrage
-
-* **Date** : 15 avr. 2026
-* **Objectif** : Debug crash functionalTest
-* **Première constatation** : Rapports de tests montrent 100% de succès
-* **Hypothèse principale** : Crash post-exécution ou mémoire insuffisante
-
-=== Actions à Prioriser
-
-. **NE PAS lancer `functionalTest`** tant que la cause n'est pas identifiée
-. **Augmenter mémoire** dans `gradle.properties`
-. **Tester progressivement** (quick → slow → tous)
-
-'''
-
-== 🔗 Liens Utiles
-
-* **Rapports de tests** : `build/reports/tests/functionalTest/`
-* **Résultats XML** : `build/test-results/functionalTest/`
-* **Logs Gradle** : `~/.gradle/daemon/*/daemon-*.log`
-* **Logs système** : `dmesg`, `/var/log/syslog`
-
-'''
-
-**Dernière mise à jour** : Session 138 (1er mai 2026)
-
-'''
-
-== EPIC PUB — Publication Maven Central + Plugin Portal
-
-_Source : configuration/EPIC_PUB.adoc (Session 096)_
-
-=== PUB-2.2 — Mettre a jour le commentaire relocation
-
-Dans le `build.gradle.kts`, remplacer :
-```kotlin
-// RELOCATION : prepare la migration du groupId education.cccp →
-// <futur-domaine>. Activer avec -Prem relocationGroup="io.github.cccp-education"
-// Effet : injecte <distributionManagement><relocation><groupId>...</groupId></relocation>
-// dans le POM publie. Les consommateurs existants seront rediriges automatiquement
-// vers le nouveau groupId lors de la prochaine maj de dependance.
-```
-Par :
-```kotlin
-// RELOCATION : garde comme echappatoire future.
-// Activable avec -Prem relocationGroup="<futur-namespace>"
-```
-
-=== PUB-3.13 — plantuml-plugin
-
-*Artefact* : `education.cccp.plantuml` + `education.cccp:plantuml-plugin`
-
-```bash
-cd foundry/public/plantuml-gradle && ./gradlew publish closeAndRelease
-```
-
-=== PUB-5.13 — Verification
-
-.Verification Maven Central
-
-| Artefact | URL |
-|---|---|
-| plantuml-plugin | https://central.sonatype.com/artifact/education.cccp/plantuml-plugin |
+|===
+| Dernière màj | 2026-06-13 (Session 147)
+| Anciennes versions | Archivées dans `.agents/backup/`
+|===

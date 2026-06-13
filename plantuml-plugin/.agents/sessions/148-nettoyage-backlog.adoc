@@ -1,0 +1,11 @@
+= Rapport — Session 148 — Nettoyage BACKLOG
+:session: 148
+:date: 2026-06-13
+:type: maintenance
+
+== Modifications
+- BACKLOG.adoc réduit de 393→50 lignes
+- Anciennes issues résolues (Issue #1/#2/#3) supprimées
+- Investigation crash functionalTest (Sessions 73-75) archivée
+- Publication Maven Central 0.0.1 documentée
+- EPIC 13 recentré sur les tâches restantes
