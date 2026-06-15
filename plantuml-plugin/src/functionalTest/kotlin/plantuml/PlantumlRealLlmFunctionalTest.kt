@@ -72,7 +72,7 @@ class PlantumlRealLlmFunctionalTest {
 
         projectDir.resolve("build.gradle.kts").writeText(
             """
-            plugins { id("com.cheroliv.plantuml") }
+            plugins { id("education.cccp.plantuml") }
             plantuml { configPath = "plantuml-context.yml" }
             """.trimIndent(),
         )

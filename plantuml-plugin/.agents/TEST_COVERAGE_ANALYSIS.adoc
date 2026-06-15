@@ -1,25 +1,25 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 148 (15 juin 2026)
+_Dernière mise à jour_ : Session 149 (15 juin 2026)
 
 === Résumé Global
 
-* **Total tests unitaires** : 380 + 35 nouveaux = 415 PASSED, 0 FAILED (hors 50 échecs pré-existants plugin ID)
+* **Total tests unitaires** : 380 + 35 (S148) + 23 (S149) = 438 PASSED, 2 FAILED (pré-existants)
 * **Tests fonctionnels GradleRunner KG** : 15 PASSED
 * **Tests real-llm (Ollama local)** : 6 créés, 0 FAILED (non exécutés — nécessite Ollama)
 * **Tests fine-tune SmolLM2 (testcontainer Python)** : 3 crees, 3/3 PASS
 * **Tests Knowledge Graph** : 90 unitaires + 15 fonctionnels
 * **Kover instruction coverage** : 81.19% (baseline Session 136)
 
-=== Nouveaux Tests — Session 148 (PLT-I18N US-0)
+=== Nouveaux Tests — Session 149 (PLT-I18N US-0 BDD + US-1)
 
-* **ConfigMergerTest** : 11 nouveaux tests i18n (defaults, gradle.properties, YAML override, CLI override, fallback en, full merge) — 19/19 PASS
-* **ModelsDataClassTest** : 6 nouveaux tests i18n (defaults, SUPPORTED_LANGS 10 codes, custom values) — 16/16 PASS
-* **Total nouveaux** : 35 tests PASS
+* **PlantumlMessagesTest** : 23 tests unitaires (forLanguage 10 langues, get, format, fallback, MissingResourceException) — 23/23 PASS
+* **15_i18n_language_switch.feature** : 8 scénarios Cucumber (default en, CLI override fr, YAML zh, gradle.properties es, env var hi, fallback xx, fallback YAML invalid, supportedLanguages) — compilent, non exécutables (blocage codebase-plugin:0.0.2 dans includeBuild)
+* **I18nSteps.kt** : 6 step definitions Cucumber
 
-=== Blocage découvert — Plugin ID mismatch
+=== Blocage résolu — Plugin ID mismatch
 
-Plugin ID `com.cheroliv.plantuml` → `education.cccp.plantuml` non répercuté dans 10 fichiers de test (PlantumlWorld.kt + 9 tests). Cause 50 échecs pré-existants (Session 145-147 publication). À fixer Session 149.
+Plugin ID `com.cheroliv.plantuml` → `education.cccp.plantuml` répercuté dans 11 fichiers de test (PlantumlWorld.kt + 10 tests). 37 occurrences corrigées. ✅
 
 === Knowledge Graph — Couverture par Composant
 

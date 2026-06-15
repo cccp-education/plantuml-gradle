@@ -43,7 +43,7 @@ class GeneratePlantumlDiagramsTaskBranchTest {
             .withProjectDir(tempDir)
             .build()
         
-        project.pluginManager.apply("com.cheroliv.plantuml")
+        project.pluginManager.apply("education.cccp.plantuml")
         task = project.tasks.getByName("generatePlantumlDiagrams") as GeneratePlantumlDiagramsTask
         
         // Configure WireMock to return a valid response

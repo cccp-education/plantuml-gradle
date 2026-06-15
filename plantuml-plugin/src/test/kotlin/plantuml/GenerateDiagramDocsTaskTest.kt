@@ -27,7 +27,7 @@ class GenerateDiagramDocsTaskTest {
             .withProjectDir(tempDir)
             .build()
 
-        project.pluginManager.apply("com.cheroliv.plantuml")
+        project.pluginManager.apply("education.cccp.plantuml")
         task = project.tasks.getByName("generateDiagramDocs") as GenerateDiagramDocsTask
     }
 

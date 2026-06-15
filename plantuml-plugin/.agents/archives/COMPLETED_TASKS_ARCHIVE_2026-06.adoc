@@ -1,5 +1,25 @@
 = Archive des Tâches Terminées — Juin 2026
 
+== Session 149 — 2026-06-15 — Fix Plugin ID + US-I18N-0 BDD + US-I18N-1 Messages
+
+**Contexte** : Fix du plugin ID mismatch + BDD Cucumber i18n + Messages properties 10 langues.
+Baby steps DDD/TDD/BDD.
+
+**Tâches réalisées** :
+
+* [x] Fix plugin ID `com.cheroliv.plantuml` → `education.cccp.plantuml` dans 11 fichiers (37 occurrences)
+* [x] US-I18N-0 BDD: `15_i18n_language_switch.feature` (8 scénarios Cucumber)
+* [x] US-I18N-0 BDD: `I18nSteps.kt` (6 step definitions)
+* [x] US-I18N-1 DDD: `PlantumlMessages.kt` — ResourceBundle UTF-8 control + MessageFormat
+* [x] US-I18N-1 DDD: `Messages.properties` — 100+ clés (anglais, fallback)
+* [x] US-I18N-1 DDD: 10 `Messages_{code}.properties` (zh, hi, es, fr, ar, bn, pt, ru, ur) — placeholders
+* [x] US-I18N-1 TDD: `PlantumlMessagesTest` — 23 tests (forLanguage, get, format, fallback, MissingResourceException)
+* [x] Compile OK
+* [x] 23/23 nouveaux tests PASS
+
+**Fichiers modifiés** : 11 fichiers de test (plugin ID)
+**Fichiers créés** : `PlantumlMessages.kt`, 11 `Messages*.properties`, `PlantumlMessagesTest.kt`, `15_i18n_language_switch.feature`, `I18nSteps.kt`
+
 == Session 148 — 2026-06-15 — Cadrage EPIC PLT-I18N + US-0 Configuration Layer
 
 **Contexte** : Internationalisation plantuml-gradle (10 langues). Inspiré de bakery BKY-I18N

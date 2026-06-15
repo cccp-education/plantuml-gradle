@@ -75,7 +75,7 @@ class PlantumlWorld {
             File(templateDir, "build.gradle.kts").writeText(
                 """
                 plugins {
-                    id("com.cheroliv.plantuml")
+                    id("education.cccp.plantuml")
                 }
                 
                 plantuml {

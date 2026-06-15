@@ -161,7 +161,7 @@ class PlantumlFunctionalSuite {
 
             File(sharedProjectDir, "build.gradle.kts").writeText(
                 """
-                plugins { id("com.cheroliv.plantuml") }
+                plugins { id("education.cccp.plantuml") }
                 plantuml { configPath = "plantuml-context.yml" }
                 """.trimIndent(),
             )
@@ -304,7 +304,7 @@ class PlantumlFunctionalSuite {
             val configFile = File(sharedProjectDir, "plantuml-context.yml")
             File(sharedProjectDir, "build.gradle.kts").writeText(
                 """
-                plugins { id("com.cheroliv.plantuml") }
+                plugins { id("education.cccp.plantuml") }
                 plantuml { configPath = file("${configFile.name}").absolutePath }
                 """.trimIndent(),
             )
@@ -316,7 +316,7 @@ class PlantumlFunctionalSuite {
             // Restore the nominal build file
             File(sharedProjectDir, "build.gradle.kts").writeText(
                 """
-                plugins { id("com.cheroliv.plantuml") }
+                plugins { id("education.cccp.plantuml") }
                 plantuml { configPath = "plantuml-context.yml" }
                 """.trimIndent(),
             )
@@ -766,7 +766,7 @@ class PlantumlFunctionalSuite {
             File(subDir, "settings.gradle.kts").writeText("""rootProject.name = "rag-absent"""")
             File(subDir, "build.gradle.kts").writeText(
                 """
-                plugins { id("com.cheroliv.plantuml") }
+                plugins { id("education.cccp.plantuml") }
                 plantuml { configPath = "ctx.yml" }
                 """.trimIndent(),
             )
@@ -844,7 +844,7 @@ class PlantumlFunctionalSuite {
             File(subDir, "settings.gradle.kts").writeText("""rootProject.name = "empty-prompts"""")
             File(subDir, "build.gradle.kts").writeText(
                 """
-                plugins { id("com.cheroliv.plantuml") }
+                plugins { id("education.cccp.plantuml") }
                 plantuml { configPath = "ctx.yml" }
                 """.trimIndent(),
             )
@@ -921,7 +921,7 @@ class PlantumlFunctionalSuite {
                 """rootProject.name = "plantuml-permission-test"""".trimIndent(),
             )
             File(sharedProjectDir, "build.gradle.kts").writeText(
-                """plugins { id("com.cheroliv.plantuml") }""",
+                """plugins { id("education.cccp.plantuml") }""",
             )
 
             val diagramFile = File(sharedProjectDir, "protected.puml")
@@ -960,7 +960,7 @@ class PlantumlFunctionalSuite {
                 """rootProject.name = "plantuml-permission-test"""".trimIndent(),
             )
             File(sharedProjectDir, "build.gradle.kts").writeText(
-                """plugins { id("com.cheroliv.plantuml") }""",
+                """plugins { id("education.cccp.plantuml") }""",
             )
 
             val diagramFile = File(sharedProjectDir, "test.puml")
@@ -991,7 +991,7 @@ class PlantumlFunctionalSuite {
                 """rootProject.name = "plantuml-permission-test"""".trimIndent(),
             )
             File(sharedProjectDir, "build.gradle.kts").writeText("""
-                plugins { id("com.cheroliv.plantuml") }
+                plugins { id("education.cccp.plantuml") }
                 plantuml { configPath = "plantuml-context.yml" }
             """.trimIndent())
 
@@ -1023,7 +1023,7 @@ class PlantumlFunctionalSuite {
                 """rootProject.name = "plantuml-permission-test"""".trimIndent(),
             )
             File(sharedProjectDir, "build.gradle.kts").writeText("""
-                plugins { id("com.cheroliv.plantuml") }
+                plugins { id("education.cccp.plantuml") }
                 plantuml { configPath = "plantuml-context.yml" }
             """.trimIndent())
 
@@ -1078,7 +1078,7 @@ class PlantumlFunctionalSuite {
                 """rootProject.name = "plantuml-large-file-test"""".trimIndent(),
             )
             File(sharedProjectDir, "build.gradle.kts").writeText(
-                """plugins { id("com.cheroliv.plantuml") }""".trimIndent(),
+                """plugins { id("education.cccp.plantuml") }""".trimIndent(),
             )
 
             val largeDiagramFile = File(sharedProjectDir, "large.puml")
@@ -1100,7 +1100,7 @@ class PlantumlFunctionalSuite {
                 """rootProject.name = "plantuml-special-chars-test"""".trimIndent(),
             )
             File(sharedProjectDir, "build.gradle.kts").writeText(
-                """plugins { id("com.cheroliv.plantuml") }""".trimIndent(),
+                """plugins { id("education.cccp.plantuml") }""".trimIndent(),
             )
 
             val specialFiles = listOf(
@@ -1134,7 +1134,7 @@ class PlantumlFunctionalSuite {
                 """rootProject.name = "plantuml-deep-path-test"""".trimIndent(),
             )
             File(sharedProjectDir, "build.gradle.kts").writeText(
-                """plugins { id("com.cheroliv.plantuml") }""".trimIndent(),
+                """plugins { id("education.cccp.plantuml") }""".trimIndent(),
             )
 
             File(sharedProjectDir, "plantuml-context.yml").writeText(
@@ -1176,7 +1176,7 @@ class PlantumlFunctionalSuite {
                 """rootProject.name = "plantuml-unicode-test"""".trimIndent(),
             )
             File(sharedProjectDir, "build.gradle.kts").writeText(
-                """plugins { id("com.cheroliv.plantuml") }""".trimIndent(),
+                """plugins { id("education.cccp.plantuml") }""".trimIndent(),
             )
 
             val unicodeFile = File(sharedProjectDir, "unicode.puml")
@@ -1216,7 +1216,7 @@ class PlantumlFunctionalSuite {
             )
             File(sharedProjectDir, "build.gradle.kts").writeText(
                 """
-                plugins { id("com.cheroliv.plantuml") }
+                plugins { id("education.cccp.plantuml") }
                 plantuml { configPath = "plantuml-context.yml" }
                 """.trimIndent(),
             )
@@ -1278,7 +1278,7 @@ class PlantumlFunctionalSuite {
             )
             File(sharedProjectDir, "build.gradle.kts").writeText(
                 """
-                plugins { id("com.cheroliv.plantuml") }
+                plugins { id("education.cccp.plantuml") }
                 plantuml { configPath = "plantuml-context.yml" }
                 """.trimIndent(),
             )
@@ -1316,7 +1316,7 @@ class PlantumlFunctionalSuite {
             )
             File(sharedProjectDir, "build.gradle.kts").writeText(
                 """
-                plugins { id("com.cheroliv.plantuml") }
+                plugins { id("education.cccp.plantuml") }
                 plantuml { configPath = "plantuml-context.yml" }
                 """.trimIndent(),
             )
@@ -1357,7 +1357,7 @@ class PlantumlFunctionalSuite {
                 """rootProject.name = "plantuml-network-test" """,
             )
             File(sharedProjectDir, "build.gradle.kts").writeText(
-                """plugins { id("com.cheroliv.plantuml") }""",
+                """plugins { id("education.cccp.plantuml") }""",
             )
 
             File(sharedProjectDir, "local.puml").writeText(
@@ -1408,7 +1408,7 @@ class PlantumlFunctionalSuite {
                 """rootProject.name = "plantuml-performance-test"""",
             )
             File(sharedProjectDir, "build.gradle.kts").writeText(
-                """plugins { id("com.cheroliv.plantuml") }""",
+                """plugins { id("education.cccp.plantuml") }""",
             )
 
             File(sharedProjectDir, "plantuml-context.yml").writeText(
@@ -1451,7 +1451,7 @@ class PlantumlFunctionalSuite {
                 """rootProject.name = "plantuml-performance-test"""",
             )
             File(sharedProjectDir, "build.gradle.kts").writeText(
-                """plugins { id("com.cheroliv.plantuml") }""",
+                """plugins { id("education.cccp.plantuml") }""",
             )
 
             File(sharedProjectDir, "minimal.puml").writeText("@startuml\nclass A\n@enduml")
@@ -1477,7 +1477,7 @@ class PlantumlFunctionalSuite {
                 """rootProject.name = "plantuml-performance-test"""",
             )
             File(sharedProjectDir, "build.gradle.kts").writeText(
-                """plugins { id("com.cheroliv.plantuml") }""",
+                """plugins { id("education.cccp.plantuml") }""",
             )
 
             for (i in 1..2) {
@@ -1518,7 +1518,7 @@ class PlantumlFunctionalSuite {
                 """rootProject.name = "plantuml-performance-test"""",
             )
             File(sharedProjectDir, "build.gradle.kts").writeText(
-                """plugins { id("com.cheroliv.plantuml") }""",
+                """plugins { id("education.cccp.plantuml") }""",
             )
 
             File(sharedProjectDir, "plantuml-context.yml").writeText(
@@ -1635,7 +1635,7 @@ class PlantumlFunctionalSuite {
 
                 File(sharedProjectDir, "build.gradle.kts").writeText(
                     """
-                    plugins { id("com.cheroliv.plantuml") }
+                    plugins { id("education.cccp.plantuml") }
                     plantuml { configPath = "plantuml-context.yml" }
                     """.trimIndent(),
                 )
@@ -1687,7 +1687,7 @@ class PlantumlFunctionalSuite {
                 File(subDir, "settings.gradle.kts").writeText("""rootProject.name = "unreachable"""")
                 File(subDir, "build.gradle.kts").writeText(
                     """
-                    plugins { id("com.cheroliv.plantuml") }
+                    plugins { id("education.cccp.plantuml") }
                     plantuml { configPath = "ctx.yml" }
                     """.trimIndent(),
                 )
@@ -1779,7 +1779,7 @@ class PlantumlFunctionalSuite {
 
             File(sharedProjectDir, "build.gradle.kts").writeText(
                 """
-                plugins { id("com.cheroliv.plantuml") }
+                plugins { id("education.cccp.plantuml") }
                 plantuml { configPath = "plantuml-context.yml" }
                 """.trimIndent(),
             )
@@ -1959,7 +1959,7 @@ class PlantumlFunctionalSuite {
             )
             File(sharedProjectDir, "build.gradle.kts").writeText(
                 """
-                plugins { id("com.cheroliv.plantuml") }
+                plugins { id("education.cccp.plantuml") }
                 plantuml { configPath = "plantuml-context.yml" }
                 """.trimIndent(),
             )

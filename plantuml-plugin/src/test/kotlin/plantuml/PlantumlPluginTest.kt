@@ -14,7 +14,7 @@ class PlantumlPluginTest {
         val project = builder().build()
 
         // When
-        project.pluginManager.apply("com.cheroliv.plantuml")
+        project.pluginManager.apply("education.cccp.plantuml")
 
         // Then
         val extension = project.extensions.findByName("plantuml")
@@ -28,10 +28,10 @@ class PlantumlPluginTest {
         val project = builder().build()
 
         // When
-        project.pluginManager.apply("com.cheroliv.plantuml")
+        project.pluginManager.apply("education.cccp.plantuml")
 
         // Then
         // If we get here without exception, the plugin was applied correctly
-        assertTrue(project.plugins.hasPlugin("com.cheroliv.plantuml"))
+        assertTrue(project.plugins.hasPlugin("education.cccp.plantuml"))
     }
 }

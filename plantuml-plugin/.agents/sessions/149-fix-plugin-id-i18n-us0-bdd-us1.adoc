@@ -1,0 +1,59 @@
+= Session 149 — Fix Plugin ID + US-I18N-0 BDD + US-I18N-1 Messages Properties
+:date: 2026-06-15
+:type: fix + DDD + TDD + BDD
+:score: 9/10
+
+== Résumé
+
+3 US livrées en une session :
+. Fix plugin ID `com.cheroliv.plantuml` → `education.cccp.plantuml` dans 11 fichiers de test
+. US-I18N-0 BDD : Cucumber feature `15_i18n_language_switch.feature` (8 scénarios) + `I18nSteps.kt`
+. US-I18N-1 DDD+TDD : `PlantumlMessages.kt` (UTF-8 control) + 11 `Messages*.properties` (100+ clés, 10 langues) + `PlantumlMessagesTest` (23/23 PASS)
+
+== Fichiers modifiés/créés
+
+=== Modifiés (11)
+- `src/functionalTest/kotlin/plantuml/KnowledgeGraphDiagramFunctionalTest.kt` — plugin ID
+- `src/functionalTest/kotlin/plantuml/PlantumlFunctionalSuite.kt` — plugin ID (26 occurrences)
+- `src/functionalTest/kotlin/plantuml/PlantumlRealLlmFunctionalTest.kt` — plugin ID
+- `src/test/kotlin/plantuml/CollectPlantumlIndexIntegrationTest.kt` — plugin ID
+- `src/test/kotlin/plantuml/CollectPlantumlIndexTaskBranchTest.kt` — plugin ID
+- `src/test/kotlin/plantuml/GenerateDiagramDocsTaskTest.kt` — plugin ID
+- `src/test/kotlin/plantuml/GeneratePlantumlDiagramsTaskBranchTest.kt` — plugin ID
+- `src/test/kotlin/plantuml/GeneratePlantumlDiagramsTaskTest.kt` — plugin ID
+- `src/test/kotlin/plantuml/PlantumlPluginTest.kt` — plugin ID (3 occurrences)
+- `src/test/kotlin/plantuml/tasks/GenerateKnowledgeGraphDiagramTaskTest.kt` — plugin ID
+- `src/test/scenarios/plantuml/scenarios/PlantumlWorld.kt` — plugin ID
+
+=== Créés (16)
+- `src/main/kotlin/plantuml/PlantumlMessages.kt` — ResourceBundle UTF-8 control + MessageFormat
+- `src/main/resources/i18n/Messages.properties` — 100+ clés (anglais, fallback)
+- `src/main/resources/i18n/Messages_en.properties` — copie anglais
+- `src/main/resources/i18n/Messages_zh.properties` — placeholder chinois
+- `src/main/resources/i18n/Messages_hi.properties` — placeholder hindi
+- `src/main/resources/i18n/Messages_es.properties` — placeholder espagnol
+- `src/main/resources/i18n/Messages_fr.properties` — placeholder français
+- `src/main/resources/i18n/Messages_ar.properties` — placeholder arabe
+- `src/main/resources/i18n/Messages_bn.properties` — placeholder bengali
+- `src/main/resources/i18n/Messages_pt.properties` — placeholder portugais
+- `src/main/resources/i18n/Messages_ru.properties` — placeholder russe
+- `src/main/resources/i18n/Messages_ur.properties` — placeholder ourdou
+- `src/test/kotlin/plantuml/PlantumlMessagesTest.kt` — 23 tests unitaires
+- `src/test/features/15_i18n_language_switch.feature` — 8 scénarios Cucumber
+- `src/test/scenarios/plantuml/scenarios/I18nSteps.kt` — steps Cucumber i18n
+
+== Résultats tests
+
+- Compile OK ✅
+- PlantumlMessagesTest : 23/23 PASS ✅
+- Tests unitaires globaux : 411 tests, 2 échecs pré-existants (docs group + NPE mock listProperty)
+- Cucumber : 0 scénario passe (blocage pré-existant codebase-plugin:0.0.2 non résolu dans includeBuild)
+
+== Blocages
+
+- Cucumber : `codebase-plugin:0.0.2` non résolu dans l'environnement `includeBuild` → 0/87 scénarios passent. Pré-existant, non lié à cette session.
+- 2 échecs unitaires pré-existants : `GenerateDiagramDocsTaskTest.should register docs lifecycle task` (group `"info"` vs `"plantuml"`) + `PlantumlPluginUnitTest.should create plantuml extension` (NPE mock `listProperty` ajouté Session 148)
+
+== Prochaine session (150)
+
+US-I18N-2 : Task descriptions + groups i18n — Refactorer les 12 descriptions/groupes de tâches + `@DisableCachingByDefault` + `gradlePlugin.description/displayName`. ~3 pts.
