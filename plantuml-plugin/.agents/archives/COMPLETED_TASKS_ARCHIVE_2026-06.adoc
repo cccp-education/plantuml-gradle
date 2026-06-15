@@ -1,5 +1,38 @@
 = Archive des Tâches Terminées — Juin 2026
 
+== Session 151 — 2026-06-15 — US-I18N-3 Logger Lifecycle Messages i18n
+
+**Contexte** : Refactoring ~66 `logger.lifecycle()` hardcodés dans les 5 tâches principales.
+Baby steps DDD/TDD/BDD.
+
+**Tâches réalisées** :
+
+* [x] DDD: 5 task classes — +champ `lang`, 66 lifecycle → `PlantumlMessages.format()`/`get()`
+* [x] DDD: Fix nullable `e.message`/`chatModel`/`System.getProperty` → `?: "Unknown error"`/`.toString()`
+* [x] TDD: `LifecycleMessagesI18nTest` — 760/760 PASS (74 clés × 10 langues + 20 format tests)
+* [x] BDD: `17_i18n_lifecycle_messages.feature` (2 scénarios fr + en) + `I18nSteps.kt` step
+* [x] Compile OK + publishToMavenLocal OK
+
+**Fichiers modifiés** : 5 task classes + I18nSteps.kt
+**Fichiers créés** : `LifecycleMessagesI18nTest.kt`, `17_i18n_lifecycle_messages.feature`
+
+== Session 150 — 2026-06-15 — US-I18N-2 Task Descriptions i18n
+
+**Contexte** : Refactoring des descriptions/groupes de tâches Gradle vers PlantumlMessages.
+Baby steps DDD/TDD/BDD.
+
+**Tâches réalisées** :
+
+* [x] DDD: `PlantumlManager.resolveLanguage()` helper
+* [x] DDD: 5 task classes init blocks → `PlantumlMessages.get()` (group + description)
+* [x] DDD: `PlantumlPlugin.kt` docs task → `PlantumlMessages.get()`
+* [x] TDD: `TaskDescriptionsI18nTest` — 16/16 PASS (6 tâches × 10 langues)
+* [x] BDD: `16_i18n_task_descriptions.feature` (2 scénarios) + `I18nSteps.kt` (2 steps)
+* [x] Compile OK + publishToMavenLocal OK
+
+**Fichiers modifiés** : `PlantumlManager.kt`, 5 task classes, `PlantumlPlugin.kt`
+**Fichiers créés** : `TaskDescriptionsI18nTest.kt`, `16_i18n_task_descriptions.feature`
+
 == Session 149 — 2026-06-15 — Fix Plugin ID + US-I18N-0 BDD + US-I18N-1 Messages
 
 **Contexte** : Fix du plugin ID mismatch + BDD Cucumber i18n + Messages properties 10 langues.

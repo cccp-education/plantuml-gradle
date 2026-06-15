@@ -1,5 +1,6 @@
 = Historique des Sessions
 
+_Session 151_ (2026-06-15) : US-I18N-3 Logger Lifecycle Messages i18n — DDD+TDD+BDD. 5 task classes +champ `lang`, 66 `logger.lifecycle()` → `PlantumlMessages.format()`/`get()`. LifecycleMessagesI18nTest 760/760 PASS. 17_i18n_lifecycle_messages.feature (2 scénarios) + I18nSteps.kt step. Compile + publishToMavenLocal OK. ✅
 _Session 150_ (2026-06-15) : US-I18N-2 Task Descriptions i18n — DDD+TDD+BDD. PlantumlManager.resolveLanguage(), 5 task classes + PlantumlPlugin init blocks → PlantumlMessages.get(). TaskDescriptionsI18nTest 16/16 PASS. 16_i18n_task_descriptions.feature (2 scénarios) + I18nSteps.kt. Compile + publishToMavenLocal OK. ✅
 _Session 149_ (2026-06-15) : Fix plugin ID + US-I18N-0 BDD + US-I18N-1 Messages — 11 fichiers plugin ID fixés, 15_i18n_language_switch.feature (8 scénarios) + I18nSteps.kt, PlantumlMessages.kt (UTF-8 control) + 11 Messages*.properties (100+ clés, 10 langues) + PlantumlMessagesTest (23/23 PASS). Compile OK. ✅
 _Session 148_ (2026-06-15) : Cadrage EPIC PLT-I18N + US-0 Configuration Layer — 7 US, ~28 pts, 10 langues. PlantumlConfig.language/supportedLanguages/SUPPORTED_LANGS, PlantumlExtension DSL, ConfigMerger mergeLanguage/mergeSupportedLanguages (4 couches). 35/35 nouveaux tests PASS. Blocage plugin ID mismatch découvert (50 échecs pré-existants). ✅

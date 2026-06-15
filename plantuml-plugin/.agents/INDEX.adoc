@@ -3,8 +3,8 @@
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
 _Derniere mise a jour_ : 2026-06-15  
-_Session en cours_ : 151 — US-I18N-3 Logger Lifecycle Messages i18n  
-_Session terminee_ : 150 — US-I18N-2 Task Descriptions i18n
+_Session en cours_ : 152 — US-I18N-4 Logger warn/error + exceptions i18n  
+_Session terminee_ : 151 — US-I18N-3 Logger Lifecycle Messages i18n
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
 '''
@@ -119,6 +119,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 
 |===
 | # | Date | Type | Sujet | Fichier | Score
+.1+^.^| 151 | 2026-06-15 | DDD + TDD + BDD | US-I18N-3 Logger Lifecycle Messages i18n — 5 task classes +champ `lang`, 66 lifecycle → PlantumlMessages, LifecycleMessagesI18nTest 760/760 PASS, 17_i18n_lifecycle_messages.feature (2 scénarios) | `151-i18n-us3-lifecycle-messages.adoc` | 9/10
 .1+^.^| 150 | 2026-06-15 | DDD + TDD + BDD | US-I18N-2 Task Descriptions i18n — PlantumlManager.resolveLanguage(), 5 task classes + PlantumlPlugin init blocks → PlantumlMessages.get(), TaskDescriptionsI18nTest 16/16 PASS, 16_i18n_task_descriptions.feature (2 scénarios) | `150-i18n-us2-task-descriptions.adoc` | 9/10
 .1+^.^| 149 | 2026-06-15 | fix + DDD + TDD + BDD | Fix plugin ID + US-I18N-0 BDD + US-I18N-1 Messages — 11 fichiers fixés, 15_i18n_language_switch.feature (8 scénarios), PlantumlMessages.kt + 11 Messages*.properties (100+ clés, 10 langues), PlantumlMessagesTest (23/23 PASS) | `149-fix-plugin-id-i18n-us0-bdd-us1.adoc` | 9/10
 .1+^.^| 148 | 2026-06-15 | DDD + TDD + cadrage | Cadrage EPIC PLT-I18N + US-0 Configuration Layer — 7 US, ~28 pts, 10 langues, 35/35 tests PASS | `148-i18n-cadrage-us0.adoc` | 9/10
@@ -151,7 +152,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 
 == 🎯 Roadmap — État Actuel
 
-| EPIC PLT-I18N : Internationalisation 10 langues | 🟠 36% | 10/28 | 🟠 EN COURS — Session 150 (US-0 ✅, US-1 ✅, US-2 ✅)
+| EPIC PLT-I18N : Internationalisation 10 langues | 🟠 57% | 16/28 | 🟠 EN COURS — Session 151 (US-0 ✅, US-1 ✅, US-2 ✅, US-3 ✅)
 | EPIC 13 : Multi-provider API Pool (tiers) | 🟡 0% | —/10 | 🟡 EN COURS — Sessions 138-141
 | BKY-PUB-1 ✅ : Publication Maven Central | ✅ 100% | 9/10 | ✅ TERMINÉ — Session 147 (nmcp, 0.0.1)
 |===

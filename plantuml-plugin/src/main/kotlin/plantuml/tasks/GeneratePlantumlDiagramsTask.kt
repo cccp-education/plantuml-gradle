@@ -46,8 +46,9 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         .registerModule(JavaTimeModule())
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
+    private val lang: String = PlantumlManager.resolveLanguage(project)
+
     init {
-        val lang = PlantumlManager.resolveLanguage(project)
         group = PlantumlMessages.get("task.generate.group", lang)
         description = PlantumlMessages.get("task.generate.description", lang)
     }
@@ -101,7 +102,7 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         logger.debug("DEBUG: promptsDirectory exists: ${promptsDirectory.exists()}")
 
         if (!promptsDirectory.exists()) {
-            logger.lifecycle("Prompts directory does not exist: ${promptsDirectory.absolutePath}")
+            logger.lifecycle(PlantumlMessages.format("generate.prompts_dir_missing", lang, promptsDirectory.absolutePath))
             return
         }
 
@@ -110,17 +111,17 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         } ?: emptyArray()
 
         if (promptFiles.isEmpty()) {
-            logger.lifecycle("No prompt files found in: ${promptsDirectory.absolutePath}")
+            logger.lifecycle(PlantumlMessages.format("generate.no_prompt_files", lang, promptsDirectory.absolutePath))
             return
         }
 
-        logger.lifecycle("Processing ${promptFiles.size} prompt files...")
+        logger.lifecycle(PlantumlMessages.format("generate.processing", lang, promptFiles.size))
 
         // Initialize services
         val plantumlService = PlantumlService()
         val llmService = LlmService(config)
         val chatModel = llmService.createChatModel()
-        logger.lifecycle("DEBUG: chatModel=$chatModel, config.output.diagrams=${config.output.diagrams}, testMode=${System.getProperty("plantuml.test.mode")}")
+        logger.lifecycle(PlantumlMessages.format("generate.debug", lang, chatModel.toString(), config.output.diagrams, System.getProperty("plantuml.test.mode") ?: "null"))
         val diagramProcessor = DiagramProcessor(plantumlService, chatModel, config)
 
         promptFiles.forEach { promptFile ->
@@ -203,7 +204,7 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         config: plantuml.PlantumlConfig,
         diagramProcessor: DiagramProcessor
     ) {
-        logger.lifecycle("Processing prompt: ${promptFile.name}")
+        logger.lifecycle(PlantumlMessages.format("generate.processing_prompt", lang, promptFile.name))
 
         // Read the prompt content
         val promptContent = promptFile.readText()
@@ -215,25 +216,25 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         val diagram = try {
             diagramProcessor.processPrompt(promptContent, maxIterations, logger)
         } catch (e: IllegalStateException) {
-            logger.lifecycle("  → Error: ${e.message}")
+            logger.lifecycle(PlantumlMessages.format("generate.error", lang, e.message ?: "Unknown error"))
             throw e
         }
 
         if (diagram != null) {
             // Validate PlantUML syntax
-            logger.lifecycle("  → Validating PlantUML syntax...")
+            logger.lifecycle(PlantumlMessages.get("generate.validating", lang))
             val validationResult = diagramProcessor.plantumlService.validateSyntax(diagram.plantuml.code)
 
             if (validationResult is PlantumlService.SyntaxValidationResult.Invalid) {
-                logger.lifecycle("    Validation errors found:")
-                logger.lifecycle("      ${validationResult.errorMessage}")
-                logger.lifecycle("      ${validationResult.stackTrace}")
+                logger.lifecycle(PlantumlMessages.get("generate.validation_errors", lang))
+                logger.lifecycle(PlantumlMessages.format("generate.validation_error", lang, validationResult.errorMessage))
+                logger.lifecycle(PlantumlMessages.format("generate.validation_stack", lang, validationResult.stackTrace))
                 // In a real implementation, we would send this back to LLM for correction
                 // For now, we'll continue with the processing
             }
 
             // Generate image from valid diagrams
-            logger.lifecycle("  → Generating diagram image...")
+            logger.lifecycle(PlantumlMessages.get("generate.generating_image", lang))
             val imagesDir = project.file(config.output.images)
             try {
                 imagesDir.mkdirs()
@@ -242,13 +243,13 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
                 // Generate actual PlantUML image
                 diagramProcessor.plantumlService.generateImage(diagram.plantuml.code, imageFile)
             } catch (e: Exception) {
-                logger.lifecycle("    Warning: Failed to generate image - ${e.message}")
+                logger.lifecycle(PlantumlMessages.format("generate.image_warning", lang, e.message ?: "Unknown error"))
             }
 
             // Request LLM validation with scoring (call once, reuse result)
             var validation: plantuml.ValidationFeedback? = null
             if (config.langchain4j.validation) {
-                logger.lifecycle("  → Requesting LLM validation...")
+                logger.lifecycle(PlantumlMessages.get("generate.llm_validation", lang))
                 validation = diagramProcessor.validateDiagram(diagram)
 
                 // Save validation feedback using Jackson serialization
@@ -267,7 +268,7 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
             }
 
             // Save valid diagrams for RAG training
-            logger.lifecycle("  → Collecting for RAG training...")
+            logger.lifecycle(PlantumlMessages.get("generate.collecting_rag", lang))
             try {
                 val ragDir = project.file(config.output.rag)
                 ragDir.mkdirs()
@@ -279,19 +280,17 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
                     diagramProcessor.saveForRagTraining(diagram, validation)
                 }
             } catch (e: Exception) {
-                logger.lifecycle("    Warning: Failed to save diagrams for RAG training - ${e.message}")
+                logger.lifecycle(PlantumlMessages.format("generate.rag_warning", lang, e.message ?: "Unknown error"))
             }
         } else {
-            logger.lifecycle("  → Failed to generate valid diagram after $maxIterations iterations")
-            // Delete the processed prompt file
+            logger.lifecycle(PlantumlMessages.format("generate.max_iterations", lang, maxIterations))
             promptFile.delete()
-            throw RuntimeException("Failed to generate valid PlantUML diagram after max attempts ($maxIterations iterations exhausted). Check logs for details.")
+            throw RuntimeException(PlantumlMessages.format("generate.failed_max_attempts", lang, maxIterations))
         }
 
-        // Delete the processed prompt file
         promptFile.delete()
 
-        logger.lifecycle("  ✓ Completed processing: ${promptFile.name}")
+        logger.lifecycle(PlantumlMessages.format("generate.completed", lang, promptFile.name))
     }
 
     /**
@@ -301,12 +300,12 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         try {
             val buildDir = File(project.buildDir, "plantuml-plugin")
             if (buildDir.exists()) {
-                logger.lifecycle("  → Cleaning up partial outputs in ${buildDir.absolutePath}")
+                logger.lifecycle(PlantumlMessages.format("generate.cleaning", lang, buildDir.absolutePath))
                 buildDir.deleteRecursively()
-                logger.lifecycle("  ✓ Cleanup complete")
+                logger.lifecycle(PlantumlMessages.get("generate.cleanup_complete", lang))
             }
         } catch (e: Exception) {
-            logger.warn("  ⚠ Cleanup failed: ${e.message}")
+            logger.warn(PlantumlMessages.format("generate.cleanup_failed", lang, e.message ?: "Unknown error"))
         }
     }
 }

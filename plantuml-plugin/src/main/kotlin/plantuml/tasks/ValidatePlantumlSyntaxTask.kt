@@ -32,8 +32,9 @@ import plantuml.service.PlantumlService
 @DisableCachingByDefault(because = "Validation results depend on file content which may change")
 abstract class ValidatePlantumlSyntaxTask : DefaultTask() {
 
+    private val lang: String = PlantumlManager.resolveLanguage(project)
+
     init {
-        val lang = PlantumlManager.resolveLanguage(project)
         group = PlantumlMessages.get("task.validate.group", lang)
         description = PlantumlMessages.get("task.validate.description", lang)
     }
@@ -56,18 +57,18 @@ abstract class ValidatePlantumlSyntaxTask : DefaultTask() {
             ?: diagramFile.orNull
 
         if (diagramPath.isNullOrEmpty()) {
-            logger.lifecycle("No diagram file specified. Use -Pplantuml.diagram=file.puml")
+            logger.lifecycle(PlantumlMessages.get("validate.no_file", lang))
             return
         }
 
         // Resolve the diagram file path relative to the project directory
         val diagramFile = project.file(diagramPath)
         if (!diagramFile.exists()) {
-            logger.lifecycle("Diagram file does not exist: $diagramPath")
-            throw GradleException("Diagram file does not exist: $diagramPath")
+            logger.lifecycle(PlantumlMessages.format("validate.file_not_found", lang, diagramPath))
+            throw GradleException(PlantumlMessages.format("validate.file_not_found", lang, diagramPath))
         }
 
-        logger.lifecycle("Validating PlantUML syntax for: $diagramPath")
+        logger.lifecycle(PlantumlMessages.format("validate.validating", lang, diagramPath))
 
         // Load the PlantUML file
         val plantumlCode = diagramFile.readText()
@@ -78,14 +79,14 @@ abstract class ValidatePlantumlSyntaxTask : DefaultTask() {
 
         when (validationResult) {
             is PlantumlService.SyntaxValidationResult.Valid -> {
-                logger.lifecycle("  ✓ PlantUML syntax is valid")
+                logger.lifecycle(PlantumlMessages.get("validate.valid", lang))
             }
 
             is PlantumlService.SyntaxValidationResult.Invalid -> {
-                logger.lifecycle("  ✗ PlantUML syntax is invalid:")
-                logger.lifecycle("    Error: ${validationResult.errorMessage}")
+                logger.lifecycle(PlantumlMessages.get("validate.invalid", lang))
+                logger.lifecycle(PlantumlMessages.format("validate.error_line", lang, validationResult.errorMessage))
                 if (validationResult.stackTrace.isNotEmpty()) {
-                    logger.lifecycle("    Stack trace: ${validationResult.stackTrace}")
+                    logger.lifecycle(PlantumlMessages.format("validate.stack_trace", lang, validationResult.stackTrace))
                 }
             }
         }

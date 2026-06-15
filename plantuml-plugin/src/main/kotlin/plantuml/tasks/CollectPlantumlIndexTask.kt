@@ -66,8 +66,9 @@ enum class RagMode { SIMULATION, DATABASE, TESTCONTAINERS }
 @DisableCachingByDefault(because = "RAG indexing processes all files and results depend on current state")
 abstract class CollectPlantumlIndexTask : DefaultTask() {
 
+    private val lang: String = PlantumlManager.resolveLanguage(project)
+
     init {
-        val lang = PlantumlManager.resolveLanguage(project)
         group = PlantumlMessages.get("task.collect.group", lang)
         description = PlantumlMessages.get("task.collect.description", lang)
     }
@@ -82,7 +83,7 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
      */
     @TaskAction
     fun reindexRag() {
-        logger.lifecycle("Rebuilding RAG index with PlantUML diagrams...")
+        logger.lifecycle(PlantumlMessages.get("collect.rebuilding", lang))
 
         // Check for test mode port conflict simulation FIRST, before determining RAG mode
         val simulatePortConflict = System.getProperty("plantuml.test.simulate.port.conflict") == "true" ||
@@ -114,9 +115,9 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         // Load valid PlantUML diagrams from the RAG collection directory
         val ragDir = File(config.output.rag)
         if (!ragDir.exists()) {
-            logger.lifecycle("  → No RAG directory found at: ${ragDir.absolutePath}")
+            logger.lifecycle(PlantumlMessages.format("collect.no_rag_dir", lang, ragDir.absolutePath))
             ragDir.mkdirs()
-            logger.lifecycle("  → Created RAG directory")
+            logger.lifecycle(PlantumlMessages.get("collect.created_rag_dir", lang))
             return
         }
 
@@ -173,11 +174,11 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         }
 
         if (diagramFiles.isEmpty() && historyFiles.isEmpty()) {
-            logger.lifecycle("  → No PlantUML diagrams or training data found in RAG directory")
+            logger.lifecycle(PlantumlMessages.get("collect.no_data", lang))
             return
         }
 
-        logger.lifecycle("  → Found ${diagramFiles.size} PlantUML diagrams and ${historyFiles.size} training histories for indexing")
+        logger.lifecycle(PlantumlMessages.format("collect.found_data", lang, diagramFiles.size, historyFiles.size))
 
         val embeddingModel: EmbeddingModel = if (System.getProperty("plantuml.test.rag.mode") != null) {
             val stubClass = System.getProperty("plantuml.test.embedding.model.class")
@@ -225,43 +226,39 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         // Priority 1: CLI parameter (-Prag.mode)
         val cliMode = cliParams["rag.mode"]?.toString()?.lowercase()
         if (cliMode != null) {
-            logger.lifecycle("  → RAG mode from CLI parameter: $cliMode")
+            logger.lifecycle(PlantumlMessages.format("collect.rag_mode_cli", lang, cliMode))
             return RagMode.valueOf(cliMode.uppercase())
         }
 
-        // Priority 2: Environment variable (RAG_MODE)
         val envMode = System.getenv("RAG_MODE")?.lowercase()
         if (envMode != null) {
-            logger.lifecycle("  → RAG mode from environment variable: $envMode")
+            logger.lifecycle(PlantumlMessages.format("collect.rag_mode_env", lang, envMode))
             return RagMode.valueOf(envMode.uppercase())
         }
 
-        // Priority 3: Gradle property (rag.mode from -P flag or gradle.properties)
         val gradlePropMode = project.properties["rag.mode"]?.toString()?.lowercase()
         if (gradlePropMode != null) {
-            logger.lifecycle("  → RAG mode from Gradle property: $gradlePropMode")
+            logger.lifecycle(PlantumlMessages.format("collect.rag_mode_prop", lang, gradlePropMode))
             return RagMode.valueOf(gradlePropMode.uppercase())
         }
 
-        // Priority 4: Test mode property (plantuml.test.rag.mode via -P flag or gradle.properties)
         val testMode = project.properties["plantuml.test.rag.mode"]?.toString()?.lowercase()
             ?: System.getProperty("plantuml.test.rag.mode")?.lowercase()
         if (testMode != null) {
-            logger.lifecycle("  → RAG mode from test property: $testMode")
+            logger.lifecycle(PlantumlMessages.format("collect.rag_mode_test", lang, testMode))
             return RagMode.valueOf(testMode.uppercase())
         }
 
-        // Priority 5: Config file (if databaseUrl is set → database, else → simulation)
         val useDatabase = config.rag.databaseUrl.isNotBlank() &&
                 config.rag.port != 0 &&
                 config.rag.username.isNotBlank() &&
                 config.rag.password.isNotBlank()
 
         return if (useDatabase) {
-            logger.lifecycle("  → RAG mode from config file: database")
+            logger.lifecycle(PlantumlMessages.get("collect.rag_mode_db", lang))
             RagMode.DATABASE
         } else {
-            logger.lifecycle("  → RAG mode from config file: simulation")
+            logger.lifecycle(PlantumlMessages.get("collect.rag_mode_sim", lang))
             RagMode.SIMULATION
         }
     }
@@ -284,8 +281,8 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         embeddingModel: EmbeddingModel,
         documentSplitter: DocumentSplitter
     ) {
-        logger.lifecycle("  → Using PostgreSQL database for RAG indexing")
-        logger.lifecycle("  → Database URL: ${config.rag.databaseUrl}:${config.rag.port}")
+        logger.lifecycle(PlantumlMessages.get("collect.using_db", lang))
+        logger.lifecycle(PlantumlMessages.format("collect.db_url", lang, config.rag.databaseUrl, config.rag.port))
 
         // Initialize PGVector embedding store
         val embeddingStore: EmbeddingStore<TextSegment> = PgVectorEmbeddingStore.builder()
@@ -300,8 +297,8 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
 
         indexDiagrams(diagramFiles, historyFiles, embeddingModel, documentSplitter, embeddingStore)
 
-        logger.lifecycle("  ✓ RAG reindexing complete with ${diagramFiles.size} diagrams and ${historyFiles.size} histories")
-        logger.lifecycle("  → Embeddings stored in PostgreSQL database")
+        logger.lifecycle(PlantumlMessages.format("collect.reindex_complete_db", lang, diagramFiles.size, historyFiles.size))
+        logger.lifecycle(PlantumlMessages.get("collect.embeddings_stored_db", lang))
     }
 
     /**
@@ -321,7 +318,7 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         embeddingModel: EmbeddingModel,
         documentSplitter: DocumentSplitter
     ) {
-        logger.lifecycle("  → Using testcontainers PostgreSQL for RAG indexing")
+        logger.lifecycle(PlantumlMessages.get("collect.using_testcontainers", lang))
 
         val container = try {
             org.testcontainers.containers.PostgreSQLContainer<Nothing>("postgres:15-alpine").apply {
@@ -345,8 +342,8 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
             throw RuntimeException(message, e)
         }
 
-        logger.lifecycle("  → PostgreSQL container started: ${container.containerId}")
-        logger.lifecycle("  → JDBC URL: ${container.jdbcUrl}")
+        logger.lifecycle(PlantumlMessages.format("collect.container_started", lang, container.containerId))
+        logger.lifecycle(PlantumlMessages.format("collect.jdbc_url", lang, container.jdbcUrl))
 
         val embeddingStore: EmbeddingStore<TextSegment> = PgVectorEmbeddingStore.builder()
             .host(container.host)
@@ -361,9 +358,9 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         indexDiagrams(diagramFiles, historyFiles, embeddingModel, documentSplitter, embeddingStore)
 
         container.stop()
-        logger.lifecycle("  → PostgreSQL container stopped")
-        logger.lifecycle("  ✓ RAG reindexing complete with ${diagramFiles.size} diagrams and ${historyFiles.size} histories")
-        logger.lifecycle("  → Embeddings stored in testcontainers PostgreSQL")
+        logger.lifecycle(PlantumlMessages.get("collect.container_stopped", lang))
+        logger.lifecycle(PlantumlMessages.format("collect.reindex_complete_tc", lang, diagramFiles.size, historyFiles.size))
+        logger.lifecycle(PlantumlMessages.get("collect.embeddings_stored_tc", lang))
     }
 
     /**
@@ -390,7 +387,7 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         embeddingStore: EmbeddingStore<TextSegment>
     ) {
         diagramFiles.forEach { file ->
-            logger.lifecycle("    Indexing diagram: ${file.name}")
+            logger.lifecycle(PlantumlMessages.format("collect.indexing_diagram", lang, file.name))
 
             val content = try {
                 file.readText()
@@ -406,13 +403,13 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
             )
 
             val segments = documentSplitter.split(doc)
-            logger.lifecycle("      Split into ${segments.size} segments")
+            logger.lifecycle(PlantumlMessages.format("collect.split_segments", lang, segments.size))
 
             segments.forEach { segment ->
                 val embedding: Embedding = embeddingModel.embed(segment.text()).content()
                 try {
                     embeddingStore.add(embedding, segment)
-                    logger.lifecycle("        Stored embedding for segment: ${segment.text().take(50)}...")
+                    logger.lifecycle(PlantumlMessages.format("collect.stored_embedding", lang, segment.text().take(50)))
                 } catch (e: Exception) {
                     handleEmbeddingStoreError(e, file)
                 }
@@ -420,7 +417,7 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         }
 
         historyFiles.forEach { file ->
-            logger.lifecycle("    Indexing training history: ${file.name}")
+            logger.lifecycle(PlantumlMessages.format("collect.indexing_history", lang, file.name))
 
             val content = try {
                 file.readText()
@@ -436,13 +433,13 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
             )
 
             val segments = documentSplitter.split(doc)
-            logger.lifecycle("      Split into ${segments.size} segments")
+            logger.lifecycle(PlantumlMessages.format("collect.split_segments", lang, segments.size))
 
             segments.forEach { segment ->
                 val embedding: Embedding = embeddingModel.embed(segment.text()).content()
                 try {
                     embeddingStore.add(embedding, segment)
-                    logger.lifecycle("        Stored embedding for segment: ${segment.text().take(50)}...")
+                    logger.lifecycle(PlantumlMessages.format("collect.stored_embedding", lang, segment.text().take(50)))
                 } catch (e: Exception) {
                     handleEmbeddingStoreError(e, file)
                 }
@@ -504,12 +501,12 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         try {
             val buildDir = File(project.buildDir, "plantuml-plugin")
             if (buildDir.exists()) {
-                logger.lifecycle("  → Cleaning up partial outputs in ${buildDir.absolutePath}")
+                logger.lifecycle(PlantumlMessages.format("collect.cleaning", lang, buildDir.absolutePath))
                 buildDir.deleteRecursively()
-                logger.lifecycle("  ✓ Cleanup complete")
+                logger.lifecycle(PlantumlMessages.get("collect.cleanup_complete", lang))
             }
         } catch (e: Exception) {
-            logger.warn("  ⚠ Cleanup failed: ${e.message}")
+            logger.warn(PlantumlMessages.format("collect.cleanup_failed", lang, e.message ?: "Unknown error"))
         }
     }
 
@@ -552,57 +549,48 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         // For now, we'll just log the indexing process
         // In a production implementation, this would connect to a vector database
         diagramFiles.forEach { file ->
-            logger.lifecycle("    Indexing diagram: ${file.name}")
+            logger.lifecycle(PlantumlMessages.format("collect.indexing_diagram", lang, file.name))
 
-            // Read the PlantUML diagram
             val content = file.readText()
 
-            // Create document
             val document = document(
                 content,
                 metadata("source", file.name).put("type", "plantuml").put("contentType", "diagram")
             )
 
 
-            // Split document into segments
             val segments = documentSplitter.split(document)
-            logger.lifecycle("      Split into ${segments.size} segments")
+            logger.lifecycle(PlantumlMessages.format("collect.split_segments", lang, segments.size))
 
-            // Generate embeddings (in a real implementation, we would store these)
             segments.forEach { segment ->
                 val embedding: Embedding = embeddingModel.embed(segment.text()).content()
-                logger.lifecycle("        Generated embedding for segment: ${segment.text().take(50)}...")
+                logger.lifecycle(PlantumlMessages.format("collect.generated_embedding", lang, segment.text().take(50)))
             }
         }
 
-        // Process each history file
         historyFiles.forEach { file ->
-            logger.lifecycle("    Indexing training history: ${file.name}")
+            logger.lifecycle(PlantumlMessages.format("collect.indexing_history", lang, file.name))
 
-            // Read the history file
             val content = file.readText()
 
-            // Create document
             val document = document(
                 content,
                 metadata("source", file.name).put("type", "training").put("contentType", "history")
             )
 
-            // Split document into segments
             val segments = documentSplitter.split(document)
-            logger.lifecycle("      Split into ${segments.size} segments")
+            logger.lifecycle(PlantumlMessages.format("collect.split_segments", lang, segments.size))
 
-            // Generate embeddings (in a real implementation, we would store these)
             segments.forEach { segment ->
                 val embedding: Embedding = embeddingModel.embed(segment.text()).content()
-                logger.lifecycle("        Generated embedding for segment: ${segment.text().take(50)}...")
+                logger.lifecycle(PlantumlMessages.format("collect.generated_embedding", lang, segment.text().take(50)))
             }
         }
 
-        logger.lifecycle("  ✓ RAG reindexing complete with ${diagramFiles.size} diagrams and ${historyFiles.size} histories")
-        logger.lifecycle("  → Note: In a production implementation, embeddings would be stored in a vector database")
-        logger.lifecycle("  → To enable actual vector storage, configure PostgreSQL with pgvector extension")
-        logger.lifecycle("  → Set database connection properties in plantuml-context.yml")
+        logger.lifecycle(PlantumlMessages.format("collect.reindex_complete_sim", lang, diagramFiles.size, historyFiles.size))
+        logger.lifecycle(PlantumlMessages.get("collect.note_production", lang))
+        logger.lifecycle(PlantumlMessages.get("collect.note_pgvector", lang))
+        logger.lifecycle(PlantumlMessages.get("collect.note_config", lang))
     }
 }
 

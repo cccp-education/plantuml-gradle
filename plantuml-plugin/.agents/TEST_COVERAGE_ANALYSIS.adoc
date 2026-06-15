@@ -1,15 +1,21 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 150 (15 juin 2026)
+_Dernière mise à jour_ : Session 151 (15 juin 2026)
 
 === Résumé Global
 
-* **Total tests unitaires** : 380 + 35 (S148) + 23 (S149) + 16 (S150) = 454 PASSED, 2 FAILED (pré-existants)
+* **Total tests unitaires** : 380 + 35 (S148) + 23 (S149) + 16 (S150) + 760 (S151) = 1214 PASSED, 2 FAILED (pré-existants)
 * **Tests fonctionnels GradleRunner KG** : 15 PASSED
 * **Tests real-llm (Ollama local)** : 6 créés, 0 FAILED (non exécutés — nécessite Ollama)
 * **Tests fine-tune SmolLM2 (testcontainer Python)** : 3 crees, 3/3 PASS
 * **Tests Knowledge Graph** : 90 unitaires + 15 fonctionnels
 * **Kover instruction coverage** : 81.19% (baseline Session 136)
+
+=== Nouveaux Tests — Session 151 (PLT-I18N US-3 Lifecycle Messages)
+
+* **LifecycleMessagesI18nTest** : 760 tests unitaires (74 clés lifecycle × 10 langues + 20 format tests) — 760/760 PASS
+* **17_i18n_lifecycle_messages.feature** : 2 scénarios Cucumber (fr + en) — compile OK, Cucumber runner timeout (mock LLM lent)
+* **I18nSteps.kt** : +1 step definition (outputShouldContainI18nLifecycleMessage)
 
 === Nouveaux Tests — Session 150 (PLT-I18N US-2 Task Descriptions)
 

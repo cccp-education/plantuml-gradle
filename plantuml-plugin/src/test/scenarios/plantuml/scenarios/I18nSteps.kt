@@ -123,6 +123,15 @@ class I18nSteps(private val world: PlantumlWorld) {
         }
     }
 
+    @Then("the output should contain the i18n lifecycle message {string} with args {list} in language {string}")
+    fun outputShouldContainI18nLifecycleMessage(key: String, args: List<Int>, language: String) {
+        assertThat(world.buildResult).isNotNull
+        val output = world.buildResult!!.output
+        assertThat(output).contains("BUILD SUCCESSFUL")
+        val expectedMessage = PlantumlMessages.format(key, language, *args.toTypedArray())
+        assertThat(output).contains(expectedMessage)
+    }
+
     @Then("the output should contain the i18n task description for {string} in language {string}")
     fun outputShouldContainI18nTaskDescription(taskName: String, language: String) {
         assertThat(world.buildResult).isNotNull

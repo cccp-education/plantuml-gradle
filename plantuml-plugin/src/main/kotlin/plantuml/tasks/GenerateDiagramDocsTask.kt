@@ -12,8 +12,9 @@ import java.io.File
 @DisableCachingByDefault(because = "Depends on Graphify output which may change")
 abstract class GenerateDiagramDocsTask : DefaultTask() {
 
+    private val lang: String = PlantumlManager.resolveLanguage(project)
+
     init {
-        val lang = PlantumlManager.resolveLanguage(project)
         group = PlantumlMessages.get("task.diagramdocs.group", lang)
         description = PlantumlMessages.get("task.diagramdocs.description", lang)
     }
@@ -24,11 +25,11 @@ abstract class GenerateDiagramDocsTask : DefaultTask() {
 
         if (!graphFile.exists()) {
             throw GradleException(
-                "graphify-out/graph.json not found. Run 'graphify . --no-viz' first to build the knowledge graph."
+                PlantumlMessages.get("diagramdocs.graph_not_found", lang)
             )
         }
 
-        logger.lifecycle("Reading knowledge graph from: ${graphFile.absolutePath}")
+        logger.lifecycle(PlantumlMessages.format("diagramdocs.reading", lang, graphFile.absolutePath))
 
         val subgraph = project.findProperty("plantuml.diagram.subgraph")?.toString()
         val generateAll = project.findProperty("plantuml.diagram.all")?.toString() == "true"
@@ -44,24 +45,22 @@ abstract class GenerateDiagramDocsTask : DefaultTask() {
         val adapter = GraphifyPromptAdapter(graphFile, promptsDir)
 
         val results = if (generateAll) {
-            logger.lifecycle("Generating prompts for all communities...")
+            logger.lifecycle(PlantumlMessages.get("diagramdocs.all_communities", lang))
             adapter.generateAllPrompts()
         } else {
             val targetSubgraph = subgraph ?: "service layer"
-            logger.lifecycle("Generating prompt for subgraph: $targetSubgraph")
+            logger.lifecycle(PlantumlMessages.format("diagramdocs.subgraph", lang, targetSubgraph))
             listOf(adapter.generatePrompt(targetSubgraph))
         }
 
         results.forEach { result ->
             logger.lifecycle(
-                "Generated prompt: {} ({} nodes, {} edges)",
-                result.promptFile.name, result.nodes.size, result.edges.size
+                PlantumlMessages.format("diagramdocs.generated_prompt", lang, result.promptFile.name, result.nodes.size, result.edges.size)
             )
         }
 
         logger.lifecycle(
-            "Generated {} prompt(s). Run 'generatePlantumlDiagrams' to render diagrams.",
-            results.size
+            PlantumlMessages.format("diagramdocs.summary", lang, results.size)
         )
     }
 }

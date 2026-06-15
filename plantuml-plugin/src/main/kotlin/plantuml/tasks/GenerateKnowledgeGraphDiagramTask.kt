@@ -15,8 +15,9 @@ import java.io.File
 @DisableCachingByDefault(because = "Depends on graph.json which may change")
 abstract class GenerateKnowledgeGraphDiagramTask : DefaultTask() {
 
+    private val lang: String = PlantumlManager.resolveLanguage(project)
+
     init {
-        val lang = PlantumlManager.resolveLanguage(project)
         group = PlantumlMessages.get("task.kg.group", lang)
         description = PlantumlMessages.get("task.kg.description", lang)
     }
@@ -27,11 +28,11 @@ abstract class GenerateKnowledgeGraphDiagramTask : DefaultTask() {
 
         if (!graphFile.exists()) {
             throw GradleException(
-                "graphify-out/graph.json not found. Run 'graphify . --no-viz' first to build the knowledge graph."
+                PlantumlMessages.format("kgparser.file_not_found", lang, graphFile.absolutePath)
             )
         }
 
-        logger.lifecycle("Reading knowledge graph from: ${graphFile.absolutePath}")
+        logger.lifecycle(PlantumlMessages.format("kg.reading", lang, graphFile.absolutePath))
 
         val communityFilter = project.findProperty("plantuml.kg.community")?.toString()
         val edgeTypesStr = project.findProperty("plantuml.kg.edgeTypes")?.toString()
@@ -58,8 +59,7 @@ abstract class GenerateKnowledgeGraphDiagramTask : DefaultTask() {
         val graph = parser.parse()
 
         logger.lifecycle(
-            "Knowledge graph: {} nodes, {} edges, {} communities",
-            graph.nodes.size, graph.edges.size, graph.communities.size
+            PlantumlMessages.format("kg.stats", lang, graph.nodes.size, graph.edges.size, graph.communities.size)
         )
 
         val renderer = KnowledgeGraphRenderer()
@@ -82,22 +82,21 @@ abstract class GenerateKnowledgeGraphDiagramTask : DefaultTask() {
         }
         val pumlFile = File(outputDir, "knowledge-graph${fileNameSuffix}.puml")
         pumlFile.writeText(plantumlCode)
-        logger.lifecycle("Generated PlantUML: {}", pumlFile.absolutePath)
+        logger.lifecycle(PlantumlMessages.format("kg.generated_puml", lang, pumlFile.absolutePath))
 
         val plantumlService = PlantumlService()
         val validationResult = plantumlService.validateSyntax(plantumlCode)
         if (validationResult is PlantumlService.SyntaxValidationResult.Invalid) {
             logger.warn("Generated PlantUML has validation issues: {}", validationResult.errorMessage)
-            logger.lifecycle("PlantUML file saved despite validation issues: {}", pumlFile.absolutePath)
+            logger.lifecycle(PlantumlMessages.format("kg.saved_despite_issues", lang, pumlFile.absolutePath))
         } else {
             val imageFile = File(outputDir, "knowledge-graph${fileNameSuffix}.png")
             plantumlService.generateImage(plantumlCode, imageFile)
-            logger.lifecycle("Generated PNG: {}", imageFile.absolutePath)
+            logger.lifecycle(PlantumlMessages.format("kg.generated_png", lang, imageFile.absolutePath))
         }
 
         logger.lifecycle(
-            "Knowledge graph diagram generated successfully ({} nodes, {} edges, {} communities)",
-            graph.nodes.size, graph.edges.size, graph.communities.size
+            PlantumlMessages.format("kg.success", lang, graph.nodes.size, graph.edges.size, graph.communities.size)
         )
     }
 

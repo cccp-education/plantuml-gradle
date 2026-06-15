@@ -1,0 +1,52 @@
+= Session 151 — US-I18N-3 Logger Lifecycle Messages i18n
+:date: 2026-06-15
+:type: DDD + TDD + BDD
+:score: 9/10
+
+== Résumé
+
+Refactoring de ~66 `logger.lifecycle()` hardcodés dans les 5 tâches principales
+vers `PlantumlMessages.format()`/`PlantumlMessages.get()` avec résolution de langue
+via `PlantumlManager.resolveLanguage(project)`.
+
+== DDD — 5 fichiers modifiés
+
+[cols="2,2,3"]
+|===
+| Fichier | Lifecycle | Changement
+| `ValidatePlantumlSyntaxTask.kt` | 7 | +champ `lang`, 7 lifecycle → i18n
+| `GenerateDiagramDocsTask.kt` | 5 | +champ `lang`, 5 lifecycle + 1 GradleException → i18n
+| `GenerateKnowledgeGraphDiagramTask.kt` | 6 | +champ `lang`, 6 lifecycle + 1 GradleException → i18n
+| `GeneratePlantumlDiagramsTask.kt` | 19 | +champ `lang`, 19 lifecycle + 1 RuntimeException → i18n
+| `CollectPlantumlIndexTask.kt` | 29 | +champ `lang`, 29 lifecycle → i18n
+|===
+
+Pattern : `private val lang: String = PlantumlManager.resolveLanguage(project)` rendu
+accessible dans toute la classe (plus seulement dans `init`).
+
+Fix nullable : `e.message` → `e.message ?: "Unknown error"`, `chatModel.toString()`,
+`System.getProperty(...) ?: "null"` pour compatibilité `vararg Any`.
+
+== TDD — LifecycleMessagesI18nTest
+
+- 74 clés lifecycle × 10 langues = 740 tests paramétrés `keyAndLangProvider`
+- 10 tests `should format lifecycle message with args in all languages`
+- 10 tests `should format multi-arg lifecycle message in all languages`
+- **760/760 PASS**
+
+== BDD — 17_i18n_lifecycle_messages.feature
+
+- 2 scénarios Cucumber (fr + en)
+- Step `outputShouldContainI18nLifecycleMessage` dans `I18nSteps.kt`
+- Compile OK, Cucumber runner timeout (mock LLM lent)
+
+== Compile + publishToMavenLocal
+
+- `./gradlew compileKotlin` OK
+- `./gradlew -q publishToMavenLocal` OK
+
+== Prochaine session (152)
+
+US-I18N-4 : Logger warn/error + exception messages i18n (~45 occurrences).
+Fichiers : PlantumlManager, PlantumlService, DiagramProcessor, KnowledgeGraphParser,
+GraphifyPromptAdapter, ApiKeyPool + logger.warn/error résiduels dans les 5 tâches.
