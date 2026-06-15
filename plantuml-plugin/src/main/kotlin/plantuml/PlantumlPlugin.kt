@@ -24,8 +24,9 @@ class PlantumlPlugin : Plugin<Project> {
             PlantumlManager.Tasks.registerTasks(this)
 
             project.tasks.register("docs") {
-                it.group = "info"
-                it.description = "Full documentation pipeline: knowledge graph + generate prompts + process + validate"
+                val lang = PlantumlManager.resolveLanguage(project)
+                it.group = PlantumlMessages.get("task.docs.group", lang)
+                it.description = PlantumlMessages.get("task.docs.description", lang)
                 it.dependsOn("generateKnowledgeGraphDiagram")
                 it.dependsOn("generateDiagramDocs")
                 it.dependsOn("generatePlantumlDiagrams")

@@ -7,6 +7,8 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
+import plantuml.PlantumlManager
+import plantuml.PlantumlMessages
 import plantuml.service.PlantumlService
 
 /**
@@ -31,8 +33,9 @@ import plantuml.service.PlantumlService
 abstract class ValidatePlantumlSyntaxTask : DefaultTask() {
 
     init {
-        group = "verify"
-        description = "Validates PlantUML syntax for debugging"
+        val lang = PlantumlManager.resolveLanguage(project)
+        group = PlantumlMessages.get("task.validate.group", lang)
+        description = PlantumlMessages.get("task.validate.description", lang)
     }
 
     @get:Input

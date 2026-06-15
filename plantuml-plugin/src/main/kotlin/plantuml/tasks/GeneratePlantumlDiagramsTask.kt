@@ -8,6 +8,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
 import plantuml.PlantumlConfig
 import plantuml.PlantumlManager
+import plantuml.PlantumlMessages
 import plantuml.service.DiagramProcessor
 import plantuml.service.LlmService
 import plantuml.service.PlantumlService
@@ -46,8 +47,9 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
     init {
-        group = "generate"
-        description = "Process PlantUML prompts and generate diagrams with LLM assistance"
+        val lang = PlantumlManager.resolveLanguage(project)
+        group = PlantumlMessages.get("task.generate.group", lang)
+        description = PlantumlMessages.get("task.generate.description", lang)
     }
 
     /**

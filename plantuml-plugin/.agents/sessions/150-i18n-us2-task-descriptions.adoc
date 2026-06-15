@@ -1,0 +1,80 @@
+= Session 150 — US-I18N-2 Task Descriptions i18n
+:date: 2026-06-15
+:type: DDD + TDD + BDD
+:score: 9/10
+
+== Résumé
+
+US-I18N-2 : Refactoring des 12 descriptions/groupes de tâches Gradle
+pour utiliser `PlantumlMessages.get()` au lieu de strings hardcodées.
+
+== Fichiers modifiés (8)
+
+[cols="1,3,2"]
+|===
+| Fichier | Modification | Lignes
+
+| `PlantumlManager.kt`
+| Ajout `resolveLanguage(project)` helper
+| +5
+
+| `PlantumlPlugin.kt`
+| `docs` task group/description → `PlantumlMessages.get()`
+| +3/-2
+
+| `ValidatePlantumlSyntaxTask.kt`
+| init block → `PlantumlMessages.get("task.validate.*")`
+| +5/-2
+
+| `GeneratePlantumlDiagramsTask.kt`
+| init block → `PlantumlMessages.get("task.generate.*")`
+| +4/-2
+
+| `GenerateDiagramDocsTask.kt`
+| init block → `PlantumlMessages.get("task.diagramdocs.*")`
+| +5/-2
+
+| `GenerateKnowledgeGraphDiagramTask.kt`
+| init block → `PlantumlMessages.get("task.kg.*")`
+| +5/-2
+
+| `CollectPlantumlIndexTask.kt`
+| init block → `PlantumlMessages.get("task.collect.*")`
+| +4/-2
+
+| `I18nSteps.kt`
+| Steps `runTask` + `outputShouldContainI18nTaskDescription`
+| +25
+|===
+
+== Fichiers créés (2)
+
+- `TaskDescriptionsI18nTest.kt` — 16 tests unitaires (6 tâches + 10 langues)
+- `16_i18n_task_descriptions.feature` — 2 scénarios BDD (fr + en)
+
+== Tests
+
+[cols="2,2,2"]
+|===
+| Suite | Tests | Statut
+| TaskDescriptionsI18nTest | 16 | ✅ 16/16 PASS
+| PlantumlMessagesTest | 23 | ✅ 23/23 PASS (pré-existant)
+| 16_i18n_task_descriptions.feature | 2 | ⚠️ Compile OK, non exécuté (Cucumber runner timeout mock LLM)
+|===
+
+== EPIC PLT-I18N — Progression
+
+- US-I18N-0 : ✅ Configuration layer (3/28)
+- US-I18N-1 : ✅ Messages properties 10 langues (4/28)
+- US-I18N-2 : ✅ Task descriptions i18n (3/28) ← Session 150
+- US-I18N-3 : ☐ Logger lifecycle messages (6/28) ← Session 151
+- US-I18N-4 : ☐ Logger warn/error + exceptions (5/28)
+- US-I18N-5 : ☐ println cleanup → logger (2/28)
+- US-I18N-6 : ☐ Cucumber BDD scénarios (3/28)
+- US-I18N-7 : ☐ Documentation + README (2/28)
+- Total : 10/28 pts (36%)
+
+== Prochaine session (151)
+
+US-I18N-3 : Logger lifecycle messages i18n — ~60 `logger.lifecycle()` dans
+les 5 tâches principales. Messages paramétrés via `MessageFormat`.

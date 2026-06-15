@@ -88,6 +88,11 @@ object PlantumlManager {
         }
     }
 
+    fun resolveLanguage(project: Project): String {
+        val config = Configuration.load(project)
+        return config.language
+    }
+
     /**
      * Manages plugin extension points.
      */

@@ -62,3 +62,25 @@ VAGUE 4.4 — HTOWN.
 **Fichiers modifiés** : `build.gradle.kts`, `settings.gradle.kts`
 
 **Résultats** : `education.cccp:plantuml-gradle:0.0.1` publié sur Maven Central ✅
+
+== Session 150 — 2026-06-15 — US-I18N-2 Task Descriptions i18n
+
+**Contexte** : Refactoring des 12 descriptions/groupes de tâches Gradle pour utiliser
+`PlantumlMessages.get()` au lieu de strings hardcodées. Baby steps DDD/TDD/BDD.
+
+**Tâches réalisées** :
+
+* [x] DDD : `PlantumlManager.resolveLanguage(project)` helper
+* [x] DDD : `ValidatePlantumlSyntaxTask` init block → `PlantumlMessages.get("task.validate.*")`
+* [x] DDD : `GeneratePlantumlDiagramsTask` init block → `PlantumlMessages.get("task.generate.*")`
+* [x] DDD : `GenerateDiagramDocsTask` init block → `PlantumlMessages.get("task.diagramdocs.*")`
+* [x] DDD : `GenerateKnowledgeGraphDiagramTask` init block → `PlantumlMessages.get("task.kg.*")`
+* [x] DDD : `CollectPlantumlIndexTask` init block → `PlantumlMessages.get("task.collect.*")`
+* [x] DDD : `PlantumlPlugin.kt` docs task → `PlantumlMessages.get("task.docs.*")`
+* [x] TDD : `TaskDescriptionsI18nTest` — 16 tests (6 tâches + 10 langues) — 16/16 PASS
+* [x] BDD : `16_i18n_task_descriptions.feature` (2 scénarios fr + en) + `I18nSteps.kt` (+2 steps)
+* [x] Compile OK + publishToMavenLocal OK
+
+**Fichiers modifiés** : 8 (PlantumlManager.kt, PlantumlPlugin.kt, 5 task classes, I18nSteps.kt)
+**Fichiers créés** : 2 (TaskDescriptionsI18nTest.kt, 16_i18n_task_descriptions.feature)
+**EPIC PLT-I18N** : 10/28 pts (36%) — US-0 ✅, US-1 ✅, US-2 ✅

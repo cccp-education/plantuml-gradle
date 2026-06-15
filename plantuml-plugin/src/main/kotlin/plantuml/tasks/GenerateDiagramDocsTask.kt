@@ -4,6 +4,8 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
+import plantuml.PlantumlManager
+import plantuml.PlantumlMessages
 import plantuml.service.GraphifyPromptAdapter
 import java.io.File
 
@@ -11,8 +13,9 @@ import java.io.File
 abstract class GenerateDiagramDocsTask : DefaultTask() {
 
     init {
-        group = "generate"
-        description = "Auto-generate PlantUML documentation diagrams from Graphify knowledge graph"
+        val lang = PlantumlManager.resolveLanguage(project)
+        group = PlantumlMessages.get("task.diagramdocs.group", lang)
+        description = PlantumlMessages.get("task.diagramdocs.description", lang)
     }
 
     @TaskAction

@@ -16,6 +16,7 @@ import org.gradle.work.DisableCachingByDefault
 import org.testcontainers.containers.PostgreSQLContainer
 import plantuml.PlantumlConfig
 import plantuml.PlantumlManager
+import plantuml.PlantumlMessages
 import java.io.File
 
 /**
@@ -66,8 +67,9 @@ enum class RagMode { SIMULATION, DATABASE, TESTCONTAINERS }
 abstract class CollectPlantumlIndexTask : DefaultTask() {
 
     init {
-        group = "collect"
-        description = "Rebuilds the RAG index with collected PlantUML diagrams"
+        val lang = PlantumlManager.resolveLanguage(project)
+        group = PlantumlMessages.get("task.collect.group", lang)
+        description = PlantumlMessages.get("task.collect.description", lang)
     }
 
     /**

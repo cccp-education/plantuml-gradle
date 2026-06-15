@@ -5,6 +5,8 @@ import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
 import plantuml.EdgeType
+import plantuml.PlantumlManager
+import plantuml.PlantumlMessages
 import plantuml.service.KnowledgeGraphParser
 import plantuml.service.KnowledgeGraphRenderer
 import plantuml.service.PlantumlService
@@ -14,8 +16,9 @@ import java.io.File
 abstract class GenerateKnowledgeGraphDiagramTask : DefaultTask() {
 
     init {
-        group = "generate"
-        description = "Generate Knowledge Graph diagram from graphify-out/graph.json (deterministic, no LLM)"
+        val lang = PlantumlManager.resolveLanguage(project)
+        group = PlantumlMessages.get("task.kg.group", lang)
+        description = PlantumlMessages.get("task.kg.description", lang)
     }
 
     @TaskAction
