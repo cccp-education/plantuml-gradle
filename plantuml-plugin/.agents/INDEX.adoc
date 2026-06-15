@@ -2,9 +2,9 @@
 
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
-_Derniere mise a jour_ : 2026-06-11  
-_Session en cours_ : 148 — (à définir)  
-_Session terminee_ : 147 — Publication Maven Central 0.0.1
+_Derniere mise a jour_ : 2026-06-15  
+_Session en cours_ : 149 — Fix plugin ID + US-I18N-0 BDD + US-I18N-1  
+_Session terminee_ : 148 — Cadrage EPIC PLT-I18N + US-0 Configuration Layer
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
 '''
@@ -119,6 +119,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 
 |===
 | # | Date | Type | Sujet | Fichier | Score
+.1+^.^| 148 | 2026-06-15 | DDD + TDD + cadrage | Cadrage EPIC PLT-I18N + US-0 Configuration Layer — 7 US, ~28 pts, 10 langues, 35/35 tests PASS | `148-i18n-cadrage-us0.adoc` | 9/10
 .1+^.^| 147 | 2026-06-11 | publish | Publication Maven Central 0.0.1 (nmcp, POM sans guard, codebase→0.0.2) | `147-pub-maven-central-0.0.1.adoc` | 9/10
 .1+^.^| 146 | 2026-06-02 | governance | Borough-isation — plantuml-gradle devient HTOWN 🚀, 23ème borough | `146-borough-isation-htown.adoc` | 10/10
 .1+^.^| 145 | 2026-05-19 | migration | EPIC K-1 Renommage taxonomie (generatePlantumlDiagrams, collectPlantumlIndex) — 18 fichiers modifiés, Build OK | `145-epic-k-k1-renommage-taxonomie.adoc` | 10/10
@@ -148,6 +149,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 
 == 🎯 Roadmap — État Actuel
 
+| EPIC PLT-I18N : Internationalisation 10 langues | 🟠 11% | 3/28 | 🟠 EN COURS — Session 148 (US-0 ✅)
 | EPIC 13 : Multi-provider API Pool (tiers) | 🟡 0% | —/10 | 🟡 EN COURS — Sessions 138-141
 | BKY-PUB-1 ✅ : Publication Maven Central | ✅ 100% | 9/10 | ✅ TERMINÉ — Session 147 (nmcp, 0.0.1)
 |===

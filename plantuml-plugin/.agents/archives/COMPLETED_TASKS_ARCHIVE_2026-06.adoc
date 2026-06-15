@@ -1,5 +1,28 @@
 = Archive des Tâches Terminées — Juin 2026
 
+== Session 148 — 2026-06-15 — Cadrage EPIC PLT-I18N + US-0 Configuration Layer
+
+**Contexte** : Internationalisation plantuml-gradle (10 langues). Inspiré de bakery BKY-I18N
+et MEM-3 i18n-contracts. Baby steps DDD/TDD.
+
+**Tâches réalisées** :
+
+* [x] Cadrage EPIC PLT-I18N dans BACKLOG.adoc — 7 US, ~28 pts, 10 langues
+* [x] US-0 DDD: `PlantumlConfig.language` + `supportedLanguages` + `SUPPORTED_LANGS` (10 codes)
+* [x] US-0 DDD: `PlantumlExtension` DSL — `language` (Property<String>) + `supportedLanguages` (ListProperty<String>)
+* [x] US-0 DDD: `ConfigMerger.mergeLanguage()` + `mergeSupportedLanguages()` — cascade 4 couches
+* [x] US-0 DDD: `loadFromEnvironment()` + `buildConfigFromProperties()` — env vars + gradle.properties
+* [x] US-0 TDD: 19 tests `ConfigMergerTest` (defaults, gradle.properties, YAML, CLI, fallback en)
+* [x] US-0 TDD: 6 tests `ModelsDataClassTest` (defaults, SUPPORTED_LANGS, custom values)
+* [x] Compile OK + publishToMavenLocal OK
+* [x] 35/35 nouveaux tests PASS
+
+**Blocage découvert** : Plugin ID mismatch `com.cheroliv.plantuml` → `education.cccp.plantuml`
+dans 10 fichiers de test. 50 échecs pré-existants. À fixer Session 149.
+
+**Fichiers modifiés** : `BACKLOG.adoc`, `models.kt`, `PlantumlPlugin.kt`, `ConfigMerger.kt`,
+`ConfigMergerTest.kt`, `ModelsDataClassTest.kt`
+
 == Session 147 — 2026-06-11 — Publication Maven Central 0.0.1
 
 **Contexte** : Publication du plugin plantuml-gradle sur Maven Central via nmcp.

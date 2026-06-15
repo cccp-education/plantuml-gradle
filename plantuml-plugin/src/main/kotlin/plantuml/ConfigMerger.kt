@@ -19,7 +19,9 @@ object ConfigMerger {
             langchain4j = mergeLangchain4jConfig(envConfig.langchain4j, propertiesConfig.langchain4j, yamlConfig.langchain4j, cliParams),
             git = mergeGitConfig(envConfig.git, propertiesConfig.git, yamlConfig.git, cliParams),
             rag = mergeRagConfig(envConfig.rag, propertiesConfig.rag, yamlConfig.rag, cliParams),
-            diagramDocs = mergeDiagramDocsConfig(envConfig.diagramDocs, propertiesConfig.diagramDocs, yamlConfig.diagramDocs, cliParams)
+            diagramDocs = mergeDiagramDocsConfig(envConfig.diagramDocs, propertiesConfig.diagramDocs, yamlConfig.diagramDocs, cliParams),
+            language = mergeLanguage(envConfig.language, propertiesConfig.language, yamlConfig.language, cliParams),
+            supportedLanguages = mergeSupportedLanguages(envConfig.supportedLanguages, propertiesConfig.supportedLanguages, yamlConfig.supportedLanguages, cliParams)
         )
     }
 
@@ -33,7 +35,9 @@ object ConfigMerger {
             langchain4j = mergeLangchain4jConfig(envConfig.langchain4j, propertiesConfig.langchain4j, yamlConfig.langchain4j, cliParams),
             git = mergeGitConfig(envConfig.git, propertiesConfig.git, yamlConfig.git, cliParams),
             rag = mergeRagConfig(envConfig.rag, propertiesConfig.rag, yamlConfig.rag, cliParams),
-            diagramDocs = mergeDiagramDocsConfig(envConfig.diagramDocs, propertiesConfig.diagramDocs, yamlConfig.diagramDocs, cliParams)
+            diagramDocs = mergeDiagramDocsConfig(envConfig.diagramDocs, propertiesConfig.diagramDocs, yamlConfig.diagramDocs, cliParams),
+            language = mergeLanguage(envConfig.language, propertiesConfig.language, yamlConfig.language, cliParams),
+            supportedLanguages = mergeSupportedLanguages(envConfig.supportedLanguages, propertiesConfig.supportedLanguages, yamlConfig.supportedLanguages, cliParams)
         )
     }
 
@@ -137,7 +141,11 @@ object ConfigMerger {
                     ?: sysProps["PLANTUML_DIAGRAM_DOCS_SUBGRAPHS"]?.split(",")?.map { it.trim() }
                     ?: listOf("service layer", "config layer", "task layer", "model layer", "RAG"),
                 model = env["PLANTUML_DIAGRAM_DOCS_MODEL"] ?: sysProps["PLANTUML_DIAGRAM_DOCS_MODEL"] ?: "qwen3.5-cloud"
-            )
+            ),
+            language = env["PLANTUML_LANGUAGE"] ?: sysProps["PLANTUML_LANGUAGE"] ?: "en",
+            supportedLanguages = env["PLANTUML_SUPPORTED_LANGUAGES"]?.split(",")?.map { it.trim() }
+                ?: sysProps["PLANTUML_SUPPORTED_LANGUAGES"]?.split(",")?.map { it.trim() }
+                ?: listOf("en")
         )
     }
 
@@ -219,7 +227,12 @@ object ConfigMerger {
                     ?.map { it.trim() }
                     ?: listOf("service layer", "config layer", "task layer", "model layer", "RAG"),
                 model = props["plantuml.diagramDocs.model"] ?: "qwen3.5-cloud"
-            )
+            ),
+            language = props["plantuml.language"] ?: "en",
+            supportedLanguages = props["plantuml.supportedLanguages"]
+                ?.split(",")
+                ?.map { it.trim() }
+                ?: listOf("en")
         )
     }
 
@@ -314,5 +327,20 @@ object ConfigMerger {
             subgraphs = (cli["diagramDocs.subgraphs"] as? List<String>) ?: (if (env.subgraphs != defaultSubgraphs) env.subgraphs else (if (yaml.subgraphs != defaultSubgraphs) yaml.subgraphs else props.subgraphs)),
             model = cli["diagramDocs.model"]?.toString() ?: (if (env.model != "qwen3.5-cloud") env.model else (if (yaml.model != "qwen3.5-cloud") yaml.model else props.model))
         )
+    }
+
+    private fun mergeLanguage(envLang: String, propsLang: String, yamlLang: String, cli: Map<String, Any?>): String {
+        val resolved = cli["language"]?.toString()
+            ?: (if (envLang != "en") envLang else (if (yamlLang != "en") yamlLang else propsLang))
+        return if (resolved in PlantumlConfig.SUPPORTED_LANGS) resolved else "en"
+    }
+
+    private fun mergeSupportedLanguages(envLangs: List<String>, propsLangs: List<String>, yamlLangs: List<String>, cli: Map<String, Any?>): List<String> {
+        @Suppress("UNCHECKED_CAST")
+        val cliValue = cli["supportedLanguages"] as? List<String>
+        if (cliValue != null && cliValue.isNotEmpty()) return cliValue
+        if (envLangs != listOf("en")) return envLangs
+        if (yamlLangs != listOf("en")) return yamlLangs
+        return propsLangs
     }
 }

@@ -94,15 +94,179 @@ Sessions 145-147. Publié via nmcp (Central Portal).
 
 '''
 
-== Prochain EPIC
+== 🟠 EPIC PLT-I18N : Internationalisation — 10 Langues (NOUVEAU)
 
-1. **EPIC 13** — TieredRotationStrategy. ~6 pts. 2-3 sessions.
+*Découverte* : Session 148 — Cadrage i18n pour les ~150 strings hardcodées du plugin.
+*Objectif* : Remplacer les strings en anglais hardcodé dans le code Kotlin (logger,
+exceptions, descriptions de tâches) par un système d'i18n standard (ResourceBundle +
+MessageFormat). Les prompts LLM restent en anglais (prompt engineering, pas i18n).
+*Charge* : ~28 pts (~6-7 sessions)
+*Priorité* : P1 — Plugin publié sur Maven Central mais monolingue (en). L'i18n est
+le prochain cap majeur pour rendre le plugin utilisable internationalement.
+*Dépend de* : `education.cccp:i18n-contracts:0.0.1` (MEM-3, workspace-bom) — artefact N0
+fournissant `SupportedLanguage`, `LanguageCatalog`, `I18nConfig`, `MessageBundle`, `LocaleResolver`.
+Actuellement en mavenLocal seulement (MEM-3.6 publication Central pending).
+
+=== Différence vs Bakery BKY-I18N
+
+Bakery = i18n de templates Thymeleaf (`#{key}`). Plantuml = i18n de code Kotlin
+(logger, exceptions, descriptions). Approche : `java.util.ResourceBundle` +
+`java.text.MessageFormat` pour les messages paramétrés, wrapper `PlantumlMessages`.
+
+=== Langues supportées (10)
+
+[cols="1,3,2"]
+|===
+| Rang | Langue | Locuteurs (approx.)
+| 1 | Anglais (English) | 1,53 milliard
+| 2 | Chinois Mandarin (中文) | 1,14 milliard
+| 3 | Hindi (हिन्दी) | 630 millions
+| 4 | Espagnol (Español) | 560 millions
+| 5 | Français (Français) | 417 millions
+| 6 | Arabe Standard (العربية) | 272 millions
+| 7 | Bengali (বাংলা) | 273 millions
+| 8 | Portugais (Português) | 265 millions
+| 9 | Russe (Русский) | 255 millions
+| 10 | Ourdou (اردو) | 234 millions
+|===
+
+=== Architecture i18n
+
+*Principe* : `ResourceBundle` standard Java + `MessageFormat` pour les messages
+paramétrés. Chaque langue a un fichier `Messages_{code}.properties` dans
+`src/main/resources/i18n/`. La langue active est déterminée par `language` dans
+`PlantumlConfig`, résolu via la cascade ConfigMerger 4 couches
+(CLI > env vars > YAML > gradle.properties > defaults).
+
+[source]
+----
+PlantumlConfig.language ──► ConfigMerger (4 couches)
+    │
+    ▼
+PlantumlMessages.forLanguage(code) ──► ResourceBundle.getBundle("i18n/Messages", locale)
+    │
+    ▼
+PlantumlMessages.get("key")           → String simple
+PlantumlMessages.format("key", args)  → String formaté (MessageFormat)
+----
+
+=== Codes de langue
+
+[cols="1,2"]
+|===
+| Langue | Code
+| Anglais | `en`
+| Chinois Mandarin | `zh`
+| Hindi | `hi`
+| Espagnol | `es`
+| Français | `fr`
+| Arabe Standard | `ar`
+| Bengali | `bn`
+| Portugais | `pt`
+| Russe | `ru`
+| Ourdou | `ur`
+|===
+
+=== User Stories
+
+[cols="1,4,2,2"]
+|===
+| US | Description | Pts | Priorité
+
+| US-I18N-0
+| **Configuration layer** — Ajouter `language` (String, default `"en"`) et
+  `supportedLanguages` (List<String>, default `["en"]`) à `PlantumlConfig`.
+  Ajouter propriétés DSL `language` et `supportedLanguages` dans `PlantumlExtension`.
+  Ajouter merge dans `ConfigMerger` (4 couches : CLI > env > YAML > gradle.properties).
+  Valider que le code langue est dans `SUPPORTED_LANGS`.
+  Déplacer `InputConfig.defaultLang` → obsolète (remplacé par `PlantumlConfig.language`).
+| 3
+| 🔴 P0
+
+| US-I18N-1
+| **Messages properties — 10 langues** — Créer `Messages_{code}.properties`
+  pour chaque langue dans `src/main/resources/i18n/`.
+  Extraire toutes les chaînes hardcodées des ~150 occurrences
+  (logger, exceptions, descriptions) → clés de message.
+  Template de référence : `Messages_en.properties` (source actuelle).
+  Créer `PlantumlMessages` object : `ResourceBundle` + `MessageFormat`.
+| 4
+| 🟠 P1
+
+| US-I18N-2
+| **Task descriptions + groups i18n** — Refactorer les 12 descriptions/groupes
+  de tâches (`GeneratePlantumlDiagramsTask`, `GenerateDiagramDocsTask`,
+  `GenerateKnowledgeGraphDiagramTask`, `ValidatePlantumlSyntaxTask`,
+  `CollectPlantumlIndexTask`, `PlantumlPlugin.docs`) + `@DisableCachingByDefault`
+  + `gradlePlugin.description/displayName`.
+| 3
+| 🟠 P1
+
+| US-I18N-3
+| **Logger lifecycle messages i18n** — Refactorer ~60 `logger.lifecycle()`
+  dans les 5 tâches principales. Messages paramétrés via `MessageFormat`
+  (ex: `"Processing {0} prompt files..."` → `PlantumlMessages.format("processing.prompts", count)`).
+| 6
+| 🟠 P1
+
+| US-I18N-4
+| **Logger warn/error + exception messages i18n** — Refactorer ~45
+  `logger.warn()`, `logger.error()`, `throw ...Exception(...)`.
+  Inclut `PlantumlManager`, `PlantumlService`, `DiagramProcessor`,
+  `KnowledgeGraphParser`, `GraphifyPromptAdapter`, `ApiKeyPool`.
+| 5
+| 🟡 P2
+
+| US-I18N-5
+| **println cleanup → logger i18n** — Migrer ~15 `println()`/`System.err`
+  résiduels vers `logger.lifecycle`/`logger.warn` avec i18n.
+  Inclut `PlantumlManager`, `PlantumlService`, `DiagramProcessor`,
+  `build.gradle.kts` (Cucumber cleanup).
+| 2
+| 🟡 P2
+
+| US-I18N-6
+| **Cucumber BDD — Scénarios i18n** — Feature `i18n_language_switch.feature` :
+  langue par défaut `en`, override CLI `-Pplantuml.language=fr`,
+  fallback `en` si langue non supportée, validation `SUPPORTED_LANGS`.
+  6-8 scénarios Cucumber.
+| 3
+| 🟡 P2
+
+| US-I18N-7
+| **Documentation + README** — Mettre à jour `README_truth.adoc` avec
+  section i18n. Mettre à jour `CHANGELOG.adoc`. Documenter l'architecture
+  i18n dans `PLUGIN_SELF_DOCUMENTATION.adoc`.
+| 2
+| 🟢 P3
+|===
+
+=== Critères d'Acceptation
+
+* [ ] `PlantumlConfig.language` + `supportedLanguages` résolus via ConfigMerger 4 couches
+* [ ] `PlantumlExtension` DSL expose `language` + `supportedLanguages`
+* [ ] 10 fichiers `Messages_{code}.properties` avec ~100 clés chacun
+* [ ] `PlantumlMessages` object fonctionnel (ResourceBundle + MessageFormat)
+* [ ] Toutes les descriptions de tâches i18nisées
+* [ ] Tous les `logger.lifecycle`/`warn`/`error` i18nisés
+* [ ] Toutes les exceptions i18nisées
+* [ ] Zéro `println()` résiduel
+* [ ] ≥8 scénarios Cucumber i18n PASS
+* [ ] `./gradlew compileKotlin` OK + `test` OK (380+ tests)
+* [ ] Kover ≥ 75% maintenu
+
+'''
+
+== Prochains EPICs
+
+1. **EPIC PLT-I18N** — Internationalisation 10 langues. ~28 pts. 6-7 sessions. ← Session 148
+2. **EPIC 13** — TieredRotationStrategy. ~6 pts. 2-3 sessions.
 
 '''
 
 == Métadonnées
 
 |===
-| Dernière màj | 2026-06-13 (Session 147)
+| Dernière màj | 2026-06-15 (Session 148 — Cadrage PLT-I18N)
 | Anciennes versions | Archivées dans `.agents/backup/`
 |===

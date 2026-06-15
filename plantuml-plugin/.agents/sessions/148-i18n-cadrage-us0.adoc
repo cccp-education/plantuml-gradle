@@ -1,0 +1,43 @@
+= Session 148 — Cadrage EPIC PLT-I18N + US-0 Configuration Layer
+:date: 2026-06-15
+:type: DDD + TDD + cadrage
+:score: 9/10
+
+== Résumé
+
+Cadrage de l'EPIC PLT-I18N (internationalisation 10 langues) pour plantuml-gradle,
+inspiré de bakery BKY-I18N et MEM-3 i18n-contracts. Implémentation US-0 (configuration
+layer) en baby steps DDD/TDD.
+
+== Fait
+
+* [x] Cadrage EPIC PLT-I18N dans BACKLOG.adoc — 7 US, ~28 pts, 10 langues
+* [x] US-0 DDD: `PlantumlConfig.language` + `supportedLanguages` + `SUPPORTED_LANGS`
+* [x] US-0 DDD: `PlantumlExtension` DSL — `language` (Property<String>) + `supportedLanguages` (ListProperty<String>)
+* [x] US-0 DDD: `ConfigMerger.mergeLanguage()` + `mergeSupportedLanguages()` — cascade 4 couches (CLI > env > YAML > gradle.properties)
+* [x] US-0 DDD: `loadFromEnvironment()` + `buildConfigFromProperties()` — `PLANTUML_LANGUAGE`, `PLANTUML_SUPPORTED_LANGUAGES`, `plantuml.language`, `plantuml.supportedLanguages`
+* [x] US-0 TDD: 19 tests `ConfigMergerTest` (defaults, gradle.properties, YAML override, CLI override, fallback en, full merge)
+* [x] US-0 TDD: 6 tests `ModelsDataClassTest` (defaults, SUPPORTED_LANGS 10 codes, custom values)
+* [x] Compile OK + publishToMavenLocal OK
+* [x] 35/35 nouveaux tests PASS (19 ConfigMerger + 16 ModelsDataClass)
+
+== Blocages découverts
+
+* Plugin ID mismatch pré-existant : `com.cheroliv.plantuml` → `education.cccp.plantuml`
+  non répercuté dans 10 fichiers de test (PlantumlWorld.kt + 9 tests). Cause 50 échecs
+  pré-existants (Session 145-147 publication). Bloque BDD Cucumber.
+* BDD Cucumber i18n (US-0) reporté à Session 149 après fix plugin ID.
+
+== Fichiers modifiés
+
+* `BACKLOG.adoc` — EPIC PLT-I18N (7 US, ~28 pts)
+* `models.kt` — PlantumlConfig.language/supportedLanguages/SUPPORTED_LANGS
+* `PlantumlPlugin.kt` — PlantumlExtension.language/supportedLanguages DSL
+* `ConfigMerger.kt` — mergeLanguage/mergeSupportedLanguages + env/props loading
+* `ConfigMergerTest.kt` — 11 nouveaux tests i18n
+* `ModelsDataClassTest.kt` — 6 nouveaux tests i18n
+
+== Prochaine session (149)
+
+Fix plugin ID `com.cheroliv.plantuml` → `education.cccp.plantuml` dans 10 fichiers
+de test pour débloquer BDD + 50 tests. Puis US-I18N-1 (messages properties 10 langues).

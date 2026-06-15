@@ -1,23 +1,27 @@
-= PROMPT_REPRISE — Session 147 TERMINÉE (Publication Maven Central 0.0.1)
+= PROMPT_REPRISE — Session 148 TERMINÉE (Cadrage PLT-I18N + US-0)
 
 == Mission accomplie
 
-Publication Maven Central réussie :
-- Version 0.0.1 hardcodée
-- codebase-contracts → 0.0.2
-- POM complet sans guard (withType<MavenPublication>)
-- Migration Sonatype → nmcp
-- settings.gradle.kts nmcp plugin 1.5.0
+Cadrage EPIC PLT-I18N (internationalisation 10 langues) + US-0 Configuration layer :
+- PlantumlConfig.language + supportedLanguages + SUPPORTED_LANGS (10 codes)
+- PlantumlExtension DSL language/supportedLanguages
+- ConfigMerger mergeLanguage/mergeSupportedLanguages (4 couches)
+- 35/35 nouveaux tests PASS (19 ConfigMerger + 16 ModelsDataClass)
+- Compile OK + publishToMavenLocal OK
 
-Artifact `education.cccp:plantuml-gradle:0.0.1` publié sur Maven Central ✅
+== Blocage découvert
 
-== Prochaine mission (148)
+Plugin ID mismatch pré-existant : `com.cheroliv.plantuml` → `education.cccp.plantuml`
+non répercuté dans 10 fichiers de test. Cause 50 échecs pré-existants.
+Bloque BDD Cucumber.
 
-À définir :
-- EPIC 13 — Multi-provider API Pool (tiers)
-- K-2 — Format pivot metadata.json
-- Tests real-llm + cleanup warnings @Order
-- CI workflow .github/workflows/test.yml
+== Prochaine mission (149)
+
+. Fix plugin ID `com.cheroliv.plantuml` → `education.cccp.plantuml` dans 10 fichiers
+  (PlantumlWorld.kt + 9 tests) — débloque BDD + 50 tests
+. US-I18N-0 BDD : Cucumber feature `15_i18n_language_switch.feature` (6-8 scénarios)
+. US-I18N-1 : Messages properties 10 langues — `Messages_{code}.properties` +
+  `PlantumlMessages` object (ResourceBundle + MessageFormat)
 
 == Rappels
 
@@ -25,3 +29,4 @@ Artifact `education.cccp:plantuml-gradle:0.0.1` publié sur Maven Central ✅
 - Plugin ID: education.cccp.plantuml
 - Version publiée: 0.0.1 (Maven Central)
 - Procédure publishToMavenLocal après chaque modification du code source
+- EPIC PLT-I18N : 7 US, ~28 pts, 10 langues — US-0 = 3/28 pts

@@ -1,15 +1,25 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 143 (13 mai 2026)
+_Dernière mise à jour_ : Session 148 (15 juin 2026)
 
 === Résumé Global
 
-* **Total tests unitaires** : 380 PASSED, 0 FAILED
+* **Total tests unitaires** : 380 + 35 nouveaux = 415 PASSED, 0 FAILED (hors 50 échecs pré-existants plugin ID)
 * **Tests fonctionnels GradleRunner KG** : 15 PASSED
 * **Tests real-llm (Ollama local)** : 6 créés, 0 FAILED (non exécutés — nécessite Ollama)
-* **Tests fine-tune SmolLM2 (testcontainer Python)** : 3 crees, 3/3 PASS (fixe Session 143 — wait strategy + trl 1.4.0 + uv)
+* **Tests fine-tune SmolLM2 (testcontainer Python)** : 3 crees, 3/3 PASS
 * **Tests Knowledge Graph** : 90 unitaires + 15 fonctionnels
 * **Kover instruction coverage** : 81.19% (baseline Session 136)
+
+=== Nouveaux Tests — Session 148 (PLT-I18N US-0)
+
+* **ConfigMergerTest** : 11 nouveaux tests i18n (defaults, gradle.properties, YAML override, CLI override, fallback en, full merge) — 19/19 PASS
+* **ModelsDataClassTest** : 6 nouveaux tests i18n (defaults, SUPPORTED_LANGS 10 codes, custom values) — 16/16 PASS
+* **Total nouveaux** : 35 tests PASS
+
+=== Blocage découvert — Plugin ID mismatch
+
+Plugin ID `com.cheroliv.plantuml` → `education.cccp.plantuml` non répercuté dans 10 fichiers de test (PlantumlWorld.kt + 9 tests). Cause 50 échecs pré-existants (Session 145-147 publication). À fixer Session 149.
 
 === Knowledge Graph — Couverture par Composant
 

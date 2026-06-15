@@ -21,9 +21,13 @@ data class PlantumlConfig(
     val langchain4j: LangchainConfig = LangchainConfig(),
     val git: GitConfig = GitConfig(),
     val rag: RagConfig = RagConfig(),
-    val diagramDocs: DiagramDocsConfig = DiagramDocsConfig()
+    val diagramDocs: DiagramDocsConfig = DiagramDocsConfig(),
+    val language: String = "en",
+    val supportedLanguages: List<String> = listOf("en")
 ) {
     companion object {
+        val SUPPORTED_LANGS = setOf("en", "zh", "hi", "es", "fr", "ar", "bn", "pt", "ru", "ur")
+
         /**
          * Loads PlantUML configuration from a YAML file.
          *

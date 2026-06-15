@@ -113,4 +113,39 @@ class ModelsDataClassTest {
         assertEquals("user", config.git.userName)
         assertEquals("jdbc:postgresql://localhost:5432/rag", config.rag.databaseUrl)
     }
+
+    @Test
+    fun `PlantumlConfig should default language to en`() {
+        val config = PlantumlConfig()
+        assertEquals("en", config.language)
+    }
+
+    @Test
+    fun `PlantumlConfig should default supportedLanguages to en only`() {
+        val config = PlantumlConfig()
+        assertEquals(listOf("en"), config.supportedLanguages)
+    }
+
+    @Test
+    fun `PlantumlConfig SUPPORTED_LANGS should contain exactly 10 languages`() {
+        assertEquals(10, PlantumlConfig.SUPPORTED_LANGS.size)
+    }
+
+    @Test
+    fun `PlantumlConfig SUPPORTED_LANGS should contain all expected codes`() {
+        val expected = setOf("en", "zh", "hi", "es", "fr", "ar", "bn", "pt", "ru", "ur")
+        assertEquals(expected, PlantumlConfig.SUPPORTED_LANGS)
+    }
+
+    @Test
+    fun `PlantumlConfig should accept custom language`() {
+        val config = PlantumlConfig(language = "fr")
+        assertEquals("fr", config.language)
+    }
+
+    @Test
+    fun `PlantumlConfig should accept custom supportedLanguages`() {
+        val config = PlantumlConfig(supportedLanguages = listOf("fr", "en", "es"))
+        assertEquals(listOf("fr", "en", "es"), config.supportedLanguages)
+    }
 }

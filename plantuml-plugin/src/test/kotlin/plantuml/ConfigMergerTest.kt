@@ -155,4 +155,139 @@ class ConfigMergerTest {
         assertEquals("custom-user", result.git.userName)
         assertEquals("my_embeddings", result.rag.tableName)
     }
+
+    @Test
+    fun `should default language to en`() {
+        val yamlConfig = PlantumlConfig()
+        val cliParams = emptyMap<String, Any?>()
+
+        val result = ConfigMerger.merge(testProjectDir, yamlConfig, cliParams)
+
+        assertEquals("en", result.language)
+    }
+
+    @Test
+    fun `should default supportedLanguages to en only`() {
+        val yamlConfig = PlantumlConfig()
+        val cliParams = emptyMap<String, Any?>()
+
+        val result = ConfigMerger.merge(testProjectDir, yamlConfig, cliParams)
+
+        assertEquals(listOf("en"), result.supportedLanguages)
+    }
+
+    @Test
+    fun `should resolve language from gradle properties`() {
+        val gradleProperties = File(testProjectDir, "gradle.properties")
+        gradleProperties.writeText("plantuml.language=fr")
+
+        val yamlConfig = PlantumlConfig()
+        val cliParams = emptyMap<String, Any?>()
+
+        val result = ConfigMerger.merge(testProjectDir, yamlConfig, cliParams)
+
+        assertEquals("fr", result.language)
+    }
+
+    @Test
+    fun `should resolve supportedLanguages from gradle properties`() {
+        val gradleProperties = File(testProjectDir, "gradle.properties")
+        gradleProperties.writeText("plantuml.supportedLanguages=fr,en,es")
+
+        val yamlConfig = PlantumlConfig()
+        val cliParams = emptyMap<String, Any?>()
+
+        val result = ConfigMerger.merge(testProjectDir, yamlConfig, cliParams)
+
+        assertEquals(listOf("fr", "en", "es"), result.supportedLanguages)
+    }
+
+    @Test
+    fun `should override language with YAML config`() {
+        val gradleProperties = File(testProjectDir, "gradle.properties")
+        gradleProperties.writeText("plantuml.language=fr")
+
+        val yamlConfig = PlantumlConfig(language = "zh")
+        val cliParams = emptyMap<String, Any?>()
+
+        val result = ConfigMerger.merge(testProjectDir, yamlConfig, cliParams)
+
+        assertEquals("zh", result.language)
+    }
+
+    @Test
+    fun `should override language with CLI parameter`() {
+        val gradleProperties = File(testProjectDir, "gradle.properties")
+        gradleProperties.writeText("plantuml.language=fr")
+
+        val yamlConfig = PlantumlConfig(language = "zh")
+        val cliParams = mapOf("language" to "es")
+
+        val result = ConfigMerger.merge(testProjectDir, yamlConfig, cliParams)
+
+        assertEquals("es", result.language)
+    }
+
+    @Test
+    fun `should fallback to en when language not in SUPPORTED_LANGS`() {
+        val yamlConfig = PlantumlConfig(language = "de")
+        val cliParams = emptyMap<String, Any?>()
+
+        val result = ConfigMerger.merge(testProjectDir, yamlConfig, cliParams)
+
+        assertEquals("en", result.language)
+    }
+
+    @Test
+    fun `should fallback to en when CLI language not in SUPPORTED_LANGS`() {
+        val yamlConfig = PlantumlConfig()
+        val cliParams = mapOf("language" to "it")
+
+        val result = ConfigMerger.merge(testProjectDir, yamlConfig, cliParams)
+
+        assertEquals("en", result.language)
+    }
+
+    @Test
+    fun `should override supportedLanguages with YAML config`() {
+        val gradleProperties = File(testProjectDir, "gradle.properties")
+        gradleProperties.writeText("plantuml.supportedLanguages=fr,en")
+
+        val yamlConfig = PlantumlConfig(supportedLanguages = listOf("zh", "hi"))
+        val cliParams = emptyMap<String, Any?>()
+
+        val result = ConfigMerger.merge(testProjectDir, yamlConfig, cliParams)
+
+        assertEquals(listOf("zh", "hi"), result.supportedLanguages)
+    }
+
+    @Test
+    fun `should override supportedLanguages with CLI parameter`() {
+        val gradleProperties = File(testProjectDir, "gradle.properties")
+        gradleProperties.writeText("plantuml.supportedLanguages=fr,en")
+
+        val yamlConfig = PlantumlConfig(supportedLanguages = listOf("zh", "hi"))
+        val cliParams = mapOf("supportedLanguages" to listOf("ar", "ur"))
+
+        val result = ConfigMerger.merge(testProjectDir, yamlConfig, cliParams)
+
+        assertEquals(listOf("ar", "ur"), result.supportedLanguages)
+    }
+
+    @Test
+    fun `should resolve language from gradle properties with full merge`() {
+        val gradleProperties = File(testProjectDir, "gradle.properties")
+        gradleProperties.writeText("""
+            plantuml.language=fr
+            plantuml.supportedLanguages=fr,en,es
+        """.trimIndent())
+
+        val yamlConfig = PlantumlConfig()
+        val cliParams = emptyMap<String, Any?>()
+
+        val result = ConfigMerger.merge(testProjectDir, yamlConfig, cliParams)
+
+        assertEquals("fr", result.language)
+        assertEquals(listOf("fr", "en", "es"), result.supportedLanguages)
+    }
 }

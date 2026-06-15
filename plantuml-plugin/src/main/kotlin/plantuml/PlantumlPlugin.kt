@@ -3,6 +3,7 @@ package plantuml
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import javax.inject.Inject
 
@@ -45,6 +46,8 @@ class PlantumlPlugin : Plugin<Project> {
      */
     open class PlantumlExtension @Inject constructor(objects: ObjectFactory) {
         val configPath: Property<String> = objects.property(String::class.java)
+        val language: Property<String> = objects.property(String::class.java)
+        val supportedLanguages: ListProperty<String> = objects.listProperty(String::class.java)
     }
 }
 

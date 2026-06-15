@@ -1,5 +1,6 @@
 = Historique des Sessions
 
+_Session 148_ (2026-06-15) : Cadrage EPIC PLT-I18N + US-0 Configuration Layer — 7 US, ~28 pts, 10 langues. PlantumlConfig.language/supportedLanguages/SUPPORTED_LANGS, PlantumlExtension DSL, ConfigMerger mergeLanguage/mergeSupportedLanguages (4 couches). 35/35 nouveaux tests PASS. Blocage plugin ID mismatch découvert (50 échecs pré-existants). ✅
 _Session 147_ (2026-06-11) : Publication Maven Central 0.0.1 — version 0.0.1 hardcodée, codebase→0.0.2, POM sans guard, Sonatype→nmcp, settings nmcp. Publié -x functionalTest ✅
 _Session 146_ (2026-06-02) : Borough-isation — plantuml-gradle devient HTOWN 🚀, 23ème borough, N2 ✅
 _Session 145_ (2026-05-19) : EPIC K-1 Renommage taxonomie — `processPlantumlPrompts`→`generatePlantumlDiagrams`, `reindexPlantumlRag`→`collectPlantumlIndex`. 18 fichiers modifiés, Build OK ✅
