@@ -4,7 +4,6 @@
 // annotations:26.0.2-1. Codebase-plugin exclut koog-agents mais les sous-modules
 // koog transitifs contournent l'exclusion. Solution : forcer annotations:26.0.2-1.
 buildscript {
-    repositories { mavenLocal(); mavenCentral() }
     configurations.all { resolutionStrategy { force("org.jetbrains:annotations:26.0.2-1") } }
 }
 
@@ -23,14 +22,14 @@ plugins {
     alias(libs.plugins.codebase)
 }
 
+// Apply the BOM
+dependencies {
+    implementation(platform("education.cccp:workspace-bom:0.0.1"))
+}
+
 group = "education.cccp"
 version = libs.plugins.plantuml.get().version
 kotlin.jvmToolchain(JavaVersion.VERSION_24.ordinal)
-
-repositories {
-    mavenCentral()
-    gradlePluginPortal()
-}
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
@@ -48,10 +47,10 @@ dependencies {
     // Testcontainers for RAG integration tests
     api(libs.testcontainers.pg)
 
-    // Jackson for JSON serialization
-    api(libs.jackson.module.kotlin)
-    api(libs.jackson.dataformat.yaml)
-    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2")
+    // Jackson for JSON serialization (using BOM versions)
+    api("com.fasterxml.jackson.module:jackson-module-kotlin")
+    api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
+    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
     // Coroutines - IMPORTANT for the asynchronous tests
     testImplementation(libs.bundles.coroutines)
@@ -157,9 +156,9 @@ dependencies {
     add(functionalTest.implementationConfigurationName, kotlin("test"))
     add(functionalTest.implementationConfigurationName, kotlin("test-junit5"))
 
-    // Add required dependencies explicitly
-    add(functionalTest.implementationConfigurationName, "org.slf4j:slf4j-api:2.0.17")
-    add(functionalTest.runtimeOnlyConfigurationName, "ch.qos.logback:logback-classic:1.5.26")
+    // Add required dependencies explicitly (using BOM versions)
+    add(functionalTest.implementationConfigurationName, "org.slf4j:slf4j-api")
+    add(functionalTest.runtimeOnlyConfigurationName, "ch.qos.logback:logback-classic")
     add(functionalTest.runtimeOnlyConfigurationName, "org.junit.platform:junit-platform-launcher")
 
     // CORRECTION: Add AssertJ for assertions
@@ -184,7 +183,7 @@ dependencies {
 
     // Add testcontainers for RAG integration tests
     add(functionalTest.implementationConfigurationName, libs.testcontainers.pg)
-    add(functionalTest.implementationConfigurationName, "org.testcontainers:testcontainers:1.21.4")
+    add(functionalTest.implementationConfigurationName, "org.testcontainers:testcontainers")
 }
 
 // 3. Task for functional tests
@@ -286,7 +285,7 @@ val cucumberTest = tasks.register<Test>("cucumberTest") {
             sourceSets.main.get().output +
             sourceSets["functionalTest"].output +
             files(tasks.jar.get().archiveFile)
-    
+
     // FIX: Ensure plugin classes are compiled before running tests
     dependsOn(tasks.classes)
     useJUnitPlatform {
@@ -295,13 +294,13 @@ val cucumberTest = tasks.register<Test>("cucumberTest") {
         excludeEngines("junit-jupiter")
     }
     systemProperty("cucumber.junit-platform.naming-strategy", "long")
-    
+
     // FIX: Disable Gradle daemon for tests to avoid startup overhead and memory leaks
     systemProperty("org.gradle.daemon", "false")
-    
+
     // Memory leak prevention: limit heap size
     maxHeapSize = "1g"
-    
+
     testLogging {
         events("passed", "skipped", "failed")
         showStandardStreams = true
@@ -317,19 +316,19 @@ val cucumberTest = tasks.register<Test>("cucumberTest") {
     jvmArgs("-XX:+UseSerialGC")
     jvmArgs("-XX:MaxMetaspaceSize=256m")
     jvmArgs("-XX:TieredStopAtLevel=1")
-    
+
     // FIX: Timeout per test to prevent hanging
     timeout.set(Duration.ofMinutes(5))
-    
+
     // Cleanup after test execution
     doLast {
         println("=== Cucumber Test Cleanup ===")
         println("Cleaning temporary test directories...")
-        
+
         // Clean old gradle-test-* directories (> 1 hour)
         val tempDir = File(System.getProperty("java.io.tmpdir"))
         val oneHourAgo = System.currentTimeMillis() - (60 * 60 * 1000)
-        
+
         tempDir.listFiles { file ->
             file.isDirectory && file.name.startsWith("gradle-test-") &&
             file.lastModified() < oneHourAgo
@@ -344,7 +343,7 @@ val cucumberTest = tasks.register<Test>("cucumberTest") {
                 println("  ✗ Error cleaning ${oldDir.name}: ${e.message}")
             }
         }
-        
+
         println("=== Cleanup complete ===")
     }
 }
@@ -581,7 +580,7 @@ publishing {
                     developer {
                         id.set("cccp-education")
                         name.set("CCCP Education")
-                        email.set("cccp.education@gmail.com")
+                        email.set("cccp.edu@gmail.com")
                     }
                 }
                 scm {

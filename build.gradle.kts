@@ -1,2 +1,2 @@
-plugins { id("education.cccp.plantuml").version("0.0.0") }
+plugins { id("education.cccp.plantuml") }
 plantuml { configPath = "plantuml-context.yml".run(::file).absolutePath }
