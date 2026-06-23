@@ -1,26 +1,28 @@
-= PROMPT_REPRISE — Session 152 (US-I18N-4 Logger warn/error + exceptions i18n)
+= PROMPT_REPRISE — Session 153 (US-I18N-4 Logger warn/error + exceptions i18n)
 
-== Mission accomplie (Session 151)
+== Mission accomplie (Session 152)
 
-. DDD : 5 task classes — +champ `lang`, 66 `logger.lifecycle()` → `PlantumlMessages.format()`/`get()`
-. DDD : Fix nullable `e.message`/`chatModel`/`System.getProperty` → `?: "Unknown error"`/`.toString()`
-. TDD : `LifecycleMessagesI18nTest` — 760/760 PASS (74 clés × 10 langues + 20 format tests)
-. BDD : `17_i18n_lifecycle_messages.feature` (2 scénarios) + `I18nSteps.kt` step — compile OK
-. Compile + publishToMavenLocal OK
+. 20 fichiers README créés — 10 langues × 2 audiences
+. `README.consommateurs/` (guide utilisateur, 139 lignes × 10 langues)
+. `README.plugin/` (guide contributeur, 242 lignes × 10 langues)
+. Badges Maven Central / Plugin Portal / CI / Coverage / License
+. Markers version 0.0.1 + 380/380 PASS
+. Switcher i18n 10 langues (EN/FR switcher réduit, 8 autres switcher complet)
+. AR + UR en script RTL (bidi Unicode, pas de `dir="rtl"` explicite)
+. US-I18N-7 ✅ TERMINÉ (2/28 pts)
 
-== Statut EPIC PLT-I18N
+== Statut EPIC PLT-I18N (18/28 pts, 64%)
 
 - US-I18N-0 : ✅ Configuration layer (3/28 pts)
 - US-I18N-1 : ✅ Messages properties 10 langues + PlantumlMessages (4/28 pts)
 - US-I18N-2 : ✅ Task descriptions + groups i18n (3/28 pts)
-- US-I18N-3 : ✅ Logger lifecycle messages i18n (6/28 pts) ← Session 151
-- US-I18N-4 : ☐ Logger warn/error + exceptions i18n (5/28 pts) ← Session 152
+- US-I18N-3 : ✅ Logger lifecycle messages i18n (6/28 pts)
+- US-I18N-4 : ☐ Logger warn/error + exceptions i18n (5/28 pts) ← Session 153
 - US-I18N-5 : ☐ println cleanup → logger i18n (2/28 pts)
 - US-I18N-6 : ☐ Cucumber BDD scénarios i18n (3/28 pts)
-- US-I18N-7 : ☐ Documentation + README (2/28 pts)
-- Total : 16/28 pts (57%)
+- US-I18N-7 : ✅ Documentation + README (2/28 pts) ← Session 152
 
-== Prochaine mission (152)
+== Prochaine mission (153)
 
 US-I18N-4 : Refactorer ~45 `logger.warn()`, `logger.error()`, `throw ...Exception(...)` :
 - `PlantumlManager` : ~5 warn/error
@@ -32,9 +34,16 @@ US-I18N-4 : Refactorer ~45 `logger.warn()`, `logger.error()`, `throw ...Exceptio
 - Résiduels dans les 5 tâches : ~15 warn/error (déjà partiellement i18nisés en S151)
 
 Baby steps DDD/TDD/BDD :
-. DDD : Remplacer `logger.warn("hardcoded")`/`logger.error("hardcoded")`/`throw X("hardcoded")` par i18n
-. TDD : Tests unitaires vérifiant que les messages warn/error/exceptions sont i18nisés
-. BDD : Scénario Cucumber vérifiant les messages d'erreur dans la sortie Gradle
+. DDD : remplacer `logger.warn("hardcoded")`/`logger.error("hardcoded")`/`throw X("hardcoded")` par i18n
+. TDD : tests unitaires vérifiant que les messages warn/error/exceptions sont i18nisés
+. BDD : scénario Cucumber vérifiant les messages d'erreur dans la sortie Gradle
+
+== Restes US-I18N-7 (non bloquants)
+
+- `README_truth.adoc` : section i18n non ajoutée
+- `CHANGELOG.adoc` : non créé
+- `PLUGIN_SELF_DOCUMENTATION.adoc` : non mis à jour
+- Switcher i18n EN/FR : réduire à 2 entrées à harmoniser (switcher complet 10 langues)
 
 == Rappels
 

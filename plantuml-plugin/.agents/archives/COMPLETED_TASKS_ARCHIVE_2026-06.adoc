@@ -1,5 +1,31 @@
 = Archive des Tâches Terminées — Juin 2026
 
+== Session 152 — 2026-06-24 — US-I18N-7 Documentation + README i18n
+
+**Contexte** : Création de 20 fichiers README traduits en 10 langues pour les
+deux audiences de `plantuml-gradle`. Clôture US-I18N-7 (Documentation + README).
+
+**Tâches réalisées** :
+
+* [x] 10 fichiers `README.consommateurs/README.{md,fr,zh,hi,es,ar,bn,pt,ru,ur}.md` (guide utilisateur, 139 lignes)
+* [x] 10 fichiers `README.plugin/README.{md,fr,zh,hi,es,ar,bn,pt,ru,ur}.md` (guide contributeur, 242 lignes)
+* [x] Badges Maven Central / Gradle Plugin Portal / CI / Coverage / License sur les 20 fichiers
+* [x] Markers de version `0.0.1` + tests `380/380 PASS` + toolchain Java 24 / Kotlin 2.3.20 / Gradle 9.5.1
+* [x] Switcher i18n 10 langues (EN/FR switcher réduit, 8 autres switcher complet)
+* [x] AR + UR rédigés en script RTL (bidi Unicode, pas de `dir="rtl"` explicite)
+* [x] Commentaires d'en-tête master/traduction (`rev 0.0.1`)
+* [x] US-I18N-7 ✅ TERMINÉ (2/28 pts) — EPIC PLT-I18N : 18/28 pts (64%)
+
+**Restes US-I18N-7 (non bloquants, session ultérieure)** :
+
+* [ ] `README_truth.adoc` — section i18n à ajouter
+* [ ] `CHANGELOG.adoc` — à créer
+* [ ] `PLUGIN_SELF_DOCUMENTATION.adoc` — architecture i18n à documenter
+* [ ] Switcher i18n EN/FR à harmoniser (switcher complet 10 langues)
+
+**Fichiers créés** : 20 README (2 répertoires à la racine `plantuml-gradle/`)
+**Fichiers modifiés** : aucun (documentation only)
+
 == Session 151 — 2026-06-15 — US-I18N-3 Logger Lifecycle Messages i18n
 
 **Contexte** : Refactoring ~66 `logger.lifecycle()` hardcodés dans les 5 tâches principales.

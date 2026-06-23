@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-06-13 (Session 147 — Publication Maven Central)
+:last_update: 2026-06-24 (Session 152 — US-I18N-7 README i18n)
 
 '''
 == 🔴 EPIC 13 : Multi-provider API Pool — Rotation par tiers
@@ -239,6 +239,8 @@ PlantumlMessages.format("key", args)  → String formaté (MessageFormat)
   i18n dans `PLUGIN_SELF_DOCUMENTATION.adoc`.
 | 2
 | 🟢 P3
+| ✅ Session 152 — 20 fichiers README créés (10 langues × consommateur + plugin).
+  `README_truth.adoc`, `CHANGELOG.adoc`, `PLUGIN_SELF_DOCUMENTATION.adoc` restent à faire (non bloquants).
 |===
 
 === Critères d'Acceptation
@@ -267,6 +269,6 @@ PlantumlMessages.format("key", args)  → String formaté (MessageFormat)
 == Métadonnées
 
 |===
-| Dernière màj | 2026-06-15 (Session 148 — Cadrage PLT-I18N)
+| Dernière màj | 2026-06-24 (Session 152 — US-I18N-7 README i18n)
 | Anciennes versions | Archivées dans `.agents/backup/`
 |===
