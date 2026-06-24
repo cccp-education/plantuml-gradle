@@ -1,15 +1,12 @@
-= PROMPT_REPRISE — Session 153 (US-I18N-4 Logger warn/error + exceptions i18n)
+= PROMPT_REPRISE — Plantuml — Session 154
+:session: 154
+:date: 2026-06-24
 
-== Mission accomplie (Session 152)
+== Session 153 terminée — Architecture README Plugin + Consommateur
 
-. 20 fichiers README créés — 10 langues × 2 audiences
-. `README.consommateurs/` (guide utilisateur, 139 lignes × 10 langues)
-. `README.plugin/` (guide contributeur, 242 lignes × 10 langues)
-. Badges Maven Central / Plugin Portal / CI / Coverage / License
-. Markers version 0.0.1 + 380/380 PASS
-. Switcher i18n 10 langues (EN/FR switcher réduit, 8 autres switcher complet)
-. AR + UR en script RTL (bidi Unicode, pas de `dir="rtl"` explicite)
-. US-I18N-7 ✅ TERMINÉ (2/28 pts)
+Déplacement README.plugin → plantuml-plugin/README.plugin/ (README.md master
+remonté à racine plugin). Déplacement README.consommateurs → racine borough.
+Liens i18n recréés (10 langues).
 
 == Statut EPIC PLT-I18N (18/28 pts, 64%)
 
@@ -17,12 +14,12 @@
 - US-I18N-1 : ✅ Messages properties 10 langues + PlantumlMessages (4/28 pts)
 - US-I18N-2 : ✅ Task descriptions + groups i18n (3/28 pts)
 - US-I18N-3 : ✅ Logger lifecycle messages i18n (6/28 pts)
-- US-I18N-4 : ☐ Logger warn/error + exceptions i18n (5/28 pts) ← Session 153
+- US-I18N-4 : ☐ Logger warn/error + exceptions i18n (5/28 pts) ← Session 154
 - US-I18N-5 : ☐ println cleanup → logger i18n (2/28 pts)
 - US-I18N-6 : ☐ Cucumber BDD scénarios i18n (3/28 pts)
 - US-I18N-7 : ✅ Documentation + README (2/28 pts) ← Session 152
 
-== Prochaine mission (153)
+== Prochaine mission (154)
 
 US-I18N-4 : Refactorer ~45 `logger.warn()`, `logger.error()`, `throw ...Exception(...)` :
 - `PlantumlManager` : ~5 warn/error
@@ -37,13 +34,6 @@ Baby steps DDD/TDD/BDD :
 . DDD : remplacer `logger.warn("hardcoded")`/`logger.error("hardcoded")`/`throw X("hardcoded")` par i18n
 . TDD : tests unitaires vérifiant que les messages warn/error/exceptions sont i18nisés
 . BDD : scénario Cucumber vérifiant les messages d'erreur dans la sortie Gradle
-
-== Restes US-I18N-7 (non bloquants)
-
-- `README_truth.adoc` : section i18n non ajoutée
-- `CHANGELOG.adoc` : non créé
-- `PLUGIN_SELF_DOCUMENTATION.adoc` : non mis à jour
-- Switcher i18n EN/FR : réduire à 2 entrées à harmoniser (switcher complet 10 langues)
 
 == Rappels
 

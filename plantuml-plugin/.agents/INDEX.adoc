@@ -3,8 +3,8 @@
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
 _Derniere mise a jour_ : 2026-06-24  
-_Session en cours_ : 153 — US-I18N-4 Logger warn/error + exceptions i18n  
-_Session terminee_ : 152 — US-I18N-7 Documentation + README i18n (20 fichiers, 10 langues)
+_Session en cours_ : 154 — US-I18N-4 Logger warn/error + exceptions i18n  
+_Session terminee_ : 153 — Architecture README Plugin + Consommateur (déplacement README.plugin → plantuml-plugin/, README.consommateurs → racine, liens i18n recréés) ✅
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
 '''

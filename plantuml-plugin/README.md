@@ -13,7 +13,7 @@
 - **Toolchain**: Java 24 (ordinal) · Kotlin 2.3.20 · Gradle 9.5.1
 - **Build**: `./gradlew build -x test` · **Tests**: `./gradlew test functionalTest cucumberTest` · **Coverage gate**: `./gradlew koverThresholdCheck` (≥75%)
 
-🌐 Languages: **EN** | [Français](README.fr.md)
+🌐 Languages: **EN** | [中文](README.plugin/README.zh.md) | [हिन्दी](README.plugin/README.hi.md) | [Español](README.plugin/README.es.md) | [Français](README.plugin/README.fr.md) | [العربية](README.plugin/README.ar.md) | [বাংলা](README.plugin/README.bn.md) | [Português](README.plugin/README.pt.md) | [Русский](README.plugin/README.ru.md) | [اردو](README.plugin/README.ur.md)
 
 ---
 

@@ -1,0 +1,34 @@
+= Session 153 — Architecture README Plugin + Consommateur
+:session: 153
+:date: 2026-06-24
+:type: Refactor README
+:score: 8/10
+
+== Objectif
+
+Réorganiser les README selon l'architecture « Plugin Indépendant + Racine
+Consommateur » (article 0124).
+
+== Ce qui a été fait
+
+=== 1. Déplacement README.plugin → plantuml-plugin/README.plugin/
+
+* `README.plugin/` (10 fichiers) déplacé vers `plantuml-plugin/README.plugin/`.
+* `README.md` (master source EN) remonté à la racine de `plantuml-plugin/`.
+
+=== 2. Déplacement README.consommateurs → racine du borough
+
+* `README.consommateurs/README.md` remonté à la racine `plantuml-gradle/README.md`.
+
+=== 3. Mise à jour des liens i18n
+
+* `plantuml-plugin/README.md` : liens → `README.plugin/README.{lang}.md` (10 langues).
+* `README.md` (racine) : liens → `README.consommateurs/README.{lang}.md` (10 langues).
+
+== Fichiers modifiés
+
+* `README.md` (racine) + `plantuml-plugin/README.md` + traductions déplacées
+
+== Prochaines étapes
+
+* Valider le rendu sur GitHub
