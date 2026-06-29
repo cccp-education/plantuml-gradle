@@ -1566,7 +1566,7 @@ class PlantumlFunctionalSuite {
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     inner class RealInfrastructure {
 
-        private val ollamaUrl = "http://localhost:11434"
+        private val ollamaUrl = "http://localhost:11438"
         private val ollamaModel = "smollm:135m-instruct-v0.2-q8_0"
         private var ollamaAvailable = false
 

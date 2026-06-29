@@ -96,7 +96,7 @@ class PlantumlWorld {
                 langchain4j:
                   model: "ollama"
                   ollama:
-                    baseUrl: "http://localhost:11434"
+                    baseUrl: "http://localhost:11438"
                     modelName: "smollm:135m"
                   maxIterations: 5
                 """.trimIndent()
@@ -141,18 +141,18 @@ class PlantumlWorld {
 
     /**
      * Ensures an Ollama instance is available:
-     * - If Ollama is running locally on port 11434, uses it directly.
+     * - If Ollama is running locally on port 11438, uses it directly.
      * - Otherwise starts a Testcontainers Ollama container.
      */
     fun ensureOllama() {
         if (isOllamaLocal()) {
-            ollamaBaseUrl = "http://localhost:11434"
+            ollamaBaseUrl = "http://localhost:11438"
             log.info("Ollama detected locally at $ollamaBaseUrl")
         }
     }
 
     private fun isOllamaLocal(): Boolean = runCatching {
-        val conn = URI("http://localhost:11434/api/tags").toURL().openConnection() as HttpURLConnection
+        val conn = URI("http://localhost:11438/api/tags").toURL().openConnection() as HttpURLConnection
         conn.connectTimeout = 5_000
         conn.readTimeout = 5_000
         conn.requestMethod = "GET"

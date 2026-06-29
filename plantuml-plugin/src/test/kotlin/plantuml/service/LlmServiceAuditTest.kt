@@ -25,7 +25,7 @@ class LlmServiceAuditTest {
             langchain4j = PlantumlConfig().langchain4j.copy(
                 model = "ollama",
                 ollama = PlantumlConfig().langchain4j.ollama.copy(
-                    baseUrl = "http://localhost:11434",
+                    baseUrl = "http://localhost:11438",
                     modelName = "llama2"
                 )
             )
@@ -164,7 +164,7 @@ class LlmServiceAuditTest {
             langchain4j = PlantumlConfig().langchain4j.copy(
                 model = "ollama",
                 ollama = PlantumlConfig().langchain4j.ollama.copy(
-                    baseUrl = "http://localhost:11434",
+                    baseUrl = "http://localhost:11438",
                     modelName = "llama2"
                 )
             )

@@ -25,7 +25,7 @@ class LlmConfigurationTest {
             langchain4j:
               model: "ollama"
               ollama:
-                baseUrl: "http://localhost:11435"
+                baseUrl: "http://localhost:11438"
                 modelName: "llama3:8b"
         """.trimIndent())
 
@@ -34,7 +34,7 @@ class LlmConfigurationTest {
 
         // Then
         assertEquals("ollama", config.langchain4j.model)
-        assertEquals("http://localhost:11435", config.langchain4j.ollama.baseUrl)
+        assertEquals("http://localhost:11438", config.langchain4j.ollama.baseUrl)
         assertEquals("llama3:8b", config.langchain4j.ollama.modelName)
     }
 
@@ -160,7 +160,7 @@ class LlmConfigurationTest {
             langchain4j:
               model: "ollama"
               ollama:
-                baseUrl: "http://localhost:11434"
+                baseUrl: "http://localhost:11438"
                 modelName: "llama3:8b"
               gemini:
                 apiKey: "fake-gemini-key"
@@ -181,7 +181,7 @@ class LlmConfigurationTest {
 
         // Then
         assertEquals("ollama", config.langchain4j.model)
-        assertEquals("http://localhost:11434", config.langchain4j.ollama.baseUrl)
+        assertEquals("http://localhost:11438", config.langchain4j.ollama.baseUrl)
         assertEquals("llama3:8b", config.langchain4j.ollama.modelName)
         assertEquals("fake-gemini-key", config.langchain4j.gemini.apiKey)
         assertEquals("fake-mistral-key", config.langchain4j.mistral.apiKey)

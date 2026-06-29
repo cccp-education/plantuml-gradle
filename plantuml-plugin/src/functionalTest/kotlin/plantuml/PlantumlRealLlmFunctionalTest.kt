@@ -29,7 +29,7 @@ import kotlin.test.assertTrue
 @DisplayName("PlantUML plugin — integration Ollama locale (sans WireMock)")
 class PlantumlRealLlmFunctionalTest {
 
-    private val ollamaBaseUrl = "http://localhost:11434"
+    private val ollamaBaseUrl = "http://localhost:11438"
     private val ollamaModel = "smollm:135m-instruct-v0.2-q8_0"
     private var ollamaAvailable = false
 

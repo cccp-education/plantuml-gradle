@@ -26,7 +26,7 @@ class I18nSteps(private val world: PlantumlWorld) {
             langchain4j:
               model: "ollama"
               ollama:
-                baseUrl: "http://localhost:11434"
+                baseUrl: "http://localhost:11438"
                 modelName: "smollm:135m"
               maxIterations: 5
             language: "$language"
@@ -51,7 +51,7 @@ class I18nSteps(private val world: PlantumlWorld) {
             langchain4j:
               model: "ollama"
               ollama:
-                baseUrl: "http://localhost:11434"
+                baseUrl: "http://localhost:11438"
                 modelName: "smollm:135m"
               maxIterations: 5
             language: "en"

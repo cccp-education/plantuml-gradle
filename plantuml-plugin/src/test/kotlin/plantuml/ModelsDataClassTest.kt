@@ -45,7 +45,7 @@ class ModelsDataClassTest {
     @Test
     fun `OllamaConfig should have correct defaults`() {
         val config = OllamaConfig()
-        assertEquals("http://localhost:11434", config.baseUrl)
+        assertEquals("http://localhost:11438", config.baseUrl)
         assertEquals("smollm:135m", config.modelName)
     }
 

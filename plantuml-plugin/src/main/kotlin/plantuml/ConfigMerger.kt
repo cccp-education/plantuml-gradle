@@ -85,7 +85,7 @@ object ConfigMerger {
                 validation = env["PLANTUML_VALIDATION"]?.toBoolean() ?: sysProps["PLANTUML_VALIDATION"]?.toBoolean() ?: true,
                 validationPrompt = env["PLANTUML_VALIDATION_PROMPT"] ?: sysProps["PLANTUML_VALIDATION_PROMPT"] ?: "Rate this diagram on clarity, completeness, and best practices. Return a JSON with 'score' (1-10) and 'feedback' (string) and 'recommendations' (array).",
                 ollama = OllamaConfig(
-                    baseUrl = env["PLANTUML_OLLAMA_BASE_URL"] ?: sysProps["PLANTUML_OLLAMA_BASE_URL"] ?: "http://localhost:11434",
+                    baseUrl = env["PLANTUML_OLLAMA_BASE_URL"] ?: sysProps["PLANTUML_OLLAMA_BASE_URL"] ?: "http://localhost:11438",
                     modelName = env["PLANTUML_OLLAMA_MODEL_NAME"] ?: sysProps["PLANTUML_OLLAMA_MODEL_NAME"] ?: "smollm:135m"
                 ),
                 gemini = ApiKeyConfig(
@@ -169,7 +169,7 @@ object ConfigMerger {
                 validation = props["plantuml.langchain4j.validation"]?.toBoolean() ?: true,
                 validationPrompt = props["plantuml.langchain4j.validationPrompt"] ?: "Rate this diagram on clarity, completeness, and best practices. Return a JSON with 'score' (1-10) and 'feedback' (string) and 'recommendations' (array).",
                 ollama = OllamaConfig(
-                    baseUrl = props["plantuml.langchain4j.ollama.baseUrl"] ?: "http://localhost:11434",
+                    baseUrl = props["plantuml.langchain4j.ollama.baseUrl"] ?: "http://localhost:11438",
                     modelName = props["plantuml.langchain4j.ollama.modelName"] ?: "smollm:135m"
                 ),
                 gemini = ApiKeyConfig(
@@ -262,7 +262,7 @@ object ConfigMerger {
             validation = cli["langchain4j.validation"] as? Boolean ?: (if (!yaml.validation) yaml.validation else props.validation),
             validationPrompt = cli["langchain4j.validationPrompt"]?.toString() ?: yaml.validationPrompt,
             ollama = OllamaConfig(
-                baseUrl = cli["langchain4j.ollama.baseUrl"]?.toString() ?: (if (env.ollama.baseUrl != "http://localhost:11434") env.ollama.baseUrl else (if (yaml.ollama.baseUrl != "http://localhost:11434") yaml.ollama.baseUrl else props.ollama.baseUrl)),
+                baseUrl = cli["langchain4j.ollama.baseUrl"]?.toString() ?: (if (env.ollama.baseUrl != "http://localhost:11438") env.ollama.baseUrl else (if (yaml.ollama.baseUrl != "http://localhost:11438") yaml.ollama.baseUrl else props.ollama.baseUrl)),
                 modelName = cli["langchain4j.ollama.modelName"]?.toString() ?: (if (env.ollama.modelName != "smollm:135m") env.ollama.modelName else (if (yaml.ollama.modelName != "smollm:135m") yaml.ollama.modelName else props.ollama.modelName))
             ),
             gemini = ApiKeyConfig(

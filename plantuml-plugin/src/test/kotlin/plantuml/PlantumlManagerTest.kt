@@ -173,7 +173,7 @@ class PlantumlManagerTest {
               maxIterations: 3
               validation: true
               ollama:
-                baseUrl: "http://localhost:11434"
+                baseUrl: "http://localhost:11438"
                 modelName: "smollm:135m"
               openai:
                 apiKey: "sk-test"
@@ -211,7 +211,7 @@ class PlantumlManagerTest {
         assertEquals("ollama", config.langchain4j.model)
         assertEquals(3, config.langchain4j.maxIterations)
         assertTrue(config.langchain4j.validation)
-        assertEquals("http://localhost:11434", config.langchain4j.ollama.baseUrl)
+        assertEquals("http://localhost:11438", config.langchain4j.ollama.baseUrl)
         assertEquals("smollm:135m", config.langchain4j.ollama.modelName)
         assertEquals("sk-test", config.langchain4j.openai.apiKey)
         assertEquals("gem-test", config.langchain4j.gemini.apiKey)
@@ -280,7 +280,7 @@ class PlantumlManagerTest {
         assertEquals("ollama", config.langchain4j.model)
         assertEquals(5, config.langchain4j.maxIterations)
         assertTrue(config.langchain4j.validation)
-        assertEquals("http://localhost:11434", config.langchain4j.ollama.baseUrl)
+        assertEquals("http://localhost:11438", config.langchain4j.ollama.baseUrl)
         assertEquals("smollm:135m", config.langchain4j.ollama.modelName)
     }
 }

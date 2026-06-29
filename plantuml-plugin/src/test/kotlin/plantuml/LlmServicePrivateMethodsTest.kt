@@ -24,7 +24,7 @@ class LlmServicePrivateMethodsTest {
                 maxIterations = 1,
                 validation = false,
                 ollama = OllamaConfig(
-                    baseUrl = "http://localhost:11434",
+                    baseUrl = "http://localhost:11438",
                     modelName = "smollm:135m"
                 ),
                 openai = ApiKeyConfig(apiKey = "sk-test-openai"),

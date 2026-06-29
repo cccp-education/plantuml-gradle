@@ -48,7 +48,7 @@ class ConfigurationSteps(private val world: PlantumlWorld) {
             langchain4j:
               model: "ollama"
               ollama:
-                baseUrl: "http://localhost:11434"
+                baseUrl: "http://localhost:11438"
                 modelName: "smollm:135m"
               maxIterations: 5
             invalid yaml syntax here: [unclosed bracket
@@ -96,7 +96,7 @@ class ConfigurationSteps(private val world: PlantumlWorld) {
             langchain4j:
               model: "ollama"
               ollama:
-                baseUrl: "http://localhost:11434"
+                baseUrl: "http://localhost:11438"
                 modelName: "smollm:135m"
               maxIterations: 5
             """.trimIndent()
@@ -143,7 +143,7 @@ class ConfigurationSteps(private val world: PlantumlWorld) {
             langchain4j:
               model: "ollama"
               ollama:
-                baseUrl: "http://localhost:11434"
+                baseUrl: "http://localhost:11438"
                 modelName: "smollm:135m"
               maxIterations: 5
             """.trimIndent()
@@ -180,7 +180,7 @@ class ConfigurationSteps(private val world: PlantumlWorld) {
             langchain4j:
               model: "ollama"
               ollama:
-                baseUrl: "http://localhost:11434"
+                baseUrl: "http://localhost:11438"
                 modelName: "smollm:135m"
               maxIterations: $maxIterations
             """.trimIndent()

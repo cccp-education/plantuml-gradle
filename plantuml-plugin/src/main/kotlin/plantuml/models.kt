@@ -126,13 +126,13 @@ data class GitConfig(
 /**
  * Ollama LLM provider configuration.
  *
- * @property baseUrl Ollama server base URL (default: "http://localhost:11434")
- * @property modelName Ollama model name to use (default: "smollm:135m")
+ * @property baseUrl Ollama server base URL (default: "http://localhost:11438")
+ * @property modelName Ollama model name to use (default: "gpt-oss:120b-cloud")
  * @property pool List of Ollama instances for rotation (optional)
  */
 data class OllamaConfig(
-    val baseUrl: String = "http://localhost:11434",
-    val modelName: String = "smollm:135m",
+    val baseUrl: String = "http://localhost:11438",
+    val modelName: String = "gpt-oss:120b-cloud",
     val pool: List<ApiKeyPoolEntry> = emptyList()
 )
 
