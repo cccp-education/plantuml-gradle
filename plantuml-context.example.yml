@@ -20,7 +20,7 @@ langchain4j:
   validationPrompt: "Rate this diagram on clarity, completeness, and best practices. Return a JSON with 'score' (1-10) and 'feedback' (string) and 'recommendations' (array)."
   
   ollama:
-    baseUrl: "http://localhost:11434"
+    baseUrl: "http://localhost:11438"
     modelName: "smollm:135m"
   
   gemini:

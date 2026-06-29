@@ -1,0 +1,49 @@
+= Session 154 — SEC-1 : purge ports 11434 + deepseek résiduels
+:session: 154
+:date: 2026-06-30
+:type: sécurité
+:score: 8/10
+
+== Objectif
+
+EPIC SEC-1 (workspace-bom) : purger les ports interdits 11434-11436 et les
+références deepseek résiduelles dans plantuml-gradle.
+
+== Ce qui a été fait
+
+=== 1. Ports 11434 corrigés (code main + test resources)
+
+- `plantuml-api/src/main/resources/application.yaml` : `11434` → `11438` (chat-model + streaming-chat-model)
+- `plantuml-api/src/test/resources/application-test.yaml` : `11434` → `11440`
+- `src/test/resources/ollama-local-smollm-135.yml` : `11434` → `11440`
+- `plantuml-plugin/dev-tools/test-llm-param/ollama-local-smollm-135.yml` : `11434` → `11438`
+- 4 configs racine : `ollama-local-smollm-135.yaml`, `sample-plantuml-context.yml`, `plantuml-context.example.yml`, `sample-plantuml-test-config.yml` : `11434` → `11438`
+
+=== 2. application-ai.yaml (gitignoré)
+
+Non modifié — contient les secrets API (deepseek URL + clé). Le champ
+`deepseek` dans `Properties.kt` est un binding Spring config, pas un appel réseau.
+
+=== 3. Tests fonctionnels — vérification dynamique
+
+Tous les tests `generatePlantumlDiagrams` qui font `.build()` (SUCCESS) utilisent
+WireMock (`wireMockServer.port()`) ou `-Dplantuml.test.mode=true` (mode simulé).
+Le test `@Tag("real-llm")` PlantumlRealLlmFunctionalTest est protégé par
+`assumeTrue(ollamaAvailable)`. 1 test `@Ignore` (nécessite Ollama réel).
+
+== Fichiers modifiés
+
+* `plantuml-plugin/plantuml-api/src/main/resources/application.yaml`
+* `plantuml-plugin/plantuml-api/src/test/resources/application-test.yaml`
+* `plantuml-plugin/src/test/resources/ollama-local-smollm-135.yml`
+* `plantuml-plugin/dev-tools/test-llm-param/ollama-local-smollm-135.yml`
+* `ollama-local-smollm-135.yaml`, `sample-plantuml-context.yml`, `plantuml-context.example.yml`, `sample-plantuml-test-config.yml`
+
+== Non modifié (gitignoré)
+
+* `plantuml-context.yml`, `plantuml-test-context.yml` (gitignorés)
+* `application-ai.yaml` (gitignoré — secrets API)
+
+== Prochaines étapes
+
+* Maintenance — plantuml-gradle 0.0.1 publié.

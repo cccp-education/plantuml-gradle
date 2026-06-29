@@ -61,14 +61,14 @@ server:
 langchain4j:
   ollama:
     chat-model:
-      base-url: http://localhost:11434
+      base-url: http://localhost:11438
  #     model-name: llama3.2:3b-instruct-q8_0
 #      model-name: smollm:135m
       model-name: smollm:135m-instruct-v0.2-q8_0
 
       timeout: PT120S
     streaming-chat-model:
-      base-url: http://localhost:11434
+      base-url: http://localhost:11438
 #      model-name: smollm:135m
       model-name: smollm:135m-instruct-v0.2-q8_0
 #      model-name: llama3.2:3b-instruct-q8_0

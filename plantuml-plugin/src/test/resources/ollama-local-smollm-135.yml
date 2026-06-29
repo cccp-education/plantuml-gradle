@@ -2,7 +2,7 @@
 langchain4j:
   model: "ollama"
   ollama:
-    baseUrl: "http://localhost:11434"
+    baseUrl: "http://localhost:11440"
     modelName: "smollm:135m"
   validation: false  # Désactiver la validation pour les tests rapides
 

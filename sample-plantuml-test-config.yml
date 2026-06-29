@@ -4,7 +4,7 @@
 
 langchain4j:
   ollama:
-    baseUrl: "http://localhost:11434"
+    baseUrl: "http://localhost:11438"
     modelName: "smollm:135m"
   gemini:
     apiKey: "TEST_API_KEY_PLACEHOLDER"

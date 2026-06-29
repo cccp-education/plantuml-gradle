@@ -22,10 +22,10 @@ logging:
 langchain4j:
   ollama:
     chat-model:
-      base-url: http://localhost:11434
+      base-url: http://localhost:11440
       model-name: smollm:135m
 #      model-name: smollm:135m-instruct-v0.2-q8_0
     streaming-chat-model:
-      base-url: http://localhost:11434
+      base-url: http://localhost:11440
       model-name: smollm:135m
 #      model-name: smollm:135m-instruct-v0.2-q8_0

@@ -3,7 +3,7 @@ langchain4j:
   gemini:
     apiKey: "fake-api-key"
   ollama:
-    baseUrl: "http://localhost:11434"
+    baseUrl: "http://localhost:11438"
     modelName: "smollm:135m"
   validation: false
 
