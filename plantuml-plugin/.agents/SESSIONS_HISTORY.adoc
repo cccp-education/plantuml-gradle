@@ -1,5 +1,9 @@
 = Historique des Sessions
 
+== Session 155 (2026-07-03) — CNV-6 Migration
+
+Migration du `build.gradle.kts` vers les convention plugins `education.cccp.build.gradle-plugin` (0.0.1) + `education.cccp.build.publishing` (0.0.1), pattern bakery. build.gradle.kts 616→570 lignes (-46). compileKotlin SUCCESS. Variantes gardées : buildscript annotations force, groovy exclusions, Docker/HuggingFace tasks, kover 75%, configurationCache=false.
+
 _Session 153_ (2026-06-24) : Architecture README Plugin + Consommateur — déplacement README.plugin → plantuml-plugin/, README.consommateurs → racine, liens i18n recréés (10 langues). Aucun code Kotlin modifié. ✅
 _Session 152_ (2026-06-24) : US-I18N-7 Documentation + README i18n — 20 fichiers README créés (10 langues × 2 audiences : `README.consommateurs/` + `README.plugin/`). Badges Maven Central/Portal/CI/Coverage/License, markers version 0.0.1 + 380/380 PASS, switcher i18n 10 langues, AR/UR en script RTL. US-I18N-7 ✅ (2/28 pts). EPIC PLT-I18N : 18/28 pts (64%). ✅
 _Session 151_ (2026-06-15) : US-I18N-3 Logger Lifecycle Messages i18n — DDD+TDD+BDD. 5 task classes +champ `lang`, 66 `logger.lifecycle()` → `PlantumlMessages.format()`/`get()`. LifecycleMessagesI18nTest 760/760 PASS. 17_i18n_lifecycle_messages.feature (2 scénarios) + I18nSteps.kt step. Compile + publishToMavenLocal OK. ✅
