@@ -266,7 +266,7 @@ class DiagramProcessor(
      * @param history Complete list of [AttemptEntry] from prompt processing
      */
     private fun archiveAttemptHistory(history: List<AttemptEntry>, logger: Logger) {
-        System.out.println("📦 [ARCHIVE] START - entries=${history.size}, projectDirProp=${System.getProperty("plugin.project.dir")}")
+        logger.info(PlantumlMessages.format("processor.archive_start", "en", history.size, System.getProperty("plugin.project.dir") ?: ""))
         // Always archive if there is at least one attempt
         if (history.isNotEmpty()) {
             try {
@@ -280,11 +280,11 @@ class DiagramProcessor(
                 val projectDir = File(projectDirPath)
                 val diagramsDir = File(projectDir, diagramsPath)
                 
-                System.out.println("📦 [ARCHIVE] diagramsPath=$diagramsPath, projectDirPath=$projectDirPath, diagramsDir=${diagramsDir.absolutePath}, exists=${diagramsDir.exists()}")
+                logger.info(PlantumlMessages.format("processor.archive_path", "en", diagramsPath, projectDirPath, diagramsDir.absolutePath, diagramsDir.exists()))
                 
                 if (!diagramsDir.exists()) {
                     val created = diagramsDir.mkdirs()
-                    System.out.println("📦 [ARCHIVE] Created diagrams directory: ${diagramsDir.absolutePath}, success=$created")
+                    logger.info(PlantumlMessages.format("processor.archive_created", "en", diagramsDir.absolutePath, created))
                 }
 
                 // Create a filename based on timestamp
@@ -296,14 +296,13 @@ class DiagramProcessor(
                 val historyJson = convertHistoryToJson(history)
                 historyFile.writeText(historyJson)
                 
-                System.out.println("📦 [ARCHIVE] SUCCESS - Archived ${history.size} entries to ${historyFile.absolutePath}, exists=${historyFile.exists()}")
+                logger.info(PlantumlMessages.format("processor.archive_success", "en", history.size, historyFile.absolutePath, historyFile.exists()))
 
             } catch (e: Exception) {
-                System.out.println(PlantumlMessages.format("processor.archive_failed", "en", e.message ?: ""))
                 logger.error(PlantumlMessages.format("processor.archive_failed", "en", e.message ?: ""), e)
             }
         } else {
-            System.out.println("📦 [ARCHIVE] SKIPPED - history is empty")
+            logger.info(PlantumlMessages.get("processor.archive_skipped"))
         }
     }
 
@@ -506,6 +505,6 @@ class DiagramProcessor(
         // results to the RAG training data directory
 
         // Placeholder implementation - we're not actually saving anything in this demo
-        println("Would save diagram for RAG training with score: ${validation.score}")
+        logger.info(PlantumlMessages.format("processor.would_save_rag", "en", validation.score))
     }
 }

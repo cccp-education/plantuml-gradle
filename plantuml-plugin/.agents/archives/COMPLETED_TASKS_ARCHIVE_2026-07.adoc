@@ -1,5 +1,19 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-07
 
+== Session 157 (2026-07-05) — US-I18N-5 println cleanup → logger i18n
+
+=== Fait
+- PlantumlManager 4 println("[plantuml] ...") → project.logger.lifecycle/error i18n ✅
+- PlantumlService 1 System.err.println → logger.warn i18n + Logger SLF4J ajouté ✅
+- DiagramProcessor 4 System.out.println archive → logger.info i18n ✅
+- DiagramProcessor 1 println would_save_rag → logger.info i18n ✅
+- Zéro println/System.err/System.out résiduel dans src/main/kotlin ✅
+- compileKotlin + compileTestKotlin + publishToMavenLocal SUCCESS ✅
+
+=== Prochaine session
+- US-I18N-6 Cucumber BDD i18n (exécution bloquée par BOM) OU EPIC 13 TieredRotationStrategy
+- Blocage tests :t par BOM junit-bom 6.0.3 (préexistant, à traiter en session dédiée)
+
 == Session 156 (2026-07-05) — US-I18N-4 Logger warn/error + exceptions i18n
 
 === Fait

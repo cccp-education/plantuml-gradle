@@ -40,12 +40,12 @@ object PlantumlManager {
             else File(project.projectDir, CONFIG_FILE_NAME)
 
             val yamlConfig = if (!configFile.exists() || configFile.length() == 0L) {
-                println("[plantuml] No $CONFIG_FILE_NAME or empty file — using defaults")
+                project.logger.lifecycle(PlantumlMessages.get("manager.no_config"))
                 PlantumlConfig()
             } else {
                 try {
                     val config = ConfigLoader.load(configFile)
-                    println("[plantuml] Config loaded: ${configFile.absolutePath}")
+                    project.logger.lifecycle(PlantumlMessages.format("manager.config_loaded", "en", configFile.absolutePath))
                     config
                 } catch (e: com.fasterxml.jackson.core.JsonParseException) {
                     val lineNum = e.location?.lineNr ?: -1
@@ -55,7 +55,7 @@ object PlantumlManager {
                     val errorMessage = PlantumlMessages.format(
                         "manager.invalid_yaml", "en", configFile.absolutePath, e.message ?: "", locationMsg
                     )
-                    println(PlantumlMessages.format("manager.error_prefix", "en", errorMessage))
+                    project.logger.error(PlantumlMessages.format("manager.error_prefix", "en", errorMessage))
                     throw IllegalStateException(errorMessage)
                 } catch (e: com.fasterxml.jackson.databind.exc.MismatchedInputException) {
                     val lineNum = e.location?.lineNr ?: -1
@@ -65,19 +65,19 @@ object PlantumlManager {
                     val errorMessage = PlantumlMessages.format(
                         "manager.invalid_syntax", "en", configFile.absolutePath, e.message ?: "", locationMsg
                     )
-                    println(PlantumlMessages.format("manager.error_prefix", "en", errorMessage))
+                    project.logger.error(PlantumlMessages.format("manager.error_prefix", "en", errorMessage))
                     throw IllegalStateException(errorMessage)
                 } catch (e: Exception) {
                     val errorMessage = PlantumlMessages.format(
                         "manager.parse_failed", "en", configFile.absolutePath, e.message ?: ""
                     )
-                    println(PlantumlMessages.format("manager.error_prefix", "en", errorMessage))
+                    project.logger.error(PlantumlMessages.format("manager.error_prefix", "en", errorMessage))
                     throw IllegalStateException(errorMessage)
                 }
             }
 
             return ConfigMerger.merge(project, yamlConfig, cliParams)
-                .also { println("[plantuml] Configuration merged (properties < yaml < cli)") }
+                .also { project.logger.lifecycle(PlantumlMessages.get("manager.config_merged")) }
         }
     }
 

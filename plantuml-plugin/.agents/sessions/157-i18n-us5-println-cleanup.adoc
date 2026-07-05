@@ -1,0 +1,60 @@
+= Session 157 (2026-07-05) — US-I18N-5 println cleanup → logger i18n
+
+:date: 2026-07-05
+:epic: PLT-I18N
+:us: US-I18N-5
+:status: ✅ TERMINÉ
+
+== Résumé
+
+Migration des ~15 `println()`/`System.err`/`System.out.println` résiduels vers
+`logger.lifecycle`/`logger.warn`/`logger.info`/`logger.error` avec i18n.
+Baby steps DDD/TDD/BDD, un fichier à la fois, compilation après chaque step.
+
+== Fait
+
+=== Baby steps (3 classes refactorées)
+
+. *PlantumlManager* — 4 `println("[plantuml] ...")` → `project.logger.lifecycle`/`.error` + clés `manager.no_config`, `manager.config_loaded`, `manager.config_merged`, `manager.error_prefix` (3 println error déjà i18nisés en S156, passés de `println` à `project.logger.error`)
+. *PlantumlService* — 1 `System.err.println("Failed to write diagram...")` → `logger.warn` + clé `service.write_failed`. Logger SLF4J ajouté à la classe.
+. *DiagramProcessor* — 4 `System.out.println("📦 [ARCHIVE] ...")` → `logger.info` + clés `processor.archive_start`, `processor.archive_path`, `processor.archive_created`, `processor.archive_success`, `processor.archive_skipped`. 1 `println("Would save diagram...")` → `logger.info` + clé `processor.would_save_rag`.
+
+=== Note technique
+
+* `archiveAttemptHistory` prend un `Logger` SLF4J en paramètre → `logger.info` (SLF4J n'a pas `lifecycle`)
+* `PlantumlManager.Configuration.load` utilise `project.logger` (Gradle) → `logger.lifecycle`/`.error`
+* `PlantumlService` n'avait pas de logger → ajouté `private val logger: Logger = LoggerFactory.getLogger(...)`
+* Les `println` error de PlantumlManager (S156) étaient déjà i18nisés mais via `println` → passés à `project.logger.error`
+
+=== Vérifications
+
+* `compileKotlin` SUCCESS ✅
+* `compileTestKotlin` SUCCESS ✅
+* `publishToMavenLocal` SUCCESS ✅
+* Zéro occurrence `println(`/`System.err.print`/`System.out.print` résiduelle dans `src/main/kotlin` ✅
+* Scan secrets : références API_KEY dans config/models uniquement (légitimes) ✅
+
+== EPIC PLT-I18N statut (25/28 pts, 89%)
+
+* US-I18N-0 : ✅ Configuration layer (3/28 pts)
+* US-I18N-1 : ✅ Messages properties 10 langues (4/28 pts)
+* US-I18N-2 : ✅ Task descriptions (3/28 pts)
+* US-I18N-3 : ✅ Logger lifecycle messages (6/28 pts)
+* US-I18N-4 : ✅ Logger warn/error + exceptions (5/28 pts)
+* US-I18N-5 : ✅ println cleanup → logger i18n (2/28 pts) ← Session 157
+* US-I18N-6 : 🟡 Cucumber BDD i18n (3/28 pts) — feature 18 créée (S156), exécution bloquée par BOM
+* US-I18N-7 : ✅ Documentation + README (2/28 pts)
+
+== Prochaine session
+
+US-I18N-6 : Cucumber BDD scénarios i18n — exécution bloquée par BOM junit-bom 6.0.3.
+Soit traiter le BOM d'abord (session dédiée dependencies), soit valider les features
+par compilation seule.
+
+Alternativement : EPIC 13 TieredRotationStrategy (~6 pts, 2-3 sessions).
+
+== Fichiers modifiés
+
+* `src/main/kotlin/plantuml/PlantumlManager.kt`
+* `src/main/kotlin/plantuml/service/PlantumlService.kt`
+* `src/main/kotlin/plantuml/service/DiagramProcessor.kt`

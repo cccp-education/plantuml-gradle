@@ -1,5 +1,9 @@
 = Historique des Sessions
 
+== Session 157 (2026-07-05) — US-I18N-5 println cleanup → logger i18n
+
+Migration ~15 `println`/`System.err`/`System.out.println` résiduels → `logger.lifecycle`/`warn`/`info`/`error` i18n. 3 classes (PlantumlManager 4 println → project.logger, PlantumlService 1 System.err → logger.warn + Logger SLF4J ajouté, DiagramProcessor 5 System.out/println → logger.info). compileKotlin + compileTestKotlin + publishToMavenLocal SUCCESS. Zéro println résiduel. US-I18N-5 ✅ (2/28 pts). EPIC PLT-I18N : 25/28 pts (89%). ✅
+
 == Session 156 (2026-07-05) — US-I18N-4 Logger warn/error + exceptions i18n
 
 Refactoring ~45 `logger.warn`/`error`/`throw ...Exception` hardcodés → `PlantumlMessages.get()`/`format()`. 8 classes refactorées (ApiKeyPool, KnowledgeGraphParser, GraphifyPromptAdapter, DiagramProcessor, PlantumlManager, GenerateKnowledgeGraphDiagramTask, GeneratePlantumlDiagramsTask, CollectPlantumlIndexTask). Nouvelle clé `kg.validation_issues` (10 fichiers). Feature Cucumber 18 (7 scénarios) + I18nErrorSteps (12 steps). compileKotlin + compileTestKotlin + publishToMavenLocal SUCCESS. US-I18N-4 ✅ (5/28 pts). EPIC PLT-I18N : 23/28 pts (82%). Tests :t cassés par BOM junit-bom 6.0.3 (préexistant). ✅

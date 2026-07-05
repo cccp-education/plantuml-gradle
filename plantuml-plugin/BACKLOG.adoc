@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-07-05 (Session 156 — US-I18N-4 warn/error/exceptions i18n)
+:last_update: 2026-07-05 (Session 157 — US-I18N-5 println cleanup)
 
 '''
 == 🔴 EPIC 13 : Multi-provider API Pool — Rotation par tiers
@@ -225,6 +225,7 @@ PlantumlMessages.format("key", args)  → String formaté (MessageFormat)
   `build.gradle.kts` (Cucumber cleanup).
 | 2
 | 🟡 P2
+| ✅ Session 157 — 3 classes refactorées (PlantumlManager 4 println, PlantumlService 1 System.err, DiagramProcessor 5 System.out/println). Logger SLF4J ajouté à PlantumlService. Zéro println résiduel. compileKotlin + publishToMavenLocal SUCCESS.
 
 | US-I18N-6
 | **Cucumber BDD — Scénarios i18n** — Feature `i18n_language_switch.feature` :
@@ -262,7 +263,7 @@ PlantumlMessages.format("key", args)  → String formaté (MessageFormat)
 
 == Prochains EPICs
 
-1. **EPIC PLT-I18N** — Internationalisation 10 langues. ~28 pts. 6-7 sessions. ← Session 156 (23/28 pts, 82%)
+1. **EPIC PLT-I18N** — Internationalisation 10 langues. ~28 pts. 6-7 sessions. ← Session 157 (25/28 pts, 89%)
 2. **EPIC 13** — TieredRotationStrategy. ~6 pts. 2-3 sessions.
 
 '''
