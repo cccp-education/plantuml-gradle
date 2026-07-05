@@ -87,7 +87,7 @@ abstract class GenerateKnowledgeGraphDiagramTask : DefaultTask() {
         val plantumlService = PlantumlService()
         val validationResult = plantumlService.validateSyntax(plantumlCode)
         if (validationResult is PlantumlService.SyntaxValidationResult.Invalid) {
-            logger.warn("Generated PlantUML has validation issues: {}", validationResult.errorMessage)
+            logger.warn(PlantumlMessages.format("kg.validation_issues", lang, validationResult.errorMessage))
             logger.lifecycle(PlantumlMessages.format("kg.saved_despite_issues", lang, pumlFile.absolutePath))
         } else {
             val imageFile = File(outputDir, "knowledge-graph${fileNameSuffix}.png")
@@ -106,7 +106,7 @@ abstract class GenerateKnowledgeGraphDiagramTask : DefaultTask() {
             "INFERRED" -> EdgeType.INFERRED
             "AMBIGUOUS" -> EdgeType.AMBIGUOUS
             else -> {
-                logger.warn("Unknown edge type '{}', defaulting to EXTRACTED", typeStr)
+                logger.warn(PlantumlMessages.format("kg.unknown_edge", lang, typeStr))
                 EdgeType.EXTRACTED
             }
         }

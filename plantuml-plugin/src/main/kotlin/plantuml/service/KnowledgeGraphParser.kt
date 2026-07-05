@@ -6,6 +6,7 @@ import plantuml.KnowledgeGraph
 import plantuml.KnowledgeGraphCommunity
 import plantuml.KnowledgeGraphEdge
 import plantuml.KnowledgeGraphNode
+import plantuml.PlantumlMessages
 import java.io.File
 
 class KnowledgeGraphParser(
@@ -15,7 +16,9 @@ class KnowledgeGraphParser(
 
     fun parse(): KnowledgeGraph {
         if (!graphFile.exists()) {
-            throw IllegalArgumentException("Graph file not found: ${graphFile.absolutePath}")
+            throw IllegalArgumentException(
+                PlantumlMessages.format("kgparser.file_not_found", "en", graphFile.absolutePath)
+            )
         }
 
         val root = mapper.readTree(graphFile)

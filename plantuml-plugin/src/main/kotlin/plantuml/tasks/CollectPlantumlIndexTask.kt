@@ -89,13 +89,7 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         val simulatePortConflict = System.getProperty("plantuml.test.simulate.port.conflict") == "true" ||
             project.properties["plantuml.test.simulate.port.conflict"]?.toString() == "true"
         if (simulatePortConflict) {
-            val message = """
-                Failed to start pgvector container: port 5432 is already in use.
-                Suggestions:
-                - Use a different port: ./gradlew collectPlantumlIndex -Pplantuml.rag.port=5433
-                - Stop existing PostgreSQL: sudo systemctl stop postgresql
-                - Check running containers: docker ps | grep postgres
-            """.trimIndent()
+            val message = PlantumlMessages.get("collect.port_conflict", lang)
             logger.error(message)
             throw RuntimeException(message)
         }
@@ -123,14 +117,14 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
 
         // Check if the path is actually a directory
         if (!ragDir.isDirectory) {
-            val errorMsg = "  ✗ Path exists but is not a directory: ${ragDir.absolutePath}"
+            val errorMsg = PlantumlMessages.format("collect.not_dir", lang, ragDir.absolutePath)
             logger.error(errorMsg)
             throw RuntimeException(errorMsg)
         }
 
         // Check if we can read the directory
         if (!ragDir.canRead()) {
-            val errorMsg = "  ✗ Permission denied: Cannot read RAG directory at ${ragDir.absolutePath}"
+            val errorMsg = PlantumlMessages.format("collect.permission_denied_dir", lang, ragDir.absolutePath)
             logger.error(errorMsg)
             throw RuntimeException(errorMsg)
         }
@@ -140,13 +134,15 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
                 file.extension == "puml"
             } ?: emptyArray()
         } catch (e: SecurityException) {
-            val errorMsg =
-                "  ✗ Permission denied: Cannot access files in RAG directory ${ragDir.absolutePath} - ${e.message}"
+            val errorMsg = PlantumlMessages.format(
+                "collect.permission_denied_files", lang, ragDir.absolutePath, e.message ?: ""
+            )
             logger.error(errorMsg)
             throw RuntimeException(errorMsg, e)
         } catch (e: Exception) {
-            // Handle other potential exceptions like AccessDeniedException
-            val errorMsg = "  ✗ Error accessing RAG directory ${ragDir.absolutePath} - ${e.message}"
+            val errorMsg = PlantumlMessages.format(
+                "collect.error_access_dir", lang, ragDir.absolutePath, e.message ?: ""
+            )
             logger.error(errorMsg)
             throw RuntimeException(errorMsg, e)
         }
@@ -164,8 +160,9 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
                     file.extension == "json" && file.name.startsWith("attempt-history")
                 } ?: emptyArray()
             } catch (e: SecurityException) {
-                val errorMsg =
-                    "  ✗ Permission denied: Cannot access training directory ${trainingDir.absolutePath} - ${e.message}"
+                val errorMsg = PlantumlMessages.format(
+                    "collect.permission_denied_training", lang, trainingDir.absolutePath, e.message ?: ""
+                )
                 logger.error(errorMsg)
                 throw RuntimeException(errorMsg, e)
             }
@@ -327,17 +324,11 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         } catch (e: Exception) {
             val errorMsg = e.message ?: "Unknown error"
             if (errorMsg.contains("port") || errorMsg.contains("bind") || errorMsg.contains("in use")) {
-                val message = """
-                    Failed to start pgvector container: port 5432 is already in use.
-                    Suggestions:
-                    - Use a different port: ./gradlew collectPlantumlIndex -Pplantuml.rag.port=5433
-                    - Stop existing PostgreSQL: sudo systemctl stop postgresql
-                    - Check running containers: docker ps | grep postgres
-                """.trimIndent()
+                val message = PlantumlMessages.get("collect.port_conflict", lang)
                 logger.error(message)
                 throw RuntimeException(message, e)
             }
-            val message = "Failed to start pgvector container: ${e.message}"
+            val message = PlantumlMessages.format("collect.container_failed", lang, e.message ?: "")
             logger.error(message)
             throw RuntimeException(message, e)
         }
@@ -453,18 +444,11 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
     private fun handleFileReadError(file: File, e: Exception): Nothing {
         val errorMsg = e.message ?: "Unknown error"
         if (errorMsg.contains("space") || errorMsg.contains("No space left on device")) {
-            val message = """
-                Disk space exhausted while reading ${file.name}.
-                Error: ${e.message}
-                Suggestions:
-                - Free up disk space
-                - Check available storage: df -h
-                - Clean temporary files
-            """.trimIndent()
+            val message = PlantumlMessages.format("collect.disk_space_read", lang, file.name, e.message ?: "")
             logger.error(message)
             throw RuntimeException(message, e)
         }
-        val message = "Failed to read file ${file.name}: ${e.message}"
+        val message = PlantumlMessages.format("collect.failed_read", lang, file.name, e.message ?: "")
         logger.error(message)
         throw RuntimeException(message, e)
     }
@@ -474,22 +458,14 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
      */
     private fun handleEmbeddingStoreError(e: Exception, context: File) {
         val errorMsg = e.message ?: "Unknown error"
-        if (errorMsg.contains("space") || errorMsg.contains("No space left on device") || 
+        if (errorMsg.contains("space") || errorMsg.contains("No space left on device") ||
             errorMsg.contains("disk") || errorMsg.contains("storage")) {
-            val message = """
-                Disk space exhausted while storing embeddings for ${context.name}.
-                Error: ${e.message}
-                Suggestions:
-                - Free up disk space immediately
-                - Check available storage: df -h
-                - Clean up partial outputs from build directory
-                Cleanup: Removing partial files...
-            """.trimIndent()
+            val message = PlantumlMessages.format("collect.disk_space_store", lang, context.name, e.message ?: "")
             logger.error(message)
             cleanupPartialOutputs()
             throw RuntimeException(message, e)
         }
-        val message = "Failed to store embedding for ${context.name}: ${e.message}"
+        val message = PlantumlMessages.format("collect.failed_store", lang, context.name, e.message ?: "")
         logger.error(message)
         throw RuntimeException(message, e)
     }
@@ -532,15 +508,7 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         val simulateDiskFull = System.getProperty("plantuml.test.disk.full") == "true"
         
         if (simulateDiskFull) {
-            val message = """
-                Disk space exhausted: No space left on device.
-                Error: Simulated disk full condition for testing.
-                Suggestions:
-                - Free up disk space
-                - Check available storage: df -h
-                - Clean up partial outputs from build directory
-                Cleanup: Removing partial files...
-            """.trimIndent()
+            val message = PlantumlMessages.get("collect.disk_space_sim", lang)
             logger.error(message)
             cleanupPartialOutputs()
             throw RuntimeException(message)

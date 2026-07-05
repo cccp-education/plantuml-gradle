@@ -2,9 +2,9 @@
 
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
-_Derniere mise a jour_ : 2026-07-03  
+_Derniere mise a jour_ : 2026-07-05  
 _Session en cours_ : aucune  
-_Session terminee_ : 155 — CNV-6 Migration conventions plugins education.cccp.build.* v0.0.1 ✅
+_Session terminee_ : 156 — US-I18N-4 Logger warn/error + exceptions i18n ✅
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
 '''
@@ -154,7 +154,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 
 == 🎯 Roadmap — État Actuel
 
-| EPIC PLT-I18N : Internationalisation 10 langues | 🟠 64% | 18/28 | 🟠 EN COURS — Session 152 (US-0 ✅, US-1 ✅, US-2 ✅, US-3 ✅, US-7 ✅)
+| EPIC PLT-I18N : Internationalisation 10 langues | 🟠 82% | 23/28 | 🟠 EN COURS — Session 156 (US-0 ✅, US-1 ✅, US-2 ✅, US-3 ✅, US-4 ✅, US-7 ✅, US-6 🟡 feature créée)
 | EPIC 13 : Multi-provider API Pool (tiers) | 🟡 0% | —/10 | 🟡 EN COURS — Sessions 138-141
 | CNV-6 : Migration conventions plugins education.cccp.build.* | ✅ 100% | — | ✅ TERMINÉ — Session 155 (build.gradle.kts 616→570, -46 lignes, variantes gardées)
 | BKY-PUB-1 ✅ : Publication Maven Central | ✅ 100% | 9/10 | ✅ TERMINÉ — Session 147 (nmcp, 0.0.1)

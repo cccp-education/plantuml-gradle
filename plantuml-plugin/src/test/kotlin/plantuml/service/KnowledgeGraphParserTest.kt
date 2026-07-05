@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import plantuml.EdgeType
+import plantuml.PlantumlMessages
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.assertFailsWith
@@ -183,9 +184,13 @@ class KnowledgeGraphParserTest {
         val missingFile = File(tempDir, "nonexistent.json")
         val missingParser = KnowledgeGraphParser(missingFile)
 
-        assertFailsWith<IllegalArgumentException> {
+        val ex = assertFailsWith<IllegalArgumentException> {
             missingParser.parse()
         }
+        assertEquals(
+            PlantumlMessages.format("kgparser.file_not_found", "en", missingFile.absolutePath),
+            ex.message
+        )
     }
 
     @Test

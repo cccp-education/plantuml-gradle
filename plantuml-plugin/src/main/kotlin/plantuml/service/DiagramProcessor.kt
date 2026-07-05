@@ -8,6 +8,7 @@ import org.slf4j.Logger
 import plantuml.PlantumlCode
 import plantuml.PlantumlConfig
 import plantuml.PlantumlDiagram
+import plantuml.PlantumlMessages
 import plantuml.ValidationFeedback
 import plantuml.service.PlantumlService.SyntaxValidationResult
 import java.io.File
@@ -153,7 +154,7 @@ class DiagramProcessor(
         } catch (e: IllegalStateException) {
             // JSON parsing failed - capture error for history
             parseError = e.message
-            logger.warn("Invalid LLM response format: ${e.message}")
+            logger.warn(PlantumlMessages.format("processor.invalid_format", "en", e.message ?: ""))
             // Return a placeholder that will fail validation
             "// INVALID_JSON_RESPONSE"
         }
@@ -200,7 +201,7 @@ class DiagramProcessor(
                     extractPlantUmlFromResponse(correctionResponse)
                 } catch (e: IllegalStateException) {
                     parseError = e.message
-                    logger.warn("Invalid LLM response format on correction: ${e.message}")
+                    logger.warn(PlantumlMessages.format("processor.invalid_correction", "en", e.message ?: ""))
                     "// INVALID_JSON_RESPONSE"
                 }
                 attemptHistory.add(
@@ -298,8 +299,8 @@ class DiagramProcessor(
                 System.out.println("📦 [ARCHIVE] SUCCESS - Archived ${history.size} entries to ${historyFile.absolutePath}, exists=${historyFile.exists()}")
 
             } catch (e: Exception) {
-                System.out.println("📦 [ARCHIVE] FAILED - ${e.message}")
-                logger.error("archiveAttemptHistory: FAILED - {}", e.message, e)
+                System.out.println(PlantumlMessages.format("processor.archive_failed", "en", e.message ?: ""))
+                logger.error(PlantumlMessages.format("processor.archive_failed", "en", e.message ?: ""), e)
             }
         } else {
             System.out.println("📦 [ARCHIVE] SKIPPED - history is empty")
@@ -392,14 +393,14 @@ class DiagramProcessor(
             }
             // JSON is valid but doesn't contain expected structure - this is a malformed response
             if (looksLikeJson) {
-                throw IllegalStateException("Invalid LLM response format: JSON response does not contain 'plantuml' or 'code' field. Response: ${response.take(200)}")
+                throw IllegalStateException(PlantumlMessages.format("processor.invalid_json", "en", response.take(200)))
             }
             // Not JSON, return as-is
             response
         } catch (e: com.fasterxml.jackson.core.JsonParseException) {
             // If the top-level JSON is malformed, throw descriptive error
             if (looksLikeJson) {
-                throw IllegalStateException("Invalid LLM response format: malformed JSON detected. The LLM response could not be parsed. Please ensure the LLM returns valid JSON. Response: ${response.take(200)}")
+                throw IllegalStateException(PlantumlMessages.format("processor.malformed_json", "en", response.take(200)))
             }
             // Not JSON, return as-is
             response

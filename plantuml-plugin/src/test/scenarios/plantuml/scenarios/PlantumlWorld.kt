@@ -27,6 +27,11 @@ class PlantumlWorld {
     var exception: Throwable? = null
     val environmentVariables = mutableMapOf<String, String>()
 
+    var i18nErrorPool: plantuml.apikey.ApiKeyPool? = null
+    var i18nErrorGraphFile: File? = null
+    var i18nErrorPromptsDir: File? = null
+    var i18nErrorResponse: String? = null
+
     private val asyncJobs = mutableListOf<Deferred<BuildResult>>()
     
     private val version: String = System.getProperty("plugin.version", "0.0.0")

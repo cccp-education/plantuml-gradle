@@ -1,43 +1,49 @@
-= PROMPT_REPRISE — Plantuml — Session 156
-:session: 156
-:date: 2026-07-03
+= PROMPT_REPRISE — Plantuml — Session 157
+:session: 157
+:date: 2026-07-05
 
-== Session 155 terminée — CNV-6 Migration conventions plugins
+== Session 156 terminée — US-I18N-4 Logger warn/error + exceptions i18n
 
-Migration du `build.gradle.kts` vers les convention plugins
-`education.cccp.build.gradle-plugin` (0.0.1) + `education.cccp.build.publishing`
-(0.0.1), pattern bakery. build.gradle.kts 616→570 lignes (-46). compileKotlin
-SUCCESS. Variantes gardées : buildscript annotations force, groovy exclusions,
-Docker/HuggingFace tasks, kover 75%, configurationCache=false.
+Refactoring des ~45 `logger.warn()`, `logger.error()`, `throw ...Exception(...)`
+hardcodés → `PlantumlMessages.get()`/`format()`. 8 classes refactorées par baby
+steps DDD/TDD/BDD. Nouvelle clé `kg.validation_issues` ajoutée aux 10 fichiers
+properties. Feature Cucumber `18_i18n_error_messages.feature` (7 scénarios) +
+`I18nErrorSteps.kt` (12 steps) créés. compileKotlin + compileTestKotlin +
+publishToMavenLocal SUCCESS. Zéro occurrence hardcoded restante.
 
-CNV-6 ✅ TERMINÉ pour plantuml-gradle.
+US-I18N-4 ✅ TERMINÉ (5/28 pts). EPIC PLT-I18N : 23/28 pts (82%).
 
-== Statut EPIC PLT-I18N (18/28 pts, 64%)
+== Note technique
+
+Tests `:test` cassés par BOM `junit-bom:5.14.3` upgradant `junit-platform-commons`
+à `6.0.3` (inexistant), incompatible avec launcher 1.14.3. Problème préexistant
+hors US-I18N-4. À traiter en session dédiée.
+
+== Statut EPIC PLT-I18N (23/28 pts, 82%)
 
 - US-I18N-0 : ✅ Configuration layer (3/28 pts)
-- US-I18N-1 : ✅ Messages properties 10 langues + PlantumlMessages (4/28 pts)
-- US-I18N-2 : ✅ Task descriptions + groups i18n (3/28 pts)
-- US-I18N-3 : ✅ Logger lifecycle messages i18n (6/28 pts)
-- US-I18N-4 : ☐ Logger warn/error + exceptions i18n (5/28 pts) ← Session 154
-- US-I18N-5 : ☐ println cleanup → logger i18n (2/28 pts)
-- US-I18N-6 : ☐ Cucumber BDD scénarios i18n (3/28 pts)
-- US-I18N-7 : ✅ Documentation + README (2/28 pts) ← Session 152
+- US-I18N-1 : ✅ Messages properties 10 langues (4/28 pts)
+- US-I18N-2 : ✅ Task descriptions (3/28 pts)
+- US-I18N-3 : ✅ Logger lifecycle messages (6/28 pts)
+- US-I18N-4 : ✅ Logger warn/error + exceptions (5/28 pts)
+- US-I18N-5 : ☐ println cleanup → logger i18n (2/28 pts) ← Session 157
+- US-I18N-6 : 🟡 Cucumber BDD i18n (3/28 pts) — feature 18 créée, exécution bloquée par BOM
+- US-I18N-7 : ✅ Documentation + README (2/28 pts)
 
-== Prochaine mission (156)
+== Prochaine mission (157)
 
-US-I18N-4 : Refactorer ~45 `logger.warn()`, `logger.error()`, `throw ...Exception(...)` :
-- `PlantumlManager` : ~5 warn/error
-- `PlantumlService` : ~4 exceptions
-- `DiagramProcessor` : ~8 warn/error + exceptions
-- `KnowledgeGraphParser` : ~2 exceptions
-- `GraphifyPromptAdapter` : ~2 exceptions
-- `ApiKeyPool` : ~3 exceptions
-- Résiduels dans les 5 tâches : ~15 warn/error (déjà partiellement i18nisés en S151)
+US-I18N-5 : Migrer ~15 `println()`/`System.err` résiduels vers
+`logger.lifecycle`/`logger.warn` avec i18n.
+
+Fichiers concernés :
+- `PlantumlManager` : ~5 `println("[plantuml] ...")` → `logger.lifecycle` + clés `manager.*`
+- `DiagramProcessor` : ~6 `System.out.println("📦 [ARCHIVE] ...")` → `logger.lifecycle` + clés `processor.archive_*`
+- `build.gradle.kts` : ~4 `println` Cucumber cleanup
 
 Baby steps DDD/TDD/BDD :
-. DDD : remplacer `logger.warn("hardcoded")`/`logger.error("hardcoded")`/`throw X("hardcoded")` par i18n
-. TDD : tests unitaires vérifiant que les messages warn/error/exceptions sont i18nisés
-. BDD : scénario Cucumber vérifiant les messages d'erreur dans la sortie Gradle
+. DDD : remplacer `println("hardcoded")` par `logger.lifecycle(PlantumlMessages.get/format(...))`
+. TDD : tests unitaires vérifiant les messages lifecycle i18nisés
+. BDD : scénario Cucumber vérifiant l'absence de println résiduel dans la sortie Gradle
 
 == Rappels
 
@@ -48,3 +54,4 @@ Baby steps DDD/TDD/BDD :
 - PlantumlMessages.get(key, language) + PlantumlMessages.format(key, language, args)
 - Messages.properties UTF-8 via ResourceBundle.Control custom
 - resolveLanguage via PlantumlManager.resolveLanguage(project)
+- Tests :t cassés par BOM junit-bom 6.0.3 (préexistant, à traiter hors US-I18N-5)

@@ -1,6 +1,7 @@
 package plantuml.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import plantuml.PlantumlMessages
 import java.io.File
 
 class GraphifyPromptAdapter(
@@ -24,7 +25,7 @@ class GraphifyPromptAdapter(
         val community = communities?.find {
             it.get("name")?.asText()?.contains(subgraphName, ignoreCase = true) == true
         } ?: communities?.first()
-            ?: throw IllegalArgumentException("No community found for: $subgraphName")
+            ?: throw IllegalArgumentException(PlantumlMessages.format("graphify.no_community", "en", subgraphName))
 
         val communityName = community.get("name").asText()
         val nodes = community.get("nodes")?.map { it.asText() } ?: emptyList()
@@ -45,7 +46,7 @@ class GraphifyPromptAdapter(
     fun generateAllPrompts(): List<SubgraphResult> {
         val graph = mapper.readTree(graphFile)
         val communities = graph.get("communities")
-            ?: throw IllegalArgumentException("No communities in graph")
+            ?: throw IllegalArgumentException(PlantumlMessages.get("graphify.no_communities"))
 
         return communities.map { community ->
             val name = community.get("name").asText()

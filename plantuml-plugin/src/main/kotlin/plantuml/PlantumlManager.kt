@@ -50,22 +50,28 @@ object PlantumlManager {
                 } catch (e: com.fasterxml.jackson.core.JsonParseException) {
                     val lineNum = e.location?.lineNr ?: -1
                     val colNum = e.location?.columnNr ?: -1
-                    val locationMsg = if (lineNum > 0 && colNum > 0) 
+                    val locationMsg = if (lineNum > 0 && colNum > 0)
                         " (line $lineNum, column $colNum)" else ""
-                    val errorMessage = "Invalid YAML configuration in ${configFile.absolutePath}: ${e.message}$locationMsg"
-                    println("[plantuml] ERROR: $errorMessage")
+                    val errorMessage = PlantumlMessages.format(
+                        "manager.invalid_yaml", "en", configFile.absolutePath, e.message ?: "", locationMsg
+                    )
+                    println(PlantumlMessages.format("manager.error_prefix", "en", errorMessage))
                     throw IllegalStateException(errorMessage)
                 } catch (e: com.fasterxml.jackson.databind.exc.MismatchedInputException) {
                     val lineNum = e.location?.lineNr ?: -1
                     val colNum = e.location?.columnNr ?: -1
-                    val locationMsg = if (lineNum > 0 && colNum > 0) 
+                    val locationMsg = if (lineNum > 0 && colNum > 0)
                         " (line $lineNum, column $colNum)" else ""
-                    val errorMessage = "Invalid YAML syntax in ${configFile.absolutePath}: ${e.message}$locationMsg"
-                    println("[plantuml] ERROR: $errorMessage")
+                    val errorMessage = PlantumlMessages.format(
+                        "manager.invalid_syntax", "en", configFile.absolutePath, e.message ?: "", locationMsg
+                    )
+                    println(PlantumlMessages.format("manager.error_prefix", "en", errorMessage))
                     throw IllegalStateException(errorMessage)
                 } catch (e: Exception) {
-                    val errorMessage = "Failed to parse YAML configuration from ${configFile.absolutePath}: ${e.message}"
-                    println("[plantuml] ERROR: $errorMessage")
+                    val errorMessage = PlantumlMessages.format(
+                        "manager.parse_failed", "en", configFile.absolutePath, e.message ?: ""
+                    )
+                    println(PlantumlMessages.format("manager.error_prefix", "en", errorMessage))
                     throw IllegalStateException(errorMessage)
                 }
             }

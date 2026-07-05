@@ -1,5 +1,7 @@
 package plantuml.apikey
 
+import plantuml.PlantumlMessages
+
 /**
  * Manages a pool of API keys with rotation support.
  *
@@ -35,7 +37,7 @@ class ApiKeyPool(
      */
     fun getNextKey(): ApiKeyEntry {
         if (entries.isEmpty()) {
-            throw IllegalStateException("API Key Pool is empty")
+            throw IllegalStateException(PlantumlMessages.get("apikey.pool_empty"))
         }
 
         val selectedEntry = when (rotationStrategy) {

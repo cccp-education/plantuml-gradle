@@ -1,6 +1,7 @@
 package plantuml.apikey
 
 import org.junit.jupiter.api.Test
+import plantuml.PlantumlMessages
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.assertFalse
@@ -41,9 +42,10 @@ class ApiKeyPoolTest {
     fun `should throw exception when pool is empty`() {
         val pool = ApiKeyPool(emptyList())
 
-        assertFailsWith<IllegalStateException> {
+        val ex = assertFailsWith<IllegalStateException> {
             pool.getNextKey()
         }
+        assertEquals(PlantumlMessages.get("apikey.pool_empty"), ex.message)
     }
 
     @Test

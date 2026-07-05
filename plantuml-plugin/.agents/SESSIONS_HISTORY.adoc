@@ -1,5 +1,9 @@
 = Historique des Sessions
 
+== Session 156 (2026-07-05) — US-I18N-4 Logger warn/error + exceptions i18n
+
+Refactoring ~45 `logger.warn`/`error`/`throw ...Exception` hardcodés → `PlantumlMessages.get()`/`format()`. 8 classes refactorées (ApiKeyPool, KnowledgeGraphParser, GraphifyPromptAdapter, DiagramProcessor, PlantumlManager, GenerateKnowledgeGraphDiagramTask, GeneratePlantumlDiagramsTask, CollectPlantumlIndexTask). Nouvelle clé `kg.validation_issues` (10 fichiers). Feature Cucumber 18 (7 scénarios) + I18nErrorSteps (12 steps). compileKotlin + compileTestKotlin + publishToMavenLocal SUCCESS. US-I18N-4 ✅ (5/28 pts). EPIC PLT-I18N : 23/28 pts (82%). Tests :t cassés par BOM junit-bom 6.0.3 (préexistant). ✅
+
 == Session 155 (2026-07-03) — CNV-6 Migration
 
 Migration du `build.gradle.kts` vers les convention plugins `education.cccp.build.gradle-plugin` (0.0.1) + `education.cccp.build.publishing` (0.0.1), pattern bakery. build.gradle.kts 616→570 lignes (-46). compileKotlin SUCCESS. Variantes gardées : buildscript annotations force, groovy exclusions, Docker/HuggingFace tasks, kover 75%, configurationCache=false.

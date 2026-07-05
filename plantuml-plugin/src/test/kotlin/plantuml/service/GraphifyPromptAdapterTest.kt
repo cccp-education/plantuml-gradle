@@ -9,6 +9,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlin.test.assertNotNull
 import kotlin.test.assertFailsWith
+import plantuml.PlantumlMessages
 
 class GraphifyPromptAdapterTest {
 
@@ -190,8 +191,9 @@ class GraphifyPromptAdapterTest {
     fun `should throw when no communities in graph`() {
         graphFile.writeText("""{"other_field": "value"}""")
 
-        assertFailsWith<IllegalArgumentException> {
+        val ex = assertFailsWith<IllegalArgumentException> {
             adapter.generateAllPrompts()
         }
+        assertEquals(PlantumlMessages.get("graphify.no_communities"), ex.message)
     }
 }

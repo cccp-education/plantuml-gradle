@@ -1,0 +1,93 @@
+= Session 156 (2026-07-05) — US-I18N-4 Logger warn/error + exceptions i18n
+
+:date: 2026-07-05
+:epic: PLT-I18N
+:us: US-I18N-4
+:status: ✅ TERMINÉ
+
+== Résumé
+
+Refactoring des ~45 `logger.warn()`, `logger.error()`, `throw ...Exception(...)`
+hardcodés en messages i18nisés via `PlantumlMessages.get()`/`format()`. Baby steps
+DDD/TDD/BDD, un fichier à la fois, compilation après chaque step.
+
+== Fait
+
+=== Baby steps (8 classes refactorées)
+
+. *ApiKeyPool* — `IllegalStateException("API Key Pool is empty")` → `PlantumlMessages.get("apikey.pool_empty")`
+. *KnowledgeGraphParser* — `IllegalArgumentException("Graph file not found: ...")` → `PlantumlMessages.format("kgparser.file_not_found", ...)`
+. *GraphifyPromptAdapter* — 2 `IllegalArgumentException` → `graphify.no_community` / `graphify.no_communities`
+. *DiagramProcessor* — 3 `logger.warn`/`error` + 2 `IllegalStateException` → `processor.invalid_format`, `processor.invalid_correction`, `processor.archive_failed`, `processor.invalid_json`, `processor.malformed_json`
+. *PlantumlManager* — 3 `IllegalStateException` → `manager.invalid_yaml`, `manager.invalid_syntax`, `manager.parse_failed`
+. *GenerateKnowledgeGraphDiagramTask* — 2 `logger.warn` hardcoded → `kg.validation_issues` (nouvelle clé), `kg.unknown_edge`
+. *GeneratePlantumlDiagramsTask* — 1 `logger.error` multi-ligne → `generate.disk_space`
+. *CollectPlantumlIndexTask* — ~13 `logger.error`/`throw` hardcoded → `collect.port_conflict`, `collect.not_dir`, `collect.permission_denied_dir`, `collect.permission_denied_files`, `collect.error_access_dir`, `collect.permission_denied_training`, `collect.container_failed`, `collect.disk_space_read`, `collect.failed_read`, `collect.disk_space_store`, `collect.failed_store`, `collect.disk_space_sim`
+
+=== Nouvelle clé i18n
+
+* `kg.validation_issues=Generated PlantUML has validation issues: {0}` ajoutée aux 10 fichiers `Messages_*.properties`
+
+=== Tests TDD
+
+* `ApiKeyPoolTest` — assertion `assertEquals(PlantumlMessages.get("apikey.pool_empty"), ex.message)`
+* `KnowledgeGraphParserTest` — assertion sur `kgparser.file_not_found` formaté
+* `GraphifyPromptAdapterTest` — assertion sur `graphify.no_communities`
+
+=== BDD Cucumber (US-I18N-6 partiel)
+
+* Feature `18_i18n_error_messages.feature` (7 scénarios) créée
+* Step definitions `I18nErrorSteps.kt` créées (12 steps)
+* Champs `i18nErrorPool`, `i18nErrorGraphFile`, `i18nErrorPromptsDir`, `i18nErrorResponse` ajoutés au `PlantumlWorld`
+
+=== Vérifications
+
+* `compileKotlin` SUCCESS ✅
+* `compileTestKotlin` SUCCESS ✅
+* `publishToMavenLocal` SUCCESS ✅
+* Zéro occurrence `logger.(warn|error)("...` ou `throw ...Exception("...` hardcodée restante ✅
+* Scan secrets : références API_KEY dans config/models uniquement (légitimes) ✅
+
+== Note
+
+Tests `:test` cassés par un problème préexistant de résolution BOM :
+`junit-bom:5.14.3` (importé par `workspace-bom:0.0.1`) upgrad `junit-platform-commons`
+à `6.0.3` (inexistant en 6.x), incompatible avec `junit-platform-launcher:1.14.3`.
+Erreur : `NoSuchMethodError: CollectionUtils.toUnmodifiableList()`.
+Ce problème est hors périmètre US-I18N-4 — il affecte l'exécution des tests,
+pas la compilation. À traiter dans une session dédiée BOM/dependencies.
+
+== EPIC PLT-I18N statut (23/28 pts, 82%)
+
+* US-I18N-0 : ✅ Configuration layer (3/28 pts)
+* US-I18N-1 : ✅ Messages properties 10 langues (4/28 pts)
+* US-I18N-2 : ✅ Task descriptions (3/28 pts)
+* US-I18N-3 : ✅ Logger lifecycle messages (6/28 pts)
+* US-I18N-4 : ✅ Logger warn/error + exceptions (5/28 pts) ← Session 156
+* US-I18N-5 : ☐ println cleanup → logger i18n (2/28 pts)
+* US-I18N-6 : 🟡 Cucumber BDD i18n (3/28 pts) — feature 18 créée, steps créés, exécution bloquée par BOM
+* US-I18N-7 : ✅ Documentation + README (2/28 pts)
+
+== Prochaine session
+
+US-I18N-5 : Migrer ~15 `println()`/`System.err` résiduels vers `logger.lifecycle`/`logger.warn` i18n.
+Inclut `PlantumlManager` (println `[plantuml] ...`), `DiagramProcessor` (`System.out.println` archive),
+`build.gradle.kts` (Cucumber cleanup println).
+
+== Fichiers modifiés
+
+* `src/main/kotlin/plantuml/apikey/ApiKeyPool.kt`
+* `src/main/kotlin/plantuml/service/KnowledgeGraphParser.kt`
+* `src/main/kotlin/plantuml/service/GraphifyPromptAdapter.kt`
+* `src/main/kotlin/plantuml/service/DiagramProcessor.kt`
+* `src/main/kotlin/plantuml/PlantumlManager.kt`
+* `src/main/kotlin/plantuml/tasks/GenerateKnowledgeGraphDiagramTask.kt`
+* `src/main/kotlin/plantuml/tasks/GeneratePlantumlDiagramsTask.kt`
+* `src/main/kotlin/plantuml/tasks/CollectPlantumlIndexTask.kt`
+* `src/main/resources/i18n/Messages_*.properties` (10 fichiers, +1 clé)
+* `src/test/kotlin/plantuml/apikey/ApiKeyPoolTest.kt`
+* `src/test/kotlin/plantuml/service/KnowledgeGraphParserTest.kt`
+* `src/test/kotlin/plantuml/service/GraphifyPromptAdapterTest.kt`
+* `src/test/features/18_i18n_error_messages.feature` (nouveau)
+* `src/test/scenarios/plantuml/scenarios/I18nErrorSteps.kt` (nouveau)
+* `src/test/scenarios/plantuml/scenarios/PlantumlWorld.kt`

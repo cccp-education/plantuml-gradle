@@ -1,0 +1,22 @@
+= COMPLETED_TASKS_ARCHIVE — 2026-07
+
+== Session 156 (2026-07-05) — US-I18N-4 Logger warn/error + exceptions i18n
+
+=== Fait
+- ApiKeyPool IllegalStateException → i18n ✅
+- KnowledgeGraphParser IllegalArgumentException → i18n ✅
+- GraphifyPromptAdapter 2 IllegalArgumentException → i18n ✅
+- DiagramProcessor 3 warn/error + 2 IllegalStateException → i18n ✅
+- PlantumlManager 3 IllegalStateException → i18n ✅
+- GenerateKnowledgeGraphDiagramTask 2 warn hardcoded → i18n ✅
+- GeneratePlantumlDiagramsTask 1 logger.error hardcoded → i18n ✅
+- CollectPlantumlIndexTask ~13 logger.error hardcoded → i18n ✅
+- Nouvelle clé `kg.validation_issues` ajoutée aux 10 fichiers Messages_*.properties ✅
+- Feature Cucumber `18_i18n_error_messages.feature` (7 scénarios) + `I18nErrorSteps.kt` (12 steps) ✅
+- compileKotlin + compileTestKotlin + publishToMavenLocal SUCCESS ✅
+- Zéro occurrence hardcoded restante ✅
+
+=== Prochaine session
+- US-I18N-5 : Migrer ~15 `println()`/`System.err` résiduels vers `logger.lifecycle`/`logger.warn` i18n
+- Fichiers : PlantumlManager, DiagramProcessor (System.out.println archive), build.gradle.kts (Cucumber cleanup)
+- Blocage tests :t par BOM junit-bom 6.0.3 (préexistant, à traiter en session dédiée)
