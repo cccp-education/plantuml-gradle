@@ -4,7 +4,7 @@ _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
 _Derniere mise a jour_ : 2026-07-05  
 _Session en cours_ : aucune  
-_Session terminee_ : 157 — US-I18N-5 println cleanup → logger i18n ✅
+_Session terminee_ : 158 — Cadrage CNV-7 (conventions-gradle) + report US-I18N-6 ✅
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
 '''

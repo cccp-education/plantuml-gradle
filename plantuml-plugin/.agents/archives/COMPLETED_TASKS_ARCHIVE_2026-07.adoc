@@ -1,5 +1,17 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-07
 
+== Session 158 (2026-07-05) — Cadrage CNV-7 + report US-I18N-6
+
+=== Fait
+- Diagnostic blocage tests :t → `junit-platform-params = "6.0.3"` (inexistant) dans catalogue local ✅
+- Analyse conventions-gradle : CucumberConventionsPlugin gère tasks mais pas deps ✅
+- Cadrage EPIC CNV-7 dans conventions-gradle/BACKLOG.adoc (8 pts, 3 US) ✅
+- US-I18N-6 reportée (en attente CNV-7) ✅
+
+=== Prochaine session
+- Aller dans conventions-gradle pour exécuter CNV-7 (US-CN-7.1 → 7.2 → 7.3)
+- Puis revenir à US-I18N-6 plantuml
+
 == Session 157 (2026-07-05) — US-I18N-5 println cleanup → logger i18n
 
 === Fait

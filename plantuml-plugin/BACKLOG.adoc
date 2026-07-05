@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-07-05 (Session 157 — US-I18N-5 println cleanup)
+:last_update: 2026-07-05 (Session 158 — Cadrage CNV-7, report US-I18N-6)
 
 '''
 == 🔴 EPIC 13 : Multi-provider API Pool — Rotation par tiers
@@ -234,6 +234,7 @@ PlantumlMessages.format("key", args)  → String formaté (MessageFormat)
   6-8 scénarios Cucumber.
 | 3
 | 🟡 P2
+| 🟡 En attente CNV-7 — feature 18 créée (S156), exécution bloquée par bug BOM `junit-platform-params = "6.0.3"`. Fix structurel via conventions-gradle EPIC CNV-7.
 
 | US-I18N-7
 | **Documentation + README** — Mettre à jour `README_truth.adoc` avec
@@ -263,8 +264,9 @@ PlantumlMessages.format("key", args)  → String formaté (MessageFormat)
 
 == Prochains EPICs
 
-1. **EPIC PLT-I18N** — Internationalisation 10 langues. ~28 pts. 6-7 sessions. ← Session 157 (25/28 pts, 89%)
-2. **EPIC 13** — TieredRotationStrategy. ~6 pts. 2-3 sessions.
+1. **CNV-7** (conventions-gradle) — Centralisation deps test. ~8 pts. 2 sessions. ← Priorité (débloque US-I18N-6)
+2. **EPIC PLT-I18N** — Internationalisation 10 langues. ~28 pts. 25/28 pts (89%). US-I18N-6 en attente CNV-7.
+3. **EPIC 13** — TieredRotationStrategy. ~6 pts. 2-3 sessions.
 
 '''
 

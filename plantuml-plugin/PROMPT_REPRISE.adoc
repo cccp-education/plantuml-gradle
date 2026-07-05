@@ -1,53 +1,35 @@
-= PROMPT_REPRISE — Plantuml — Session 158
-:session: 158
+= PROMPT_REPRISE — Plantuml — Session 159
+:session: 159
 :date: 2026-07-05
 
-== Session 157 terminée — US-I18N-5 println cleanup → logger i18n
+== Session 158 terminée — Cadrage CNV-7 + report US-I18N-6
 
-Migration des ~15 `println()`/`System.err`/`System.out.println` résiduels vers
-`logger.lifecycle`/`logger.warn`/`logger.info`/`logger.error` avec i18n. 3 classes
-refactorées (PlantumlManager, PlantumlService, DiagramProcessor). Logger SLF4J
-ajouté à PlantumlService. compileKotlin + compileTestKotlin +
-publishToMavenLocal SUCCESS. Zéro println résiduel.
+Diagnostic du blocage tests `:test` : `junit-platform-params = "6.0.3"` (version
+inexistante) dans `plantuml-plugin/gradle/libs.versions.toml:15`. Décision : le
+fix est structurel — conventions-gradle doit gérer les deps test. EPIC CNV-7
+cadré dans `conventions-gradle/BACKLOG.adoc` (8 pts, 3 US).
 
-US-I18N-5 ✅ TERMINÉ (2/28 pts). EPIC PLT-I18N : 25/28 pts (89%).
-
-== Note technique
-
-Tests `:test` cassés par BOM `junit-bom:5.14.3` upgradant `junit-platform-commons`
-à `6.0.3` (inexistant), incompatible avec launcher 1.14.3. Problème préexistant.
+US-I18N-6 (Cucumber BDD i18n, 3 pts) en attente — exécution bloquée par CNV-7.
 
 == Statut EPIC PLT-I18N (25/28 pts, 89%)
 
-- US-I18N-0 : ✅ Configuration layer (3/28 pts)
-- US-I18N-1 : ✅ Messages properties 10 langues (4/28 pts)
-- US-I18N-2 : ✅ Task descriptions (3/28 pts)
-- US-I18N-3 : ✅ Logger lifecycle messages (6/28 pts)
-- US-I18N-4 : ✅ Logger warn/error + exceptions (5/28 pts)
-- US-I18N-5 : ✅ println cleanup → logger i18n (2/28 pts)
-- US-I18N-6 : 🟡 Cucumber BDD i18n (3/28 pts) — feature 18 créée, exécution bloquée par BOM ← Session 158
+- US-I18N-0 → US-I18N-5 : ✅ TERMINÉS (23/28 pts)
+- US-I18N-6 : 🟡 Cucumber BDD i18n (3/28 pts) — en attente CNV-7
 - US-I18N-7 : ✅ Documentation + README (2/28 pts)
 
-== Prochaine mission (158)
+== Prochaine mission
 
-Option A : US-I18N-6 Cucumber BDD i18n — valider les features 15-18 par
-compilation. Exécution bloquée par BOM junit-bom 6.0.3. Soit traiter le BOM
-d'abord (session dédiée dependencies), soit valider par compilation seule.
+Aller dans `foundry/public/conventions-gradle` pour exécuter CNV-7 :
+1. US-CN-7.1 : CucumberConventionsPlugin deps cucumber (3 pts)
+2. US-CN-7.2 : GradlePluginConventionsPlugin deps junit test (3 pts)
+3. US-CN-7.3 : Migration plantuml-gradle + suppression deps locales (2 pts)
 
-Option B : EPIC 13 TieredRotationStrategy (~6 pts, 2-3 sessions) —
-ApiKeyEntry.tier, TieredRotationStrategy, getNextKey() intégration.
-
-Option C : Fix BOM junit-bom 6.0.3 — pin junit-platform-commons à 1.14.3
-dans workspace-bom ou plantuml-plugin build.gradle.kts. Débloque tests :t
-et Cucumber US-I18N-6.
+Une fois CNV-7 terminé, revenir à US-I18N-6 plantuml.
 
 == Rappels
 
 - GroupId: education.cccp.plantuml
 - Plugin ID: education.cccp.plantuml
 - Version publiée: 0.0.1 (Maven Central)
-- Procédure publishToMavenLocal après chaque modification du code source
-- PlantumlMessages.get(key, language) + PlantumlMessages.format(key, language, args)
-- Messages.properties UTF-8 via ResourceBundle.Control custom
-- resolveLanguage via PlantumlManager.resolveLanguage(project)
-- Tests :t cassés par BOM junit-bom 6.0.3 (préexistant)
+- Tests :t cassés par `junit-platform-params = "6.0.3"` (fix via CNV-7)
+- Voir `conventions-gradle/conventions-plugin/BACKLOG.adoc` EPIC CNV-7

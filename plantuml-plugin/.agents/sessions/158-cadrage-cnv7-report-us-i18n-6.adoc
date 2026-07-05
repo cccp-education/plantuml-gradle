@@ -1,0 +1,51 @@
+= Session 158 (2026-07-05) — Cadrage CNV-7 + report US-I18N-6
+
+:date: 2026-07-05
+:epic: PLT-I18N / CNV-7
+:status: ✅ CLÔTURÉE (cadrage, pas de code)
+
+== Résumé
+
+Analyse du blocage tests `:test` (`NoSuchMethodError: CollectionUtils.toUnmodifiableList()`).
+Racine identifiée : `junit-platform-params = "6.0.3"` (version inexistante) dans
+`plantuml-plugin/gradle/libs.versions.toml:15`.
+
+Décision stratégique : le fix local du catalogue plantuml serait jeté à la
+migration vers `CucumberConventionsPlugin`. Le vrai fix est structurel —
+conventions-gradle doit gérer les deps test (junit + cucumber) pour éliminer
+la duplication et les bugs de version.
+
+== Fait
+
+* Diagnostic complet du bug BOM junit-bom 6.0.3 :
+  - Source : `junit-platform-params = "6.0.3"` dans catalogue local plantuml
+  - Impact : `junit-platform-commons` upgradé à 6.0.3 (inexistant), launcher 1.14.3 incompatible
+  - Symptôme : `NoSuchMethodError` à l'exécution des tests
+* Analyse conventions-gradle : `CucumberConventionsPlugin` gère les tasks mais PAS les deps
+* Analyse boroughs migrés (bakery, capsule) : tous dupliquent les deps test en local
+* Cadrage EPIC CNV-7 dans `conventions-gradle/BACKLOG.adoc` :
+  - US-CN-7.1 : CucumberConventionsPlugin deps cucumber (3 pts)
+  - US-CN-7.2 : GradlePluginConventionsPlugin deps junit test (3 pts)
+  - US-CN-7.3 : Migration plantuml-gradle + suppression deps locales (2 pts)
+  - Total : 8 pts, ~2 sessions
+
+== Décision
+
+US-I18N-6 (Cucumber BDD i18n, 3 pts) reste en attente — son exécution est
+bloquée par le bug BOM. Le déblocage passe par CNV-7 (conventions-gradle)
+qui élimine la source du bug à la racine pour tous les boroughs.
+
+== EPIC PLT-I18N statut (25/28 pts, 89%)
+
+* US-I18N-0 → US-I18N-5 : ✅ TERMINÉS (23/28 pts)
+* US-I18N-6 : 🟡 Cucumber BDD i18n (3/28 pts) — en attente CNV-7
+* US-I18N-7 : ✅ Documentation + README (2/28 pts)
+
+== Prochaine session
+
+CNV-7 dans conventions-gradle (US-CN-7.1 → US-CN-7.2 → US-CN-7.3).
+Une fois CNV-7 terminé, revenir à US-I18N-6 plantuml.
+
+== Fichiers modifiés
+
+* `conventions-gradle/conventions-plugin/BACKLOG.adoc` (cadrage CNV-7)
