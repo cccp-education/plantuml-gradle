@@ -52,20 +52,19 @@ dependencies {
     // Coroutines - IMPORTANT for the asynchronous tests
     testImplementation(libs.bundles.coroutines)
 
-    testImplementation(kotlin("test-junit5"))
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    // CNV-7.3 — deps junit test centralisées par education.cccp.build.gradle-plugin (CNV-7.2)
+    // kotlin-test-junit5, junit-jupiter, junit-platform-params, assertj-core,
+    // junit-platform-launcher, workspace-bom platform injectés automatiquement.
     testImplementation(libs.slf4j)
     testRuntimeOnly(libs.logback)
 
-    testImplementation(libs.assertj.core)
     testImplementation(libs.mockito.kotlin)
     testImplementation(libs.mockito.junit.jupiter)
-    testImplementation(libs.junit.platform.params)
     testImplementation(libs.wiremock)
     testImplementation(libs.testcontainers.pg)
     testImplementation(libs.testcontainers.junit5)
 
-    // Cucumber dependencies
+    // Cucumber dependencies (CucumberConventionsPlugin non applicable — cucumberTest custom)
     testImplementation(libs.bundles.cucumber)
 }
 

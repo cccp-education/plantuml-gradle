@@ -2,34 +2,37 @@
 :session: 159
 :date: 2026-07-05
 
-== Session 158 terminée — Cadrage CNV-7 + report US-I18N-6
+== Session 010 conventions-gradle terminée — CNV-7 ✅ + plantuml migré
 
-Diagnostic du blocage tests `:test` : `junit-platform-params = "6.0.3"` (version
-inexistante) dans `plantuml-plugin/gradle/libs.versions.toml:15`. Décision : le
-fix est structurel — conventions-gradle doit gérer les deps test. EPIC CNV-7
-cadré dans `conventions-gradle/BACKLOG.adoc` (8 pts, 3 US).
+CNV-7 (conventions-gradle session 010) TERMINÉ. plantuml-gradle migré en US-CN-7.3 :
+- Suppression deps junit test dupliquées du `build.gradle.kts` (lignes 55-63)
+- Correction catalogue `junit-platform-params = "6.0.3"` → `"5.12.2"`
+- Bug `NoSuchMethodError: CollectionUtils.toUnmodifiableList()` **ÉLIMINÉ**
+- `:test` exécute 956 tests (5 failures LLM Ollama timeout réseau, préexistantes)
 
-US-I18N-6 (Cucumber BDD i18n, 3 pts) en attente — exécution bloquée par CNV-7.
+Deps junit test désormais injectées par `education.cccp.build.gradle-plugin` v0.0.1
+via `TestDependencies.addJunitDeps` (CNV-7.2) en `afterEvaluate`.
 
 == Statut EPIC PLT-I18N (25/28 pts, 89%)
 
 - US-I18N-0 → US-I18N-5 : ✅ TERMINÉS (23/28 pts)
-- US-I18N-6 : 🟡 Cucumber BDD i18n (3/28 pts) — en attente CNV-7
+- US-I18N-6 : 🟢 Cucumber BDD i18n (3/28 pts) — **DÉBLOQUÉ** (CNV-7 terminé)
 - US-I18N-7 : ✅ Documentation + README (2/28 pts)
 
 == Prochaine mission
 
-Aller dans `foundry/public/conventions-gradle` pour exécuter CNV-7 :
-1. US-CN-7.1 : CucumberConventionsPlugin deps cucumber (3 pts)
-2. US-CN-7.2 : GradlePluginConventionsPlugin deps junit test (3 pts)
-3. US-CN-7.3 : Migration plantuml-gradle + suppression deps locales (2 pts)
+US-I18N-6 (Cucumber BDD i18n, 3 pts) — exécution maintenant possible.
+Le bug `6.0.3` étant éliminé, `:test` et `cucumberTest` peuvent tourner.
 
-Une fois CNV-7 terminé, revenir à US-I18N-6 plantuml.
+Vérifier que les features i18n créées session 158 (S156) s'exécutent correctement.
+Si besoin, ajuster le `build.gradle.kts` (cucumberTest custom conservé — pas de
+CucumberConventionsPlugin applicé, le setup Cucumber de plantuml reste custom).
 
 == Rappels
 
 - GroupId: education.cccp.plantuml
 - Plugin ID: education.cccp.plantuml
 - Version publiée: 0.0.1 (Maven Central)
-- Tests :t cassés par `junit-platform-params = "6.0.3"` (fix via CNV-7)
-- Voir `conventions-gradle/conventions-plugin/BACKLOG.adoc` EPIC CNV-7
+- Tests `:t` **DÉBLOQUÉS** (bug 6.0.3 éliminé via CNV-7)
+- Deps junit test gérées par conventions-gradle v0.0.1 + CNV-7.2
+- Voir `conventions-gradle/conventions-plugin/.agents/sessions/010-cnv7-centralisation-deps-test.adoc`
