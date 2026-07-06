@@ -100,7 +100,7 @@ class ModelsDataClassTest {
         val config = PlantumlConfig(
             input = InputConfig("custom-prompts", "fr"),
             output = OutputConfig("out/diagrams", "out/images", "out/validations", "out/rag", "svg", "dark"),
-            langchain4j = LangchainConfig(3, "openai", true, "", OllamaConfig("http://custom:11434", "llama2"), ApiKeyConfig("sk-key")),
+            langchain4j = LangchainConfig(maxIterations = 3, model = "openai", validation = true, validationPrompt = "", ollama = OllamaConfig("http://custom:11434", "llama2"), openai = ApiKeyConfig("sk-key")),
             git = GitConfig("user", "user@email.com", "custom message", listOf("main")),
             rag = RagConfig("jdbc:postgresql://localhost:5432/rag", 5432, "user", "pass", "custom_table")
         )

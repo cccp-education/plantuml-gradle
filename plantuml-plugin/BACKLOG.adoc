@@ -1,13 +1,13 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-07-06 (Session 160 — Fix 5 tests unitaires régression + clôture EPIC PLT-I18N 28/28 pts)
+:last_update: 2026-07-06 (Session 161 — EPIC 13 TieredRotationStrategy 5/6 tâches, 4 étapes A→B→C→D, 7/7 Cucumber + 5/5 functional + suite unitaire verte)
 
 '''
 == 🔴 EPIC 13 : Multi-provider API Pool — Rotation par tiers
 
-**Statut** : 🟡 EN COURS
+**Statut** : 🟡 EN COURS (5/6 tâches, reste cross-provider)
 **Priorité** : 🔴 HAUTE
-**Session** : 138-147
+**Sessions** : 138-147, 161
 
 === Contexte
 
@@ -23,33 +23,34 @@ dernier recours.
 | Priorité | Tâche | Statut
 |🔴 HIGH
 | **ApiKeyEntry** : Ajouter `tier: KeyTier` (ENTERPRISE=3, PRO=2, FREE=1)
-| ⬜
+| ✅ S161
 |🔴 HIGH
 | **TieredRotationStrategy** — trier par tier descendant, intra-tier par weight
-| ⬜
+| ✅ S161
 |🟡 MEDIUM
 | **ApiKeyPool.getNextKey()** : intégrer rotation, descente de tier si quota saturé
-| ⬜
+| ✅ S161
 |🟡 MEDIUM
 | **fallbackEnabled** — basculer FREE quand Enterprise+Pro épuisés
-| ⬜
+| ✅ S161
 |🟢 LOW
 | **YAML schema** — tier + weight dans plantuml-test-context.yml
-| ⬜
+| ✅ S161
 |🟢 LOW
 | **Cross-provider** — fallback inter-provider (Gemini Pro → Mistral Free → Ollama)
-| ⬜
+| ⬜ S162
 |===
 
 === Critères d'Acceptation
 
-* [ ] `ApiKeyEntry` supporte `tier` et `weight`
-* [ ] `TieredRotationStrategy` : Enterprise > Pro > Free
-* [ ] `getNextKey()` descend les tiers si quota saturé
-* [ ] Fallback FREE quand `fallbackEnabled=true`
-* [ ] YAML parsé
-* [ ] ≥15 tests unitaires
-* [ ] `./gradlew compileKotlin` OK + `test` OK
+* [x] `ApiKeyEntry` supporte `tier` et `weight`
+* [x] `TieredRotationStrategy` : Enterprise > Pro > Free
+* [x] `getNextKey()` descend les tiers si quota saturé
+* [x] Fallback FREE quand `fallbackEnabled=true`
+* [x] YAML parsé
+* [x] ≥15 tests unitaires (20+ ajoutés S161)
+* [x] `./gradlew compileKotlin` OK + `test` OK
+* [ ] Cross-provider fallback inter-provider (S162)
 
 '''
 
@@ -264,7 +265,7 @@ PlantumlMessages.format("key", args)  → String formaté (MessageFormat)
 
 == Prochains EPICs
 
-1. **EPIC 13** — TieredRotationStrategy. ~6 pts. 2-3 sessions. ← Priorité (EPIC PLT-I18N clôturé S160)
+1. **EPIC 13** — Cross-provider fallback inter-provider. ~2 pts. 1 session. ← Priorité (5/6 tâches terminées S161)
 2. **EPIC PLT-I18N** — ✅ TERMINÉ (28/28 pts BDD, 1210/1210 tests unitaires PASS S160)
 
 '''

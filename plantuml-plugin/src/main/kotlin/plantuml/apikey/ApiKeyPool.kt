@@ -22,6 +22,7 @@ class ApiKeyPool(
     private val tracker: QuotaTracker = QuotaTracker()
     private val resetManager: QuotaResetManager = QuotaResetManager(tracker, autoResetEnabled)
     private val auditLogger: QuotaAuditLogger = QuotaAuditLogger(auditEnabled)
+    private val tieredStrategy: TieredRotationStrategy = TieredRotationStrategy()
 
     init {
         entries.forEach { entry ->
@@ -44,6 +45,7 @@ class ApiKeyPool(
             RotationStrategy.ROUND_ROBIN -> getNextRoundRobin()
             RotationStrategy.LEAST_USED -> getNextLeastUsed()
             RotationStrategy.WEIGHTED, RotationStrategy.SMART -> getNextRoundRobin()
+            RotationStrategy.TIERED -> getNextTiered()
         }
 
         tracker.trackUsage(selectedEntry.id)
@@ -76,6 +78,27 @@ class ApiKeyPool(
         return entries.minByOrNull { entry ->
             tracker.getUsage(entry.id)
         } ?: entries.first()
+    }
+
+    /**
+     * Get next key using tiered strategy (Enterprise > Pro > Free, intra-tier by weight).
+     *
+     * When [fallbackEnabled] is true (default), entries whose quota is exceeded are
+     * excluded so the strategy descends to lower tiers. When all entries are saturated,
+     * the full list is used so a key is always returned.
+     *
+     * When [fallbackEnabled] is false, saturated entries are kept as candidates so the
+     * strategy never descends to a lower tier (Enterprise/Pro are reused even when
+     * saturated, FREE is never reached).
+     */
+    private fun getNextTiered(): ApiKeyEntry {
+        val candidates = if (fallbackEnabled) {
+            val available = entries.filterNot { tracker.isQuotaExceeded(it) }
+            if (available.isEmpty()) entries else available
+        } else {
+            entries
+        }
+        return tieredStrategy.select(candidates)
     }
 
     /**

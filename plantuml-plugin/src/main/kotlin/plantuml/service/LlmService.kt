@@ -44,35 +44,44 @@ class LlmService(
     }
 
     private fun initializeApiKeyPools() {
+        val rotation = parseRotationStrategy(config.langchain4j.rotationStrategy)
+        val fallback = config.langchain4j.fallbackEnabled
+
         val openaiPool = config.langchain4j.openai.pool
         if (openaiPool.isNotEmpty()) {
-            apiKeyPools["openai"] = ApiKeyPool(openaiPool.map { it.toApiKeyEntry() })
+            apiKeyPools["openai"] = ApiKeyPool(openaiPool.map { it.toApiKeyEntry() }, rotation, fallbackEnabled = fallback)
         }
 
         val geminiPool = config.langchain4j.gemini.pool
         if (geminiPool.isNotEmpty()) {
-            apiKeyPools["gemini"] = ApiKeyPool(geminiPool.map { it.toApiKeyEntry() })
+            apiKeyPools["gemini"] = ApiKeyPool(geminiPool.map { it.toApiKeyEntry() }, rotation, fallbackEnabled = fallback)
         }
 
         val mistralPool = config.langchain4j.mistral.pool
         if (mistralPool.isNotEmpty()) {
-            apiKeyPools["mistral"] = ApiKeyPool(mistralPool.map { it.toApiKeyEntry() })
+            apiKeyPools["mistral"] = ApiKeyPool(mistralPool.map { it.toApiKeyEntry() }, rotation, fallbackEnabled = fallback)
         }
 
         val claudePool = config.langchain4j.claude.pool
         if (claudePool.isNotEmpty()) {
-            apiKeyPools["claude"] = ApiKeyPool(claudePool.map { it.toApiKeyEntry() })
+            apiKeyPools["claude"] = ApiKeyPool(claudePool.map { it.toApiKeyEntry() }, rotation, fallbackEnabled = fallback)
         }
 
         val huggingfacePool = config.langchain4j.huggingface.pool
         if (huggingfacePool.isNotEmpty()) {
-            apiKeyPools["huggingface"] = ApiKeyPool(huggingfacePool.map { it.toApiKeyEntry() })
+            apiKeyPools["huggingface"] = ApiKeyPool(huggingfacePool.map { it.toApiKeyEntry() }, rotation, fallbackEnabled = fallback)
         }
 
         val groqPool = config.langchain4j.groq.pool
         if (groqPool.isNotEmpty()) {
-            apiKeyPools["groq"] = ApiKeyPool(groqPool.map { it.toApiKeyEntry() })
+            apiKeyPools["groq"] = ApiKeyPool(groqPool.map { it.toApiKeyEntry() }, rotation, fallbackEnabled = fallback)
         }
+    }
+
+    private fun parseRotationStrategy(value: String): plantuml.apikey.RotationStrategy {
+        return runCatching {
+            plantuml.apikey.RotationStrategy.valueOf(value.uppercase())
+        }.getOrDefault(plantuml.apikey.RotationStrategy.ROUND_ROBIN)
     }
 
     private fun resolveProvider(name: String): Provider {
@@ -92,11 +101,19 @@ class LlmService(
             keyRef = this.keyRef,
             provider = resolveProvider(this.provider),
             services = this.services.map { plantuml.apikey.ServiceType.valueOf(it.uppercase()) },
+            tier = parseTier(this.tier),
+            weight = this.weight,
             quota = QuotaConfig(
                 limitValue = this.quota.limitValue,
                 thresholdPercent = this.quota.thresholdPercent
             )
         )
+    }
+
+    private fun parseTier(value: String): plantuml.apikey.KeyTier {
+        return runCatching {
+            plantuml.apikey.KeyTier.valueOf(value.uppercase())
+        }.getOrDefault(plantuml.apikey.KeyTier.FREE)
     }
 
     private fun getApiKeyFromPool(provider: String): String? {

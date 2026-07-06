@@ -1,5 +1,29 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-07
 
+== Session 161 (2026-07-06) — EPIC 13 TieredRotationStrategy (4 étapes A→B→C→D)
+
+=== Fait
+- Baby-step 1 : Enum `KeyTier` (ENTERPRISE, PRO, FREE) créé dans `Provider.kt` ✅
+- Baby-step 2 : `ApiKeyEntry.tier: KeyTier = KeyTier.FREE` ajouté (rétro-compatible) ✅
+- Baby-step 3a : `ApiKeyEntry.weight: Int = 1` ajouté (rétro-compatible) ✅
+- Baby-step 4 : `TieredRotationStrategy.select()` — trie par tier descendant, intra-tier par weight descendant (5 tests) ✅
+- Baby-step 5 : `RotationStrategy.TIERED` + `ApiKeyPool.getNextTiered()` avec descente de tier (2 tests) ✅
+- Étape A BDD : `19_tiered_rotation.feature` (7 scénarios `@tiered`) + `TieredRotationSteps.kt` (11 steps), 7/7 PASS ✅
+- Étape B functional : `TieredRotationFunctionalTest.kt` (5 tests), 5/5 PASS — bug `IllegalArgumentException` résolu ✅
+- Étape C YAML : `tier`/`weight` sur `ApiKeyPoolEntry`, `rotationStrategy`/`fallbackEnabled` sur `LangchainConfig`, conversion `toApiKeyEntry()` + `parseTier`/`parseRotationStrategy`, 3 tests ConfigLoader, fix `ModelsDataClassTest` ✅
+- Étape D fallbackEnabled : `getNextTiered()` sémantique (true=descente, false=reuse saturated), 2 tests unitaires + 1 scénario Cucumber ✅
+- `./gradlew test` : suite unitaire verte (0 failure) ✅
+- `./gradlew publishToMavenLocal` : BUILD SUCCESSFUL ✅
+- **EPIC 13 : 5/6 tâches terminées** (HIGH ×2, MEDIUM ×2, LOW ×1) ✅
+
+=== Non fait
+- Tâche LOW Cross-provider (Gemini Pro → Mistral Free → Ollama) — S162
+- Test fonctionnel KG `should fail when graphify-out graph json does not exist` pré-existant en échec (hors-scope EPIC 13)
+
+=== Prochaine session
+- EPIC 13 cross-provider fallback inter-provider (dernière tâche LOW)
+- Voir BACKLOG.adoc §"EPIC 13"
+
 == Session 160 (2026-07-06) — Fix 5 tests unitaires régression + clôture EPIC PLT-I18N
 
 === Fait

@@ -1,19 +1,23 @@
-= PROMPT_REPRISE — Plantuml — Session 161
-:session: 161
-:date: 2026-07-06
+= PROMPT_REPRISE — Plantuml — Session 162
+:session: 162
+:date: 2026-07-07
 
-== EPIC PLT-I18N TERMINÉ — Prochain EPIC 13 TieredRotationStrategy
+== EPIC 13 — Reste Cross-provider fallback inter-provider
 
-Session 160 a clôturé EPIC PLT-I18N : 5/5 tests unitaires régression fixés
-(baby-step TDD), 1210/1210 PASS, publishToMavenLocal OK. EPIC PLT-I18N
-28/28 pts BDD + tests unitaires verts → clôture définitive.
+Session 161 a livré 5/6 tâches EPIC 13 TieredRotationStrategy (4 étapes
+A→B→C→D, baby-step TDD) : KeyTier enum, ApiKeyEntry.tier/weight,
+TieredRotationStrategy.select(), RotationStrategy.TIERED dans ApiKeyPool,
+getNextTiered() avec descente de tier + fallbackEnabled, YAML schema
+(tier/weight/rotationStrategy/fallbackEnabled parsés), 7/7 Cucumber PASS,
+5/5 functional PASS, suite unitaire verte. publishToMavenLocal OK.
 
-== Mission session 161 — EPIC 13 TieredRotationStrategy
+== Mission session 162 — Cross-provider fallback
 
-Pool actuel round-robin/least-used sans notion de tier. Stratégies
-`WEIGHTED` et `SMART` sont des stubs. Objectif : rotation intelligente
-consommant les clés Enterprise en priorité, Pro en second, Free en
-dernier recours.
+Dernière tâche EPIC 13 (LOW) : fallback inter-provider quand un provider
+est entièrement saturé. Exemple : Gemini Pro épuisé → Mistral Free → Ollama.
+Actuellement `ApiKeyPool` est construit par provider (un pool OpenAI, un pool
+Gemini, etc.) sans pont inter-provider. Objectif : orchestrer la rotation
+cross-provider quand un pool entier est saturé.
 
 == Backlog EPIC 13 (BACKLOG.adoc §"EPIC 13")
 
@@ -22,28 +26,28 @@ dernier recours.
 | Priorité | Tâche | Statut
 |🔴 HIGH
 | **ApiKeyEntry** : Ajouter `tier: KeyTier` (ENTERPRISE=3, PRO=2, FREE=1)
-| ⬜
+| ✅ S161
 |🔴 HIGH
 | **TieredRotationStrategy** — trier par tier descendant, intra-tier par weight
-| ⬜
+| ✅ S161
 |🟡 MEDIUM
 | **ApiKeyPool.getNextKey()** : intégrer rotation, descente de tier si quota saturé
-| ⬜
+| ✅ S161
 |🟡 MEDIUM
 | **fallbackEnabled** — basculer FREE quand Enterprise+Pro épuisés
-| ⬜
+| ✅ S161
 |🟢 LOW
 | **YAML schema** — tier + weight dans plantuml-test-context.yml
-| ⬜
+| ✅ S161
 |🟢 LOW
 | **Cross-provider** — fallback inter-provider (Gemini Pro → Mistral Free → Ollama)
-| ⬜
+| ⬜ S162
 |===
 
 Critères d'acceptation : `ApiKeyEntry.tier`, `TieredRotationStrategy`
 Enterprise > Pro > Free, `getNextKey()` descend les tiers, fallback FREE
 si `fallbackEnabled=true`, YAML parsé, ≥15 tests unitaires, `compileKotlin`
-+ `test` OK.
++ `test` OK. ✅ 5/6 fait. Reste cross-provider.
 
 == Méthodologie
 
@@ -56,4 +60,5 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 - Version publiée: 0.0.1 (Maven Central)
 - `publishToMavenLocal` obligatoire après modif code plugin
 - Bug `{word}` vs `{string}` Cucumber : `{word}` capture les guillemets Gherkin
-- Voir `sessions/160-fix-5-tests-regression.adoc`
+- Test fonctionnel KG `should fail when graphify-out graph json does not exist` pré-existant en échec (hors-scope EPIC 13)
+- Voir `sessions/161-epic-13-tiered-rotation.adoc`

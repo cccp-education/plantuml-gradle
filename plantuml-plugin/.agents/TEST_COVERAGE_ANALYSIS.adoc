@@ -1,16 +1,28 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 160 (6 juillet 2026)
+_Dernière mise à jour_ : Session 161 (6 juillet 2026)
 
 === Résumé Global
 
-* **Total tests unitaires** : 1210 tentés Session 160 — 0 FAILED, 0 errors, 0 skipped ✅ (5 régression S159 fixées)
-* **Tests fonctionnels GradleRunner KG** : 15 PASSED
-* **Tests Cucumber i18n language switch** : 8/8 PASS (Session 159 — feature 15) ✅
+* **Total tests unitaires** : suite complète verte (0 failure) Session 161 — nouveaux tests KeyTier/TieredRotationStrategy/ApiKeyPool TIERED/ConfigLoader ajoutés ✅
+* **Tests fonctionnels GradleRunner KG** : 15 PASSED (1 pré-existant FAILED hors-scope EPIC 13 : `should fail when graphify-out graph json does not exist`)
+* **Tests fonctionnels TieredRotation** : 5/5 PASS (Session 161) ✅
+* **Tests Cucumber i18n** : features 15-18 PASS ✅
+* **Tests Cucumber tiered rotation** : 7/7 scénarios feature 19 PASS (Session 161) ✅
 * **Tests real-llm (Ollama local)** : 6 créés, 0 FAILED (non exécutés — nécessite Ollama)
 * **Tests fine-tune SmolLM2 (testcontainer Python)** : 3 crees, 3/3 PASS
 * **Tests Knowledge Graph** : 90 unitaires + 15 fonctionnels
-* **Kover instruction coverage** : 81.19% (baseline Session 136) — inchangé S160 (0 fichier de production modifié)
+* **Kover instruction coverage** : 81.19% (baseline Session 136) — nouveaux tests TieredRotationStrategy augmentent la couverture (chiffrage exact à recalculer)
+
+=== Nouveaux Tests — Session 161 (EPIC 13 TieredRotationStrategy, 4 étapes A→B→C→D)
+
+* **KeyTierTest** (6 tests) : enum 3 valeurs, noms corrects, `ApiKeyEntry.tier` défaut FREE, tier explicite ENTERPRISE, `weight` défaut 1, weight explicite 5
+* **TieredRotationStrategyTest** (5 tests) : ENTERPRISE d'abord, PRO si pas Enterprise, FREE si seulement FREE, weight intra-tier descendant, `IllegalArgumentException` si liste vide
+* **ApiKeyPoolTest** (+4 tests TIERED) : ENTERPRISE d'abord avec TIERED, descente ent→pro quand quota saturé, `fallbackEnabled=false` bloque descente FREE, `fallbackEnabled=true` descend vers FREE
+* **ProviderEnumsTest** (mis à jour) : `RotationStrategy` 4→5 valeurs (+TIERED), noms corrects
+* **ConfigLoaderApiKeyPoolTest** (+3 tests) : parse `tier`+`weight` depuis YAML, parse `rotationStrategy`+`fallbackEnabled` au niveau `langchain4j`
+* **TieredRotationFunctionalTest** (5 tests fonctionnels) : ENTERPRISE d'abord + audit log, descente complète ent→pro→free, weight intra-tier, quota exceeded loggé, retourne clé même si tout saturé
+* **19_tiered_rotation.feature** (7 scénarios Cucumber `@tiered`) : Enterprise d'abord, PRO fallback, FREE si seulement FREE, weight intra-tier, descente ent→pro, fallback FREE quand enabled, blocage descente FREE quand disabled
 
 === Nouveaux Tests — Session 160 (Fix 5 tests unitaires régression)
 

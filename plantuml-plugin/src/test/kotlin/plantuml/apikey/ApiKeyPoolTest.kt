@@ -228,4 +228,91 @@ class ApiKeyPoolTest {
         assertTrue(logs.any { it.eventType == AuditEventType.QUOTA_EXCEEDED })
         assertTrue(logs.any { it.eventType == AuditEventType.AUTO_RESET })
     }
+
+    @Test
+    fun `should select ENTERPRISE key first with TIERED strategy`() {
+        val entries = listOf(
+            createTestEntry("free1").copy(tier = KeyTier.FREE),
+            createTestEntry("ent1").copy(tier = KeyTier.ENTERPRISE),
+            createTestEntry("pro1").copy(tier = KeyTier.PRO)
+        )
+        val pool = ApiKeyPool(entries, RotationStrategy.TIERED)
+
+        val selected = pool.getNextKey()
+
+        assertEquals("ent1", selected.id)
+    }
+
+    @Test
+    fun `should descend tiers with TIERED strategy when higher tier quota saturated`() {
+        val entQuota = QuotaConfig(
+            limitValue = 4,
+            thresholdPercent = 50,
+            resetPolicy = ResetPolicy.MANUAL
+        )
+        val proQuota = QuotaConfig(
+            limitValue = 4,
+            thresholdPercent = 50,
+            resetPolicy = ResetPolicy.MANUAL
+        )
+        val entries = listOf(
+            createTestEntry("ent1", quota = entQuota).copy(tier = KeyTier.ENTERPRISE),
+            createTestEntry("pro1", quota = proQuota).copy(tier = KeyTier.PRO)
+        )
+        val pool = ApiKeyPool(entries, RotationStrategy.TIERED, autoResetEnabled = false)
+
+        val first = pool.getNextKey()
+        val second = pool.getNextKey()
+        val third = pool.getNextKey()
+
+        assertEquals("ent1", first.id)
+        assertEquals("ent1", second.id)
+        assertEquals("pro1", third.id)
+    }
+
+    @Test
+    fun `TIERED with fallback disabled should not descend to FREE when higher tiers saturated`() {
+        val entQuota = QuotaConfig(limitValue = 2, thresholdPercent = 50, resetPolicy = ResetPolicy.MANUAL)
+        val freeQuota = QuotaConfig(limitValue = 100, thresholdPercent = 50, resetPolicy = ResetPolicy.MANUAL)
+        val entries = listOf(
+            createTestEntry("ent1", quota = entQuota).copy(tier = KeyTier.ENTERPRISE),
+            createTestEntry("free1", quota = freeQuota).copy(tier = KeyTier.FREE)
+        )
+        val pool = ApiKeyPool(
+            entries = entries,
+            rotationStrategy = RotationStrategy.TIERED,
+            fallbackEnabled = false,
+            autoResetEnabled = false
+        )
+
+        val first = pool.getNextKey()
+        val second = pool.getNextKey()
+        val third = pool.getNextKey()
+
+        assertEquals("ent1", first.id)
+        assertEquals("ent1", second.id)
+        assertEquals("ent1", third.id)
+    }
+
+    @Test
+    fun `TIERED with fallback enabled should descend to FREE when higher tiers saturated`() {
+        val entQuota = QuotaConfig(limitValue = 2, thresholdPercent = 50, resetPolicy = ResetPolicy.MANUAL)
+        val freeQuota = QuotaConfig(limitValue = 100, thresholdPercent = 50, resetPolicy = ResetPolicy.MANUAL)
+        val entries = listOf(
+            createTestEntry("ent1", quota = entQuota).copy(tier = KeyTier.ENTERPRISE),
+            createTestEntry("free1", quota = freeQuota).copy(tier = KeyTier.FREE)
+        )
+        val pool = ApiKeyPool(
+            entries = entries,
+            rotationStrategy = RotationStrategy.TIERED,
+            fallbackEnabled = true,
+            autoResetEnabled = false
+        )
+
+        val first = pool.getNextKey()
+        val second = pool.getNextKey()
+
+        assertEquals("ent1", first.id)
+        assertEquals("free1", second.id)
+    }
 }

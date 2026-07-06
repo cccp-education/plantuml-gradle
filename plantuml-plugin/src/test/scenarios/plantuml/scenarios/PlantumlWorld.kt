@@ -32,6 +32,9 @@ class PlantumlWorld {
     var i18nErrorPromptsDir: File? = null
     var i18nErrorResponse: String? = null
 
+    var tieredPool: plantuml.apikey.ApiKeyPool? = null
+    var tieredSelectedKeys: MutableList<plantuml.apikey.ApiKeyEntry> = mutableListOf()
+
     private val asyncJobs = mutableListOf<Deferred<BuildResult>>()
     
     private val version: String = System.getProperty("plugin.version", "0.0.0")

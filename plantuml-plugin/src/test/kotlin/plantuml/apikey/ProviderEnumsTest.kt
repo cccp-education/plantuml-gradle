@@ -86,7 +86,7 @@ class ProviderEnumsTest {
     @Test
     fun `RotationStrategy enum should have 4 values`() {
         val strategies = RotationStrategy.entries
-        assertEquals(4, strategies.size)
+        assertEquals(5, strategies.size)
     }
 
     @Test
@@ -96,6 +96,7 @@ class ProviderEnumsTest {
         assertTrue(strategies.contains(RotationStrategy.WEIGHTED))
         assertTrue(strategies.contains(RotationStrategy.LEAST_USED))
         assertTrue(strategies.contains(RotationStrategy.SMART))
+        assertTrue(strategies.contains(RotationStrategy.TIERED))
     }
 
     @Test
@@ -131,5 +132,6 @@ class ProviderEnumsTest {
         assertEquals("WEIGHTED", RotationStrategy.WEIGHTED.name)
         assertEquals("LEAST_USED", RotationStrategy.LEAST_USED.name)
         assertEquals("SMART", RotationStrategy.SMART.name)
+        assertEquals("TIERED", RotationStrategy.TIERED.name)
     }
 }

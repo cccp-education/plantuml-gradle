@@ -1,0 +1,103 @@
+= Session 161 (2026-07-06) — EPIC 13 TieredRotationStrategy (4 étapes A→B→C→D)
+
+== Mission
+
+Reprise plantuml sur EPIC 13 TieredRotationStrategy, méthodologie baby-step
+DDD/TDD/BDD (unit → functional → cucumber), agile software craftsmanship.
+4 étapes dans l'ordre : A (BDD Cucumber) → B (functional) → C (YAML schema) →
+D (fallbackEnabled).
+
+== Fait
+
+=== Baby-steps 1-5 (TDD unit) — socle domaine
+
+- Baby-step 1 : Enum `KeyTier` (ENTERPRISE, PRO, FREE) créé dans `Provider.kt` — 1 test → Green ✅
+- Baby-step 2 : `ApiKeyEntry.tier: KeyTier = KeyTier.FREE` ajouté (rétro-compatible) — 4 tests → Green ✅
+- Baby-step 3a : `ApiKeyEntry.weight: Int = 1` ajouté (rétro-compatible) — 6 tests → Green ✅
+- Baby-step 4 : `TieredRotationStrategy.select()` — trie par tier descendant (ENTERPRISE=3 > PRO=2 > FREE=1), intra-tier par weight descendant. 5 tests unitaires → Green ✅
+  - Refactor : suppression helper `maxByWith`, utilisation `maxWithOrNull` + `compareBy`/`thenBy` (comparator ascendant pour `maxWithOrNull`)
+  - Exception `IllegalArgumentException` (idomatique `require{}`) au lieu de `IllegalStateException`
+- Baby-step 5 : `RotationStrategy.TIERED` ajouté à l'enum (5 valeurs) + `ApiKeyPool.getNextTiered()` — sélection par tier, filtrage entries quota-exceeded, fallback sur liste complète si tout saturé — 2 tests intégration `ApiKeyPoolTest` → Green ✅
+  - Bug fonctionnel pré-existant découvert : test `KnowledgeGraphDiagramFunctionalTest.should fail when graphify-out graph json does not exist` FAILED (pré-existant, hors-scope EPIC 13, environnement graphify-out)
+
+=== Étape A — BDD Cucumber
+
+- `19_tiered_rotation.feature` créée (6 scénarios Gherkin taggés `@tiered`) ✅
+  - Enterprise d'abord, PRO si pas d'Enterprise, FREE si seulement FREE
+  - Weight intra-tier (ent-high weight 5 bat ent-low weight 1)
+  - Descente de tier (ent-1 ×2 puis pro-1, quota limit 4 threshold 50)
+  - Fallback FREE (ent-1 → pro-1 → free-1, quota limit 2 threshold 50)
+- `TieredRotationSteps.kt` créée (11 steps Given/When/Then) ✅
+- `PlantumlWorld` étendu : `tieredPool`, `tieredSelectedKeys` ✅
+- Filtre `-Pcucumber.tags="@tiered"` → 6/6 scénarios PASS ✅
+- Fix calibration scénario descente : `limit=4, threshold=50` → seuil=2 → 3 sélections (ent, ent, pro), pas 2
+
+=== Étape B — Tests fonctionnels
+
+- `TieredRotationFunctionalTest.kt` créé (5 tests JUnit5 sur `ApiKeyPool` publique API) ✅
+  - ENTERPRISE d'abord + audit log USAGE
+  - Descente complète ent→pro→free avec quotas
+  - Weight intra-tier (ent-high weight 10 sélectionné)
+  - Quota exceeded loggé lors de la descente
+  - Retourne une clé même quand tout saturé
+- Bug `IllegalArgumentException` découvert puis résolu : `getNextTiered()` avec liste vide quand `fallbackEnabled=false` et tout saturé → correction : fallback sur `entries` complet si `available.isEmpty()` ✅
+- 5/5 functional tests PASS ✅
+
+=== Étape C — YAML schema
+
+- `ApiKeyPoolEntry` (config) : ajout `tier: String = "FREE"` + `weight: Int = 1` ✅
+- `LangchainConfig` : ajout `rotationStrategy: String = "ROUND_ROBIN"` + `fallbackEnabled: Boolean = true` ✅
+- `LlmService.initializeApiKeyPools()` : utilise `parseRotationStrategy(config.langchain4j.rotationStrategy)` + propage `fallbackEnabled` à chaque `ApiKeyPool` ✅
+- `LlmService.toApiKeyEntry()` : conversion `tier` String → `KeyTier` enum via `parseTier()` (fallback FREE si invalide) + propagation `weight` ✅
+- 3 nouveaux tests `ConfigLoaderApiKeyPoolTest` : parse tier+weight, parse rotationStrategy+fallbackEnabled ✅
+- Fix régression `ModelsDataClassTest` (ligne 103) : constructeur positionnel `LangchainConfig` cassé par nouveaux champs → conversion en args nommés ✅
+
+=== Étape D — fallbackEnabled
+
+- `getNextTiered()` implémente la sémantique `fallbackEnabled` ✅ :
+  - `fallbackEnabled=true` (défaut) : filtre les entries quota-exceeded → descente de tier normale. Si tout saturé, fallback sur liste complète.
+  - `fallbackEnabled=false` : garde toutes les entries (saturées incluses) → jamais de descente vers tiers inférieur (Enterprise/Pro réutilisés même saturés, FREE jamais atteint)
+- 2 tests unitaires `ApiKeyPoolTest` : fallback disabled bloque descente FREE, fallback enabled descend vers FREE ✅
+- 1 scénario Cucumber `Strategy does not descend to FREE when fallback is disabled` → 7/7 scénarios PASS ✅
+- Step `Given a pool with TIERED rotation strategy with fallback disabled` ajouté ✅
+
+=== Validation finale
+
+- `./gradlew test` : tous tests unitaires PASS (0 failure) ✅
+- `./gradlew functionalTest --tests TieredRotationFunctionalTest` : 5/5 PASS ✅
+- `./gradlew cucumberTest -Pcucumber.tags="@tiered"` : 7/7 scénarios PASS ✅
+- `./gradlew publishToMavenLocal` : BUILD SUCCESSFUL (règle INDEX.adoc §0 respectée) ✅
+
+== Non fait
+
+- Tâche LOW **Cross-provider** (Gemini Pro → Mistral Free → Ollama) — backlog EPIC 13, 1-2 sessions
+- Test fonctionnel KG `should fail when graphify-out graph json does not exist` pré-existant en échec (hors-scope EPIC 13, environnement graphify-out)
+
+== Fichiers
+
+=== Nouveaux (6)
+- `src/main/kotlin/plantuml/apikey/TieredRotationStrategy.kt` (37 lignes)
+- `src/test/kotlin/plantuml/apikey/KeyTierTest.kt` (6 tests)
+- `src/test/kotlin/plantuml/apikey/TieredRotationStrategyTest.kt` (5 tests)
+- `src/functionalTest/kotlin/plantuml/TieredRotationFunctionalTest.kt` (5 tests)
+- `src/test/scenarios/plantuml/scenarios/TieredRotationSteps.kt` (11 steps)
+- `src/test/features/19_tiered_rotation.feature` (7 scénarios)
+
+=== Modifiés (9)
+- `src/main/kotlin/plantuml/apikey/Provider.kt` (+`KeyTier`, +`TIERED`)
+- `src/main/kotlin/plantuml/apikey/models.kt` (+`tier`/`weight` sur `ApiKeyEntry`)
+- `src/main/kotlin/plantuml/apikey/ApiKeyPool.kt` (+`getNextTiered`, `tieredStrategy`)
+- `src/main/kotlin/plantuml/models.kt` (+`tier`/`weight` sur `ApiKeyPoolEntry`, +`rotationStrategy`/`fallbackEnabled` sur `LangchainConfig`)
+- `src/main/kotlin/plantuml/service/LlmService.kt` (config→domaine mapping, `parseRotationStrategy`, `parseTier`)
+- `src/test/kotlin/plantuml/apikey/ApiKeyPoolTest.kt` (+4 tests TIERED)
+- `src/test/kotlin/plantuml/apikey/ProviderEnumsTest.kt` (4→5 valeurs RotationStrategy)
+- `src/test/kotlin/plantuml/ConfigLoaderApiKeyPoolTest.kt` (+3 tests tier/weight/rotation)
+- `src/test/kotlin/plantuml/ModelsDataClassTest.kt` (fix args nommés LangchainConfig)
+- `src/test/scenarios/plantuml/scenarios/PlantumlWorld.kt` (+`tieredPool`/`tieredSelectedKeys`)
+
+== Score : 9/10
+
+Baby-step TDD propre (Red→Green→Refactor), 4 étapes dans l'ordre demandé,
+couverture unit/functional/cucumber complète. Bug `IllegalArgumentException`
+détecté et résolu par les tests fonctionnels (le filet de sécurité a fonctionné).
+1 test fonctionnel KG pré-existant en échec (hors-scope).

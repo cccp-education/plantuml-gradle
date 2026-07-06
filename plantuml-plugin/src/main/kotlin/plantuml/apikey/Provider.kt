@@ -45,5 +45,18 @@ enum class RotationStrategy {
     ROUND_ROBIN,
     WEIGHTED,
     LEAST_USED,
-    SMART
+    SMART,
+    TIERED
+}
+
+/**
+ * Key Tier enumeration.
+ *
+ * Represents the priority tier of an API key for tiered rotation.
+ * Higher priority tiers are consumed first; lower tiers act as fallback.
+ */
+enum class KeyTier {
+    ENTERPRISE,
+    PRO,
+    FREE
 }

@@ -11,6 +11,7 @@ import java.time.LocalDateTime
  * @property keyRef GitHub Secrets reference (e.g., "GOOGLE_API_KEY_1")
  * @property provider The API provider (GOOGLE, HUGGINGFACE, etc.)
  * @property services List of services this key can access
+ * @property tier Priority tier for tiered rotation (default: FREE)
  * @property expirationDate Optional expiration date for the key
  * @property quota Quota configuration for this key
  * @property metadata Additional metadata (creation date, notes, etc.)
@@ -22,6 +23,8 @@ data class ApiKeyEntry(
     val keyRef: String,
     val provider: Provider,
     val services: List<ServiceType>,
+    val tier: KeyTier = KeyTier.FREE,
+    val weight: Int = 1,
     val expirationDate: LocalDateTime? = null,
     val quota: QuotaConfig = QuotaConfig(),
     val metadata: Map<String, String> = emptyMap()

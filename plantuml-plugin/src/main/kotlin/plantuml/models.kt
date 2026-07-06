@@ -97,6 +97,8 @@ data class LangchainConfig(
     val model: String = "ollama",
     val validation: Boolean = true,
     val validationPrompt: String = "Rate this diagram on clarity, completeness, and best practices. Return a JSON with 'score' (1-10) and 'feedback' (string) and 'recommendations' (array).",
+    val rotationStrategy: String = "ROUND_ROBIN",
+    val fallbackEnabled: Boolean = true,
     val ollama: OllamaConfig = OllamaConfig(),
     val gemini: ApiKeyConfig = ApiKeyConfig(),
     val mistral: ApiKeyConfig = ApiKeyConfig(),
@@ -162,6 +164,8 @@ data class ApiKeyConfig(
  * @property services List of services this key can access
  * @property baseUrl Base URL for the API (optional, overrides provider default)
  * @property quota Quota configuration for this key
+ * @property tier Priority tier for tiered rotation (ENTERPRISE, PRO, FREE; default: FREE)
+ * @property weight Relative weight for intra-tier selection (default: 1)
  */
 data class ApiKeyPoolEntry(
     val id: String = "",
@@ -171,7 +175,9 @@ data class ApiKeyPoolEntry(
     val provider: String = "",
     val services: List<String> = emptyList(),
     val baseUrl: String = "",
-    val quota: PoolQuotaConfig = PoolQuotaConfig()
+    val quota: PoolQuotaConfig = PoolQuotaConfig(),
+    val tier: String = "FREE",
+    val weight: Int = 1
 )
 
 /**

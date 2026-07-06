@@ -285,7 +285,6 @@ class ConfigLoaderApiKeyPoolTest {
     @Test
     @DisplayName("should parse pool with baseUrl")
     fun `should parse pool with baseUrl`() {
-        // Given
         val tempFile = File.createTempFile("test-config-baseurl-pool", ".yml")
         tempFile.writeText("""
             langchain4j:
@@ -307,12 +306,82 @@ class ConfigLoaderApiKeyPoolTest {
         """.trimIndent())
         tempFile.deleteOnExit()
 
-        // When
         val config = ConfigLoader.load(tempFile)
 
-        // Then
         assertNotNull(config.langchain4j.openai.pool)
         assertEquals(1, config.langchain4j.openai.pool.size)
         assertEquals("https://custom.openai.api", config.langchain4j.openai.pool[0].baseUrl)
+    }
+
+    @Test
+    @DisplayName("should parse tier and weight from pool entries")
+    fun `should parse tier and weight from pool entries`() {
+        val tempFile = File.createTempFile("test-config-tier-pool", ".yml")
+        tempFile.writeText("""
+            langchain4j:
+              model: openai
+              openai:
+                pool:
+                  - id: "ent-key-1"
+                    email: "ent@example.com"
+                    name: "Enterprise Key"
+                    keyRef: "ENT_API_KEY_1"
+                    provider: "OPENAI"
+                    services:
+                      - "CHAT_COMPLETION"
+                    tier: "ENTERPRISE"
+                    weight: 5
+                    quota:
+                      limitValue: 10000
+                      thresholdPercent: 80
+                  - id: "free-key-1"
+                    email: "free@example.com"
+                    name: "Free Key"
+                    keyRef: "FREE_API_KEY_1"
+                    provider: "OPENAI"
+                    services:
+                      - "CHAT_COMPLETION"
+                    quota:
+                      limitValue: 100
+                      thresholdPercent: 80
+        """.trimIndent())
+        tempFile.deleteOnExit()
+
+        val config = ConfigLoader.load(tempFile)
+
+        assertEquals(2, config.langchain4j.openai.pool.size)
+        val ent = config.langchain4j.openai.pool[0]
+        assertEquals("ENTERPRISE", ent.tier)
+        assertEquals(5, ent.weight)
+        val free = config.langchain4j.openai.pool[1]
+        assertEquals("FREE", free.tier)
+        assertEquals(1, free.weight)
+    }
+
+    @Test
+    @DisplayName("should parse tiered rotation strategy at langchain4j level")
+    fun `should parse tiered rotation strategy at langchain4j level`() {
+        val tempFile = File.createTempFile("test-config-rotation", ".yml")
+        tempFile.writeText("""
+            langchain4j:
+              model: openai
+              rotationStrategy: "TIERED"
+              fallbackEnabled: false
+              openai:
+                pool:
+                  - id: "k1"
+                    email: "e@e.com"
+                    name: "K1"
+                    keyRef: "K1"
+                    provider: "OPENAI"
+                    services:
+                      - "CHAT_COMPLETION"
+        """.trimIndent())
+        tempFile.deleteOnExit()
+
+        val config = ConfigLoader.load(tempFile)
+
+        assertEquals("TIERED", config.langchain4j.rotationStrategy)
+        assertEquals(false, config.langchain4j.fallbackEnabled)
     }
 }
