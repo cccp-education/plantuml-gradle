@@ -144,7 +144,7 @@ class KnowledgeGraphDiagramFunctionalTest {
         val result = runner("generateKnowledgeGraphDiagram").buildAndFail()
 
         Assertions.assertEquals(FAILED, result.task(":generateKnowledgeGraphDiagram")?.outcome)
-        assertTrue(result.output.contains("graphify-out/graph.json not found"))
+        assertTrue(result.output.contains("Graph file not found"))
     }
 
     @Test

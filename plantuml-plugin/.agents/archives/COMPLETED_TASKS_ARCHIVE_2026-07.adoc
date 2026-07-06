@@ -1,5 +1,28 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-07
 
+== Session 163 (2026-07-08) — Bug KG trié+fixé + Cadrage EPIC PLT-BOUNDARY
+
+=== Fait
+- Bug KG trié avec diagnostic précis : cause racine = régression silencieuse S156 (US-I18N-4 refactor exceptions → PlantumlMessages.format), message hardcodé `"graphify-out/graph.json not found"` remplacé par clé i18n `kgparser.file_not_found` (`"Graph file not found: {0}"`), test fonctionnel non mis à jour ✅
+- Bug KG fixé : `KnowledgeGraphDiagramFunctionalTest.kt:147` assertion alignée sur contrat i18n stable `contains("Graph file not found")`, indépendant du chemin absolu ✅
+- 15/15 tests fonctionnels KG PASS (0 FAIL) ✅
+- Constat i18n : 9 fichiers `Messages_*.properties` (ar, bn, es, fr, hi, pt, ru, ur, zh) strictement identiques à `Messages_en.properties` — coquille vide, zéro traduction réelle ✅
+- Constat i18n : cœur métier non couvert — chaînes hardcodées dans `KnowledgeGraphRenderer.kt` et `DiagramProcessor.kt` finissent dans les diagrammes générés, jamais i18nisées ✅
+- Cadrage EPIC PLT-BOUNDARY Translation Boundary (8 US, ~26 pts) ✅
+- Vision i18n validée avec l'utilisateur : 3 natures (Présentation, Identité sémantique, Champ lexical métier), 3 stratégies (TRANSLATE, BORROW, PRESERVE) ✅
+- Anti-patterns explicitement rejetés : francisation forcée, mot-à-mot aveugle, tout-traduire, tout-préserver ✅
+- Fichier vision créé : `.agents/I18N_BOUNDARY_VISION.adoc` (174 lignes) ✅
+- Gouvernance borough mise à jour : BACKLOG, PROMPT_REPRISE, INDEX, AGENT, SESSIONS_HISTORY, TEST_COVERAGE_ANALYSIS ✅
+- Gouvernance workspace mise à jour : PLAN_GLOBAL.adoc (EPIC 13 ✅ TERMINÉ, PLT-BOUNDARY ajouté), AGENTS.adoc (ligne HTOWN, historique 2026-07-08) ✅
+
+=== Non fait
+- US-BND-0 Domain model non démarré (cadrage seul en S163)
+
+=== Prochaine session
+- US-BND-0 Domain model — `TranslationCategory`, `TranslationStrategy`, `TranslatableText`, `ClassifiedText`
+- Baby-step DDD/TDD, 1 classe + 1 test par concept
+- Voir BACKLOG.adoc §"EPIC PLT-BOUNDARY"
+
 == Session 161 (2026-07-06) — EPIC 13 TieredRotationStrategy (4 étapes A→B→C→D)
 
 === Fait

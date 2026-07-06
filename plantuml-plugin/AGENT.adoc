@@ -345,6 +345,7 @@ il DOIT consulter ces codebases comme reference. Ces chemins sont LAZY — ne ja
 
 | `*_REFERENCE.adoc` | Architecture complete
 | `.agents/sessions/{N}*.adoc` | Archives detaillees par session
+| `.agents/I18N_BOUNDARY_VISION.adoc` | Vision i18n Translation Boundary (3 natures, 3 stratégies) — EPIC PLT-BOUNDARY
 | `.agents/archives/COMPLETED_TASKS_ARCHIVE_*.adoc` | Archive des taches terminees
 | `SESSION_PROCEDURE.adoc` | Procedure de fin de session
 | `AGENT_MODUS_OPERANDI.adoc` | Methodologie LAZY/EAGER

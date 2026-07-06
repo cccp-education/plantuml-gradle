@@ -1,11 +1,11 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 162 (6 juillet 2026)
+_Dernière mise à jour_ : Session 163 (8 juillet 2026)
 
 === Résumé Global
 
 * **Total tests unitaires** : 1235/1235 PASS (0 failure, 0 skipped) Session 162 — `ApiKeyPool.isPoolSaturated()` + `CrossProviderFallbackOrchestrator` ajoutés ✅
-* **Tests fonctionnels GradleRunner KG** : 15 PASSED (1 pré-existant FAILED hors-scope EPIC 13 : `should fail when graphify-out graph json does not exist`)
+* **Tests fonctionnels GradleRunner KG** : 15/15 PASSED ✅ Session 163 (bug `should fail when graphify-out graph json does not exist` trié+fixé — assertion alignée sur contrat i18n `kgparser.file_not_found`)
 * **Tests fonctionnels TieredRotation** : 5/5 PASS (Session 161) ✅
 * **Tests fonctionnels CrossProviderFallback** : 5/5 PASS (Session 162) ✅
 * **Tests Cucumber i18n** : features 15-18 PASS ✅

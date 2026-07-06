@@ -1,0 +1,156 @@
+= Session 163 — Bug KG trié+fixé + Cadrage EPIC PLT-BOUNDARY
+:session: 163
+:date: 2026-07-08
+:project: plantuml-gradle (HTOWN 🚀)
+:score: 8/10
+:type: TDD + cadrage
+
+== Résumé
+
+Session courte, deux livrables :
+
+. **Bug KG trié+fixé** — `KnowledgeGraphDiagramFunctionalTest.should fail
+  when graphify-out graph json does not exist` était en échec pré-existant
+  depuis S156 (US-I18N-4). Cause racine : le refactor i18n a remplacé le
+  message hardcodé `"graphify-out/graph.json not found"` par la clé i18n
+  `kgparser.file_not_found` (`"Graph file not found: {0}"`), mais le test
+  fonctionnel cherchait encore l'ancien texte. Fix : assertion alignée sur
+  le contrat i18n stable (`contains("Graph file not found")`), indépendant
+  du chemin absolu. 1 fichier modifié (test), 0 fichier de production
+  touché. 15/15 KG fonctionnels PASS.
+
+. **Cadrage EPIC PLT-BOUNDARY** — Suite au constat que EPIC PLT-I18N a
+  traduit les logs mais pas le livrable (le diagramme reste monolingue), et
+  que les 9 fichiers `Messages_*.properties` sont des copies conformes de
+  `Messages_en.properties` (zéro traduction réelle), cadrage d'un nouvel
+  EPIC Translation Boundary. Vision validée avec l'utilisateur :
+  3 natures de texte (Présentation, Identité sémantique, Champ lexical
+  métier), 3 stratégies (TRANSLATE, BORROW, PRESERVE). Rejet explicite de
+  la francisation forcée et du mot-à-mot aveugle. 8 US, ~26 pts, baby-step
+  DDD/TDD/BDD.
+
+== Bug KG — Diagnostic détaillé
+
+* **Symptôme** : `KnowledgeGraphDiagramFunctionalTest.kt:147` —
+  `assertTrue(result.output.contains("graphify-out/graph.json not found"))`
+  échouait.
+* **Cause racine** : `GenerateKnowledgeGraphDiagramTask.kt:30-32` lève
+  `GradleException(PlantumlMessages.format("kgparser.file_not_found", lang, graphFile.absolutePath))`.
+  La clé i18n produit `"Graph file not found: /tmp/.../graphify-out/graph.json"`.
+  L'ordre des mots est inversé vs l'ancien message hardcodé.
+* **Régression silencieuse** : introduite à S156 (US-I18N-4 refactor
+  exceptions → PlantumlMessages). Restée hors-scope des EPICs suivants
+  (PLT-I18N clôture, EPIC 13 Multi-provider).
+* **Fix** : `KnowledgeGraphDiagramFunctionalTest.kt:147` —
+  `assertTrue(result.output.contains("Graph file not found"))`.
+  Assertion stable, indépendante du chemin absolu, alignée sur le contrat
+  i18n.
+* **Vérification** : 15/15 KG fonctionnels PASS.
+
+== EPIC PLT-BOUNDARY — Constat et cadrage
+
+=== Constat
+
+. **Coquille vide i18n** : 9 fichiers `Messages_*.properties` (ar, bn, es,
+  fr, hi, pt, ru, ur, zh) sont strictement identiques à `Messages_en.properties`
+  (196 lignes chacun). `diff -q` vide pour les 9. EPIC PLT-I18N (28/28 pts,
+  1210/1210 PASS, "TERMINÉ" S160) a livré l'infrastructure mais zéro contenu
+  traduit. Les tests Cucumber sont verts parce qu'ils vérifient la mécanique
+  (résolution langue, fallback, override CLI), pas le contenu.
+
+. **Cœur métier non couvert** : chaînes hardcodées en anglais dans les
+  diagrammes générés — `KnowledgeGraphRenderer.kt` (`title Empty Knowledge
+  Graph`, `folder "Classes"`, légendes `Extracted/Inferred/Ambiguous`) et
+  `DiagramProcessor.kt` (`title "Generated Diagram"`, `rectangle "System"`).
+  L'EPIC a traduit les logs mais pas le livrable.
+
+. **Frontière inexistante** : aucun concept domaine pour distinguer
+  traduisible (étiquettes d'UI) vs préservé (identifiants, savoir extrait).
+  Risque : tout traduire y compris les noms de classes, ou tout préserver
+  par peur.
+
+=== Vision validée
+
+*Principe* : l'i18n sert la compréhension. Toute traduction qui réduit la
+compréhension est un défaut. On traduit le contenant, on préserve le contenu.
+
+*3 natures* :
+. **Présentation** — étiquettes d'UI (`"Classes"`, `"Files"`, `"Extracted"`) →
+  traduisible, mot-à-mot acceptable
+. **Identité sémantique** — savoir extrait (`LlmService`, `calls`,
+  `community_0`, formules math) → préservé, jamais touché
+. **Champ lexical métier** — termes techniques (`pipeline`, `rollback`,
+  `dependency injection`) → traduisible avec choix idiomatique
+
+*3 stratégies* :
+. **TRANSLATE** — traduction idiomatique consacrée existe
+. **BORROW** — emprunt : terme source tel quel dans langue cible (consacré
+  par l'usage communautaire)
+. **PRESERVE** — pas de traduction (identité sémantique, termes métier
+  client)
+
+*Anti-patterns rejetés* :
+. Francisation forcée ("pourriel" pour `spam`)
+. Mot-à-mot aveugle ("tuyau" pour `pipeline`)
+. Tout-traduire y compris identifiants de code
+. Tout-préserver par peur
+
+*Cohérence de transmission* : un développeur français et un développeur
+chinois regardant le même diagramme généré depuis le même `graph.json`
+doivent comprendre tous les deux (étiquettes dans leur langue), pointer
+vers le même code (identifiants identiques), pouvoir en discuter entre
+eux.
+
+=== User Stories (8 US, ~26 pts)
+
+. US-BND-0 Domain model (3 pts, 🔴 P0) — `TranslationCategory`,
+  `TranslationStrategy`, `TranslatableText`, `ClassifiedText`
+. US-BND-1 TextClassifier (3 pts, 🔴 P0) — classification heuristique
+. US-BND-2 IdiomaticGlossary + BORROW (4 pts, 🔴 P0) — glossaire YAML
+. US-BND-3 Cucumber boundary feature (3 pts, 🟠 P1) — ≥5 scénarios BDD
+. US-BND-4 KnowledgeGraphRenderer i18n (4 pts, 🟠 P1)
+. US-BND-5 DiagramProcessor structural strings (3 pts, 🟠 P1)
+. US-BND-6 NonTranslatableTermRegistry (3 pts, 🟡 P2) — REAC/AFNOR/FPA
+. US-BND-7 Cucumber full pipeline end-to-end (3 pts, 🟡 P2)
+
+== Fichiers modifiés
+
+. `src/functionalTest/kotlin/plantuml/KnowledgeGraphDiagramFunctionalTest.kt`
+   — ligne 147 : assertion alignée sur contrat i18n
+. `.agents/I18N_BOUNDARY_VISION.adoc` — CRÉÉ — vision domaine (3 natures,
+   3 stratégies, architecture cible, chaînes hardcodées, anti-patterns)
+. `BACKLOG.adoc` — ajout section EPIC PLT-BOUNDARY + correction backlog
+   post-EPIC 13
+. `PROMPT_REPRISE.adoc` — session 163 mission US-BND-0
+. `.agents/INDEX.adoc` — session 163, roadmap PLT-BOUNDARY, fichier vision
+   référencé
+. `AGENT.adoc` — référence `I18N_BOUNDARY_VISION.adoc` dans fichiers LAZY
+
+== Fichiers workspace (hors git borough)
+
+. `PLAN_GLOBAL.adoc` — table plantuml-gradle mise à jour (EPIC 13 ✅
+  TERMINÉ, PLT-BOUNDARY ajouté)
+. `AGENTS.adoc` — ligne HTOWN borough + entrée historique 2026-07-08
+
+== Tests
+
+. Bug KG fixé : 15/15 `KnowledgeGraphDiagramFunctionalTest` PASS
+. Aucun test unitaire lancé en fin de session (règle AGENT.adoc respectée)
+. Aucun fichier de production modifié pour le bug KG (test-only)
+
+== Score : 8/10
+
+. +2 points : bug KG trié avec diagnostic précis (cause racine i18n S156)
+. +3 points : cadrage EPIC vision claire, alignée sur l'intuition
+  utilisateur (termes métier, formules math, choix idiomatique)
+. +2 points : gouvernance complète (vision, backlog, prompt, index, agent,
+  plan global)
+. +1 point : session courte, 1 fichier prod touché (test), clean
+. -1 point : pas de code de production livré pour PLT-BOUNDARY (cadrage
+  seul)
+
+== Prochaine session
+
+US-BND-0 Domain model — `TranslationCategory` enum, `TranslationStrategy`
+enum, `TranslatableText` value object, `ClassifiedText`. Baby-step DDD/TDD,
+1 classe + 1 test par concept, Red→Green→Refactor.

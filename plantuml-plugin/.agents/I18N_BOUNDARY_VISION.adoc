@@ -1,0 +1,174 @@
+= I18N Translation Boundary — Vision du Domaine
+:toc: left
+:toclevels: 3
+:last_update: 2026-07-08 (Session 163 — cadrage EPIC PLT-BOUNDARY)
+
+== Principe directeur
+
+*L'i18n sert la compréhension. Toute traduction qui réduit la compréhension
+est un défaut.*
+
+Un diagramme PlantUML transmet de la connaissance. Cette connaissance doit
+arriver intacte quelle que soit la langue de celui qui la lit. La traduction
+n'est pas une fin — c'est un moyen de réduire la friction cognitive pour un
+lecteur non-anglophone.
+
+== Les trois natures de texte
+
+Un diagramme généré contient trois natures de texte, et la frontière est
+*sémantique, pas linguistique*.
+
+[cols="1,3,3,2"]
+|===
+| Nature | Rôle | Exemples | Décision
+
+| 1. Présentation
+| Orienter le lecteur dans la structure du diagramme
+| `"Classes"`, `"Files"`, `"Extracted"`, `"Empty Knowledge Graph"`, légendes, titres
+| *Traduisible* — étiquettes d'UI, pas du savoir
+
+| 2. Identité sémantique
+| Le savoir lui-même, ce que le diagramme dit du code
+| `LlmService`, `DiagramProcessor`, `calls`, `creates`, `community_0`, noms de classes, labels d'arêtes, formules math
+| *Préservé* — traduire ces éléments détruit le message
+
+| 3. Champ lexical métier
+| Termes techniques consacrés par l'usage communautaire
+| `pipeline`, `rollback`, `dependency injection`, `cache`, `endpoint`, `feature flag`
+| *Traduisible avec choix idiomatique* — TRANSLATE / BORROW selon la langue
+|===
+
+== Les trois stratégies de traduction
+
+[cols="1,3,2"]
+|===
+| Stratégie | Description | Natures concernées
+
+| TRANSLATE
+| Traduction idiomatique consacrée existe dans la langue cible, on l'utilise
+| Nature 1 (étiquettes), Nature 3 (quand traduction consacrée)
+
+| BORROW
+| Emprunt : le terme source est tel quel dans la langue cible (consacré par l'usage)
+| Nature 3 (quand la communauté cible utilise le terme anglais)
+
+| PRESERVE
+| Pas de traduction — identité sémantique intacte
+| Nature 2 (identifiants, savoir extrait), Nature 3 (termes métier client)
+|===
+
+== Ce que rejette cette vision
+
+* *Francisation forcée* — "pourriel" pour `spam`, "courriel" pour `email` quand
+  la communauté dit `email`. La francisation à tout prix au prix du ridicule.
+* *Mot-à-mot aveugle* — "tuyau" pour `pipeline`. Traduire sans connaître le
+  champ lexical métier.
+* *Tout-traduire* — y compris les identifiants de code (`LlmService`).
+* *Tout-préserver* — par peur de mal traduire, ne rien traduire du tout.
+
+== Ce qu'affirme cette vision
+
+* *Traduire les étiquettes de présentation* (Nature 1) — mot-à-mot acceptable
+* *Préserver les identifiants et le savoir extrait* (Nature 2) — jamais touché
+* *Traduire les champs lexicaux métier avec choix idiomatique* (Nature 3) —
+  en respectant la culture linguistique de chaque langue
+* *Trois stratégies explicites* : TRANSLATE / BORROW / PRESERVE
+* *Glossaire idiomatique configurable* par langue (pas dur dans le code —
+  évolutif)
+* *Registre des non-traduisibles* configurable (termes métier spécifiques au
+  domaine client : REAC, AFNOR, FPA)
+
+== La cohérence de transmission
+
+Un développeur français et un développeur chinois regardant le *même* diagramme
+généré depuis le *même* `graph.json` doivent :
+
+. *Comprendre tous les deux* — les étiquettes structurelles sont dans leur langue
+. *Pointer vers le même code* — les identifiants sont identiques pour les deux
+. *Pouvoir en discuter entre eux* — si le Chinois dit "类 LlmService appelle
+  DiagramProcessor" et le Français dit "la classe LlmService appelle
+  DiagramProcessor", ils parlent de la même chose
+
+La traduction n'a de valeur que si le *message transmis reste cohérent* à
+travers les langues. Si la traduction casse cette cohérence (le Français voit
+`ServiceLLM` et ne retrouve pas la classe `LlmService` dans le code), elle est
+*défectueuse*.
+
+== Architecture cible
+
+[source]
+----
+Texte du diagramme
+       │
+       ▼
+TextClassifier
+       │
+       ├── Présentation? ──► Messages_{lang}.properties (mot-à-mot)
+       │
+       ├── Identité sémantique? ──► PRESERVE (tel quel)
+       │
+       └── Champ lexical métier? ──► IdiomaticGlossary
+                                        │
+                                        ├── TRANSLATE → traduction consacrée
+                                        ├── BORROW → terme source tel quel
+                                        └── PRESERVE → pas de traduction
+----
+
+== Composants domaine
+
+* `TranslationCategory` — enum : `PRESENTATION`, `SEMANTIC_IDENTITY`, `LEXICAL_FIELD`
+* `TranslationStrategy` — enum : `TRANSLATE`, `BORROW`, `PRESERVE`
+* `TranslatableText` — value object encapsulant le texte + sa catégorie
+* `ClassifiedText` — résultat de la classification par `TextClassifier`
+* `TextClassifier` — classifie un texte dans une `TranslationCategory`
+* `IdiomaticGlossary` — registry terme source → {langue → traduction + stratégie}
+* `NonTranslatableTermRegistry` — termes métier client (REAC, AFNOR, FPA) à préserver
+* `TranslationResolver` — applique la bonne stratégie selon catégorie + glossaire
+
+== Périmètre d'application
+
+* Diagrammes générés via `KnowledgeGraphRenderer` (rendu déterministe)
+* Diagrammes générés via `DiagramProcessor` (rendu LLM)
+* Prompts LLM — *hors périmètre* (prompt engineering reste en anglais, déjà
+  documenté dans BACKLOG US-I18N-1)
+
+== Hors périmètre (pour rester honnête)
+
+* Traduire effectivement les 196 lignes × 9 langues (US séparée, EPIC de
+  rattrapage ultérieur)
+* Traduire les prompts LLM (prompt engineering reste en anglais)
+
+== Chaînes hardcodées identifiées dans le code de production
+
+=== KnowledgeGraphRenderer.kt (rendu diagramme KG)
+
+* `title Empty Knowledge Graph` (ligne 40)
+* `folder "Classes" {` (ligne 104)
+* `folder "Files" {` (ligne 114)
+* `' Cross-community edges` (ligne 161)
+* `' Intra-community edges` (ligne 173)
+* `' Unassigned nodes` (ligne 182)
+* Légendes `Extracted`, `Inferred`, `Ambiguous` (lignes 272, 275, 278)
+
+*Préservé* : `node.name` (identifiants), `edge.source/target` (relations extraites),
+`community.name` (identifiants générés)
+
+=== DiagramProcessor.kt (génération LLM)
+
+* `title "Generated Diagram"` (ligne 357)
+* `rectangle "System" {` (ligne 359)
+* `User --> (Feature)` (ligne 360)
+* `description = "Auto-generated diagram based on prompt: $prompt"` (ligne 128)
+
+*Préservé* : prompt utilisateur, réponse LLM, syntaxe PlantUML
+
+== Décision
+
+Vision validée par l'utilisateur en Session 163. L'EPIC PLT-BOUNDARY est
+cadré avec 8 US (~26 pts), baby-step DDD/TDD/BDD (unit → functional → cucumber).
+
+== Références
+
+* `BACKLOG.adoc` — section EPIC PLT-BOUNDARY (détail des US)
+* `PROMPT_REPRISE.adoc` — mission session en cours
+* AGENTS.adoc (workspace) — section HTOWN

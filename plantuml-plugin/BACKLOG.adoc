@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-07-06 (Session 162 — EPIC 13 Cross-provider Fallback 6/6 TERMINÉ, `CrossProviderFallbackOrchestrator` + `ApiKeyPool.isPoolSaturated()`, 1235 unit + 5 functional + 5 Cucumber PASS)
+:last_update: 2026-07-08 (Session 163 — bug KG trié+fixé, cadrage EPIC PLT-BOUNDARY Translation Boundary 8 US ~26 pts)
 
 '''
 == ✅ EPIC 13 : Multi-provider API Pool — Rotation par tiers + Cross-provider
@@ -268,13 +268,141 @@ PlantumlMessages.format("key", args)  → String formaté (MessageFormat)
 
 '''
 
+== 🔴 EPIC PLT-BOUNDARY : Translation Boundary — Frontière de traduction i18n
+
+*Vision* : voir `.agents/I18N_BOUNDARY_VISION.adoc`
+*Principe* : l'i18n sert la compréhension. Toute traduction qui réduit la
+compréhension est un défaut. On traduit le contenant (étiquettes de
+présentation), on préserve le contenu (identité sémantique). Le champ lexical
+métier se traduit avec choix idiomatique (TRANSLATE / BORROW).
+*Charge* : ~26 pts (~6-7 sessions)
+*Priorité* : 🔴 HAUTE — l'i18n actuelle (EPIC PLT-I18N) a traduit les logs mais
+pas le livrable (le diagramme). Le contenu du diagramme reste monolingue.
+*Dépend de* : néant (nouveau domaine)
+
+=== Contexte
+
+EPIC PLT-I18N a livré l'infrastructure i18n (`PlantumlMessages`, `ResourceBundle`,
+`ConfigMerger` 4 couches, 8 scénarios Cucumber PASS). Mais :
+. Les 9 fichiers `Messages_*.properties` sont des copies conformes de
+  `Messages_en.properties` (zéro traduction réelle — coquille vide).
+. Le cœur métier (diagrammes générés) n'est pas couvert : chaînes hardcodées
+  dans `KnowledgeGraphRenderer.kt` et `DiagramProcessor.kt`.
+. Aucune frontière sémantique : aucun concept domaine pour distinguer
+  traduisible (étiquettes d'UI) vs préservé (identifiants, savoir extrait).
+
+=== Natures de texte et stratégies
+
+[cols="1,3,2,2"]
+|===
+| Nature | Exemples | Décision | Stratégie
+
+| 1. Présentation
+| `"Classes"`, `"Files"`, `"Extracted"`, `"Empty Knowledge Graph"`
+| Traduisible
+| TRANSLATE (mot-à-mot via Messages_*.properties)
+
+| 2. Identité sémantique
+| `LlmService`, `calls`, `community_0`, `pgvector`, formules math
+| Préservé
+| PRESERVE (tel quel)
+
+| 3. Champ lexical métier
+| `pipeline`, `rollback`, `dependency injection`, `cache`
+| Traduisible idiomatique
+| TRANSLATE (si traduction consacrée) / BORROW (si emprunt consacré)
+|===
+
+=== Composants domaine
+
+* `TranslationCategory` — enum : `PRESENTATION`, `SEMANTIC_IDENTITY`, `LEXICAL_FIELD`
+* `TranslationStrategy` — enum : `TRANSLATE`, `BORROW`, `PRESERVE`
+* `TranslatableText` — value object (texte + catégorie)
+* `ClassifiedText` — résultat de classification
+* `TextClassifier` — classifie un texte dans une `TranslationCategory`
+* `IdiomaticGlossary` — registry terme → {langue → traduction + stratégie}
+* `NonTranslatableTermRegistry` — termes métier client (REAC, AFNOR, FPA)
+* `TranslationResolver` — applique la bonne stratégie selon catégorie + glossaire
+
+=== User Stories
+
+[cols="1,4,2,2"]
+|===
+| US | Description | Pts | Priorité
+
+| US-BND-0
+| **Domain model** — `TranslationCategory` enum (`PRESENTATION`, `SEMANTIC_IDENTITY`, `LEXICAL_FIELD`), `TranslationStrategy` enum (`TRANSLATE`, `BORROW`, `PRESERVE`), `TranslatableText` value object, `ClassifiedText`. Baby-step : 1 classe + 1 test par concept, Red→Green→Refactor.
+| 3
+| 🔴 P0
+
+| US-BND-1
+| **TextClassifier** — classifie `"Classes"` → `PRESENTATION`, `"LlmService"` → `SEMANTIC_IDENTITY`, `"pipeline"` → `LEXICAL_FIELD`. Baby-step : 1 test par catégorie. Règles de classification documentées (heuristiques : identifiants = PascalCase ou snake_case technique, étiquettes = mots isolés connus, champ lexical = glossaire).
+| 3
+| 🔴 P0
+
+| US-BND-2
+| **IdiomaticGlossary + BORROW** — glossaire YAML configurable (`idiomatic-glossary.yml`). `pipeline` en fr → `BORROW` ("pipeline"), `pipeline` en zh → `TRANSLATE` ("管道"). `rollback` en fr → `BORROW`. `dependency injection` en fr → `TRANSLATE` ("injection de dépendances"). Baby-step : 1 test par stratégie × langue.
+| 4
+| 🔴 P0
+
+| US-BND-3
+| **Cucumber boundary feature** — `21_i18n_translation_boundary.feature` : étiquette présentation traduite, identifiant préservé, terme métier idiomatique selon langue, formule math préservée, terme REAC préservé. ≥5 scénarios BDD.
+| 3
+| 🟠 P1
+
+| US-BND-4
+| **KnowledgeGraphRenderer i18n** — étiquettes structurelles (`"Classes"`, `"Files"`, `"Empty Knowledge Graph"`, légendes `Extracted`/`Inferred`/`Ambiguous`) via `TranslationResolver`. Identifiants (`node.name`, `edge.source/target`, `community.name`) préservés. Comments PUML (`' Cross-community edges`) traduits. Baby-step : 1 étiquette à la fois, unit → functional.
+| 4
+| 🟠 P1
+
+| US-BND-5
+| **DiagramProcessor structural strings** — `title "Generated Diagram"`, `rectangle "System"`, `User --> (Feature)`, `description = "Auto-generated diagram based on prompt: ..."` → i18n via resolver. Prompt LLM préservé. Baby-step : 1 chaîne à la fois.
+| 3
+| 🟠 P1
+
+| US-BND-6
+| **NonTranslatableTermRegistry** — registre configurable YAML (`non-translatable-terms.yml`) des termes métier client (REAC, AFNOR, FPA). Le `TranslationResolver` consulte ce registre avant toute traduction. Baby-step : 1 terme + 1 test.
+| 3
+| 🟡 P2
+
+| US-BND-7
+| **Cucumber full pipeline** — Scénario end-to-end : `language=fr` + glossaire FR → diagramme KG avec "Classes" traduit (TRANSLATE), "LlmService" préservé (PRESERVE), "pipeline" emprunté (BORROW), "REAC" préservé (registry). Vérifie la cohérence de transmission.
+| 3
+| 🟡 P2
+|===
+
+=== Critères d'Acceptation
+
+* [ ] `TranslationCategory` distingue les 3 natures (Présentation / Identité sémantique / Champ lexical)
+* [ ] `TranslationStrategy` expose les 3 stratégies (TRANSLATE / BORROW / PRESERVE)
+* [ ] `TextClassifier` classifie correctement un texte dans la bonne catégorie
+* [ ] `IdiomaticGlossary` configurable via YAML (terme → {langue → traduction + stratégie})
+* [ ] `NonTranslatableTermRegistry` configurable via YAML (termes métier client préservés)
+* [ ] `KnowledgeGraphRenderer` i18nisé pour les étiquettes structurelles, identifiants préservés
+* [ ] `DiagramProcessor` i18nisé pour les chaînes structurelles, prompt LLM préservé
+* [ ] ≥5 scénarios Cucumber boundary PASS
+* [ ] ≥1 scénario Cucumber full pipeline end-to-end PASS
+* [ ] `./gradlew compileKotlin` OK + `test` OK (1210+ tests)
+* [ ] Kover ≥ 75% maintenu
+* [ ] `publishToMavenLocal` OK après modif code plugin
+* [ ] Aucune chaîne de Nature 2 (identité sémantique) traduite dans les diagrammes générés
+
+=== Anti-patterns explicitement rejetés
+
+* *Francisation forcée* — "pourriel" pour `spam`, "courriel" pour `email`
+* *Mot-à-mot aveugle* — "tuyau" pour `pipeline`
+* *Tout-traduire* — y compris les identifiants de code (`LlmService`)
+* *Tout-préserver* — par peur de mal traduire, ne rien traduire du tout
+
+'''
+
 == Prochains EPICs
 
-1. **EPIC 13** — ✅ TERMINÉ (6/6 tâches, S161-S162)
-2. **EPIC PLT-I18N** — ✅ TERMINÉ (28/28 pts BDD, 1210/1210 tests unitaires PASS S160)
-3. **Bug pré-existant** — `KnowledgeGraphDiagramFunctionalTest.should fail when graphify-out graph json does not exist` (à triager)
-4. **US-I18N-7 doc** — `README_truth.adoc`, `CHANGELOG.adoc`, `PLUGIN_SELF_DOCUMENTATION.adoc` (non bloquants)
-5. **Cadrage prochain EPIC** — consulter `PLAN_GLOBAL.adoc` workspace
+1. **EPIC PLT-BOUNDARY** — 🔴 EN COURS (8 US, ~26 pts) — voir ci-dessus
+2. **EPIC rattrapage i18n** — 🟡 À CADRER — traduire effectivement les 196 lignes × 9 langues (après PLT-BOUNDARY)
+3. **Bug KG** — ✅ TRIAGÉ + FIXÉ (Session 163 — assertion alignée sur contrat i18n `kgparser.file_not_found`)
+4. **BOM upgrade** — 🟢 Maintenance — `workspace-bom:0.0.1` → `0.0.7` (MEMPHIS Session 017)
+5. **TODO.adoc ménage** — 🟢 Supprimer idée pool de clés (couverte par EPIC 13)
 
 '''
 

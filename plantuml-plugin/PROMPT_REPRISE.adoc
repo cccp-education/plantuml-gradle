@@ -1,46 +1,48 @@
-= PROMPT_REPRISE — Plantuml — Session 163
-:session: 163
+= PROMPT_REPRISE — Plantuml — Session 164
+:session: 164
 :date: 2026-07-08
 
-== État — EPIC 13 TERMINÉ (6/6)
+== État — EPIC PLT-BOUNDARY cadré, US-BND-0 à démarrer
 
-Session 162 a livré la dernière tâche EPIC 13 : Cross-provider fallback
-inter-provider. `CrossProviderFallbackOrchestrator` (service domaine) orchestre
-les 7 pools par provider dans `LlmService` ; quand un pool entier est saturé,
-passe au provider suivant dans l'ordre (provider actif + autres triés). 4 étapes
-baby-step DDD/TDD/BDD (unit → functional → cucumber), 1235 unitaires + 5
-functional + 5 Cucumber PASS, `publishToMavenLocal` OK.
+Session 163 a trié+fixé le bug KG `graphify-out graph json does not exist`
+(assertion alignée sur contrat i18n `kgparser.file_not_found` — régression
+silencieuse S156 US-I18N-4, 15/15 KG fonctionnels PASS). Session 163 a aussi
+cadré l'EPIC PLT-BOUNDARY (8 US, ~26 pts) suite au constat que PLT-I18N a
+traduit les logs mais pas le livrable (diagramme monolingue, 9 fichiers
+Messages_*.properties coquilles vides).
 
-== Mission session 163 — Cadrage prochain EPIC
+== Mission session 164 — US-BND-0 Domain model
 
-Aucun EPIC ouvert restant sur plantuml-plugin (EPIC 13 ✅, PLT-I18N ✅).
-Consulter `BACKLOG.adoc` pour identifier le prochain EPIC ou tâche de
-maintenance. Pistes possibles :
-- Bug pré-existant : `KnowledgeGraphDiagramFunctionalTest.should fail when
-  graphify-out graph json does not exist` (hors-scope EPIC 13, à triager)
-- US-I18N-7 doc : `README_truth.adoc`, `CHANGELOG.adoc`,
-  `PLUGIN_SELF_DOCUMENTATION.adoc` restants (non bloquants)
-- CNV-7 suite : conventions-gradle évolutions (voir borough ABIDJAN)
-- Nouvel EPIC à cadrer (consultation `PLAN_GLOBAL.adoc` workspace)
+Démarrer US-BND-0 :
 
-== Backlog — Aucun EPIC ouvert
+. `TranslationCategory` enum : `PRESENTATION`, `SEMANTIC_IDENTITY`, `LEXICAL_FIELD`
+. `TranslationStrategy` enum : `TRANSLATE`, `BORROW`, `PRESERVE`
+. `TranslatableText` value object (texte + catégorie)
+. `ClassifiedText` (résultat de classification)
+
+Baby-step DDD/TDD : 1 classe + 1 test par concept, Red→Green→Refactor.
+Puis US-BND-1 `TextClassifier` (classification heuristique).
+
+== Backlog — EPIC PLT-BOUNDARY (8 US, ~26 pts)
 
 [cols="1,4,1"]
 |===
 | Priorité | Tâche | Statut
-| ✅
-| EPIC 13 — Multi-provider API Pool (6/6 tâches)
-| ✅ S162
-| ✅
-| EPIC PLT-I18N — Internationalisation 10 langues (28/28 pts)
-| ✅ S160
-| 🟡
-| Bug KG `graphify-out graph json does not exist` (pré-existant)
-| ⬜ triage
-| 🟢
-| US-I18N-7 doc — README_truth, CHANGELOG, PLUGIN_SELF_DOCUMENTATION
-| ⬜ non bloquant
+| 🔴 P0 | US-BND-0 — Domain model | ⬜ en cours
+| 🔴 P0 | US-BND-1 — `TextClassifier` | ⬜
+| 🔴 P0 | US-BND-2 — `IdiomaticGlossary` + BORROW | ⬜
+| 🟠 P1 | US-BND-3 — Cucumber boundary feature | ⬜
+| 🟠 P1 | US-BND-4 — `KnowledgeGraphRenderer` i18n | ⬜
+| 🟠 P1 | US-BND-5 — `DiagramProcessor` strings | ⬜
+| 🟡 P2 | US-BND-6 — `NonTranslatableTermRegistry` | ⬜
+| 🟡 P2 | US-BND-7 — Cucumber full pipeline | ⬜
 |===
+
+== Vision
+
+Voir `.agents/I18N_BOUNDARY_VISION.adoc` — 3 natures (Présentation, Identité
+sémantique, Champ lexical), 3 stratégies (TRANSLATE, BORROW, PRESERVE). On
+traduit le contenant, on préserve le contenu.
 
 == Méthodologie
 
@@ -53,5 +55,7 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 - Version publiée: 0.0.1 (Maven Central)
 - `publishToMavenLocal` obligatoire après modif code plugin
 - Bug `{word}` vs `{string}` Cucumber : `{word}` capture les guillemets Gherkin
-- Test fonctionnel KG `should fail when graphify-out graph json does not exist` pré-existant en échec (hors-scope)
+- Bug KG `should fail when graphify-out graph json does not exist` ✅ FIXÉ S163
+- conventions-gradle ✅ intégré (build.gradle.kts 0.0.2)
+- BOM en retard : `workspace-bom:0.0.1` → `0.0.7` (maintenance)
 - Voir `sessions/162-epic-13-cross-provider-fallback.adoc`
