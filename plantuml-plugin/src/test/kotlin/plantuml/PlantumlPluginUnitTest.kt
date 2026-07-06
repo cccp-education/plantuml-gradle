@@ -4,6 +4,7 @@ import org.gradle.api.Project
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionContainer
 import org.gradle.api.plugins.PluginContainer
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.TaskContainer
 import org.junit.jupiter.api.BeforeEach
@@ -70,16 +71,22 @@ class PlantumlPluginUnitTest {
         val objects = mock(ObjectFactory::class.java)
         @Suppress("UNCHECKED_CAST")
         val property = mock(Property::class.java) as Property<String>
-        
-        // Properly mock the ObjectFactory behavior
+        @Suppress("UNCHECKED_CAST")
+        val listProperty = mock(ListProperty::class.java) as ListProperty<String>
+
         `when`(objects.property(String::class.java)).thenReturn(property)
-        
+        `when`(objects.listProperty(String::class.java)).thenReturn(listProperty)
+
         // When - Create the extension
         val extension = PlantumlExtension(objects)
-        
+
         // Then - Verify the extension and its properties
         assertNotNull(extension)
         assertNotNull(extension.configPath)
         assertEquals(property, extension.configPath)
+        assertNotNull(extension.language)
+        assertEquals(property, extension.language)
+        assertNotNull(extension.supportedLanguages)
+        assertEquals(listProperty, extension.supportedLanguages)
     }
 }

@@ -109,7 +109,7 @@ class PlantumlConfigFailureTest {
 
         // Should use defaults when nested configs are invalid
         assertEquals("http://localhost:11438", config.langchain4j.ollama.baseUrl) // Default value
-        assertEquals("smollm:135m", config.langchain4j.ollama.modelName) // Default value
+        assertEquals("gpt-oss:120b-cloud", config.langchain4j.ollama.modelName) // Default value
         assertEquals("", config.langchain4j.gemini.apiKey) // Default value
         assertEquals(listOf("main", "develop"), config.git.watchedBranches) // Default value
     }

@@ -133,7 +133,7 @@ class GenerateDiagramDocsTaskTest {
         assertTrue(project.tasks.names.contains("docs"))
         val docsTask = project.tasks.findByName("docs")
         assertNotNull(docsTask)
-        assertEquals("plantuml", docsTask!!.group)
+        assertEquals("info", docsTask!!.group)
     }
 
     private fun <T : Any> assertNotNull(value: T?): T {

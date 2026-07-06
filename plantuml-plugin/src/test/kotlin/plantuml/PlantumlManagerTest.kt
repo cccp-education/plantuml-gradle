@@ -281,6 +281,6 @@ class PlantumlManagerTest {
         assertEquals(5, config.langchain4j.maxIterations)
         assertTrue(config.langchain4j.validation)
         assertEquals("http://localhost:11438", config.langchain4j.ollama.baseUrl)
-        assertEquals("smollm:135m", config.langchain4j.ollama.modelName)
+        assertEquals("gpt-oss:120b-cloud", config.langchain4j.ollama.modelName)
     }
 }

@@ -1,5 +1,26 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-07
 
+== Session 160 (2026-07-06) — Fix 5 tests unitaires régression + clôture EPIC PLT-I18N
+
+=== Fait
+- Baby-step TDD : 5 tests unitaires fixés 1 à la fois (Red→Green→Refactor) ✅
+- Test #1 `GenerateDiagramDocsTaskTest` (ligne 136) : group i18nisé `"plantuml"`→`"info"` (arriéré US-I18N-2) ✅
+- Test #2 `ModelsDataClassTest` (ligne 49) : défaut `modelName` `smollm:135m`→`gpt-oss:120b-cloud` (arriéré SEC-1 purge deepseek) ✅
+- Test #3 `PlantumlConfigFailureTest` (ligne 112) : idem #2 — défaut modelName post-SEC-1 ✅
+- Test #4 `PlantumlManagerTest` (ligne 284) : idem #2 — défaut modelName (ligne 215 YAML explicite conservée) ✅
+- Test #5 `PlantumlPluginUnitTest` (lignes 68-84) : mock `listProperty` + assertions `language`/`supportedLanguages` (extension étendue US-I18N-0) ✅
+- 0 fichier de production modifié — 5 fichiers de test adaptés ✅
+- `./gradlew test --rerun-tasks` : 1210 tests, 0 failures, 0 errors, 0 skipped ✅
+- `./gradlew publishToMavenLocal` : BUILD SUCCESSFUL ✅
+- **EPIC PLT-I18N TERMINÉ** : 28/28 pts BDD + 1210/1210 tests unitaires verts ✅
+
+=== Non fait
+- (rien)
+
+=== Prochaine session
+- EPIC 13 TieredRotationStrategy — ApiKeyEntry.tier, TieredRotationStrategy, getNextKey() descente de tiers
+- Voir BACKLOG.adoc §"EPIC 13"
+
 == Session 159 (2026-07-06) — US-I18N-6 Cucumber BDD (8/8 PASS) + 5 tests unitaires régression
 
 === Fait

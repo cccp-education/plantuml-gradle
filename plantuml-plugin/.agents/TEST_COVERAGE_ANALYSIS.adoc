@@ -1,27 +1,26 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 159 (6 juillet 2026)
+_Dernière mise à jour_ : Session 160 (6 juillet 2026)
 
 === Résumé Global
 
-* **Total tests unitaires** : 1210 tentés Session 159 — 5 FAILED (régression loadConfiguration cliParams) — à fixer S160
+* **Total tests unitaires** : 1210 tentés Session 160 — 0 FAILED, 0 errors, 0 skipped ✅ (5 régression S159 fixées)
 * **Tests fonctionnels GradleRunner KG** : 15 PASSED
 * **Tests Cucumber i18n language switch** : 8/8 PASS (Session 159 — feature 15) ✅
 * **Tests real-llm (Ollama local)** : 6 créés, 0 FAILED (non exécutés — nécessite Ollama)
 * **Tests fine-tune SmolLM2 (testcontainer Python)** : 3 crees, 3/3 PASS
 * **Tests Knowledge Graph** : 90 unitaires + 15 fonctionnels
-* **Kover instruction coverage** : 81.19% (baseline Session 136) — à revérifier S160
+* **Kover instruction coverage** : 81.19% (baseline Session 136) — inchangé S160 (0 fichier de production modifié)
 
-=== Nouveaux Tests — Session 159 (PLT-I18N US-6 Cucumber BDD)
+=== Nouveaux Tests — Session 160 (Fix 5 tests unitaires régression)
 
-* **15_i18n_language_switch.feature** : 8/8 scénarios PASS (default, cli-override, yaml-config, gradle-properties, env-var, fallback, fallback-yaml, supported-langs) ✅
-* **I18nSteps.kt** : `resolvedLanguageShouldBe` assertion `output.contains("Resolved language: $expectedLanguage")` (avant : assertion vide BUILD SUCCESSFUL seulement)
-* **I18nSteps.kt** : `supportedLanguagesShouldInclude` assertion `BUILD SUCCESSFUL` + `Resolved language: en`
-* **I18nSteps.kt** : `gradlePropertiesSpecifiesLanguage` annotation `{word}` (pas de quoting Gherkin)
-* **Fix** : feature 17 `args [1]` → `args "[1]"` (fix `{list}` undefined parameter type)
-* **Fix** : `runGeneratePlantumlDiagramsTaskWithLanguageOverride` `{word}` → `{string}` (strip guillemets Gherkin)
-* **Infrastructure** : Cucumber tag filter `-Pcucumber.tags` → `cucumber.filter.tags` system property (suppression annotation figée runner)
-* **Régression** : 5 tests unitaires FAILED (GenerateDiagramDocsTaskTest, ModelsDataClassTest, PlantumlConfigFailureTest, PlantumlManagerTest, PlantumlPluginUnitTest) — cause : `loadConfiguration` passe désormais `cliParams` à `Configuration.load`. Ne PAS réverter, adapter tests S160.
+* **GenerateDiagramDocsTaskTest** (ligne 136) : `assertEquals("plantuml", docsTask.group)` → `assertEquals("info", ...)` — group i18nisé par US-I18N-2 (task.docs.group=info)
+* **ModelsDataClassTest** (ligne 49) : `assertEquals("smollm:135m", config.modelName)` → `assertEquals("gpt-oss:120b-cloud", ...)` — défaut SEC-1 purge deepseek
+* **PlantumlConfigFailureTest** (ligne 112) : idem — défaut modelName post-SEC-1
+* **PlantumlManagerTest** (ligne 284) : idem — défaut modelName (ligne 215 `smollm:135m` YAML explicite conservée)
+* **PlantumlPluginUnitTest** (lignes 68-84) : ajout mock `objects.listProperty(String)` + assertions `extension.language` / `extension.supportedLanguages` — extension étendue US-I18N-0
+* **0 fichier de production modifié** — 5 fichiers de test adaptés au nouveau comportement (i18n + SEC-1)
+* **1210/1210 PASS** validé via `./gradlew test --rerun-tasks` + parsing XML `tests=1210 failures=0 errors=0`
 
 === Nouveaux Tests — Session 151 (PLT-I18N US-3 Lifecycle Messages)
 

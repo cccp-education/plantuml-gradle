@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-07-06 (Session 159 — US-I18N-6 Cucumber BDD 8/8 PASS + 5 tests unitaires régression)
+:last_update: 2026-07-06 (Session 160 — Fix 5 tests unitaires régression + clôture EPIC PLT-I18N 28/28 pts)
 
 '''
 == 🔴 EPIC 13 : Multi-provider API Pool — Rotation par tiers
@@ -94,7 +94,7 @@ Sessions 145-147. Publié via nmcp (Central Portal).
 
 '''
 
-== 🟠 EPIC PLT-I18N : Internationalisation — 10 Langues (NOUVEAU)
+== ✅ EPIC PLT-I18N : Internationalisation — 10 Langues (TERMINÉ S160)
 
 *Découverte* : Session 148 — Cadrage i18n pour les ~150 strings hardcodées du plugin.
 *Objectif* : Remplacer les strings en anglais hardcodé dans le code Kotlin (logger,
@@ -264,9 +264,8 @@ PlantumlMessages.format("key", args)  → String formaté (MessageFormat)
 
 == Prochains EPICs
 
-1. **FIX S160** — 5 tests unitaires régression (loadConfiguration cliParams). ~3 pts. 1 session. ← Priorité (clôture EPIC PLT-I18N)
-2. **EPIC PLT-I18N** — Internationalisation 10 langues. 28/28 pts BDD (mais 5 tests unitaires à fixer).
-3. **EPIC 13** — TieredRotationStrategy. ~6 pts. 2-3 sessions.
+1. **EPIC 13** — TieredRotationStrategy. ~6 pts. 2-3 sessions. ← Priorité (EPIC PLT-I18N clôturé S160)
+2. **EPIC PLT-I18N** — ✅ TERMINÉ (28/28 pts BDD, 1210/1210 tests unitaires PASS S160)
 
 '''
 

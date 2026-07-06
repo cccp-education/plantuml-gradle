@@ -1,0 +1,111 @@
+= Session 160 — Fix 5 tests unitaires régression + clôture EPIC PLT-I18N
+:session: 160
+:date: 2026-07-06
+:epic: PLT-I18N
+:method: Baby-step TDD (Red→Green→Refactor, 1 test à la fois)
+
+== Objectif
+
+Fixer les 5 tests unitaires en régression identifiés en Session 159 pour
+clôturer définitivement l'EPIC PLT-I18N (28/28 pts BDD déjà validés).
+
+== Rappel méthode
+
+Ne PAS réverter le fix `loadConfiguration` cliParams de S159. Adapter les
+tests au nouveau comportement. Baby-step DDD/TDD : 1 test à la fois,
+validation après chaque.
+
+== Diagnostic initial vs réalité
+
+Le PROMPT_REPRISE pointait le fix `loadConfiguration` comme cause unique.
+Sur 5 tests, seul #5 touchait au fix (extension étendue par US-I18N-0).
+Les autres étaient des arriérés non suivis :
+
+| # | Test | Cause réelle | Origine
+| 1 | GenerateDiagramDocsTaskTest | group i18nisé `"plantuml"` → `"info"` | US-I18N-2 (S150)
+| 2 | ModelsDataClassTest | défaut `modelName` `smollm:135m` → `gpt-oss:120b-cloud` | SEC-1 (S154)
+| 3 | PlantumlConfigFailureTest | idem #2 | SEC-1 (S154)
+| 4 | PlantumlManagerTest | idem #2 (défaut, pas valeur YAML explicite) | SEC-1 (S154)
+| 5 | PlantumlPluginUnitTest | extension étendue (`language`, `supportedLanguages`) non mockée | US-I18N-0 (S148/149)
+
+== Exécution baby-step
+
+=== Test #1 — GenerateDiagramDocsTaskTest (ligne 136)
+
+*Fichier* : `src/test/kotlin/plantuml/GenerateDiagramDocsTaskTest.kt`
+*Fix* : `assertEquals("plantuml", ...)` → `assertEquals("info", ...)`
+*Raison* : US-I18N-2 a i18nisé le group via `PlantumlMessages.get("task.docs.group", lang)`
+qui retourne `"info"` (valeur du ResourceBundle), pas `"plantuml"`.
+*Statut* : ✅ GREEN
+
+=== Test #2 — ModelsDataClassTest (ligne 49)
+
+*Fichier* : `src/test/kotlin/plantuml/ModelsDataClassTest.kt`
+*Fix* : `assertEquals("smollm:135m", ...)` → `assertEquals("gpt-oss:120b-cloud", ...)`
+*Raison* : SEC-1 (S154) a purgé `smollm:135m` (deepseek) → `gpt-oss:120b-cloud`
+dans `OllamaConfig.modelName` défaut. Test d'attente non mis à jour.
+*Statut* : ✅ GREEN
+
+=== Test #3 — PlantumlConfigFailureTest (ligne 112)
+
+*Fichier* : `src/test/kotlin/plantuml/PlantumlConfigFailureTest.kt`
+*Fix* : idem #2 — `smollm:135m` → `gpt-oss:120b-cloud` (défaut)
+*Statut* : ✅ GREEN
+
+=== Test #4 — PlantumlManagerTest (ligne 284)
+
+*Fichier* : `src/test/kotlin/plantuml/PlantumlManagerTest.kt`
+*Fix* : idem #2 — `smollm:135m` → `gpt-oss:120b-cloud` (défaut, pas valeur YAML)
+*Note* : ligne 215 (`smollm:135m` explicite dans YAML) conservée — valeur fournie par le test, légitime.
+*Statut* : ✅ GREEN
+
+=== Test #5 — PlantumlPluginUnitTest (ligne 78, NPE)
+
+*Fichier* : `src/test/kotlin/plantuml/PlantumlPluginUnitTest.kt`
+*Fix* : mock `objects.property(String)` déjà présent, ajout mock
+`objects.listProperty(String)` + assertions sur `language` et `supportedLanguages`.
+*Raison* : US-I18N-0 (S148/149) a étendu `PlantumlExtension` avec `language`
+(Property<String>) et `supportedLanguages` (ListProperty<String>). Le test ne
+mockait qu'un seul `property(String)` — le 2e appel retournait `null` (Mockito
+défaut) et `listProperty` n'était pas stubbé → NPE à l'initialisation.
+*Statut* : ✅ GREEN
+
+== Validation finale
+
+[source,shell]
+----
+./gradlew test --console=plain --rerun-tasks
+# 1210 tests, 0 failures, 0 errors, 0 skipped
+# BUILD SUCCESSFUL in 1m 11s
+----
+
+Résultat XML : `tests=1210 skipped=0 failures=0 errors=0`
+
+`./gradlew publishToMavenLocal` : BUILD SUCCESSFUL (9 executed tasks, JAR republié).
+
+== Clôture EPIC PLT-I18N
+
+EPIC PLT-I18N (Internationalisation 10 langues) — **TERMINÉ** :
+* 28/28 pts BDD validés (S159)
+* 1210/1210 tests unitaires PASS (S160)
+* US-I18N-0 → US-I18N-7 toutes livrées
+* Critères d'acceptation tous satisfaits
+
+== Fichiers modifiés
+
+| Fichier | Ligne | Changement
+| `src/test/kotlin/plantuml/GenerateDiagramDocsTaskTest.kt` | 136 | `"plantuml"` → `"info"`
+| `src/test/kotlin/plantuml/ModelsDataClassTest.kt` | 49 | `smollm:135m` → `gpt-oss:120b-cloud`
+| `src/test/kotlin/plantuml/PlantumlConfigFailureTest.kt` | 112 | idem
+| `src/test/kotlin/plantuml/PlantumlManagerTest.kt` | 284 | idem (défaut)
+| `src/test/kotlin/plantuml/PlantumlPluginUnitTest.kt` | 68-84 | mock `listProperty` + assertions `language`/`supportedLanguages`
+
+Total : 5 fichiers de test, 0 fichier de production modifié.
+
+== Leçon
+
+Le diagnostic initial du PROMPT_REPRISE pointait le fix `loadConfiguration`
+comme cause unique, mais sur 5 tests seul #5 y était lié. Les #1-4 étaient des
+arriérés SEC-1 (purge deepseek) et US-I18N-2 (group i18nisé) non suivis dans
+les tests d'attente. **Toujours croiser le diagnostic avec l'historique git
+des valeurs attendues avant de conclure.**
