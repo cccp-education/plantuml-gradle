@@ -1,13 +1,13 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-07-06 (Session 161 — EPIC 13 TieredRotationStrategy 5/6 tâches, 4 étapes A→B→C→D, 7/7 Cucumber + 5/5 functional + suite unitaire verte)
+:last_update: 2026-07-06 (Session 162 — EPIC 13 Cross-provider Fallback 6/6 TERMINÉ, `CrossProviderFallbackOrchestrator` + `ApiKeyPool.isPoolSaturated()`, 1235 unit + 5 functional + 5 Cucumber PASS)
 
 '''
-== 🔴 EPIC 13 : Multi-provider API Pool — Rotation par tiers
+== ✅ EPIC 13 : Multi-provider API Pool — Rotation par tiers + Cross-provider
 
-**Statut** : 🟡 EN COURS (5/6 tâches, reste cross-provider)
+**Statut** : ✅ TERMINÉ (6/6 tâches)
 **Priorité** : 🔴 HAUTE
-**Sessions** : 138-147, 161
+**Sessions** : 138-147, 161-162
 
 === Contexte
 
@@ -38,7 +38,7 @@ dernier recours.
 | ✅ S161
 |🟢 LOW
 | **Cross-provider** — fallback inter-provider (Gemini Pro → Mistral Free → Ollama)
-| ⬜ S162
+| ✅ S162
 |===
 
 === Critères d'Acceptation
@@ -48,13 +48,18 @@ dernier recours.
 * [x] `getNextKey()` descend les tiers si quota saturé
 * [x] Fallback FREE quand `fallbackEnabled=true`
 * [x] YAML parsé
-* [x] ≥15 tests unitaires (20+ ajoutés S161)
+* [x] ≥15 tests unitaires (20+ ajoutés S161, 8 ajoutés S162)
 * [x] `./gradlew compileKotlin` OK + `test` OK
-* [ ] Cross-provider fallback inter-provider (S162)
-
+* [x] Cross-provider fallback inter-provider (S162 — `CrossProviderFallbackOrchestrator`)
 '''
 
 == 🟢 EPICs Terminées
+
+=== EPIC 13 : Multi-provider API Pool — Rotation par tiers + Cross-provider ✅
+
+Sessions 138-147, 161-162. TieredRotationStrategy (S161 5/6) +
+CrossProviderFallbackOrchestrator (S162 6/6). 1235 unitaires + 5 functional
++ 5 Cucumber `@cross-provider` PASS. `publishToMavenLocal` OK.
 
 === EPIC 9 : Knowledge Graph Diagram — Représentation graphique du KG via PlantUML ✅
 
@@ -265,8 +270,11 @@ PlantumlMessages.format("key", args)  → String formaté (MessageFormat)
 
 == Prochains EPICs
 
-1. **EPIC 13** — Cross-provider fallback inter-provider. ~2 pts. 1 session. ← Priorité (5/6 tâches terminées S161)
+1. **EPIC 13** — ✅ TERMINÉ (6/6 tâches, S161-S162)
 2. **EPIC PLT-I18N** — ✅ TERMINÉ (28/28 pts BDD, 1210/1210 tests unitaires PASS S160)
+3. **Bug pré-existant** — `KnowledgeGraphDiagramFunctionalTest.should fail when graphify-out graph json does not exist` (à triager)
+4. **US-I18N-7 doc** — `README_truth.adoc`, `CHANGELOG.adoc`, `PLUGIN_SELF_DOCUMENTATION.adoc` (non bloquants)
+5. **Cadrage prochain EPIC** — consulter `PLAN_GLOBAL.adoc` workspace
 
 '''
 

@@ -11,6 +11,7 @@ import plantuml.PlantumlConfig
 import plantuml.PoolQuotaConfig
 import plantuml.apikey.ApiKeyPool
 import plantuml.apikey.ApiKeyEntry
+import plantuml.apikey.CrossProviderFallbackOrchestrator
 import plantuml.apikey.Provider
 import plantuml.apikey.QuotaAuditLogger
 import plantuml.apikey.QuotaConfig
@@ -38,9 +39,11 @@ class LlmService(
 ) {
 
     private val apiKeyPools = mutableMapOf<String, ApiKeyPool>()
+    private lateinit var fallbackOrchestrator: CrossProviderFallbackOrchestrator
 
     init {
         initializeApiKeyPools()
+        initializeFallbackOrchestrator()
     }
 
     private fun initializeApiKeyPools() {
@@ -76,6 +79,21 @@ class LlmService(
         if (groqPool.isNotEmpty()) {
             apiKeyPools["groq"] = ApiKeyPool(groqPool.map { it.toApiKeyEntry() }, rotation, fallbackEnabled = fallback)
         }
+    }
+
+    /**
+     * Build the cross-provider fallback orchestrator.
+     *
+     * The fallback order starts with the active provider, then every other
+     * configured provider pool, in a stable order. This lets the plugin
+     * keep running when the primary provider is entirely saturated
+     * (EPIC 13 S162).
+     */
+    private fun initializeFallbackOrchestrator() {
+        val active = config.langchain4j.model.lowercase()
+        val others = apiKeyPools.keys.filter { it != active }.sorted()
+        val order = listOf(active) + others
+        fallbackOrchestrator = CrossProviderFallbackOrchestrator(apiKeyPools.toMap(), order)
     }
 
     private fun parseRotationStrategy(value: String): plantuml.apikey.RotationStrategy {
@@ -117,14 +135,26 @@ class LlmService(
     }
 
     private fun getApiKeyFromPool(provider: String): String? {
-        val pool = apiKeyPools[provider.lowercase()]
-        val keyEntry = pool?.getNextKey()
-        
+        val keyEntry = selectKeyWithCrossProviderFallback(provider)
+
         if (keyEntry != null) {
             auditLogger.logInfo(keyEntry.provider, "Using API key from pool: ${keyEntry.id}")
         }
-        
+
         return keyEntry?.keyRef
+    }
+
+    /**
+     * Select an API key entry, preferring the requested provider and
+     * falling back to the next provider pool when the primary one is
+     * entirely saturated (EPIC 13 S162).
+     */
+    private fun selectKeyWithCrossProviderFallback(provider: String): ApiKeyEntry? {
+        val primary = apiKeyPools[provider.lowercase()]
+        if (primary != null && !primary.isPoolSaturated()) {
+            return primary.getNextKey()
+        }
+        return fallbackOrchestrator.selectKey()
     }
 
     /**

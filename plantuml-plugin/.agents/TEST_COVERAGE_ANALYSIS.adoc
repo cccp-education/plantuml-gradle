@@ -1,18 +1,28 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 161 (6 juillet 2026)
+_Dernière mise à jour_ : Session 162 (6 juillet 2026)
 
 === Résumé Global
 
-* **Total tests unitaires** : suite complète verte (0 failure) Session 161 — nouveaux tests KeyTier/TieredRotationStrategy/ApiKeyPool TIERED/ConfigLoader ajoutés ✅
+* **Total tests unitaires** : 1235/1235 PASS (0 failure, 0 skipped) Session 162 — `ApiKeyPool.isPoolSaturated()` + `CrossProviderFallbackOrchestrator` ajoutés ✅
 * **Tests fonctionnels GradleRunner KG** : 15 PASSED (1 pré-existant FAILED hors-scope EPIC 13 : `should fail when graphify-out graph json does not exist`)
 * **Tests fonctionnels TieredRotation** : 5/5 PASS (Session 161) ✅
+* **Tests fonctionnels CrossProviderFallback** : 5/5 PASS (Session 162) ✅
 * **Tests Cucumber i18n** : features 15-18 PASS ✅
 * **Tests Cucumber tiered rotation** : 7/7 scénarios feature 19 PASS (Session 161) ✅
+* **Tests Cucumber cross-provider fallback** : 5/5 scénarios feature 20 PASS (Session 162) ✅
 * **Tests real-llm (Ollama local)** : 6 créés, 0 FAILED (non exécutés — nécessite Ollama)
 * **Tests fine-tune SmolLM2 (testcontainer Python)** : 3 crees, 3/3 PASS
 * **Tests Knowledge Graph** : 90 unitaires + 15 fonctionnels
-* **Kover instruction coverage** : 81.19% (baseline Session 136) — nouveaux tests TieredRotationStrategy augmentent la couverture (chiffrage exact à recalculer)
+* **Kover instruction coverage** : 81.19% (baseline Session 136) — nouveaux tests isPoolSaturated + CrossProviderFallbackOrchestrator augmentent la couverture (chiffrage exact à recalculer)
+
+=== Nouveaux Tests — Session 162 (EPIC 13 Cross-provider Fallback, 4 étapes A→B→C→D)
+
+* **ApiKeyPoolSaturationTest** (3 tests unitaires) : `isPoolSaturated()` false quand aucune entry dépassée, true quand toutes dépassées, false quand au moins une dispo
+* **CrossProviderFallbackOrchestratorTest** (5 tests unitaires) : clé 1er provider non saturé, fallback provider suivant si saturé, fallback à travers 2 providers saturés vers 3e, null si tout saturé, null si fallback order inconnu
+* **CrossProviderFallbackFunctionalTest** (5 tests fonctionnels) : Gemini non saturé → clé Gemini, Gemini saturé → Mistral, Gemini+Mistral saturés → Ollama, tous saturés → null, skip providers absents
+* **20_cross_provider_fallback.feature** (5 scénarios Cucumber `@cross-provider` EN only) : primary provider retourné, fallback au suivant, fallback à travers 2 saturés vers 3e, null si tout saturé, skip providers absents
+* **CrossProviderFallbackSteps.kt** (12 steps Given/When/Then) : orchestrateur + provider pools + sélection + assertions ordinales
 
 === Nouveaux Tests — Session 161 (EPIC 13 TieredRotationStrategy, 4 étapes A→B→C→D)
 

@@ -35,6 +35,9 @@ class PlantumlWorld {
     var tieredPool: plantuml.apikey.ApiKeyPool? = null
     var tieredSelectedKeys: MutableList<plantuml.apikey.ApiKeyEntry> = mutableListOf()
 
+    var crossProviderOrchestrator: plantuml.apikey.CrossProviderFallbackOrchestrator? = null
+    var crossProviderSelectedKeys: MutableList<plantuml.apikey.ApiKeyEntry> = mutableListOf()
+
     private val asyncJobs = mutableListOf<Deferred<BuildResult>>()
     
     private val version: String = System.getProperty("plugin.version", "0.0.0")

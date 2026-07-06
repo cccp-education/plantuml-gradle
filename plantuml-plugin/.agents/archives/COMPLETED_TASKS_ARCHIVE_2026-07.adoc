@@ -123,3 +123,25 @@
 - US-I18N-5 : Migrer ~15 `println()`/`System.err` résiduels vers `logger.lifecycle`/`logger.warn` i18n
 - Fichiers : PlantumlManager, DiagramProcessor (System.out.println archive), build.gradle.kts (Cucumber cleanup)
 - Blocage tests :t par BOM junit-bom 6.0.3 (préexistant, à traiter en session dédiée)
+== Session 162 (2026-07-06) — EPIC 13 Cross-provider Fallback (6/6 TERMINÉ)
+
+=== Fait
+- `ApiKeyPool.isPoolSaturated()` implémenté (3 lignes logique) ✅
+- `CrossProviderFallbackOrchestrator` créé (service domaine, 25 lignes) ✅
+- `LlmService` câblé : `initializeFallbackOrchestrator()` + `selectKeyWithCrossProviderFallback()` ✅
+- `getApiKeyFromPool()` refactorisé pour utiliser l'orchestrateur ✅
+- `ApiKeyPoolSaturationTest` (3 tests unitaires) — 3/3 PASS ✅
+- `CrossProviderFallbackOrchestratorTest` (5 tests unitaires) — 5/5 PASS ✅
+- `CrossProviderFallbackFunctionalTest` (5 tests fonctionnels) — 5/5 PASS ✅
+- `20_cross_provider_fallback.feature` (5 scénarios Cucumber `@cross-provider` EN only) — 5/5 PASS ✅
+- `CrossProviderFallbackSteps.kt` (12 steps Given/When/Then) ✅
+- `PlantumlWorld` étendu : `crossProviderOrchestrator`, `crossProviderSelectedKeys` ✅
+- Fix calibration Cucumber : `{string}` liste CSV entre guillemets, quota `limit=4, threshold=50` (seuil=2) ✅
+- compileKotlin + test (1235/1235 PASS) + publishToMavenLocal SUCCESS ✅
+- **EPIC 13 TERMINÉ 6/6 tâches** ✅
+
+=== Prochaine session
+- Aucun EPIC ouvert restant (EPIC 13 ✅, PLT-I18N ✅)
+- Bug pré-existant : `KnowledgeGraphDiagramFunctionalTest.should fail when graphify-out graph json does not exist` (à triager)
+- US-I18N-7 doc : `README_truth.adoc`, `CHANGELOG.adoc`, `PLUGIN_SELF_DOCUMENTATION.adoc` (non bloquants)
+- Cadrage prochain EPIC (consulter BACKLOG.adoc + PLAN_GLOBAL.adoc)

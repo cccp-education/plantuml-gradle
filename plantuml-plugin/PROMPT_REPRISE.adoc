@@ -1,53 +1,46 @@
-= PROMPT_REPRISE — Plantuml — Session 162
-:session: 162
-:date: 2026-07-07
+= PROMPT_REPRISE — Plantuml — Session 163
+:session: 163
+:date: 2026-07-08
 
-== EPIC 13 — Reste Cross-provider fallback inter-provider
+== État — EPIC 13 TERMINÉ (6/6)
 
-Session 161 a livré 5/6 tâches EPIC 13 TieredRotationStrategy (4 étapes
-A→B→C→D, baby-step TDD) : KeyTier enum, ApiKeyEntry.tier/weight,
-TieredRotationStrategy.select(), RotationStrategy.TIERED dans ApiKeyPool,
-getNextTiered() avec descente de tier + fallbackEnabled, YAML schema
-(tier/weight/rotationStrategy/fallbackEnabled parsés), 7/7 Cucumber PASS,
-5/5 functional PASS, suite unitaire verte. publishToMavenLocal OK.
+Session 162 a livré la dernière tâche EPIC 13 : Cross-provider fallback
+inter-provider. `CrossProviderFallbackOrchestrator` (service domaine) orchestre
+les 7 pools par provider dans `LlmService` ; quand un pool entier est saturé,
+passe au provider suivant dans l'ordre (provider actif + autres triés). 4 étapes
+baby-step DDD/TDD/BDD (unit → functional → cucumber), 1235 unitaires + 5
+functional + 5 Cucumber PASS, `publishToMavenLocal` OK.
 
-== Mission session 162 — Cross-provider fallback
+== Mission session 163 — Cadrage prochain EPIC
 
-Dernière tâche EPIC 13 (LOW) : fallback inter-provider quand un provider
-est entièrement saturé. Exemple : Gemini Pro épuisé → Mistral Free → Ollama.
-Actuellement `ApiKeyPool` est construit par provider (un pool OpenAI, un pool
-Gemini, etc.) sans pont inter-provider. Objectif : orchestrer la rotation
-cross-provider quand un pool entier est saturé.
+Aucun EPIC ouvert restant sur plantuml-plugin (EPIC 13 ✅, PLT-I18N ✅).
+Consulter `BACKLOG.adoc` pour identifier le prochain EPIC ou tâche de
+maintenance. Pistes possibles :
+- Bug pré-existant : `KnowledgeGraphDiagramFunctionalTest.should fail when
+  graphify-out graph json does not exist` (hors-scope EPIC 13, à triager)
+- US-I18N-7 doc : `README_truth.adoc`, `CHANGELOG.adoc`,
+  `PLUGIN_SELF_DOCUMENTATION.adoc` restants (non bloquants)
+- CNV-7 suite : conventions-gradle évolutions (voir borough ABIDJAN)
+- Nouvel EPIC à cadrer (consultation `PLAN_GLOBAL.adoc` workspace)
 
-== Backlog EPIC 13 (BACKLOG.adoc §"EPIC 13")
+== Backlog — Aucun EPIC ouvert
 
 [cols="1,4,1"]
 |===
 | Priorité | Tâche | Statut
-|🔴 HIGH
-| **ApiKeyEntry** : Ajouter `tier: KeyTier` (ENTERPRISE=3, PRO=2, FREE=1)
-| ✅ S161
-|🔴 HIGH
-| **TieredRotationStrategy** — trier par tier descendant, intra-tier par weight
-| ✅ S161
-|🟡 MEDIUM
-| **ApiKeyPool.getNextKey()** : intégrer rotation, descente de tier si quota saturé
-| ✅ S161
-|🟡 MEDIUM
-| **fallbackEnabled** — basculer FREE quand Enterprise+Pro épuisés
-| ✅ S161
-|🟢 LOW
-| **YAML schema** — tier + weight dans plantuml-test-context.yml
-| ✅ S161
-|🟢 LOW
-| **Cross-provider** — fallback inter-provider (Gemini Pro → Mistral Free → Ollama)
-| ⬜ S162
+| ✅
+| EPIC 13 — Multi-provider API Pool (6/6 tâches)
+| ✅ S162
+| ✅
+| EPIC PLT-I18N — Internationalisation 10 langues (28/28 pts)
+| ✅ S160
+| 🟡
+| Bug KG `graphify-out graph json does not exist` (pré-existant)
+| ⬜ triage
+| 🟢
+| US-I18N-7 doc — README_truth, CHANGELOG, PLUGIN_SELF_DOCUMENTATION
+| ⬜ non bloquant
 |===
-
-Critères d'acceptation : `ApiKeyEntry.tier`, `TieredRotationStrategy`
-Enterprise > Pro > Free, `getNextKey()` descend les tiers, fallback FREE
-si `fallbackEnabled=true`, YAML parsé, ≥15 tests unitaires, `compileKotlin`
-+ `test` OK. ✅ 5/6 fait. Reste cross-provider.
 
 == Méthodologie
 
@@ -60,5 +53,5 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 - Version publiée: 0.0.1 (Maven Central)
 - `publishToMavenLocal` obligatoire après modif code plugin
 - Bug `{word}` vs `{string}` Cucumber : `{word}` capture les guillemets Gherkin
-- Test fonctionnel KG `should fail when graphify-out graph json does not exist` pré-existant en échec (hors-scope EPIC 13)
-- Voir `sessions/161-epic-13-tiered-rotation.adoc`
+- Test fonctionnel KG `should fail when graphify-out graph json does not exist` pré-existant en échec (hors-scope)
+- Voir `sessions/162-epic-13-cross-provider-fallback.adoc`

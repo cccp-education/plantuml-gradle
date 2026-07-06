@@ -4,7 +4,7 @@ _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
 _Derniere mise a jour_ : 2026-07-06  
 _Session en cours_ : aucune  
-_Session terminee_ : 161 — EPIC 13 TieredRotationStrategy (4 étapes A→B→C→D, 5/6 tâches, 7/7 Cucumber + 5/5 functional + suite unitaire verte)
+_Session terminee_ : 162 — EPIC 13 Cross-provider Fallback (6/6 tâches TERMINÉ, `CrossProviderFallbackOrchestrator` + `ApiKeyPool.isPoolSaturated()`, 1235 unit + 5 functional + 5 Cucumber PASS, publishToMavenLocal OK)
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
 '''
@@ -119,6 +119,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 
 |=== 
 | # | Date | Type | Sujet | Fichier | Score
+.1+^.^| 162 | 2026-07-06 | DDD + TDD + BDD | EPIC 13 Cross-provider Fallback (6/6 TERMINÉ) — `ApiKeyPool.isPoolSaturated()` + `CrossProviderFallbackOrchestrator` (service domaine) + câblage `LlmService`. 4 étapes baby-step A→B→C→D (unit → functional → cucumber). 1235 unitaires + 5 functional + 5 Cucumber `@cross-provider` PASS. publishToMavenLocal OK. EPIC 13 clôturée | `162-epic-13-cross-provider-fallback.adoc` | 9/10
 .1+^.^| 161 | 2026-07-06 | DDD + TDD + BDD | EPIC 13 TieredRotationStrategy (4 étapes A→B→C→D) — KeyTier enum, ApiKeyEntry.tier/weight, TieredRotationStrategy.select(), RotationStrategy.TIERED, getNextTiered() descente + fallbackEnabled, YAML schema parsé. 7/7 Cucumber + 5/5 functional + suite unitaire verte. 5/6 tâches EPIC 13, reste cross-provider | `161-epic-13-tiered-rotation.adoc` | 9/10
 .1+^.^| 160 | 2026-07-06 | TDD | Fix 5 tests unitaires régression + clôture EPIC PLT-I18N — baby-step 1 test à la fois (Red→Green), 1210/1210 PASS, 0 prod modifié, publishToMavenLocal OK. Diagnostic : 1/5 lié au fix loadConfiguration (extension mock), 4/5 arriérés SEC-1 (modelName deepseek purge) + US-I18N-2 (group i18nisé) | `160-fix-5-tests-regression.adoc` | 9/10
 .1+^.^| 159 | 2026-07-06 | DDD + TDD + BDD | US-I18N-6 Cucumber BDD (8/8 PASS) — tag filter `-Pcucumber.tags`, log `Resolved language: {0}` (clé `config.resolved_language` 11 fichiers), fix `loadConfiguration` cliParams (CLI language câblé, gap US-I18N-0), fix `{word}`→`{string}` (guillemets), feature 17 `{list}`→`{string}`, 5 tests unitaires régression à fixer S160 | `159-us-i18n-6-cucumber-bdd-pass.adoc` | 8/10
@@ -158,7 +159,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 == 🎯 Roadmap — État Actuel
 
 | EPIC PLT-I18N : Internationalisation 10 langues | ✅ 100% | 28/28 | ✅ TERMINÉ — S160 clôture (1210/1210 tests unitaires PASS, 5 régression fixées baby-step)
-| EPIC 13 : Multi-provider API Pool (tiers) | 🟡 83% | 5/6 | 🟡 EN COURS — S161 5/6 tâches (KeyTier, TieredRotationStrategy, getNextKey descente, fallbackEnabled, YAML schema). Reste cross-provider S162
+| EPIC 13 : Multi-provider API Pool (tiers + cross-provider) | ✅ 100% | 6/6 | ✅ TERMINÉ — S161 5/6 tâches (KeyTier, TieredRotationStrategy, getNextKey descente, fallbackEnabled, YAML schema) + S162 cross-provider fallback (`CrossProviderFallbackOrchestrator`)
 | CNV-6 : Migration conventions plugins education.cccp.build.* | ✅ 100% | — | ✅ TERMINÉ — Session 155 (build.gradle.kts 616→570, -46 lignes, variantes gardées)
 | BKY-PUB-1 ✅ : Publication Maven Central | ✅ 100% | 9/10 | ✅ TERMINÉ — Session 147 (nmcp, 0.0.1)
 |===

@@ -171,6 +171,19 @@ class ApiKeyPool(
     }
 
     /**
+     * Check whether every entry in the pool has exceeded its quota threshold.
+     *
+     * Used by cross-provider fallback (EPIC 13 S162) to decide whether to
+     * skip this pool and try the next provider in the fallback chain.
+     *
+     * @return true when all entries are saturated, false otherwise
+     */
+    fun isPoolSaturated(): Boolean {
+        if (entries.isEmpty()) return true
+        return entries.all { tracker.isQuotaExceeded(it) }
+    }
+
+    /**
      * Get audit logs.
      */
     fun getAuditLogs(): List<AuditLogEntry> = auditLogger.getLogs()
