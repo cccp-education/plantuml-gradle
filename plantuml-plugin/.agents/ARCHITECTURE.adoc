@@ -1,7 +1,7 @@
 = ARCHITECTURE — PlantUML Gradle Plugin
 
 ____
-_Langue_ : Communication en français, code en anglais.
+_Language_ : English only — code, Gherkin, comments, commit messages.
 ____
 
 == 🎯 Contexte

@@ -1,16 +1,15 @@
-#language: fr
 #noinspection CucumberUndefinedStep
-Fonctionnalité: Inscription d'un compte utilisateur.
+Feature: User account signup
 
-  Contexte:
-    Etant donné une liste de login, email, password, firstName, lastName
+  Background:
+    Given a list of login, email, password, firstName, lastName
 
       | login | email          | password | firstName | lastName |
       | admin | admin@acme.com | admin    | admin     | admin    |
       | user  | user@acme.com  | user     | user      | user     |
 
 
-  Scénario: Création d'un nouveau compte utilisateur.
-    Etant donné l'utilisateur de la liste qui a pour login "user"
-    Quand on envoie la requête d'inscription de "user"
-    Alors le résultat est la création d'un nouveau compte non activé
+  Scenario: Create a new user account
+    Given the user from the list with login "user"
+    When the signup request is sent for "user"
+    Then the result is the creation of a new inactive account
