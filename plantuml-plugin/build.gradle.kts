@@ -13,8 +13,8 @@ import java.time.Duration
 
 plugins {
     `java-library`
-    id("education.cccp.build.gradle-plugin") version "0.0.1"
-    id("education.cccp.build.publishing") version "0.0.1"
+    id("education.cccp.build.gradle-plugin") version "0.0.2"
+    id("education.cccp.build.publishing") version "0.0.2"
     alias(libs.plugins.publish)
     alias(libs.plugins.kover)
     alias(libs.plugins.codebase)
@@ -287,6 +287,11 @@ val cucumberTest = tasks.register<Test>("cucumberTest") {
     }
     systemProperty("cucumber.junit-platform.naming-strategy", "long")
 
+    // Cucumber tag filter via -Pcucumber.tags="..." (default: exclude @wip and @integration)
+    val cucumberTags = project.findProperty("cucumber.tags")?.toString()
+        ?: "not @wip and not @integration"
+    systemProperty("cucumber.filter.tags", cucumberTags)
+
     // FIX: Disable Gradle daemon for tests to avoid startup overhead and memory leaks
     systemProperty("org.gradle.daemon", "false")
 
@@ -310,7 +315,7 @@ val cucumberTest = tasks.register<Test>("cucumberTest") {
     jvmArgs("-XX:TieredStopAtLevel=1")
 
     // FIX: Timeout per test to prevent hanging
-    timeout.set(Duration.ofMinutes(5))
+    timeout.set(Duration.ofMinutes(10))
 
     // Cleanup after test execution
     doLast {

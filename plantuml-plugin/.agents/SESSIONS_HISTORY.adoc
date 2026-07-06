@@ -1,5 +1,9 @@
 = Historique des Sessions
 
+== Session 159 (2026-07-06) — US-I18N-6 Cucumber BDD (8/8 PASS) + 5 tests unitaires en régression
+
+US-I18N-6 Cucumber BDD i18n livrée : 8/8 scénarios feature 15 PASS (default, cli-override, yaml-config, gradle-properties, env-var, fallback, fallback-yaml, supported-langs). Baby-step DDD/TDD/BDD. Infrastructure Cucumber tag filter (`-Pcucumber.tags` → `cucumber.filter.tags`, suppression annotation figée runner). Log `Resolved language: {0}` ajouté à `GeneratePlantumlDiagramsTask` (clé i18n `config.resolved_language` dans 11 Messages*.properties). Fix bug `loadConfiguration` : CLI language non câblé — ajout `cliParams["language"]` passé à `Configuration.load(project, cliParams)`. Fix bug Cucumber `{word}` vs `{string}` (capture guillemets). Fix feature 17 `{list}` undefined → `{string}`. Suppression doublons steps. publishToMavenLocal 5×. **Régression** : 5 tests unitaires FAILED (GenerateDiagramDocsTaskTest, ModelsDataClassTest, PlantumlConfigFailureTest, PlantumlManagerTest, PlantumlPluginUnitTest) — cause : `loadConfiguration` cliParams modifie résolution config. Ne PAS réverter, adapter tests session 160. EPIC PLT-I18N : 28/28 pts BDD (mais 5 tests unitaires à fixer). ✅ BDD / ⚠️ Unitaires
+
 == Session 158 (2026-07-05) — Cadrage CNV-7 + report US-I18N-6
 
 Diagnostic blocage tests :t → `junit-platform-params = "6.0.3"` (inexistant) dans catalogue local plantuml. Décision : fix structurel via conventions-gradle (CNV-7). EPIC CNV-7 cadré (8 pts, 3 US : deps cucumber, deps junit, migration plantuml). US-I18N-6 en attente CNV-7. Pas de code plantuml modifié. ✅

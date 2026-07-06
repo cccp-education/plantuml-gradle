@@ -81,6 +81,7 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         
         // Load configuration
         val config = loadConfiguration()
+        logger.lifecycle(PlantumlMessages.format("config.resolved_language", lang, config.language))
         val promptsDir = project.findProperty("plantuml.prompts.dir") as? String
             ?: config.input.prompts
 
@@ -141,9 +142,17 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         val ollamaModelName = project.findProperty("plantuml.langchain4j.ollama.modelName") as? String
         val ollamaBaseUrl = project.findProperty("plantuml.langchain4j.ollama.baseUrl") as? String
         val maxIterations = project.findProperty("plantuml.langchain4j.maxIterations") as? Int
-        
+        val cliLanguage = project.findProperty("plantuml.language") as? String
+
+        val cliParams = mutableMapOf<String, Any?>()
+        if (llmModel != null) cliParams["langchain4j.model"] = llmModel
+        if (ollamaModelName != null) cliParams["langchain4j.ollama.modelName"] = ollamaModelName
+        if (ollamaBaseUrl != null) cliParams["langchain4j.ollama.baseUrl"] = ollamaBaseUrl
+        if (maxIterations != null) cliParams["langchain4j.maxIterations"] = maxIterations
+        if (cliLanguage != null) cliParams["language"] = cliLanguage
+
         // Load base configuration
-        val baseConfig = PlantumlManager.Configuration.load(project)
+        val baseConfig = PlantumlManager.Configuration.load(project, cliParams.toMap())
 
         // Apply CLI parameter overrides
         var config = baseConfig

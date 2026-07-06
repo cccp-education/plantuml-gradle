@@ -1,5 +1,37 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-07
 
+== Session 159 (2026-07-06) — US-I18N-6 Cucumber BDD (8/8 PASS) + 5 tests unitaires régression
+
+=== Fait
+- Baby-step 1-2 : Lecture feature 15 + diagnostic cucumberTest (49 timeouts Ollama préexistants, glue incomplète) ✅
+- Infrastructure Cucumber tag filter : `-Pcucumber.tags` → system property `cucumber.filter.tags` dans build.gradle.kts ✅
+- CucumberTestRunner.kt : suppression annotation `FILTER_TAGS_PROPERTY_NAME` figée (prioritaire sur system property) ✅
+- Timeout cucumberTest 5min → 10min (build composite includeBuild cold start) ✅
+- Clé i18n `config.resolved_language=Resolved language: {0}` dans 11 fichiers `Messages*.properties` (10 langues + fallback) ✅
+- `GeneratePlantumlDiagramsTask.processPrompts()` : log `logger.lifecycle(PlantumlMessages.format("config.resolved_language", lang, config.language))` ✅
+- Fix bug `loadConfiguration` (gap US-I18N-0) : `cliParams["language"]` → `Configuration.load(project, cliParams.toMap())` ✅
+- Fix bug Cucumber `{word}` → `{string}` (capture guillemets Gherkin) ✅
+- Fix feature 17 `args [1]` → `args "[1]"` (fix `{list}` undefined parameter type) ✅
+- Suppression doublons steps (`aPromptFileExistsIn`, `runGeneratePlantumlDiagramsTask` déjà dans `ConfigurationSteps`) ✅
+- `resolvedLanguageShouldBe` : assertion `output.contains("Resolved language: $expectedLanguage")` ✅
+- `supportedLanguagesShouldInclude` : assertion `BUILD SUCCESSFUL` + `Resolved language: en` ✅
+- `gradlePropertiesSpecifiesLanguage` : annotation `{word}` (pas de quoting Gherkin) ✅
+- 8/8 scénarios feature 15 PASS (BUILD SUCCESSFUL in 8m13s) ✅
+- publishToMavenLocal 5× (règle INDEX.adoc §0 respectée) ✅
+
+=== Non fait
+- 5 tests unitaires FAILED (régression `loadConfiguration` cliParams) — à fixer session 160 :
+  1. `GenerateDiagramDocsTaskTest > should register docs lifecycle task` (AssertionFailedError:136)
+  2. `ModelsDataClassTest > OllamaConfig should have correct defaults` (AssertionFailedError:49)
+  3. `PlantumlConfigFailureTest > should handle deeply nested invalid configuration gracefully` (AssertionFailedError:112)
+  4. `PlantumlManagerTest > should handle partial config and use defaults for missing sections` (AssertionFailedError:284)
+  5. `PlantumlPluginUnitTest > should create plantuml extension with configurable properties` (NullPointerException:78)
+- Ne PAS réverter le fix CLI language — adapter les tests au nouveau comportement
+
+=== Prochaine session
+- Fix 5 tests unitaires régression (adapter au `cliParams` désormais passé à `Configuration.load`)
+- Logs : `/tmp/unit.log`
+
 == Session 158 (2026-07-05) — Cadrage CNV-7 + report US-I18N-6
 
 === Fait

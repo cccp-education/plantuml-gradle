@@ -2,9 +2,9 @@
 
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
-_Derniere mise a jour_ : 2026-07-05  
+_Derniere mise a jour_ : 2026-07-06  
 _Session en cours_ : aucune  
-_Session terminee_ : 158 — Cadrage CNV-7 (conventions-gradle) + report US-I18N-6 ✅
+_Session terminee_ : 159 — US-I18N-6 Cucumber BDD (8/8 PASS) + 5 tests unitaires régression ⚠️
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
 '''
@@ -119,6 +119,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 
 |===
 | # | Date | Type | Sujet | Fichier | Score
+.1+^.^| 159 | 2026-07-06 | DDD + TDD + BDD | US-I18N-6 Cucumber BDD (8/8 PASS) — tag filter `-Pcucumber.tags`, log `Resolved language: {0}` (clé `config.resolved_language` 11 fichiers), fix `loadConfiguration` cliParams (CLI language câblé, gap US-I18N-0), fix `{word}`→`{string}` (guillemets), feature 17 `{list}`→`{string}`, 5 tests unitaires régression à fixer S160 | `159-us-i18n-6-cucumber-bdd-pass.adoc` | 8/10
 .1+^.^| 155 | 2026-07-03 | dev | CNV-6 Migration — convention plugins education.cccp.build.* v0.0.1 appliquées (gradle-plugin + publishing), build.gradle.kts 616→570 (-46), compileKotlin SUCCESS. Variantes gardées : buildscript annotations force, groovy exclusions, Docker/HuggingFace tasks, kover 75%, configurationCache=false | `155-cnv6-migration.adoc` | ✅ TERMINÉ
 .1+^.^| 152 | 2026-06-24 | docs + i18n | US-I18N-7 Documentation + README i18n — 20 fichiers README créés (10 langues × consommateur + plugin), badges Maven Central/Portal/CI/License, markers 0.0.1/380 PASS, switcher i18n 10 langues, AR/UR RTL | `152-readme-i18n.adoc` | 9/10
 .1+^.^| 151 | 2026-06-15 | DDD + TDD + BDD | US-I18N-3 Logger Lifecycle Messages i18n — 5 task classes +champ `lang`, 66 lifecycle → PlantumlMessages, LifecycleMessagesI18nTest 760/760 PASS, 17_i18n_lifecycle_messages.feature (2 scénarios) | `151-i18n-us3-lifecycle-messages.adoc` | 9/10
@@ -154,7 +155,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 
 == 🎯 Roadmap — État Actuel
 
-| EPIC PLT-I18N : Internationalisation 10 langues | 🟠 89% | 25/28 | 🟠 EN COURS — Session 157 (US-0 ✅, US-1 ✅, US-2 ✅, US-3 ✅, US-4 ✅, US-5 ✅, US-7 ✅, US-6 🟡 feature créée)
+| EPIC PLT-I18N : Internationalisation 10 langues | 🟠 100% BDD | 28/28 | 🟠 US-I18N-6 ✅ 8/8 Cucumber PASS (S159) — mais 5 tests unitaires régression à fixer S160
 | EPIC 13 : Multi-provider API Pool (tiers) | 🟡 0% | —/10 | 🟡 EN COURS — Sessions 138-141
 | CNV-6 : Migration conventions plugins education.cccp.build.* | ✅ 100% | — | ✅ TERMINÉ — Session 155 (build.gradle.kts 616→570, -46 lignes, variantes gardées)
 | BKY-PUB-1 ✅ : Publication Maven Central | ✅ 100% | 9/10 | ✅ TERMINÉ — Session 147 (nmcp, 0.0.1)

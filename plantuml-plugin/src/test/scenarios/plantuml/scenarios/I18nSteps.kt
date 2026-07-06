@@ -60,7 +60,7 @@ class I18nSteps(private val world: PlantumlWorld) {
         )
     }
 
-    @Given("gradle.properties specifies plantuml.language={string}")
+    @Given("gradle.properties specifies plantuml.language={word}")
     fun gradlePropertiesSpecifiesLanguage(language: String) {
         world.createGradleProject(
             gradleProperties = mapOf("plantuml.language" to language)
@@ -72,7 +72,7 @@ class I18nSteps(private val world: PlantumlWorld) {
         world.environmentVariables["PLANTUML_LANGUAGE"] = language
     }
 
-    @When("I run generatePlantumlDiagrams task with language override {word}")
+    @When("I run generatePlantumlDiagrams task with language override {string}")
     fun runGeneratePlantumlDiagramsTaskWithLanguageOverride(language: String) = runBlocking {
         val properties = mutableMapOf<String, String>()
         world.mockServerPort?.let {
@@ -99,6 +99,7 @@ class I18nSteps(private val world: PlantumlWorld) {
         assertThat(world.buildResult).isNotNull
         val output = world.buildResult!!.output
         assertThat(output).contains("BUILD SUCCESSFUL")
+        assertThat(output).contains("Resolved language: $expectedLanguage")
     }
 
     @Then("the supported languages should include {string}, {string}, and {string}")
@@ -106,6 +107,7 @@ class I18nSteps(private val world: PlantumlWorld) {
         assertThat(world.buildResult).isNotNull
         val output = world.buildResult!!.output
         assertThat(output).contains("BUILD SUCCESSFUL")
+        assertThat(output).contains("Resolved language: en")
     }
 
     @When("I run the {string} task")
@@ -123,11 +125,14 @@ class I18nSteps(private val world: PlantumlWorld) {
         }
     }
 
-    @Then("the output should contain the i18n lifecycle message {string} with args {list} in language {string}")
-    fun outputShouldContainI18nLifecycleMessage(key: String, args: List<Int>, language: String) {
+    @Then("the output should contain the i18n lifecycle message {string} with args {string} in language {string}")
+    fun outputShouldContainI18nLifecycleMessage(key: String, argsRaw: String, language: String) {
         assertThat(world.buildResult).isNotNull
         val output = world.buildResult!!.output
         assertThat(output).contains("BUILD SUCCESSFUL")
+        val args = argsRaw.removeSurrounding("[", "]").split(",").map { it.trim() }
+            .filter { it.isNotEmpty() }
+            .map { it.toInt() }
         val expectedMessage = PlantumlMessages.format(key, language, *args.toTypedArray())
         assertThat(output).contains(expectedMessage)
     }

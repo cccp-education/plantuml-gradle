@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-07-05 (Session 158 — Cadrage CNV-7, report US-I18N-6)
+:last_update: 2026-07-06 (Session 159 — US-I18N-6 Cucumber BDD 8/8 PASS + 5 tests unitaires régression)
 
 '''
 == 🔴 EPIC 13 : Multi-provider API Pool — Rotation par tiers
@@ -234,7 +234,7 @@ PlantumlMessages.format("key", args)  → String formaté (MessageFormat)
   6-8 scénarios Cucumber.
 | 3
 | 🟡 P2
-| 🟡 En attente CNV-7 — feature 18 créée (S156), exécution bloquée par bug BOM `junit-platform-params = "6.0.3"`. Fix structurel via conventions-gradle EPIC CNV-7.
+| ✅ Session 159 — 8/8 scénarios Cucumber PASS (default, cli-override, yaml-config, gradle-properties, env-var, fallback, fallback-yaml, supported-langs). Infrastructure tag filter `-Pcucumber.tags`. Log `Resolved language: {0}` dans GeneratePlantumlDiagramsTask. Fix bug `loadConfiguration` cliParams (CLI language câblé). ⚠️ 5 tests unitaires régression à fixer S160 (GenerateDiagramDocsTaskTest, ModelsDataClassTest, PlantumlConfigFailureTest, PlantumlManagerTest, PlantumlPluginUnitTest).
 
 | US-I18N-7
 | **Documentation + README** — Mettre à jour `README_truth.adoc` avec
@@ -264,8 +264,8 @@ PlantumlMessages.format("key", args)  → String formaté (MessageFormat)
 
 == Prochains EPICs
 
-1. **CNV-7** (conventions-gradle) — Centralisation deps test. ~8 pts. 2 sessions. ← Priorité (débloque US-I18N-6)
-2. **EPIC PLT-I18N** — Internationalisation 10 langues. ~28 pts. 25/28 pts (89%). US-I18N-6 en attente CNV-7.
+1. **FIX S160** — 5 tests unitaires régression (loadConfiguration cliParams). ~3 pts. 1 session. ← Priorité (clôture EPIC PLT-I18N)
+2. **EPIC PLT-I18N** — Internationalisation 10 langues. 28/28 pts BDD (mais 5 tests unitaires à fixer).
 3. **EPIC 13** — TieredRotationStrategy. ~6 pts. 2-3 sessions.
 
 '''

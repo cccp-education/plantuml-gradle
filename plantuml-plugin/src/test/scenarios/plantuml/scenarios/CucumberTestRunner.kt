@@ -22,5 +22,4 @@ import org.junit.platform.suite.api.Suite
     value = "pretty, html:build/reports/cucumber.html, json:build/reports/cucumber.json"
 )
 @ConfigurationParameter(key = FEATURES_PROPERTY_NAME, value = "src/test/features")
-@ConfigurationParameter(key = FILTER_TAGS_PROPERTY_NAME, value = "not @wip and not @integration")
 class CucumberTestRunner

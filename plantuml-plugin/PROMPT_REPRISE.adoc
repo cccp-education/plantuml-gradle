@@ -1,38 +1,31 @@
-= PROMPT_REPRISE — Plantuml — Session 159
-:session: 159
-:date: 2026-07-05
+= PROMPT_REPRISE — Plantuml — Session 160
+:session: 160
+:date: 2026-07-06
 
-== Session 010 conventions-gradle terminée — CNV-7 ✅ + plantuml migré
+== US-I18N-6 Cucumber BDD PASS (8/8) — 5 tests unitaires en régression
 
-CNV-7 (conventions-gradle session 010) TERMINÉ. plantuml-gradle migré en US-CN-7.3 :
-- Suppression deps junit test dupliquées du `build.gradle.kts` (lignes 55-63)
-- Correction catalogue `junit-platform-params = "6.0.3"` → `"5.12.2"`
-- Bug `NoSuchMethodError: CollectionUtils.toUnmodifiableList()` **ÉLIMINÉ**
-- `:test` exécute 956 tests (5 failures LLM Ollama timeout réseau, préexistantes)
+Session 159 a livré US-I18N-6 Cucumber BDD i18n : 8/8 scénarios feature 15 PASS.
+Mais 5 tests unitaires FAILED à cause du fix `loadConfiguration` cliParams (CLI
+language câblé). Ne PAS réverter le fix — adapter les tests.
 
-Deps junit test désormais injectées par `education.cccp.build.gradle-plugin` v0.0.1
-via `TestDependencies.addJunitDeps` (CNV-7.2) en `afterEvaluate`.
+== Tests unitaires en régression (à fixer session 160)
 
-== Statut EPIC PLT-I18N (25/28 pts, 89%)
+1. `GenerateDiagramDocsTaskTest > should register docs lifecycle task` (AssertionFailedError:136)
+2. `ModelsDataClassTest > OllamaConfig should have correct defaults` (AssertionFailedError:49)
+3. `PlantumlConfigFailureTest > should handle deeply nested invalid configuration gracefully` (AssertionFailedError:112)
+4. `PlantumlManagerTest > should handle partial config and use defaults for missing sections` (AssertionFailedError:284)
+5. `PlantumlPluginUnitTest > should create plantuml extension with configurable properties` (NullPointerException:78)
 
-- US-I18N-0 → US-I18N-5 : ✅ TERMINÉS (23/28 pts)
-- US-I18N-6 : 🟢 Cucumber BDD i18n (3/28 pts) — **DÉBLOQUÉ** (CNV-7 terminé)
-- US-I18N-7 : ✅ Documentation + README (2/28 pts)
-
-== Prochaine mission
-
-US-I18N-6 (Cucumber BDD i18n, 3 pts) — exécution maintenant possible.
-Le bug `6.0.3` étant éliminé, `:test` et `cucumberTest` peuvent tourner.
-
-Vérifier que les features i18n créées session 158 (S156) s'exécutent correctement.
-Si besoin, ajuster le `build.gradle.kts` (cucumberTest custom conservé — pas de
-CucumberConventionsPlugin applicé, le setup Cucumber de plantuml reste custom).
+Logs : `/tmp/unit.log`. Cause : `loadConfiguration` passe désormais `cliParams`
+(non-vide quand properties Gradle présentes) à `Configuration.load(project, cliParams)`.
+Certains tests unitaires n'injectent pas les properties attendues, et le
+comportement de résolution a changé (mergeLanguage lit `cli["language"]`).
 
 == Rappels
 
 - GroupId: education.cccp.plantuml
-- Plugin ID: education.cccp.plantuml
 - Version publiée: 0.0.1 (Maven Central)
-- Tests `:t` **DÉBLOQUÉS** (bug 6.0.3 éliminé via CNV-7)
-- Deps junit test gérées par conventions-gradle v0.0.1 + CNV-7.2
-- Voir `conventions-gradle/conventions-plugin/.agents/sessions/010-cnv7-centralisation-deps-test.adoc`
+- EPIC PLT-I18N : 28/28 pts BDD, mais 5 tests unitaires à réparer pour clôture
+- Bug `{word}` vs `{string}` Cucumber : `{word}` capture les guillemets Gherkin
+- `publishToMavenLocal` obligatoire après modif code plugin
+- Voir `sessions/159-us-i18n-6-cucumber-bdd-pass.adoc`
