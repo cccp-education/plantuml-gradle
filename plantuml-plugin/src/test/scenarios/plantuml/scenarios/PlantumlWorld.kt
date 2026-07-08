@@ -38,6 +38,9 @@ class PlantumlWorld {
     var crossProviderOrchestrator: plantuml.apikey.CrossProviderFallbackOrchestrator? = null
     var crossProviderSelectedKeys: MutableList<plantuml.apikey.ApiKeyEntry> = mutableListOf()
 
+    var boundaryResolver: plantuml.boundary.TranslationResolver? = null
+    var boundaryResult: plantuml.boundary.ResolvedText? = null
+
     private val asyncJobs = mutableListOf<Deferred<BuildResult>>()
     
     private val version: String = System.getProperty("plugin.version", "0.0.0")
@@ -544,6 +547,8 @@ class PlantumlWorld {
         buildResult = null
         exception = null
         asyncJobs.clear()
+        boundaryResolver = null
+        boundaryResult = null
         System.clearProperty("plantuml.test.disk.full")
         System.clearProperty("plantuml.test.rag.mode")
     }
