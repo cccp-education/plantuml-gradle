@@ -8,6 +8,9 @@ import plantuml.KnowledgeGraph
 import plantuml.KnowledgeGraphCommunity
 import plantuml.KnowledgeGraphEdge
 import plantuml.KnowledgeGraphNode
+import plantuml.boundary.IdiomaticGlossary
+import plantuml.boundary.TextClassifier
+import plantuml.boundary.TranslationResolver
 import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -609,5 +612,43 @@ class KnowledgeGraphRendererTest {
         assertFalse(result.contains("KnowledgeGraphNode"))
         assertFalse(result.contains("KnowledgeGraphEdge"))
         assertFalse(result.contains("KnowledgeGraphCommunity"))
+    }
+
+    @Test
+    fun `should translate Classes folder label when resolver provided`() {
+        val resolver = TranslationResolver(
+            classifier = TextClassifier(),
+            glossary = IdiomaticGlossary(),
+            messageResolver = { key, _ -> if (key == "label.classes") "Classes" else null }
+        )
+        val graph = KnowledgeGraph(
+            nodes = listOf(
+                KnowledgeGraphNode(name = "LlmService", type = "class", community = "core")
+            ),
+            communities = listOf(
+                KnowledgeGraphCommunity(name = "core", nodes = listOf("LlmService"))
+            )
+        )
+        val result = renderer.render(graph, resolver = resolver, language = "fr")
+        assertTrue(result.contains("folder \"Classes\" {"))
+    }
+
+    @Test
+    fun `should preserve node identifiers when resolver provided`() {
+        val resolver = TranslationResolver(
+            classifier = TextClassifier(),
+            glossary = IdiomaticGlossary(),
+            messageResolver = { _, _ -> null }
+        )
+        val graph = KnowledgeGraph(
+            nodes = listOf(
+                KnowledgeGraphNode(name = "LlmService", type = "class", community = "core")
+            ),
+            communities = listOf(
+                KnowledgeGraphCommunity(name = "core", nodes = listOf("LlmService"))
+            )
+        )
+        val result = renderer.render(graph, resolver = resolver, language = "fr")
+        assertTrue(result.contains("LlmService"))
     }
 }

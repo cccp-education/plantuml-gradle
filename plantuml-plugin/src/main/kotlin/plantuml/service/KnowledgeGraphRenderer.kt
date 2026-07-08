@@ -5,6 +5,7 @@ import plantuml.KnowledgeGraph
 import plantuml.KnowledgeGraphCommunity
 import plantuml.KnowledgeGraphEdge
 import plantuml.KnowledgeGraphNode
+import plantuml.boundary.TranslationResolver
 
 class KnowledgeGraphRenderer {
 
@@ -32,12 +33,17 @@ class KnowledgeGraphRenderer {
         edgeTypes: Set<EdgeType> = EdgeType.entries.toSet(),
         minConfidence: Double = 0.0,
         maxNodes: Int = Int.MAX_VALUE,
-        nodeTypes: Set<String>? = null
+        nodeTypes: Set<String>? = null,
+        resolver: TranslationResolver? = null,
+        language: String = "en"
     ): String {
+        val label = { text: String ->
+            resolver?.resolve(text, language)?.translated ?: text
+        }
         val filteredGraph = applyFilters(graph, communityFilter, edgeTypes, minConfidence, maxNodes, nodeTypes)
 
         if (filteredGraph.communities.isEmpty() && filteredGraph.nodes.isEmpty()) {
-            return "@startuml\ntitle Empty Knowledge Graph\n@enduml"
+            return "@startuml\ntitle ${label("Empty Knowledge Graph")}\n@enduml"
         }
 
         val sb = StringBuilder()
@@ -54,7 +60,7 @@ class KnowledgeGraphRenderer {
         sb.appendLine("skinparam ranksep 60")
         sb.appendLine()
 
-        addLegend(sb, edgeTypes, communityFilter, nodeTypes)
+        addLegend(sb, edgeTypes, communityFilter, nodeTypes, label)
 
         val filteredNodeNames = filteredGraph.nodes.map { it.name }.toSet()
         val nodesByCommunity = filteredGraph.nodes.groupBy { it.community }
@@ -101,7 +107,7 @@ class KnowledgeGraphRenderer {
             val otherNodes = communityNodeNames.filter { it !in classNodeNames && it !in fileNodeNames }
 
             if (classNodeNames.isNotEmpty()) {
-                sb.appendLine("    folder \"Classes\" {")
+                sb.appendLine("    folder \"${label("Classes")}\" {")
                 for (nodeName in classNodeNames) {
                     val nodeInfo = filteredGraph.nodes.find { it.name == nodeName }
                     if (nodeInfo != null) renderNode(sb, nodeInfo, indent = 8)
@@ -111,7 +117,7 @@ class KnowledgeGraphRenderer {
             }
 
             if (fileNodeNames.isNotEmpty()) {
-                sb.appendLine("    folder \"Files\" {")
+                sb.appendLine("    folder \"${label("Files")}\" {")
                 for (nodeName in fileNodeNames) {
                     val nodeInfo = filteredGraph.nodes.find { it.name == nodeName }
                     if (nodeInfo != null) renderNode(sb, nodeInfo, indent = 8)
@@ -158,7 +164,7 @@ class KnowledgeGraphRenderer {
         }
 
         if (crossCommunityEdges.isNotEmpty()) {
-            sb.appendLine("' Cross-community edges")
+            sb.appendLine("' ${label("Cross-community edges")}")
             for (edge in crossCommunityEdges) {
                 renderEdge(sb, edge)
             }
@@ -170,7 +176,7 @@ class KnowledgeGraphRenderer {
         }
 
         if (intraCommunityEdges.isNotEmpty()) {
-            sb.appendLine("' Intra-community edges")
+            sb.appendLine("' ${label("Intra-community edges")}")
             for (edge in intraCommunityEdges) {
                 renderEdge(sb, edge)
             }
@@ -179,7 +185,7 @@ class KnowledgeGraphRenderer {
 
         val unassignedNodes = filteredGraph.nodes.filter { it.name !in allRenderedNodes }
         if (unassignedNodes.isNotEmpty()) {
-            sb.appendLine("' Unassigned nodes")
+            sb.appendLine("' ${label("Unassigned nodes")}")
             for (node in unassignedNodes) {
                 renderNode(sb, node, indent = 0)
             }
@@ -264,18 +270,24 @@ class KnowledgeGraphRenderer {
         }
     }
 
-    private fun addLegend(sb: StringBuilder, edgeTypes: Set<EdgeType>, communityFilter: String?, nodeTypes: Set<String>?) {
+    private fun addLegend(
+        sb: StringBuilder,
+        edgeTypes: Set<EdgeType>,
+        communityFilter: String?,
+        nodeTypes: Set<String>?,
+        label: (String) -> String = { it }
+    ) {
         sb.appendLine("legend right")
         sb.appendLine("  | Type | Arrow |")
         sb.appendLine("  |------|-------|")
         if (EdgeType.EXTRACTED in edgeTypes) {
-            sb.appendLine("  | Extracted | --> |")
+            sb.appendLine("  | ${label("Extracted")} | --> |")
         }
         if (EdgeType.INFERRED in edgeTypes) {
-            sb.appendLine("  | Inferred  | ..> |")
+            sb.appendLine("  | ${label("Inferred")}  | ..> |")
         }
         if (EdgeType.AMBIGUOUS in edgeTypes) {
-            sb.appendLine("  | Ambiguous | --x |")
+            sb.appendLine("  | ${label("Ambiguous")} | --x |")
         }
         if (communityFilter != null) {
             sb.appendLine("  | Filter | $communityFilter |")

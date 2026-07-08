@@ -7,6 +7,9 @@ import org.gradle.work.DisableCachingByDefault
 import plantuml.EdgeType
 import plantuml.PlantumlManager
 import plantuml.PlantumlMessages
+import plantuml.boundary.IdiomaticGlossary
+import plantuml.boundary.TextClassifier
+import plantuml.boundary.TranslationResolver
 import plantuml.service.KnowledgeGraphParser
 import plantuml.service.KnowledgeGraphRenderer
 import plantuml.service.PlantumlService
@@ -63,13 +66,20 @@ abstract class GenerateKnowledgeGraphDiagramTask : DefaultTask() {
         )
 
         val renderer = KnowledgeGraphRenderer()
+        val resolver = TranslationResolver(
+            classifier = TextClassifier(),
+            glossary = IdiomaticGlossary(),
+            messageResolver = { key, l -> runCatching { PlantumlMessages.get(key, l) }.getOrNull() }
+        )
         val plantumlCode = renderer.render(
             graph,
             communityFilter = communityFilter,
             edgeTypes = edgeTypes,
             minConfidence = minConfidence,
             maxNodes = maxNodes,
-            nodeTypes = nodeTypes
+            nodeTypes = nodeTypes,
+            resolver = resolver,
+            language = lang
         )
 
         val outputDir = project.file(outputDirStr)
