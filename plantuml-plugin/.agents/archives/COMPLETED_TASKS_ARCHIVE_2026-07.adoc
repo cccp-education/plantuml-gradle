@@ -1,5 +1,32 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-07
 
+== Session 164 (2026-07-09) — US-BND-5 DiagramProcessor structural strings i18n
+
+=== Fait
+- Reprise plantuml : état réel US-BND-0..4 déjà committés (PROMPT_REPRISE obsolète), build compile ✅
+- US-BND-5 livrée en baby-step DDD/TDD/BDD (unit → cucumber), Red→Green→Refactor, 1 test à la fois ✅
+- `DiagramProcessor.processPrompt()` étendu avec `resolver: TranslationResolver? = null` + `language: String = "en"` (pattern US-BND-4) ✅
+- Lambda `label` local, chaînes structurelles routées : `title "Generated Diagram"` (fallback prompt vide), `rectangle "System"`, `description = "Auto-generated diagram based on prompt:"` + prompt préservé ✅
+- `applyStructuralLabels()` post-traite le code généré (préserve signature `generateSimulatedLlmResponse` testée par reflection) ✅
+- Prompt LLM (`fullPrompt`, `correctionPrompt`, `validationPrompt`) préservé — prompt engineering, pas i18n ✅
+- `GeneratePlantumlDiagramsTask` câble le resolver (TranslationResolver + TextClassifier + IdiomaticGlossary + messageResolver), pattern identique à `GenerateKnowledgeGraphDiagramTask` ✅
+- `DiagramProcessorBoundaryTest.kt` créé (3 tests unitaires) ✅
+- Scénario Cucumber `21_i18n_translation_boundary.feature` ajouté (`@boundary @diagram-processor`), `BoundarySteps.kt` +4 steps, `PlantumlWorld` +`boundaryDiagram` ✅
+- Régressions fixées : `DiagramProcessorPrivateMethodsTest` (signature préservée), `PromptOrchestratorTest` (mock 5 params + `isNull()` resolver nullable, 5 stubs), `PromptOrchestrator.kt` appel étendu ✅
+- 1303 tests unitaires 0 failure, 0 skipped (`./gradlew test --rerun-tasks`) ✅
+- 9/9 Cucumber boundary PASS (8 originaux + 1 nouveau US-BND-5) ✅
+- `publishToMavenLocal` BUILD SUCCESSFUL ✅
+
+=== Non fait
+- US-BND-6 NonTranslatableTermRegistry (prochaine session)
+- US-BND-7 Cucumber full pipeline end-to-end
+- Bug préexistant feature 18 scénarios `@diagram-processor` (quoting MessageFormat `'plantuml'` vs `''plantuml''`) — hors-scope, identifié seulement
+
+=== Prochaine session
+- US-BND-6 NonTranslatableTermRegistry — registre YAML configurable, `TranslationResolver` consulte avant traduction
+- Baby-step : 1 terme + 1 test, Red→Green→Refactor
+- Voir BACKLOG.adoc §"EPIC PLT-BOUNDARY"
+
 == Session 163 (2026-07-08) — Bug KG trié+fixé + Cadrage EPIC PLT-BOUNDARY
 
 === Fait

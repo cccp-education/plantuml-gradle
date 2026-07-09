@@ -11,6 +11,7 @@ import org.junit.jupiter.api.io.TempDir
 import org.mockito.kotlin.any
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.isNull
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.slf4j.Logger
@@ -92,7 +93,7 @@ class PromptOrchestratorTest {
             File(promptsDir, "a.prompt").writeText("Create diagram A")
             File(promptsDir, "b.prompt").writeText("Create diagram B")
 
-            whenever(mockProcessor.processPrompt(any(), any(), any())).thenReturn(fakeDiagram())
+            whenever(mockProcessor.processPrompt(any(), any(), any(), isNull(), any())).thenReturn(fakeDiagram())
 
             val result = orchestrator.process(logger)
 
@@ -106,7 +107,7 @@ class PromptOrchestratorTest {
             val promptsDir = File(tempDir, "prompts").also { it.mkdirs() }
             File(promptsDir, "bad.prompt").writeText("impossible prompt")
 
-            whenever(mockProcessor.processPrompt(any(), any(), any())).thenReturn(null)
+            whenever(mockProcessor.processPrompt(any(), any(), any(), isNull(), any())).thenReturn(null)
 
             val result = orchestrator.process(logger)
 
@@ -122,7 +123,7 @@ class PromptOrchestratorTest {
             File(promptsDir, "blank.prompt").writeText("   \n  ")
             File(promptsDir, "valid.prompt").writeText("Create a class diagram")
 
-            whenever(mockProcessor.processPrompt(any(), any(), any())).thenReturn(fakeDiagram())
+            whenever(mockProcessor.processPrompt(any(), any(), any(), isNull(), any())).thenReturn(fakeDiagram())
 
             val result = orchestrator.process(logger)
 
@@ -135,7 +136,7 @@ class PromptOrchestratorTest {
             val promptsDir = File(tempDir, "prompts").also { it.mkdirs() }
             File(promptsDir, "test.prompt").writeText("Create a class diagram")
 
-            whenever(mockProcessor.processPrompt(any(), any(), any())).thenReturn(fakeDiagram("@startuml\nclass Generated\n@enduml"))
+            whenever(mockProcessor.processPrompt(any(), any(), any(), isNull(), any())).thenReturn(fakeDiagram("@startuml\nclass Generated\n@enduml"))
 
             orchestrator.process(logger)
 
@@ -154,7 +155,7 @@ class PromptOrchestratorTest {
             )
             val orch = PromptOrchestrator(configNoValidation, mockProcessor, mockPlantumlService, tempDir.toPath())
 
-            whenever(mockProcessor.processPrompt(any(), any(), any())).thenReturn(fakeDiagram())
+            whenever(mockProcessor.processPrompt(any(), any(), any(), isNull(), any())).thenReturn(fakeDiagram())
 
             orch.process(logger)
 

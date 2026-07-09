@@ -10,6 +10,7 @@ import plantuml.PlantumlConfig
 import plantuml.PlantumlDiagram
 import plantuml.PlantumlMessages
 import plantuml.ValidationFeedback
+import plantuml.boundary.TranslationResolver
 import plantuml.service.PlantumlService.SyntaxValidationResult
 import java.io.File
 import java.time.LocalDateTime
@@ -82,16 +83,24 @@ class DiagramProcessor(
      * @return A [PlantumlDiagram] with conversation history and valid code,
      *         or null if all iterations fail
      */
-    fun processPrompt(prompt: String, maxIterations: Int = 5, logger: Logger): PlantumlDiagram? {
+    fun processPrompt(
+        prompt: String,
+        maxIterations: Int = 5,
+        logger: Logger,
+        resolver: TranslationResolver? = null,
+        language: String = "en"
+    ): PlantumlDiagram? {
         logger.debug("processPrompt: chatModel={}, config={}, testMode={}", chatModel, config, System.getProperty("plantuml.test.mode"))
         // Initialize attempt history
         val attemptHistory = mutableListOf<AttemptEntry>()
+        val label = { text: String -> resolver?.resolve(text, language)?.translated ?: text }
 
         // For testing purposes, we'll use simulated responses when chatModel is null
         if (chatModel == null) {
             logger.debug("processPrompt: Running in test mode (chatModel is null)")
             // Simulate the LLM response since we're in test mode
             var currentCode = generateSimulatedLlmResponse(prompt, maxIterations)
+            currentCode = applyStructuralLabels(currentCode, prompt, label)
             var iterations = 0
             var validationResult: SyntaxValidationResult
 
@@ -125,7 +134,7 @@ class DiagramProcessor(
                     conversation = attemptHistory.map { "${it.prompt} -> ${it.response}" },
                     plantuml = PlantumlCode(
                         code = currentCode,
-                        description = "Auto-generated diagram based on prompt: $prompt"
+                        description = "${label("Auto-generated diagram based on prompt:")} $prompt"
                     )
                 )
             }
@@ -228,7 +237,7 @@ class DiagramProcessor(
                 conversation = attemptHistory.map { "${it.prompt} -> ${it.response}" },
                 plantuml = PlantumlCode(
                     code = currentCode,
-                    description = "Auto-generated diagram based on prompt: $prompt"
+                    description = "${label("Auto-generated diagram based on prompt:")} $prompt"
                 )
             )
         }
@@ -361,6 +370,19 @@ class DiagramProcessor(
             }
             @enduml
         """.trimIndent()
+    }
+
+    private fun applyStructuralLabels(
+        code: String,
+        prompt: String,
+        label: (String) -> String
+    ): String {
+        var result = code
+        if (prompt.substringBefore("\n").isEmpty()) {
+            result = result.replaceFirst("title Generated Diagram", "title ${label("Generated Diagram")}")
+        }
+        result = result.replaceFirst("rectangle \"System\"", "rectangle \"${label("System")}\"")
+        return result
     }
 
     /**

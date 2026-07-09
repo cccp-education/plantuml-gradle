@@ -1,40 +1,39 @@
-= PROMPT_REPRISE — Plantuml — Session 164
-:session: 164
-:date: 2026-07-08
+= PROMPT_REPRISE — Plantuml — Session 165
+:session: 165
+:date: 2026-07-09
 
-== État — EPIC PLT-BOUNDARY cadré, US-BND-0 à démarrer
+== État — EPIC PLT-BOUNDARY 6/8 US terminés
 
-Session 163 a trié+fixé le bug KG `graphify-out graph json does not exist`
-(assertion alignée sur contrat i18n `kgparser.file_not_found` — régression
-silencieuse S156 US-I18N-4, 15/15 KG fonctionnels PASS). Session 163 a aussi
-cadré l'EPIC PLT-BOUNDARY (8 US, ~26 pts) suite au constat que PLT-I18N a
-traduit les logs mais pas le livrable (diagramme monolingue, 9 fichiers
-Messages_*.properties coquilles vides).
+Session 164 a livré US-BND-5 (DiagramProcessor structural strings i18n).
+`processPrompt()` accepte `resolver`/`language` (pattern US-BND-4), chaînes
+structurelles (`title "Generated Diagram"`, `rectangle "System"`, description)
+routées via `TranslationResolver`, prompt LLM préservé. `GeneratePlantumlDiagramsTask`
+câble le resolver. 1303 unitaires 0 failure, 9/9 Cucumber boundary PASS.
+publishToMavenLocal OK.
 
-== Mission session 164 — US-BND-0 Domain model
+== Mission session 165 — US-BND-6 NonTranslatableTermRegistry
 
-Démarrer US-BND-0 :
+Démarrer US-BND-6 :
 
-. `TranslationCategory` enum : `PRESENTATION`, `SEMANTIC_IDENTITY`, `LEXICAL_FIELD`
-. `TranslationStrategy` enum : `TRANSLATE`, `BORROW`, `PRESERVE`
-. `TranslatableText` value object (texte + catégorie)
-. `ClassifiedText` (résultat de classification)
+. `NonTranslatableTermRegistry` — registre configurable YAML
+  (`non-translatable-terms.yml`) des termes métier client (REAC, AFNOR, FPA)
+. Le `TranslationResolver` consulte ce registre avant toute traduction
+. Baby-step : 1 terme + 1 test, Red→Green→Refactor
 
-Baby-step DDD/TDD : 1 classe + 1 test par concept, Red→Green→Refactor.
-Puis US-BND-1 `TextClassifier` (classification heuristique).
+Puis US-BND-7 (Cucumber full pipeline end-to-end) clôturera l'EPIC PLT-BOUNDARY.
 
-== Backlog — EPIC PLT-BOUNDARY (8 US, ~26 pts)
+== Backlog — EPIC PLT-BOUNDARY (reste 2 US, ~6 pts)
 
 [cols="1,4,1"]
 |===
 | Priorité | Tâche | Statut
-| 🔴 P0 | US-BND-0 — Domain model | ⬜ en cours
-| 🔴 P0 | US-BND-1 — `TextClassifier` | ⬜
-| 🔴 P0 | US-BND-2 — `IdiomaticGlossary` + BORROW | ⬜
-| 🟠 P1 | US-BND-3 — Cucumber boundary feature | ⬜
-| 🟠 P1 | US-BND-4 — `KnowledgeGraphRenderer` i18n | ⬜
-| 🟠 P1 | US-BND-5 — `DiagramProcessor` strings | ⬜
-| 🟡 P2 | US-BND-6 — `NonTranslatableTermRegistry` | ⬜
+| 🔴 P0 | US-BND-0 — Domain model | ✅ S163
+| 🔴 P0 | US-BND-1 — TextClassifier | ✅ S163
+| 🔴 P0 | US-BND-2 — IdiomaticGlossary + BORROW | ✅ S163
+| 🟠 P1 | US-BND-3 — Cucumber boundary feature | ✅ S163
+| 🟠 P1 | US-BND-4 — KnowledgeGraphRenderer i18n | ✅ S163
+| 🟠 P1 | US-BND-5 — DiagramProcessor strings | ✅ S164
+| 🟡 P2 | US-BND-6 — NonTranslatableTermRegistry | ⬜ en cours
 | 🟡 P2 | US-BND-7 — Cucumber full pipeline | ⬜
 |===
 
@@ -54,8 +53,8 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 - GroupId: education.cccp.plantuml
 - Version publiée: 0.0.1 (Maven Central)
 - `publishToMavenLocal` obligatoire après modif code plugin
-- Bug `{word}` vs `{string}` Cucumber : `{word}` capture les guillemets Gherkin
-- Bug KG `should fail when graphify-out graph json does not exist` ✅ FIXÉ S163
+- Bug préexistant feature 18 scénarios `@diagram-processor` (quoting MessageFormat
+  `'plantuml'` vs `''plantuml''`) — hors-scope, à trier plus tard
 - conventions-gradle ✅ intégré (build.gradle.kts 0.0.2)
 - BOM en retard : `workspace-bom:0.0.1` → `0.0.7` (maintenance)
-- Voir `sessions/162-epic-13-cross-provider-fallback.adoc`
+- Voir `sessions/164-us-bnd-5-diagram-processor-i18n.adoc`

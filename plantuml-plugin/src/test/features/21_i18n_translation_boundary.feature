@@ -64,3 +64,10 @@ Feature: I18N Translation Boundary — Diagram labels translated, identifiers pr
     Then the translated text should be "E = mc^2"
     And the strategy should be PRESERVE
     And the category should be SEMANTIC_IDENTITY
+
+  @boundary @diagram-processor
+  Scenario: DiagramProcessor translates structural labels via resolver
+    Given a diagram processor in test mode with a FR resolver
+    When the diagram processor processes prompt "" in language "fr"
+    Then the generated diagram title should be translated to "Generated Diagram" in FR
+    And the generated diagram should contain the translated rectangle label "System"

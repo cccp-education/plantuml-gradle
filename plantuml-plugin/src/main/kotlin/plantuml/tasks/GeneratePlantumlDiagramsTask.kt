@@ -9,6 +9,9 @@ import org.gradle.work.DisableCachingByDefault
 import plantuml.PlantumlConfig
 import plantuml.PlantumlManager
 import plantuml.PlantumlMessages
+import plantuml.boundary.IdiomaticGlossary
+import plantuml.boundary.TextClassifier
+import plantuml.boundary.TranslationResolver
 import plantuml.service.DiagramProcessor
 import plantuml.service.LlmService
 import plantuml.service.PlantumlService
@@ -116,9 +119,14 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         val chatModel = llmService.createChatModel()
         logger.lifecycle(PlantumlMessages.format("generate.debug", lang, chatModel.toString(), config.output.diagrams, System.getProperty("plantuml.test.mode") ?: "null"))
         val diagramProcessor = DiagramProcessor(plantumlService, chatModel, config)
+        val resolver = TranslationResolver(
+            classifier = TextClassifier(),
+            glossary = IdiomaticGlossary(),
+            messageResolver = { key, l -> runCatching { PlantumlMessages.get(key, l) }.getOrNull() }
+        )
 
         promptFiles.forEach { promptFile ->
-            processSinglePrompt(promptFile, config, diagramProcessor)
+            processSinglePrompt(promptFile, config, diagramProcessor, resolver, lang)
         }
     }
 
@@ -203,7 +211,9 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
     private fun processSinglePrompt(
         promptFile: File,
         config: plantuml.PlantumlConfig,
-        diagramProcessor: DiagramProcessor
+        diagramProcessor: DiagramProcessor,
+        resolver: TranslationResolver,
+        language: String
     ) {
         logger.lifecycle(PlantumlMessages.format("generate.processing_prompt", lang, promptFile.name))
 
@@ -215,7 +225,7 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
             ?: config.langchain4j.maxIterations
 
         val diagram = try {
-            diagramProcessor.processPrompt(promptContent, maxIterations, logger)
+            diagramProcessor.processPrompt(promptContent, maxIterations, logger, resolver, language)
         } catch (e: IllegalStateException) {
             logger.lifecycle(PlantumlMessages.format("generate.error", lang, e.message ?: "Unknown error"))
             throw e

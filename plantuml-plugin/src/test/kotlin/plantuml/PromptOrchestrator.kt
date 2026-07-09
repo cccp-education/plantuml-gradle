@@ -95,7 +95,9 @@ class PromptOrchestrator(
         val diagram = diagramProcessor.processPrompt(
             prompt = promptText,
             maxIterations = config.langchain4j.maxIterations,
-            logger = logger
+            logger = logger,
+            resolver = null,
+            language = "en"
         ) ?: run {
             messages += "Could not generate valid diagram for: ${promptFile.name}"
             return ProcessResult.SKIPPED

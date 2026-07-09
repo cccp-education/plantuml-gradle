@@ -1,0 +1,96 @@
+= Session 164 (2026-07-09) — US-BND-5 DiagramProcessor structural strings i18n
+
+== Contexte
+
+Reprise plantuml-gradle. État réel à l'ouverture : US-BND-0..4 déjà terminés et
+committés (commits `08f3f47` US-BND-0..3 + `a6dc135` US-BND-4), session 163 archivée
+mais pas la 164. PROMPT_REPRISE obsolète (indiquait US-BND-0 "en cours" alors que
+US-BND-0..4 faits). Build compile, suite unitaire verte.
+
+Mission réelle : US-BND-5 — DiagramProcessor structural strings → i18n via
+TranslationResolver, prompt LLM préservé. Méthodologie baby-step DDD/TDD/BDD
+(unit → functional → cucumber), agile software craftsmanship, Red→Green→Refactor,
+1 test à la fois.
+
+== Fait
+
+Baby-step 1 (RED) : `DiagramProcessorBoundaryTest.kt` créé — 2 tests unitaires
+(titre "Generated Diagram" traduit quand resolver fourni + prompt préservé en
+description). Compilation échoue (paramètres `resolver`/`language` inexistants sur
+`processPrompt`).
+
+Baby-step 2 (GREEN) : `DiagramProcessor.processPrompt()` étendu avec
+`resolver: TranslationResolver? = null` + `language: String = "en"` (pattern
+identique à `KnowledgeGraphRenderer.render()` US-BND-4). Lambda `label` local.
+Import `TranslationResolver` ajouté.
+
+Baby-step 3 (REFACTOR) : chaînes structurelles routées via `label` :
+- `title "Generated Diagram"` (fallback quand prompt vide) — étiquette présentation
+- `rectangle "System"` — étiquette présentation
+- `description = "Auto-generated diagram based on prompt:"` + `$prompt` préservé
+
+`applyStructuralLabels()` post-traite le code généré (préserve la signature privée
+`generateSimulatedLlmResponse` testée par reflection dans
+`DiagramProcessorPrivateMethodsTest`). Prompt LLM (`fullPrompt`, `correctionPrompt`,
+`validationPrompt`) **préservé** — prompt engineering, pas i18n.
+
+Baby-step 4 : `GeneratePlantumlDiagramsTask` câble le resolver (TranslationResolver +
+TextClassifier + IdiomaticGlossary + messageResolver via PlantumlMessages.get),
+pattern identique à `GenerateKnowledgeGraphDiagramTask` US-BND-4. `processSinglePrompt`
+étendu avec `resolver` + `language`.
+
+Baby-step 5 (BDD) : scénario Cucumber `21_i18n_translation_boundary.feature` ajouté
+(`@boundary @diagram-processor`) — DiagramProcessor structural labels via resolver.
+`BoundarySteps.kt` étendu (4 nouveaux steps). `PlantumlWorld` étendu
+(`boundaryDiagram`). Scénario calibré : prompt vide → titre "Generated Diagram"
+traduit, rectangle "System" traduit. 5/5 steps ✔.
+
+Régressions détectées et fixées :
+- `DiagramProcessorPrivateMethodsTest` (2 tests) : signature `generateSimulatedLlmResponse`
+  préservée via `applyStructuralLabels` post-traitement (pas de 3e paramètre)
+- `PromptOrchestratorTest` (5 tests) : mock `processPrompt(any(), any(), any())` →
+  `processPrompt(any(), any(), any(), isNull(), any())` (5 params, `isNull()` pour
+  resolver nullable). `PromptOrchestrator.kt` (utilitaire test) appel étendu avec
+  `resolver = null, language = "en"`.
+
+== Tests
+
+- 1303 tests unitaires, 0 failure, 0 skipped (suite complète `./gradlew test --rerun-tasks`)
+- 9/9 Cucumber boundary PASS (8 originaux + 1 nouveau US-BND-5)
+- `publishToMavenLocal` BUILD SUCCESSFUL
+- Bug préexistant découvert : `18_i18n_error_messages.feature` scénarios
+  `@diagram-processor` (lignes 37, 43) échouent sur quoting MessageFormat
+  (`'plantuml'` vs `''plantuml''`) — non introduit par cette session, tag
+  `@diagram-processor` préexistant sur feature 18
+
+== Fichiers modifiés
+
+Production (3) :
+- `src/main/kotlin/plantuml/service/DiagramProcessor.kt` — `processPrompt` étendu +
+  `applyStructuralLabels` + import TranslationResolver
+- `src/main/kotlin/plantuml/tasks/GeneratePlantumlDiagramsTask.kt` — câblage resolver +
+  imports + `processSinglePrompt` étendu
+
+Tests (4) :
+- `src/test/kotlin/plantuml/service/DiagramProcessorBoundaryTest.kt` — nouveau, 3 tests
+- `src/test/kotlin/plantuml/PromptOrchestratorTest.kt` — mock 5 params + import isNull
+- `src/test/kotlin/plantuml/PromptOrchestrator.kt` — appel 5 params
+- `src/test/features/21_i18n_translation_boundary.feature` — 1 scénario US-BND-5
+- `src/test/scenarios/plantuml/scenarios/BoundarySteps.kt` — 4 steps + imports
+- `src/test/scenarios/plantuml/scenarios/PlantumlWorld.kt` — `boundaryDiagram` field
+
+Gouvernance (à faire) :
+- `PROMPT_REPRISE.adoc`, `INDEX.adoc`, `SESSIONS_HISTORY.adoc`,
+  `BACKLOG.adoc`, `COMPLETED_TASKS_ARCHIVE_2026-07.adoc`, `TEST_COVERAGE_ANALYSIS.adoc`
+
+== État EPIC PLT-BOUNDARY
+
+6/8 US terminés : US-BND-0 ✅, US-BND-1 ✅, US-BND-2 ✅, US-BND-3 ✅, US-BND-4 ✅,
+US-BND-5 ✅. Reste US-BND-6 (NonTranslatableTermRegistry) + US-BND-7 (Cucumber full
+pipeline end-to-end).
+
+== Score session
+
+8/10 — baby-step TDD/BDD respecté, régressions rapidement diagnostiquées et fixées,
+bug préexistant feature 18 identifié (hors-scope). Méthodologie DDD/TDD/BDD agile
+software craftsmanship tenue : Red→Green→Refactor, 1 test à la fois, unit → cucumber.

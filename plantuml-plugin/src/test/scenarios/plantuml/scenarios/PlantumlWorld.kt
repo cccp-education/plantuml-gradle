@@ -40,6 +40,7 @@ class PlantumlWorld {
 
     var boundaryResolver: plantuml.boundary.TranslationResolver? = null
     var boundaryResult: plantuml.boundary.ResolvedText? = null
+    var boundaryDiagram: plantuml.PlantumlDiagram? = null
 
     private val asyncJobs = mutableListOf<Deferred<BuildResult>>()
     
@@ -549,6 +550,7 @@ class PlantumlWorld {
         asyncJobs.clear()
         boundaryResolver = null
         boundaryResult = null
+        boundaryDiagram = null
         System.clearProperty("plantuml.test.disk.full")
         System.clearProperty("plantuml.test.rag.mode")
     }
