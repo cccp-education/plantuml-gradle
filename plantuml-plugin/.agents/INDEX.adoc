@@ -4,7 +4,7 @@ _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
 _Derniere mise a jour_ : 2026-07-09  
 _Session en cours_ : aucune  
-_Session terminee_ : 164 — US-BND-5 DiagramProcessor structural strings i18n (processPrompt étendu resolver/language, applyStructuralLabels, tâche câblée, 1303 unitaires 0 failure, 9/9 Cucumber boundary PASS). EPIC PLT-BOUNDARY 6/8 US.
+_Session terminee_ : 165 — US-BND-6 NonTranslatableTermRegistry (registre configurable YAML `terms: [list]`, TranslationResolver court-circuit PRESERVE avant classification, param optionnel backward-compatible, 2 tasks câblées, 1303 unitaires 0 failure, 11/11 Cucumber boundary PASS, publishToMavenLocal OK). EPIC PLT-BOUNDARY 7/8 US.
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
 '''
@@ -119,6 +119,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 
 |=== 
 | # | Date | Type | Sujet | Fichier | Score
+.1+^.^| 165 | 2026-07-09 | DDD + TDD + BDD | US-BND-6 NonTranslatableTermRegistry — registre configurable YAML `terms: [list]` (Set minimal), `NonTranslatableTermRegistryLoader` (Jackson YAML), `TranslationResolver` param optionnel `nonTranslatableRegistry?` court-circuit PRESERVE avant classification (priorité sur classifier + glossary), 2 tasks câblées (registry vide défaut), 6 tests unitaires + 3 TranslationResolver (priorité + backward-compat), 2 scénarios Cucumber `@non-translatable` (REAC vs classifier, AFNOR vs glossary BORROW), 1303 unitaires 0 fail, 11/11 Cucumber boundary PASS, publishToMavenLocal OK. EPIC PLT-BOUNDARY 7/8 US | `165-us-bnd-6-non-translatable-term-registry.adoc` | 9/10
 .1+^.^| 164 | 2026-07-09 | DDD + TDD + BDD | US-BND-5 DiagramProcessor structural strings i18n — `processPrompt()` étendu `resolver`/`language` (pattern US-BND-4), `applyStructuralLabels` (titre/rectangle/description), `GeneratePlantumlDiagramsTask` câblé, régressions fixées (reflection signature + mock 5 params), 1303 unitaires 0 fail, 9/9 Cucumber boundary PASS, publishToMavenLocal OK. EPIC PLT-BOUNDARY 6/8 US | `164-us-bnd-5-diagram-processor-i18n.adoc` | 8/10
 .1+^.^| 163 | 2026-07-08 | TDD + cadrage | Bug KG trié+fixé (assertion alignée sur contrat i18n `kgparser.file_not_found` — régression S156) + cadrage EPIC PLT-BOUNDARY Translation Boundary (8 US, ~26 pts, 3 natures/3 stratégies, vision `.agents/I18N_BOUNDARY_VISION.adoc`). 15/15 KG functional PASS | `163-bug-kg-fix-plus-boundary-cadrage.adoc` | 8/10
 .1+^.^| 162 | 2026-07-06 | DDD + TDD + BDD | EPIC 13 Cross-provider Fallback (6/6 TERMINÉ) — `ApiKeyPool.isPoolSaturated()` + `CrossProviderFallbackOrchestrator` (service domaine) + câblage `LlmService`. 4 étapes baby-step A→B→C→D (unit → functional → cucumber). 1235 unitaires + 5 functional + 5 Cucumber `@cross-provider` PASS. publishToMavenLocal OK. EPIC 13 clôturée | `162-epic-13-cross-provider-fallback.adoc` | 9/10
@@ -160,7 +161,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 
 == 🎯 Roadmap — État Actuel
 
-| EPIC PLT-BOUNDARY : Translation Boundary (8 US, ~26 pts) | 🟠 75% | 6/8 | ⏳ EN COURS — US-BND-0..5 ✅ (domain model, classifier, glossary, Cucumber boundary, KG renderer i18n, DiagramProcessor strings). Reste US-BND-6 (NonTranslatableTermRegistry) + US-BND-7 (Cucumber full pipeline) |
+| EPIC PLT-BOUNDARY : Translation Boundary (8 US, ~26 pts) | 🟠 88% | 7/8 | ⏳ EN COURS — US-BND-0..6 ✅ (domain model, classifier, glossary, Cucumber boundary, KG renderer i18n, DiagramProcessor strings, NonTranslatableTermRegistry). Reste US-BND-7 (Cucumber full pipeline end-to-end) |
 | EPIC 13 : Multi-provider API Pool (tiers + cross-provider) | ✅ 100% | 6/6 | ✅ TERMINÉ — S161 5/6 tâches (KeyTier, TieredRotationStrategy, getNextKey descente, fallbackEnabled, YAML schema) + S162 cross-provider fallback (`CrossProviderFallbackOrchestrator`) |
 | CNV-6 : Migration conventions plugins education.cccp.build.* | ✅ 100% | — | ✅ TERMINÉ — Session 155 (build.gradle.kts 616→570, -46 lignes, variantes gardées) |
 | BKY-PUB-1 ✅ : Publication Maven Central | ✅ 100% | 9/10 | ✅ TERMINÉ — Session 147 (nmcp, 0.0.1)

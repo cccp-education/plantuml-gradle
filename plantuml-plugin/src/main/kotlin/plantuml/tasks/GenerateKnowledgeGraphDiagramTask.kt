@@ -8,6 +8,7 @@ import plantuml.EdgeType
 import plantuml.PlantumlManager
 import plantuml.PlantumlMessages
 import plantuml.boundary.IdiomaticGlossary
+import plantuml.boundary.NonTranslatableTermRegistry
 import plantuml.boundary.TextClassifier
 import plantuml.boundary.TranslationResolver
 import plantuml.service.KnowledgeGraphParser
@@ -69,7 +70,8 @@ abstract class GenerateKnowledgeGraphDiagramTask : DefaultTask() {
         val resolver = TranslationResolver(
             classifier = TextClassifier(),
             glossary = IdiomaticGlossary(),
-            messageResolver = { key, l -> runCatching { PlantumlMessages.get(key, l) }.getOrNull() }
+            messageResolver = { key, l -> runCatching { PlantumlMessages.get(key, l) }.getOrNull() },
+            nonTranslatableRegistry = NonTranslatableTermRegistry()
         )
         val plantumlCode = renderer.render(
             graph,

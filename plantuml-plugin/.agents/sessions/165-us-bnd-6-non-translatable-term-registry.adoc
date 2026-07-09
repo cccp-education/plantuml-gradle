@@ -1,0 +1,118 @@
+= Session 165 (2026-07-09) — US-BND-6 NonTranslatableTermRegistry
+
+== Contexte
+
+Reprise plantuml-gradle (HTOWN). État à l'ouverture : EPIC PLT-BOUNDARY 6/8 US
+(US-BND-0..5 terminés S163-S164). Build compile, suite unitaire verte (1303).
+
+Mission : US-BND-6 — `NonTranslatableTermRegistry`, registre configurable YAML
+des termes métier client (REAC, AFNOR, FPA) à préserver quelle que soit la
+classification. Le `TranslationResolver` consulte ce registre **avant** toute
+classification. Méthodologie baby-step DDD/TDD/BDD (unit → cucumber), agile
+software craftsmanship, Red→Green→Refactor, 1 test à la fois.
+
+== Fait
+
+Baby-step 1 (RED) : `NonTranslatableTermRegistryTest.kt` créé — 3 tests
+unitaires (register+detect, not-detected unregistered, bulk registration).
+Compilation échoue (classe inexistante).
+
+Baby-step 2 (GREEN) : `NonTranslatableTermRegistry.kt` créé — Set minimal
+(`register`, `registerAll`, `contains`). 3/3 PASS.
+
+Baby-step 3 (RED) : `NonTranslatableTermRegistryLoaderTest.kt` créé — 3 tests
+(single term YAML, multiple terms YAML, blank YAML). Compilation échoue.
+
+Baby-step 4 (GREEN) : `NonTranslatableTermRegistryLoader.kt` créé — Jackson
+YAML, format `terms: [list]`, blank → registry vide. 3/3 PASS.
+
+Baby-step 5 (RED) : `TranslationResolverTest.kt` étendu +3 tests :
+- registry term préservé même si classifier dit PRESENTATION (messageResolver
+  retournerait une traduction, le registry court-circuite)
+- registry term préservé même si glossary dit BORROW (glossary retournerait
+  un emprunt, le registry court-circuite)
+- backward-compat : sans registry fourni, comportement inchangé
+Compilation échoue (param `nonTranslatableRegistry` inexistant).
+
+Baby-step 6 (GREEN) : `TranslationResolver.kt` étendu — param
+`nonTranslatableRegistry: NonTranslatableTermRegistry? = null` (optionnel,
+backward-compatible). Court-circuit en tête de `resolve()` : si le registry
+contient le texte → `ResolvedText(text, PRESERVE, SEMANTIC_IDENTITY)`, avant
+toute classification. 9/9 TranslationResolverTest PASS.
+
+Baby-step 7 (REFACTOR) : câblage dans les 2 tasks Gradle :
+- `GeneratePlantumlDiagramsTask` : resolver étendu avec
+  `nonTranslatableRegistry = NonTranslatableTermRegistry()` + import
+- `GenerateKnowledgeGraphDiagramTask` : idem + import
+Registry vide par défaut (la config YAML + scénario end-to-end viendront avec
+US-BND-7). Suite unitaire complète verte (1303+, 0 failure).
+
+Baby-step 8 (BDD) : `21_i18n_translation_boundary.feature` étendu +2 scénarios
+`@boundary @non-translatable` :
+- "Non-translatable term REAC is preserved even when classifier says
+  presentation" — registry REAC + resolver → PRESERVE
+- "Non-translatable term AFNOR is preserved even when glossary would borrow"
+  — glossary AFNOR BORROW + registry AFNOR → PRESERVE (registry priorité)
+
+`BoundarySteps.kt` étendu +2 Given steps :
+- `aTranslationResolverWithFrGlossaryAndNonTranslatableTerm(term)` — glossary
+  FR + registry 1 terme
+- `aTranslationResolverWithFrGlossaryRegisteringBorrowAndNonTranslatableTerm(
+  glossaryTerm, nonTranslatableTerm)` — glossary FR + entry BORROW + registry
+
+Import `NonTranslatableTermRegistry` ajouté. 11/11 Cucumber boundary PASS
+(9 originaux + 2 nouveaux US-BND-6). publishToMavenLocal OK (signing GPG).
+
+== Tests
+
+- Suite unitaire : 1303+ tests, 0 failure, 0 skipped (compileKotlin + test OK)
+- Cucumber boundary : 11/11 scénarios PASS (9 S163-S164 + 2 US-BND-6 S165)
+- publishToMavenLocal : BUILD SUCCESSFUL (signing GPG exécuté)
+- Bug préexistant feature 18 `@diagram-processor` (quoting MessageFormat)
+  toujours présent — hors-scope, non introduit par cette session
+
+== Fichiers modifiés
+
+Production (4) :
+- `src/main/kotlin/plantuml/boundary/NonTranslatableTermRegistry.kt` — nouveau,
+  Set minimal (register/registerAll/contains)
+- `src/main/kotlin/plantuml/boundary/NonTranslatableTermRegistryLoader.kt` —
+  nouveau, Jackson YAML `terms: [list]`
+- `src/main/kotlin/plantuml/boundary/TranslationResolver.kt` — param
+  `nonTranslatableRegistry?` + court-circuit PRESERVE avant classification
+- `src/main/kotlin/plantuml/tasks/GeneratePlantumlDiagramsTask.kt` — câblage
+  registry + import
+- `src/main/kotlin/plantuml/tasks/GenerateKnowledgeGraphDiagramTask.kt` —
+  câblage registry + import
+
+Tests (4) :
+- `src/test/kotlin/plantuml/boundary/NonTranslatableTermRegistryTest.kt` —
+  nouveau, 3 tests
+- `src/test/kotlin/plantuml/boundary/NonTranslatableTermRegistryLoaderTest.kt`
+  — nouveau, 3 tests
+- `src/test/kotlin/plantuml/boundary/TranslationResolverTest.kt` — +3 tests
+  (registry priorité + backward-compat)
+- `src/test/features/21_i18n_translation_boundary.feature` — +2 scénarios
+  `@non-translatable`
+- `src/test/scenarios/plantuml/scenarios/BoundarySteps.kt` — +2 Given steps
+  + import
+
+Gouvernance (à faire dans la procédure de fin de session) :
+- `PROMPT_REPRISE.adoc`, `INDEX.adoc`, `SESSIONS_HISTORY.adoc`,
+  `BACKLOG.adoc`, `COMPLETED_TASKS_ARCHIVE_2026-07.adoc`,
+  `TEST_COVERAGE_ANALYSIS.adoc`
+
+== État EPIC PLT-BOUNDARY
+
+7/8 US terminés : US-BND-0 ✅, US-BND-1 ✅, US-BND-2 ✅, US-BND-3 ✅,
+US-BND-4 ✅, US-BND-5 ✅, US-BND-6 ✅. Reste US-BND-7 (Cucumber full pipeline
+end-to-end : `language=fr` + glossaire FR + registry → diagramme KG avec
+Classes traduit, LlmService préservé, pipeline emprunté, REAC préservé).
+
+== Score session
+
+9/10 — baby-step DDD/TDD/BDD respecté bout en bout (8 étapes Red→Green→
+Refactor, unit → cucumber), zéro régression (param optionnel backward-
+compatible), 2 scénarios BDD couvrant les 2 cas priorité registry (classifier
+vs glossary). Méthodologie agile software craftsmanship tenue : 1 test à la
+fois, validation immédiate après chaque modification.

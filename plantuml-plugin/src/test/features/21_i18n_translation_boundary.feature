@@ -71,3 +71,17 @@ Feature: I18N Translation Boundary — Diagram labels translated, identifiers pr
     When the diagram processor processes prompt "" in language "fr"
     Then the generated diagram title should be translated to "Generated Diagram" in FR
     And the generated diagram should contain the translated rectangle label "System"
+
+  @boundary @non-translatable
+  Scenario: Non-translatable term "REAC" is preserved even when classifier says presentation
+    Given a translation resolver with a FR glossary and non-translatable term "REAC"
+    When the resolver resolves "REAC" in language "fr"
+    Then the translated text should be "REAC"
+    And the strategy should be PRESERVE
+
+  @boundary @non-translatable
+  Scenario: Non-translatable term "AFNOR" is preserved even when glossary would borrow
+    Given a translation resolver with a FR glossary registering "AFNOR" as BORROW and non-translatable term "AFNOR"
+    When the resolver resolves "AFNOR" in language "fr"
+    Then the translated text should be "AFNOR"
+    And the strategy should be PRESERVE

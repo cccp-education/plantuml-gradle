@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-07-09 (Session 164 — US-BND-5 DiagramProcessor structural strings i18n, EPIC PLT-BOUNDARY 6/8 US)
+:last_update: 2026-07-09 (Session 165 — US-BND-6 NonTranslatableTermRegistry, EPIC PLT-BOUNDARY 7/8 US)
 
 '''
 == ✅ EPIC 13 : Multi-provider API Pool — Rotation par tiers + Cross-provider
@@ -278,7 +278,7 @@ métier se traduit avec choix idiomatique (TRANSLATE / BORROW).
 *Charge* : ~26 pts (~6-7 sessions)
 *Priorité* : 🔴 HAUTE — l'i18n actuelle (EPIC PLT-I18N) a traduit les logs mais
 pas le livrable (le diagramme). Le contenu du diagramme reste monolingue.
-*Statut* : 🟠 75% — 6/8 US terminés (US-BND-0..5)
+*Statut* : 🟠 88% — 7/8 US terminés (US-BND-0..6)
 *Dépend de* : néant (nouveau domaine)
 
 === Contexte
@@ -364,7 +364,7 @@ EPIC PLT-I18N a livré l'infrastructure i18n (`PlantumlMessages`, `ResourceBundl
 | US-BND-6
 | **NonTranslatableTermRegistry** — registre configurable YAML (`non-translatable-terms.yml`) des termes métier client (REAC, AFNOR, FPA). Le `TranslationResolver` consulte ce registre avant toute traduction. Baby-step : 1 terme + 1 test.
 | 3
-| 🟡 P2
+| 🟡 P2 ✅ S165
 
 | US-BND-7
 | **Cucumber full pipeline** — Scénario end-to-end : `language=fr` + glossaire FR → diagramme KG avec "Classes" traduit (TRANSLATE), "LlmService" préservé (PRESERVE), "pipeline" emprunté (BORROW), "REAC" préservé (registry). Vérifie la cohérence de transmission.
@@ -378,7 +378,7 @@ EPIC PLT-I18N a livré l'infrastructure i18n (`PlantumlMessages`, `ResourceBundl
 * [x] `TranslationStrategy` expose les 3 stratégies (TRANSLATE / BORROW / PRESERVE)
 * [x] `TextClassifier` classifie correctement un texte dans la bonne catégorie
 * [x] `IdiomaticGlossary` configurable via YAML (terme → {langue → traduction + stratégie})
-* [ ] `NonTranslatableTermRegistry` configurable via YAML (termes métier client préservés)
+* [x] `NonTranslatableTermRegistry` configurable via YAML (termes métier client préservés)
 * [x] `KnowledgeGraphRenderer` i18nisé pour les étiquettes structurelles, identifiants préservés
 * [x] `DiagramProcessor` i18nisé pour les chaînes structurelles, prompt LLM préservé
 * [x] ≥5 scénarios Cucumber boundary PASS
@@ -399,7 +399,7 @@ EPIC PLT-I18N a livré l'infrastructure i18n (`PlantumlMessages`, `ResourceBundl
 
 == Prochains EPICs
 
-1. **EPIC PLT-BOUNDARY** — 🟠 EN COURS (8 US, ~26 pts, 6/8 fait) — US-BND-6 + US-BND-7 restants
+1. **EPIC PLT-BOUNDARY** — 🟠 EN COURS (8 US, ~26 pts, 7/8 fait) — US-BND-7 restant (Cucumber full pipeline)
 2. **EPIC rattrapage i18n** — 🟡 À CADRER — traduire effectivement les 196 lignes × 9 langues (après PLT-BOUNDARY)
 3. **Bug feature 18** — 🟡 À TRIER — scénarios `@diagram-processor` (quoting MessageFormat `'plantuml'` vs `''plantuml''`)
 4. **BOM upgrade** — 🟢 Maintenance — `workspace-bom:0.0.1` → `0.0.7` (MEMPHIS Session 017)

@@ -1,21 +1,30 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 164 (9 juillet 2026)
+_Dernière mise à jour_ : Session 165 (9 juillet 2026)
 
 === Résumé Global
 
-* **Total tests unitaires** : 1303/1303 PASS (0 failure, 0 skipped) Session 164 — `DiagramProcessorBoundaryTest` (3 tests) + US-BND-0..4 tests boundary (57 tests S163) ✅
+* **Total tests unitaires** : 1303/1303 PASS (0 failure, 0 skipped) Session 165 — US-BND-6 NonTranslatableTermRegistry (+6 tests registry/loader, +3 tests TranslationResolver) ✅
 * **Tests fonctionnels GradleRunner KG** : 15/15 PASSED ✅ Session 163 (bug `should fail when graphify-out graph json does not exist` trié+fixé — assertion alignée sur contrat i18n `kgparser.file_not_found`)
 * **Tests fonctionnels TieredRotation** : 5/5 PASS (Session 161) ✅
 * **Tests fonctionnels CrossProviderFallback** : 5/5 PASS (Session 162) ✅
 * **Tests Cucumber i18n** : features 15-18 PASS ✅
 * **Tests Cucumber tiered rotation** : 7/7 scénarios feature 19 PASS (Session 161) ✅
 * **Tests Cucumber cross-provider fallback** : 5/5 scénarios feature 20 PASS (Session 162) ✅
-* **Tests Cucumber translation boundary** : 9/9 scénarios feature 21 PASS (8 S163 + 1 US-BND-5 S164) ✅
+* **Tests Cucumber translation boundary** : 11/11 scénarios feature 21 PASS (8 S163 + 1 US-BND-5 S164 + 2 US-BND-6 S165) ✅
 * **Tests real-llm (Ollama local)** : 6 créés, 0 FAILED (non exécutés — nécessite Ollama)
 * **Tests fine-tune SmolLM2 (testcontainer Python)** : 3 crees, 3/3 PASS
 * **Tests Knowledge Graph** : 90 unitaires + 15 fonctionnels
-* **Kover instruction coverage** : 81.19% (baseline Session 136) — nouveaux tests boundary (US-BND-0..5) augmentent la couverture (chiffrage exact à recalculer)
+* **Kover instruction coverage** : 81.19% (baseline Session 136) — nouveaux tests boundary (US-BND-0..6) augmentent la couverture (chiffrage exact à recalculer)
+
+=== Nouveaux Tests — Session 165 (US-BND-6 NonTranslatableTermRegistry)
+
+* **NonTranslatableTermRegistryTest** (3 tests unitaires) : register+detect, not-detected unregistered, bulk registration
+* **NonTranslatableTermRegistryLoaderTest** (3 tests unitaires) : single term YAML, multiple terms YAML, blank YAML → registry vide
+* **TranslationResolverTest** (+3 tests) : registry term préservé même si classifier PRESENTATION (messageResolver court-circuité), registry term préservé même si glossary BORROW (glossary court-circuité), backward-compat sans registry
+* **21_i18n_translation_boundary.feature** (+2 scénarios `@boundary @non-translatable`) : REAC préservé vs classifier, AFNOR préservé vs glossary BORROW
+* **BoundarySteps.kt** (+2 Given steps) : `aTranslationResolverWithFrGlossaryAndNonTranslatableTerm`, `aTranslationResolverWithFrGlossaryRegisteringBorrowAndNonTranslatableTerm` + import `NonTranslatableTermRegistry`
+* Zéro régression : param `nonTranslatableRegistry? = null` optionnel, suite unitaire complète verte (1303+)
 
 === Nouveaux Tests — Session 164 (US-BND-5 DiagramProcessor structural strings i18n)
 

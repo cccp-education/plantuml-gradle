@@ -7,6 +7,7 @@ import org.assertj.core.api.Assertions.assertThat
 import plantuml.PlantumlMessages
 import plantuml.boundary.GlossaryEntry
 import plantuml.boundary.IdiomaticGlossary
+import plantuml.boundary.NonTranslatableTermRegistry
 import plantuml.boundary.TextClassifier
 import plantuml.boundary.TranslationResolver
 import plantuml.boundary.TranslationStrategy
@@ -28,6 +29,39 @@ class BoundarySteps(private val world: PlantumlWorld) {
             classifier = TextClassifier(),
             glossary = glossary,
             messageResolver = { key, language -> runCatching { PlantumlMessages.get(key, language) }.getOrNull() }
+        )
+    }
+
+    @Given("a translation resolver with a FR glossary and non-translatable term {string}")
+    fun aTranslationResolverWithFrGlossaryAndNonTranslatableTerm(term: String) {
+        val glossary = IdiomaticGlossary().apply {
+            register("pipeline", "fr", GlossaryEntry("pipeline", TranslationStrategy.BORROW))
+            register("rollback", "fr", GlossaryEntry("rollback", TranslationStrategy.BORROW))
+            register("dependency injection", "fr", GlossaryEntry("injection de dépendances", TranslationStrategy.TRANSLATE))
+        }
+        val registry = NonTranslatableTermRegistry().apply { register(term) }
+        world.boundaryResolver = TranslationResolver(
+            classifier = TextClassifier(),
+            glossary = glossary,
+            messageResolver = { key, language -> runCatching { PlantumlMessages.get(key, language) }.getOrNull() },
+            nonTranslatableRegistry = registry
+        )
+    }
+
+    @Given("a translation resolver with a FR glossary registering {string} as BORROW and non-translatable term {string}")
+    fun aTranslationResolverWithFrGlossaryRegisteringBorrowAndNonTranslatableTerm(glossaryTerm: String, nonTranslatableTerm: String) {
+        val glossary = IdiomaticGlossary().apply {
+            register("pipeline", "fr", GlossaryEntry("pipeline", TranslationStrategy.BORROW))
+            register("rollback", "fr", GlossaryEntry("rollback", TranslationStrategy.BORROW))
+            register("dependency injection", "fr", GlossaryEntry("injection de dépendances", TranslationStrategy.TRANSLATE))
+            register(glossaryTerm, "fr", GlossaryEntry("$glossaryTerm-emprunt", TranslationStrategy.BORROW))
+        }
+        val registry = NonTranslatableTermRegistry().apply { register(nonTranslatableTerm) }
+        world.boundaryResolver = TranslationResolver(
+            classifier = TextClassifier(),
+            glossary = glossary,
+            messageResolver = { key, language -> runCatching { PlantumlMessages.get(key, language) }.getOrNull() },
+            nonTranslatableRegistry = registry
         )
     }
 

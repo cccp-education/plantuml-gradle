@@ -120,4 +120,58 @@ class TranslationResolverTest {
         assertEquals(TranslationCategory.SEMANTIC_IDENTITY, result.category)
         assertEquals("LlmService", result.sourceText)
     }
+
+    @Test
+    fun `should preserve non-translatable term even when classifier says presentation`() {
+        val classifier = TextClassifier()
+        val glossary = IdiomaticGlossary()
+        val registry = NonTranslatableTermRegistry().apply { register("REAC") }
+        val resolver = TranslationResolver(
+            classifier = classifier,
+            glossary = glossary,
+            messageResolver = { _, _ -> "REAC-translated" },
+            nonTranslatableRegistry = registry
+        )
+
+        val result = resolver.resolve("REAC", "fr")
+
+        assertEquals("REAC", result.translated)
+        assertEquals(TranslationStrategy.PRESERVE, result.strategy)
+    }
+
+    @Test
+    fun `should preserve non-translatable term even when glossary would borrow`() {
+        val classifier = TextClassifier()
+        val glossary = IdiomaticGlossary().apply {
+            register("REAC", "fr", GlossaryEntry("REAC-emprunt", TranslationStrategy.BORROW))
+        }
+        val registry = NonTranslatableTermRegistry().apply { register("REAC") }
+        val resolver = TranslationResolver(
+            classifier = classifier,
+            glossary = glossary,
+            messageResolver = { _, _ -> null },
+            nonTranslatableRegistry = registry
+        )
+
+        val result = resolver.resolve("REAC", "fr")
+
+        assertEquals("REAC", result.translated)
+        assertEquals(TranslationStrategy.PRESERVE, result.strategy)
+    }
+
+    @Test
+    fun `should behave as before when no registry provided`() {
+        val classifier = TextClassifier()
+        val glossary = IdiomaticGlossary()
+        val resolver = TranslationResolver(
+            classifier = classifier,
+            glossary = glossary,
+            messageResolver = { _, _ -> null }
+        )
+
+        val result = resolver.resolve("LlmService", "fr")
+
+        assertEquals("LlmService", result.translated)
+        assertEquals(TranslationStrategy.PRESERVE, result.strategy)
+    }
 }

@@ -1,28 +1,30 @@
-= PROMPT_REPRISE — Plantuml — Session 165
-:session: 165
+= PROMPT_REPRISE — Plantuml — Session 166
+:session: 166
 :date: 2026-07-09
 
-== État — EPIC PLT-BOUNDARY 6/8 US terminés
+== État — EPIC PLT-BOUNDARY 7/8 US terminés
 
-Session 164 a livré US-BND-5 (DiagramProcessor structural strings i18n).
-`processPrompt()` accepte `resolver`/`language` (pattern US-BND-4), chaînes
-structurelles (`title "Generated Diagram"`, `rectangle "System"`, description)
-routées via `TranslationResolver`, prompt LLM préservé. `GeneratePlantumlDiagramsTask`
-câble le resolver. 1303 unitaires 0 failure, 9/9 Cucumber boundary PASS.
-publishToMavenLocal OK.
+Session 165 a livré US-BND-6 (NonTranslatableTermRegistry). Registre
+configurable YAML (`terms: [list]`) des termes métier client (REAC, AFNOR,
+FPA). `TranslationResolver` consulte le registry **avant** toute
+classification → PRESERVE court-circuit. Param optionnel
+(`nonTranslatableRegistry? = null`), backward-compatible. 2 tasks câblées
+(registry vide par défaut). 1303 unitaires 0 failure, 11/11 Cucumber boundary
+PASS, publishToMavenLocal OK.
 
-== Mission session 165 — US-BND-6 NonTranslatableTermRegistry
+== Mission session 166 — US-BND-7 Cucumber full pipeline end-to-end
 
-Démarrer US-BND-6 :
+Dernière US de l'EPIC PLT-BOUNDARY :
 
-. `NonTranslatableTermRegistry` — registre configurable YAML
-  (`non-translatable-terms.yml`) des termes métier client (REAC, AFNOR, FPA)
-. Le `TranslationResolver` consulte ce registre avant toute traduction
-. Baby-step : 1 terme + 1 test, Red→Green→Refactor
+. Scénario end-to-end : `language=fr` + glossaire FR + registry REAC
+. Diagramme KG généré vérifie la cohérence de transmission :
+  - "Classes" traduit (TRANSLATE via Messages)
+  - "LlmService" préservé (PRESERVE, identité sémantique)
+  - "pipeline" emprunté (BORROW via glossary)
+  - "REAC" préservé (PRESERVE via registry, priorité sur tout)
+. Baby-step BDD : 1 scénario Cucumber, vérifie le pipeline complet
 
-Puis US-BND-7 (Cucumber full pipeline end-to-end) clôturera l'EPIC PLT-BOUNDARY.
-
-== Backlog — EPIC PLT-BOUNDARY (reste 2 US, ~6 pts)
+== Backlog — EPIC PLT-BOUNDARY (reste 1 US, ~3 pts)
 
 [cols="1,4,1"]
 |===
@@ -33,8 +35,8 @@ Puis US-BND-7 (Cucumber full pipeline end-to-end) clôturera l'EPIC PLT-BOUNDARY
 | 🟠 P1 | US-BND-3 — Cucumber boundary feature | ✅ S163
 | 🟠 P1 | US-BND-4 — KnowledgeGraphRenderer i18n | ✅ S163
 | 🟠 P1 | US-BND-5 — DiagramProcessor strings | ✅ S164
-| 🟡 P2 | US-BND-6 — NonTranslatableTermRegistry | ⬜ en cours
-| 🟡 P2 | US-BND-7 — Cucumber full pipeline | ⬜
+| 🟡 P2 | US-BND-6 — NonTranslatableTermRegistry | ✅ S165
+| 🟡 P2 | US-BND-7 — Cucumber full pipeline | ⬜ en cours
 |===
 
 == Vision
@@ -57,4 +59,4 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
   `'plantuml'` vs `''plantuml''`) — hors-scope, à trier plus tard
 - conventions-gradle ✅ intégré (build.gradle.kts 0.0.2)
 - BOM en retard : `workspace-bom:0.0.1` → `0.0.7` (maintenance)
-- Voir `sessions/164-us-bnd-5-diagram-processor-i18n.adoc`
+- Voir `sessions/165-us-bnd-6-non-translatable-term-registry.adoc`

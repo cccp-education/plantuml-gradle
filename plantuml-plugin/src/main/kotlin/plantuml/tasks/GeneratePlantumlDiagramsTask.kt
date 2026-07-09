@@ -10,6 +10,7 @@ import plantuml.PlantumlConfig
 import plantuml.PlantumlManager
 import plantuml.PlantumlMessages
 import plantuml.boundary.IdiomaticGlossary
+import plantuml.boundary.NonTranslatableTermRegistry
 import plantuml.boundary.TextClassifier
 import plantuml.boundary.TranslationResolver
 import plantuml.service.DiagramProcessor
@@ -122,7 +123,8 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         val resolver = TranslationResolver(
             classifier = TextClassifier(),
             glossary = IdiomaticGlossary(),
-            messageResolver = { key, l -> runCatching { PlantumlMessages.get(key, l) }.getOrNull() }
+            messageResolver = { key, l -> runCatching { PlantumlMessages.get(key, l) }.getOrNull() },
+            nonTranslatableRegistry = NonTranslatableTermRegistry()
         )
 
         promptFiles.forEach { promptFile ->

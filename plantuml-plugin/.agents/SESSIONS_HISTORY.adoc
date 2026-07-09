@@ -1,5 +1,9 @@
 = Historique des Sessions
 
+== Session 165 (2026-07-09) — US-BND-6 NonTranslatableTermRegistry
+
+US-BND-6 livrée en baby-step DDD/TDD/BDD (8 étapes Red→Green→Refactor, unit → cucumber). `NonTranslatableTermRegistry` (Set minimal) + `NonTranslatableTermRegistryLoader` (Jackson YAML `terms: [list]`) créés. `TranslationResolver` étendu avec param optionnel `nonTranslatableRegistry? = null` — court-circuit PRESERVE en tête de `resolve()` **avant** toute classification (priorité sur classifier + glossary). Backward-compatible (sans registry, comportement inchangé). 2 tasks Gradle câblées (`GeneratePlantumlDiagramsTask`, `GenerateKnowledgeGraphDiagramTask`) avec registry vide par défaut. 6 tests unitaires nouveaux (3 registry + 3 loader) + 3 tests TranslationResolver (registry priorité vs classifier, vs glossary BORROW, backward-compat). 2 scénarios Cucumber `@non-translatable` (REAC préservé vs classifier PRESENTATION, AFNOR préservé vs glossary BORROW). 1303 unitaires 0 failure, 11/11 Cucumber boundary PASS, publishToMavenLocal OK. EPIC PLT-BOUNDARY : 7/8 US. ✅
+
 == Session 164 (2026-07-09) — US-BND-5 DiagramProcessor structural strings i18n
 
 Reprise plantuml : état réel US-BND-0..4 déjà committés (PROMPT_REPRISE obsolète).

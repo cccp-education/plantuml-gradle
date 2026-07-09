@@ -10,10 +10,19 @@ data class ResolvedText(
 class TranslationResolver(
     private val classifier: TextClassifier,
     private val glossary: IdiomaticGlossary,
-    private val messageResolver: (String, String) -> String?
+    private val messageResolver: (String, String) -> String?,
+    private val nonTranslatableRegistry: NonTranslatableTermRegistry? = null
 ) {
 
     fun resolve(text: String, language: String): ResolvedText {
+        if (nonTranslatableRegistry?.contains(text) == true) {
+            return ResolvedText(
+                sourceText = text,
+                translated = text,
+                strategy = TranslationStrategy.PRESERVE,
+                category = TranslationCategory.SEMANTIC_IDENTITY
+            )
+        }
         val translatable = classifier.classify(text)
         val strategy = decideStrategy(translatable, language)
         val translated = applyStrategy(text, translatable.category, strategy, language)

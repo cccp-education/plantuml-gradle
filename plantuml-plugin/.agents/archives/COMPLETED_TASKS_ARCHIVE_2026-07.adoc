@@ -1,5 +1,30 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-07
 
+== Session 165 (2026-07-09) — US-BND-6 NonTranslatableTermRegistry
+
+=== Fait
+- US-BND-6 livrée en baby-step DDD/TDD/BDD (8 étapes Red→Green→Refactor, unit → cucumber), agile software craftsmanship ✅
+- `NonTranslatableTermRegistry.kt` créé — Set minimal (register/registerAll/contains) ✅
+- `NonTranslatableTermRegistryLoader.kt` créé — Jackson YAML `terms: [list]`, blank → registry vide ✅
+- `TranslationResolver.kt` étendu — param optionnel `nonTranslatableRegistry: NonTranslatableTermRegistry? = null`, court-circuit PRESERVE en tête de `resolve()` **avant** toute classification (priorité sur classifier + glossary) ✅
+- Backward-compatible : sans registry fourni, comportement inchangé ✅
+- 2 tasks Gradle câblées : `GeneratePlantumlDiagramsTask` + `GenerateKnowledgeGraphDiagramTask` (registry vide par défaut, imports ajoutés) ✅
+- `NonTranslatableTermRegistryTest` (3 tests) + `NonTranslatableTermRegistryLoaderTest` (3 tests) créés ✅
+- `TranslationResolverTest` +3 tests : registry priorité vs classifier PRESENTATION, vs glossary BORROW, backward-compat ✅
+- 2 scénarios Cucumber `@boundary @non-translatable` : REAC préservé vs classifier, AFNOR préservé vs glossary BORROW ✅
+- `BoundarySteps.kt` +2 Given steps + import `NonTranslatableTermRegistry` ✅
+- 1303 unitaires 0 failure, 11/11 Cucumber boundary PASS, publishToMavenLocal OK ✅
+
+=== Non fait
+- US-BND-7 Cucumber full pipeline end-to-end (prochaine session — dernière US EPIC)
+- Bug préexistant feature 18 scénarios `@diagram-processor` (quoting MessageFormat) — hors-scope
+
+=== Prochaine session
+- US-BND-7 Cucumber full pipeline end-to-end : `language=fr` + glossaire FR + registry REAC → diagramme KG (Classes traduit, LlmService préservé, pipeline emprunté, REAC préservé)
+- Baby-step BDD : 1 scénario Cucumber, vérifie la cohérence de transmission
+- Clôturera l'EPIC PLT-BOUNDARY (8/8 US)
+- Voir BACKLOG.adoc §"EPIC PLT-BOUNDARY"
+
 == Session 164 (2026-07-09) — US-BND-5 DiagramProcessor structural strings i18n
 
 === Fait
