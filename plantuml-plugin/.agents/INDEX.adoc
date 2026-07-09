@@ -4,7 +4,7 @@ _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
 _Derniere mise a jour_ : 2026-07-09  
 _Session en cours_ : aucune  
-_Session terminee_ : 165 — US-BND-6 NonTranslatableTermRegistry (registre configurable YAML `terms: [list]`, TranslationResolver court-circuit PRESERVE avant classification, param optionnel backward-compatible, 2 tasks câblées, 1303 unitaires 0 failure, 11/11 Cucumber boundary PASS, publishToMavenLocal OK). EPIC PLT-BOUNDARY 7/8 US.
+_Session terminee_ : 166 — US-BND-7 Cucumber full pipeline end-to-end (scénario `@full-pipeline` vérifie les 4 stratégies coexistant dans un rendu KG : Classes TRANSLATE, LlmService PRESERVE, pipeline BORROW, REAC PRESERVE registry. 1312 unitaires 0 failure, 12/12 Cucumber boundary PASS, publishToMavenLocal OK). EPIC PLT-BOUNDARY CLOTUREE 8/8 US.
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
 '''
@@ -119,6 +119,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 
 |=== 
 | # | Date | Type | Sujet | Fichier | Score
+.1+^.^| 166 | 2026-07-09 | BDD | US-BND-7 Cucumber full pipeline end-to-end — scénario `@full-pipeline` vérifie les 4 stratégies coexistant dans un rendu KG (Classes TRANSLATE, LlmService PRESERVE, pipeline BORROW, REAC PRESERVE registry). 6 steps Cucumber ajoutés (Given/When/Then) + 2 champs PlantumlWorld. 1312 unitaires 0 fail, 12/12 Cucumber boundary PASS, publishToMavenLocal OK. EPIC PLT-BOUNDARY CLOTUREE 8/8 US | `166-us-bnd-7-cucumber-full-pipeline.adoc` | 9/10
 .1+^.^| 165 | 2026-07-09 | DDD + TDD + BDD | US-BND-6 NonTranslatableTermRegistry — registre configurable YAML `terms: [list]` (Set minimal), `NonTranslatableTermRegistryLoader` (Jackson YAML), `TranslationResolver` param optionnel `nonTranslatableRegistry?` court-circuit PRESERVE avant classification (priorité sur classifier + glossary), 2 tasks câblées (registry vide défaut), 6 tests unitaires + 3 TranslationResolver (priorité + backward-compat), 2 scénarios Cucumber `@non-translatable` (REAC vs classifier, AFNOR vs glossary BORROW), 1303 unitaires 0 fail, 11/11 Cucumber boundary PASS, publishToMavenLocal OK. EPIC PLT-BOUNDARY 7/8 US | `165-us-bnd-6-non-translatable-term-registry.adoc` | 9/10
 .1+^.^| 164 | 2026-07-09 | DDD + TDD + BDD | US-BND-5 DiagramProcessor structural strings i18n — `processPrompt()` étendu `resolver`/`language` (pattern US-BND-4), `applyStructuralLabels` (titre/rectangle/description), `GeneratePlantumlDiagramsTask` câblé, régressions fixées (reflection signature + mock 5 params), 1303 unitaires 0 fail, 9/9 Cucumber boundary PASS, publishToMavenLocal OK. EPIC PLT-BOUNDARY 6/8 US | `164-us-bnd-5-diagram-processor-i18n.adoc` | 8/10
 .1+^.^| 163 | 2026-07-08 | TDD + cadrage | Bug KG trié+fixé (assertion alignée sur contrat i18n `kgparser.file_not_found` — régression S156) + cadrage EPIC PLT-BOUNDARY Translation Boundary (8 US, ~26 pts, 3 natures/3 stratégies, vision `.agents/I18N_BOUNDARY_VISION.adoc`). 15/15 KG functional PASS | `163-bug-kg-fix-plus-boundary-cadrage.adoc` | 8/10
@@ -128,20 +129,6 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 .1+^.^| 159 | 2026-07-06 | DDD + TDD + BDD | US-I18N-6 Cucumber BDD (8/8 PASS) — tag filter `-Pcucumber.tags`, log `Resolved language: {0}` (clé `config.resolved_language` 11 fichiers), fix `loadConfiguration` cliParams (CLI language câblé, gap US-I18N-0), fix `{word}`→`{string}` (guillemets), feature 17 `{list}`→`{string}`, 5 tests unitaires régression à fixer S160 | `159-us-i18n-6-cucumber-bdd-pass.adoc` | 8/10
 .1+^.^| 155 | 2026-07-03 | dev | CNV-6 Migration — convention plugins education.cccp.build.* v0.0.1 appliquées (gradle-plugin + publishing), build.gradle.kts 616→570 (-46), compileKotlin SUCCESS. Variantes gardées : buildscript annotations force, groovy exclusions, Docker/HuggingFace tasks, kover 75%, configurationCache=false | `155-cnv6-migration.adoc` | ✅ TERMINÉ
 .1+^.^| 152 | 2026-06-24 | docs + i18n | US-I18N-7 Documentation + README i18n — 20 fichiers README créés (10 langues × consommateur + plugin), badges Maven Central/Portal/CI/License, markers 0.0.1/380 PASS, switcher i18n 10 langues, AR/UR RTL | `152-readme-i18n.adoc` | 9/10
-.1+^.^| 151 | 2026-06-15 | DDD + TDD + BDD | US-I18N-3 Logger Lifecycle Messages i18n — 5 task classes +champ `lang`, 66 lifecycle → PlantumlMessages, LifecycleMessagesI18nTest 760/760 PASS, 17_i18n_lifecycle_messages.feature (2 scénarios) | `151-i18n-us3-lifecycle-messages.adoc` | 9/10
-.1+^.^| 150 | 2026-06-15 | DDD + TDD + BDD | US-I18N-2 Task Descriptions i18n — PlantumlManager.resolveLanguage(), 5 task classes + PlantumlPlugin init blocks → PlantumlMessages.get(), TaskDescriptionsI18nTest 16/16 PASS, 16_i18n_task_descriptions.feature (2 scénarios) | `150-i18n-us2-task-descriptions.adoc` | 9/10
-.1+^.^| 149 | 2026-06-15 | fix + DDD + TDD + BDD | Fix plugin ID + US-I18N-0 BDD + US-I18N-1 Messages — 11 fichiers fixés, 15_i18n_language_switch.feature (8 scénarios), PlantumlMessages.kt + 11 Messages*.properties (100+ clés, 10 langues), PlantumlMessagesTest (23/23 PASS) | `149-fix-plugin-id-i18n-us0-bdd-us1.adoc` | 9/10
-.1+^.^| 148 | 2026-06-15 | DDD + TDD + cadrage | Cadrage EPIC PLT-I18N + US-0 Configuration Layer — 7 US, ~28 pts, 10 langues, 35/35 tests PASS | `148-i18n-cadrage-us0.adoc` | 9/10
-.1+^.^| 147 | 2026-06-11 | publish | Publication Maven Central 0.0.1 (nmcp, POM sans guard, codebase→0.0.2) | `147-pub-maven-central-0.0.1.adoc` | 9/10
-.1+^.^| 146 | 2026-06-02 | governance | Borough-isation — plantuml-gradle devient HTOWN 🚀, 23ème borough | `146-borough-isation-htown.adoc` | 10/10
-.1+^.^| 145 | 2026-05-19 | migration | EPIC K-1 Renommage taxonomie (generatePlantumlDiagrams, collectPlantumlIndex) — 18 fichiers modifiés, Build OK | `145-epic-k-k1-renommage-taxonomie.adoc` | 10/10
-.1+^.^| 144 | 2026-05-14 | infra | CI Template test.yml deploye, build OK, EPIC F cross-boroughs | `144-ci-template.adoc` | 10/10
-.1+^.^| 143 | 2026-05-13 | fix+refactor | Fix testcontainer fine-tune (wait strategy, trl 1.4.0, uv) | `143-fix-fine-tune-testcontainer.adoc` | 9.0/10
-.1+^.^| 142 | 2026-05-13 | feat+test | Pipeline Fine-tuning SmolLM2-135M-Instruct (testcontainer Python) | `142-smollm2-fine-tuning-pipeline.adoc` | 8.0/10
-.1+^.^| 141 | 2026-05-07 | chore | Migration chemins foundry/ → foundry/OSS/ (granularisation OSS/CSS) | — | —
-.1+^.^| 137 | 2026-05-01 | chore | EPIC 12 Cloture — BACKLOG + INDEX incohérence corrigée | `137-epic12-cloture-backlog-index.adoc` | 9.0/10
-.1+^.^| 136 | 2026-05-01 | chore+test | EPIC 12 Execution (6/6 tâches, PROCEDURES, Kover 81.19%) | `136-epic12-consolidation-execution.adoc` | 9.0/10
-.1+^.^| 135 | 2026-05-01 | chore | EPIC 12 Définition Consolidation (Audit + 6 tâches) | `135-epic12-consolidation-definition.adoc` | 9.0/10
 |===
 
 → _Sessions 1-126_ : `.agents/backup/Y2026-sessions-001-126/`

@@ -4,6 +4,10 @@ import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.assertj.core.api.Assertions.assertThat
+import plantuml.EdgeType
+import plantuml.KnowledgeGraph
+import plantuml.KnowledgeGraphCommunity
+import plantuml.KnowledgeGraphNode
 import plantuml.PlantumlMessages
 import plantuml.boundary.GlossaryEntry
 import plantuml.boundary.IdiomaticGlossary
@@ -12,6 +16,7 @@ import plantuml.boundary.TextClassifier
 import plantuml.boundary.TranslationResolver
 import plantuml.boundary.TranslationStrategy
 import plantuml.service.DiagramProcessor
+import plantuml.service.KnowledgeGraphRenderer
 import plantuml.service.PlantumlService
 
 class BoundarySteps(private val world: PlantumlWorld) {
@@ -139,5 +144,69 @@ class BoundarySteps(private val world: PlantumlWorld) {
     fun theCategoryShouldBe(category: String) {
         assertThat(world.boundaryResult!!.category)
             .isEqualTo(plantuml.boundary.TranslationCategory.valueOf(category))
+    }
+
+    @Given("a full pipeline translation resolver with a FR glossary and a non-translatable registry containing {string}")
+    fun aFullPipelineResolverWithFrGlossaryAndRegistry(term: String) {
+        val glossary = IdiomaticGlossary().apply {
+            register("pipeline", "fr", GlossaryEntry("pipeline", TranslationStrategy.BORROW))
+            register("rollback", "fr", GlossaryEntry("rollback", TranslationStrategy.BORROW))
+            register("dependency injection", "fr", GlossaryEntry("injection de dépendances", TranslationStrategy.TRANSLATE))
+        }
+        val registry = NonTranslatableTermRegistry().apply { register(term) }
+        world.boundaryResolver = TranslationResolver(
+            classifier = TextClassifier(),
+            glossary = glossary,
+            messageResolver = { key, language -> runCatching { PlantumlMessages.get(key, language) }.getOrNull() },
+            nonTranslatableRegistry = registry
+        )
+    }
+
+    @Given("a knowledge graph with nodes {string}, {string} and a community {string}")
+    fun aKnowledgeGraphWithNodesAndCommunity(node1: String, node2: String, community: String) {
+        val graph = KnowledgeGraph(
+            nodes = listOf(
+                KnowledgeGraphNode(name = node1, type = "class", community = community),
+                KnowledgeGraphNode(name = node2, type = "class", community = community)
+            ),
+            edges = emptyList(),
+            communities = listOf(
+                KnowledgeGraphCommunity(name = community, nodes = listOf(node1, node2))
+            )
+        )
+        world.boundaryGraph = graph
+    }
+
+    @When("the knowledge graph renderer renders the graph in language {string}")
+    fun theKnowledgeGraphRendererRendersTheGraph(language: String) {
+        val renderer = KnowledgeGraphRenderer()
+        world.boundaryRenderedDiagram = renderer.render(
+            graph = world.boundaryGraph!!,
+            resolver = world.boundaryResolver,
+            language = language
+        )
+    }
+
+    @Then("the rendered diagram should translate the {string} folder label via messages")
+    fun theRenderedDiagramShouldTranslateFolderLabel(label: String) {
+        val rendered = world.boundaryRenderedDiagram!!
+        val resolved = world.boundaryResolver!!.resolve(label, "fr")
+        assertThat(resolved.strategy).isEqualTo(TranslationStrategy.TRANSLATE)
+        assertThat(rendered).contains("folder \"${resolved.translated}\"")
+    }
+
+    @Then("the rendered diagram should preserve the {string} node identifier")
+    fun theRenderedDiagramShouldPreserveNodeIdentifier(node: String) {
+        val rendered = world.boundaryRenderedDiagram!!
+        assertThat(rendered).contains(node)
+    }
+
+    @Then("the rendered diagram should borrow the {string} community name")
+    fun theRenderedDiagramShouldBorrowCommunityName(community: String) {
+        val rendered = world.boundaryRenderedDiagram!!
+        val resolved = world.boundaryResolver!!.resolve(community, "fr")
+        assertThat(resolved.strategy).isEqualTo(TranslationStrategy.BORROW)
+        assertThat(resolved.translated).isEqualTo(community)
+        assertThat(rendered).contains("package \"$community\"")
     }
 }

@@ -85,3 +85,13 @@ Feature: I18N Translation Boundary — Diagram labels translated, identifiers pr
     When the resolver resolves "AFNOR" in language "fr"
     Then the translated text should be "AFNOR"
     And the strategy should be PRESERVE
+
+  @boundary @full-pipeline
+  Scenario: Full pipeline end-to-end — diagram KG with FR glossary and REAC registry
+    Given a full pipeline translation resolver with a FR glossary and a non-translatable registry containing "REAC"
+    And a knowledge graph with nodes "LlmService", "REAC" and a community "pipeline"
+    When the knowledge graph renderer renders the graph in language "fr"
+    Then the rendered diagram should translate the "Classes" folder label via messages
+    And the rendered diagram should preserve the "LlmService" node identifier
+    And the rendered diagram should preserve the "REAC" node identifier
+    And the rendered diagram should borrow the "pipeline" community name

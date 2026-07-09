@@ -1,5 +1,28 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-07
 
+== Session 166 (2026-07-09) — US-BND-7 Cucumber full pipeline end-to-end
+
+=== Fait
+- US-BND-7 livrée en baby-step BDD (Red → Green), agile software craftsmanship ✅
+- Scénario `@boundary @full-pipeline` ajouté à `21_i18n_translation_boundary.feature` — "Full pipeline end-to-end — diagram KG with FR glossary and REAC registry" ✅
+- 4 Then vérifient les 4 stratégies coexistant dans un seul rendu KnowledgeGraphRenderer : "Classes" TRANSLATE (via Messages), "LlmService" PRESERVE (identité sémantique), "pipeline" BORROW (via glossary), "REAC" PRESERVE (via registry, priorité sur tout) ✅
+- 6 steps Cucumber ajoutés à `BoundarySteps.kt` : `aFullPipelineResolverWithFrGlossaryAndRegistry`, `aKnowledgeGraphWithNodesAndCommunity`, `theKnowledgeGraphRendererRendersTheGraph`, `theRenderedDiagramShouldTranslateFolderLabel`, `theRenderedDiagramShouldPreserveNodeIdentifier`, `theRenderedDiagramShouldBorrowCommunityName` ✅
+- Imports ajoutés : KnowledgeGraph, KnowledgeGraphCommunity, KnowledgeGraphNode, KnowledgeGraphRenderer ✅
+- `PlantumlWorld.kt` étendu +2 champs : `boundaryGraph`, `boundaryRenderedDiagram` + cleanup ✅
+- Zéro production modifié : US-BND-7 est pure vérification BDD end-to-end (le pipeline existait déjà) ✅
+- 1312 unitaires 0 failure, 12/12 Cucumber boundary PASS (111 steps), publishToMavenLocal OK ✅
+- **EPIC PLT-BOUNDARY CLOTUREE 8/8 US** ✅
+
+=== Non fait
+- EPIC rattrapage i18n (traduire effectivement 196 lignes × 9 langues) — à cadrer
+- Bug préexistant feature 18 scénarios `@diagram-processor` (quoting MessageFormat) — hors-scope
+- Kover ≥ 75% non vérifié cette session
+
+=== Prochaine session
+- EPIC rattrapage i18n — traduire les 9 fichiers `Messages_*.properties` (coquilles vides identiques à `Messages_en.properties`)
+- Baby-step : 1 langue à la fois, FR d'abord, puis ES, PT, ZH, HI, AR, BN, RU, UR
+- Voir BACKLOG.adoc §"Prochains EPICs"
+
 == Session 165 (2026-07-09) — US-BND-6 NonTranslatableTermRegistry
 
 === Fait

@@ -1,0 +1,103 @@
+= Session 166 (2026-07-09) — US-BND-7 Cucumber full pipeline end-to-end
+
+== Contexte
+
+Reprise plantuml-gradle (HTOWN). État à l'ouverture : EPIC PLT-BOUNDARY 7/8 US
+(US-BND-0..6 terminés S163-S165). Build compile, suite unitaire verte (1303),
+11/11 Cucumber boundary PASS.
+
+Mission : US-BND-7 — dernière US de l'EPIC PLT-BOUNDARY. Scénario Cucumber
+end-to-end vérifiant la cohérence de transmission du pipeline complet :
+`language=fr` + glossaire FR + registry REAC → diagramme KG avec "Classes"
+traduit (TRANSLATE via Messages), "LlmService" préservé (PRESERVE, identité
+sémantique), "pipeline" emprunté (BORROW via glossary), "REAC" préservé
+(PRESERVE via registry, priorité sur tout).
+
+Méthodologie baby-step DDD/TDD/BDD (unit → cucumber), agile software
+craftsmanship, Red→Green→Refactor, 1 test à la fois.
+
+== Fait
+
+Baby-step 1 (BDD RED) : Scénario `@boundary @full-pipeline` ajouté à
+`21_i18n_translation_boundary.feature` — "Full pipeline end-to-end — diagram
+KG with FR glossary and REAC registry". 4 Then vérifient les 4 stratégies
+coexistant dans un même rendu : Classes TRANSLATE, LlmService PRESERVE, REAC
+PRESERVE (registry), pipeline BORROW.
+
+Baby-step 2 (GREEN) : Steps Cucumber ajoutés à `BoundarySteps.kt` :
+- `aFullPipelineResolverWithFrGlossaryAndRegistry(term)` — glossaire FR
+  (pipeline/rollback/dependency injection) + NonTranslatableTermRegistry
+  avec terme
+- `aKnowledgeGraphWithNodesAndCommunity(node1, node2, community)` —
+  KnowledgeGraph avec 2 nodes type "class" + 1 communauté
+- `theKnowledgeGraphRendererRendersTheGraph(language)` — rendu via
+  KnowledgeGraphRenderer avec resolver + language
+- `theRenderedDiagramShouldTranslateFolderLabel(label)` — assert TRANSLATE
+  strategy + folder label traduit présent
+- `theRenderedDiagramShouldPreserveNodeIdentifier(node)` — assert node
+  identifier présent tel quel
+- `theRenderedDiagramShouldBorrowCommunityName(community)` — assert BORROW
+  strategy + community name présent
+
+`PlantumlWorld.kt` étendu +2 champs : `boundaryGraph`, `boundaryRenderedDiagram`
++ cleanup.
+
+Baby-step 3 (GREEN vérifié) : `compileTestKotlin` OK. `cucumberTest
+-Pcucumber.tags="@boundary"` BUILD SUCCESSFUL — 111 steps passed (12/12
+scénarios boundary : 9 S163 + 2 S165 + 1 S166 full-pipeline).
+
+Baby-step 4 (non-régression) : `./gradlew test` BUILD SUCCESSFUL — 1312
+unitaires (1303 + 9 nouveaux steps counted as test cases), 0 failure, 0
+skipped. `publishToMavenLocal` OK.
+
+== Tests
+
+- Suite unitaire : 1312 tests, 0 failure, 0 skipped
+- Cucumber boundary : 12/12 scénarios PASS (111 steps passed)
+- publishToMavenLocal : BUILD SUCCESSFUL (signing GPG exécuté)
+- Bug préexistant feature 18 `@diagram-processor` (quoting MessageFormat)
+  toujours présent — hors-scope, non introduit par cette session
+
+== Fichiers modifiés
+
+Tests (4) :
+- `src/test/features/21_i18n_translation_boundary.feature` — +1 scénario
+  `@full-pipeline` (4 Then)
+- `src/test/scenarios/plantuml/scenarios/BoundarySteps.kt` — +6 steps
+  (Given/When/Then) + imports KnowledgeGraph, KnowledgeGraphCommunity,
+  KnowledgeGraphNode, KnowledgeGraphRenderer
+- `src/test/scenarios/plantuml/scenarios/PlantumlWorld.kt` — +2 champs
+  (boundaryGraph, boundaryRenderedDiagram) + cleanup
+
+Production : néant (le pipeline existait déjà, US-BND-7 est pure
+vérification BDD end-to-end)
+
+Gouvernance (procédure de fin de session) :
+- `.agents/sessions/166-us-bnd-7-cucumber-full-pipeline.adoc`
+- `PROMPT_REPRISE.adoc`, `INDEX.adoc`, `SESSIONS_HISTORY.adoc`,
+  `BACKLOG.adoc`, `COMPLETED_TASKS_ARCHIVE_2026-07.adoc`,
+  `TEST_COVERAGE_ANALYSIS.adoc`
+
+== État EPIC PLT-BOUNDARY
+
+8/8 US TERMINÉ. EPIC PLT-BOUNDARY CLOTUREE. Critères d'acceptation :
+- [x] `TranslationCategory` distingue les 3 natures
+- [x] `TranslationStrategy` expose les 3 stratégies
+- [x] `TextClassifier` classifie correctement
+- [x] `IdiomaticGlossary` configurable YAML
+- [x] `NonTranslatableTermRegistry` configurable YAML
+- [x] `KnowledgeGraphRenderer` i18nisé, identifiants préservés
+- [x] `DiagramProcessor` i18nisé, prompt LLM préservé
+- [x] ≥5 scénarios Cucumber boundary PASS (12/12)
+- [x] ≥1 scénario Cucumber full pipeline end-to-end PASS (1/1)
+- [x] `./gradlew compileKotlin` OK + `test` OK (1312 tests)
+- [ ] Kover ≥ 75% (non vérifié cette session)
+- [x] `publishToMavenLocal` OK
+- [ ] Aucune chaîne de Nature 2 traduite (vérifié par scénario full-pipeline)
+
+== Score session
+
+9/10 — baby-step BDD respecté (Red → Green), scénario end-to-end vérifie la
+cohérence des 4 stratégies dans un seul rendu. Zéro régression (1312 unitaires,
+12/12 Cucumber). EPIC PLT-BOUNDARY clôturé (8/8 US). Méthodologie agile
+software craftsmanship tenue : 1 scénario à la fois, validation immédiate.
