@@ -1,5 +1,24 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-07
 
+== Session 167 (2026-07-09) — Fix Bug Feature 18 MessageFormat Quoting
+
+=== Fait
+- Bug feature 18 fixé : 1 ligne changée dans `I18nErrorSteps.kt:136` (`PlantumlMessages.get()` → `PlantumlMessages.format(key, language, "")`) ✅
+- Root cause : mismatch quoting MessageFormat — test utilisait raw string `''plantuml''`, production utilise `format()` qui résout `''` → `'` ✅
+- 7/7 scénarios feature 18 PASS (dont 2 `@diagram-processor`) ✅
+- 122/122 Cucumber PASS (0 failure) ✅
+- 1312+ unitaires verts ✅
+- `publishToMavenLocal` BUILD SUCCESSFUL ✅
+- Zéro fichier de production modifié ✅
+- Constat : EPIC rattrapage i18n déjà terminé — 9 fichiers `Messages_*.properties` traduits (276 lignes ≠ EN), 9 tests `Messages*TranslationTest.kt` PASS ✅
+
+=== Non fait
+- BOM upgrade `workspace-bom:0.0.1` → `0.0.7` (prochaine session)
+
+=== Prochaine session
+- BOM upgrade — maintenance pure
+- Voir BACKLOG.adoc §"Prochains EPICs"
+
 == Session 166 (2026-07-09) — US-BND-7 Cucumber full pipeline end-to-end
 
 === Fait

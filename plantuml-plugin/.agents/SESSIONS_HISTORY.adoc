@@ -1,5 +1,9 @@
 = Historique des Sessions
 
+== Session 167 (2026-07-09) — Fix Bug Feature 18 MessageFormat Quoting
+
+Bug préexistant depuis S164 : les 2 scénarios `@diagram-processor` de la feature 18 échouaient à cause d'un mismatch de quoting MessageFormat. `I18nErrorSteps.kt:136` utilisait `PlantumlMessages.get()` (raw `''plantuml''`) alors que `DiagramProcessor.kt` utilise `PlantumlMessages.format()` (MessageFormat résout `''` → `'`). Fix : 1 ligne changée (`get()` → `format(key, language, "")`). 7/7 feature 18 PASS, 122/122 Cucumber PASS, 1312+ unitaires verts, publishToMavenLocal OK. Zéro production modifié. Constat : l'EPIC rattrapage i18n (traduire 196 lignes × 9 langues) est déjà terminé — les 9 fichiers `Messages_*.properties` sont traduits, 9 tests `Messages*TranslationTest.kt` passent. ✅
+
 == Session 166 (2026-07-09) — US-BND-7 Cucumber full pipeline end-to-end
 
 US-BND-7 livrée en baby-step BDD (Red → Green). Dernière US de l'EPIC PLT-BOUNDARY. Scénario `@boundary @full-pipeline` ajouté à `21_i18n_translation_boundary.feature` — "Full pipeline end-to-end — diagram KG with FR glossary and REAC registry". Vérifie la cohérence de transmission des 4 stratégies dans un seul rendu KnowledgeGraphRenderer : "Classes" TRANSLATE (via Messages), "LlmService" PRESERVE (identité sémantique), "pipeline" BORROW (via glossary), "REAC" PRESERVE (via registry, priorité sur tout). 6 steps Cucumber ajoutés à `BoundarySteps.kt` (Given resolver full pipeline, Given KG avec nodes/communauté, When renderer rendu, Then folder label traduit, Then node identifier préservé, Then community name emprunté). `PlantumlWorld.kt` étendu +2 champs (`boundaryGraph`, `boundaryRenderedDiagram`) + cleanup. 1312 unitaires 0 failure, 12/12 Cucumber boundary PASS (111 steps), publishToMavenLocal OK. **EPIC PLT-BOUNDARY CLOTUREE 8/8 US**. ✅

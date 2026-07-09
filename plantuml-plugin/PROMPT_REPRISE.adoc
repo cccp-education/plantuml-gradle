@@ -1,34 +1,30 @@
-= PROMPT_REPRISE — Plantuml — Session 167
-:session: 167
+= PROMPT_REPRISE — Plantuml — Session 168
+:session: 168
 :date: 2026-07-09
 
-== État — EPIC PLT-BOUNDARY CLOTURE (8/8 US)
+== État — Bug feature 18 FIXÉ + Rattrapage i18n TERMINÉ
 
-Session 166 a livré US-BND-7 (Cucumber full pipeline end-to-end). Scénario
-`@boundary @full-pipeline` vérifie la cohérence des 4 stratégies dans un seul
-rendu KG : "Classes" TRANSLATE, "LlmService" PRESERVE, "pipeline" BORROW,
-"REAC" PRESERVE (registry). 1312 unitaires 0 failure, 12/12 Cucumber boundary
-PASS, publishToMavenLocal OK. EPIC PLT-BOUNDARY clôturé.
+Session 167 a fixé le bug feature 18 (quoting MessageFormat `''plantuml''` vs
+`'plantuml'`). 1 ligne changée dans `I18nErrorSteps.kt` (`get()` → `format()`).
+7/7 scénarios feature 18 PASS, 122/122 Cucumber PASS, 1312+ unitaires verts.
 
-== Mission session 167 — EPIC rattrapage i18n (à cadrer)
+Constat : l'EPIC rattrapage i18n (traduire 196 lignes × 9 langues) est déjà
+terminé — les 9 fichiers `Messages_*.properties` sont traduits (276 lignes ≠ EN
+chacun), 9 tests `Messages*TranslationTest.kt` passent.
 
-Les 9 fichiers `Messages_*.properties` sont des coquilles vides (copies
-conformes de `Messages_en.properties`, zéro traduction réelle). L'EPIC
-PLT-BOUNDARY a livré la frontière sémantique ; reste à traduire effectivement
-les ~196 lignes × 9 langues (zh, hi, es, fr, ar, bn, pt, ru, ur).
+== Mission session 168 — BOM upgrade
 
-. Cadrer l'EPIC rattrapage i18n (découpage en US, estimation charge)
-. Baby-step : 1 langue à la fois, 1 fichier à la fois
-. Priorité : FR d'abord (langue cible native), puis ES, PT, ZH, HI, AR, BN,
-  RU, UR
+`workspace-bom:0.0.1` → `0.0.7` (MEMPHIS Session 017). Maintenance pure.
+
+. Mettre à jour la version BOM dans `build.gradle.kts`
+. Vérifier `compileKotlin` + `test` + `publishToMavenLocal`
+. Baby-step : 1 changement, 1 vérification
 
 == Backlog — Prochains EPICs
 
 [cols="1,4,1"]
 |===
 | Priorité | Tâche | Statut
-| 🔴 P0 | EPIC rattrapage i18n — traduire 196 lignes × 9 langues | ⬜ à cadrer
-| 🟡 P1 | Bug feature 18 — quoting MessageFormat `'plantuml'` vs `''plantuml''` | ⬜ à trier
 | 🟢 P2 | BOM upgrade — `workspace-bom:0.0.1` → `0.0.7` | ⬜ maintenance
 |===
 
@@ -42,8 +38,6 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 - GroupId: education.cccp.plantuml
 - Version publiée: 0.0.1 (Maven Central)
 - `publishToMavenLocal` obligatoire après modif code plugin
-- Bug préexistant feature 18 scénarios `@diagram-processor` (quoting MessageFormat
-  `'plantuml'` vs `''plantuml''`) — hors-scope, à trier plus tard
 - conventions-gradle ✅ intégré (build.gradle.kts 0.0.2)
 - BOM en retard : `workspace-bom:0.0.1` → `0.0.7` (maintenance)
-- Voir `sessions/166-us-bnd-7-cucumber-full-pipeline.adoc`
+- Voir `sessions/167-fix-feature-18-messageformat-quoting.adoc`

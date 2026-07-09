@@ -1,0 +1,70 @@
+= Session 167 — Fix Bug Feature 18 MessageFormat Quoting
+
+:session: 167
+:date: 2026-07-09
+:type: fix
+:score: 9/10
+
+== Contexte
+
+Bug préexistant documenté depuis Session 164 : les 2 scénarios `@diagram-processor`
+de la feature 18 (`18_i18n_error_messages.feature`) échouaient à cause d'un mismatch
+de quoting MessageFormat.
+
+== Diagnostic
+
+**Root cause** : `I18nErrorSteps.kt:136` utilisait `PlantumlMessages.get()` (raw string
+avec `''plantuml''`) alors que le code de production (`DiagramProcessor.kt`) utilise
+`PlantumlMessages.format()` (MessageFormat résout `''` → `'`). Le `contains` échouait
+car `''plantuml''` ≠ `'plantuml'`.
+
+**Code production** (`DiagramProcessor.kt:417,424`) :
+```kotlin
+throw IllegalStateException(PlantumlMessages.format("processor.invalid_json", "en", response.take(200)))
+```
+
+**Properties** (`Messages_en.properties:147`) :
+```properties
+processor.invalid_json=Invalid LLM response format: JSON response does not contain ''plantuml'' or ''code'' field. Response: {0}
+```
+
+**Test assertion** (`I18nErrorSteps.kt:136`) — AVANT :
+```kotlin
+val expected = PlantumlMessages.get(key, language)  // raw: ''plantuml''
+assertThat(world.exception!!.message).contains(expected.substringBefore("{"))
+```
+
+== Fix
+
+1 ligne changée dans `I18nErrorSteps.kt:136` :
+```kotlin
+val expected = PlantumlMessages.format(key, language, "")  // MessageFormat: 'plantuml'
+```
+
+`format()` avec arg vide `""` résout le quoting MessageFormat (`''` → `'`) et
+substitue `{0}` par `""`, produisant le même préfixe que l'exception réelle.
+
+== Vérification
+
+- `@diagram-processor` : 2/2 PASS ✅
+- Feature 18 complète (`@i18n @errors`) : 7/7 PASS ✅
+- CucumberTest complet : 122 scénarios, 0 failure ✅
+- `test` unitaires : BUILD SUCCESSFUL ✅
+- `publishToMavenLocal` : BUILD SUCCESSFUL ✅
+
+== Fichiers modifiés
+
+- `src/test/scenarios/plantuml/scenarios/I18nErrorSteps.kt` — 1 ligne (get → format)
+- Zéro fichier de production modifié
+
+== Constat additionnel
+
+L'EPIC rattrapage i18n (traduire 196 lignes × 9 langues) est **déjà terminé** :
+les 9 fichiers `Messages_*.properties` sont traduits (276 lignes ≠ EN chacun),
+9 tests `Messages*TranslationTest.kt` passent. Le PROMPT_REPRISE était en retard
+sur la réalité.
+
+== Prochaine session
+
+- BOM upgrade `workspace-bom:0.0.1` → `0.0.7` (maintenance)
+- Voir BACKLOG.adoc §"Prochains EPICs"

@@ -133,7 +133,7 @@ class I18nErrorSteps(private val world: PlantumlWorld) {
     @Then("the exception message should match the i18n format key {string} with args in language {string}")
     fun exceptionMessageShouldMatchI18nFormatKey(key: String, language: String) {
         assertThat(world.exception).isNotNull
-        val expected = PlantumlMessages.get(key, language)
+        val expected = PlantumlMessages.format(key, language, "")
         assertThat(world.exception!!.message).contains(expected.substringBefore("{"))
     }
 

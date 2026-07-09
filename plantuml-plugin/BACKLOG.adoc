@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-07-09 (Session 166 — US-BND-7 Cucumber full pipeline, EPIC PLT-BOUNDARY CLOTUREE 8/8 US)
+:last_update: 2026-07-09 (Session 167 — Fix Bug Feature 18 MessageFormat Quoting + constat EPIC rattrapage i18n déjà terminé)
 
 '''
 == ✅ EPIC 13 : Multi-provider API Pool — Rotation par tiers + Cross-provider
@@ -399,9 +399,20 @@ EPIC PLT-I18N a livré l'infrastructure i18n (`PlantumlMessages`, `ResourceBundl
 
 == Prochains EPICs
 
-1. **EPIC rattrapage i18n** — 🔴 À CADRER — traduire effectivement les 196 lignes × 9 langues (coquilles vides). Priorité FR d'abord.
-2. **Bug feature 18** — 🟡 À TRIER — scénarios `@diagram-processor` (quoting MessageFormat `'plantuml'` vs `''plantuml''`)
-3. **BOM upgrade** — 🟢 Maintenance — `workspace-bom:0.0.1` → `0.0.7` (MEMPHIS Session 017)
+1. **BOM upgrade** — 🟢 Maintenance — `workspace-bom:0.0.1` → `0.0.7` (MEMPHIS Session 017)
+
+== ✅ EPIC rattrapage i18n — TERMINÉ (Session 167)
+
+Les 9 fichiers `Messages_*.properties` (es, pt, zh, hi, ar, bn, ru, ur, fr) sont
+traduits (276 lignes ≠ EN chacun). 9 tests `Messages*TranslationTest.kt` passent.
+L'EPIC est terminé — constaté en Session 167 (le PROMPT_REPRISE était en retard).
+
+== ✅ Bug Feature 18 — FIXÉ (Session 167)
+
+1 ligne changée dans `I18nErrorSteps.kt:136` : `PlantumlMessages.get()` →
+`PlantumlMessages.format(key, language, "")`. MessageFormat résout `''plantuml''`
+→ `'plantuml'`, alignant le test sur le comportement de production. 7/7 feature 18
+PASS, 122/122 Cucumber PASS.
 
 '''
 
