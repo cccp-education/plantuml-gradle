@@ -1,6 +1,6 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 167 (9 juillet 2026)
+_Dernière mise à jour_ : Session 169 (11 juillet 2026)
 
 === Résumé Global
 
@@ -17,7 +17,15 @@ _Dernière mise à jour_ : Session 167 (9 juillet 2026)
 * **Tests real-llm (Ollama local)** : 6 créés, 0 FAILED (non exécutés — nécessite Ollama)
 * **Tests fine-tune SmolLM2 (testcontainer Python)** : 3 crees, 3/3 PASS
 * **Tests Knowledge Graph** : 90 unitaires + 15 fonctionnels
-* **Kover instruction coverage** : 81.19% (baseline Session 136)
+* **Kover main source set** : INSTRUCTION 92.93%, LINE 95.76%, BRANCH 74.20% (Session 169) ✅ ≥ 75%
+* **Kover main+functionalTest** : INSTRUCTION 53.55% (functionalTest 0% coverage plombe l'agrégat)
+* **Cucumber** : 26 failures, 9 skipped, timeout 10 minutes (préexistant, non investigué S169)
+
+=== Nouveaux Tests — Session 169 (Kover Verification)
+
+* Aucun test ajouté — maintenance pure (vérification Kover + audit backlog)
+* `./gradlew koverXmlReport -x cucumberTest -x functionalTest` BUILD SUCCESSFUL
+* Kover main source set : INSTRUCTION 92.93% ✅ ≥ 75% (seuil maintenu depuis S147, 81.19%)
 
 === Nouveaux Tests — Session 167 (Fix Bug Feature 18 MessageFormat Quoting)
 

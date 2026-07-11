@@ -1,5 +1,27 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-07
 
+== Session 169 (2026-07-11) — Kover Verification + Backlog Audit
+
+=== Fait
+- `./gradlew compileKotlin` BUILD SUCCESSFUL ✅
+- `./gradlew test` BUILD SUCCESSFUL (FROM-CACHE) ✅
+- `./gradlew koverXmlReport -x cucumberTest -x functionalTest` BUILD SUCCESSFUL ✅
+- Kover main source set : INSTRUCTION 92.93%, LINE 95.76%, BRANCH 74.20% ✅ ≥ 75%
+- Kover main+functionalTest : INSTRUCTION 53.55% (functionalTest 0% coverage plombe l'agrégat)
+- `koverThresholdCheck` parse tout le XML → 53.55% < 75% → FAIL (mais main seul ≥ 75%)
+- Cucumber : 26 failures, 9 skipped, timeout 10 minutes (préexistant, non investigué)
+- Backlog : vide, tous les EPICs terminés ✅
+
+=== Non fait
+- Fix `koverThresholdCheck` pour exclure functionalTest du calcul
+- Investigation Cucumber 26 failures (timeout + isolation)
+- Consultation PLAN_GLOBAL.adoc pour prochains EPICs cross-borough
+
+=== Prochaine session
+- Fix `koverThresholdCheck` — ne compter que le source set `main`
+- Investiguer Cucumber 26 failures (timeout 10 minutes)
+- Consulter PLAN_GLOBAL.adoc pour prochains EPICs cross-borough
+
 == Session 168 (2026-07-11) — BOM Upgrade workspace-bom:0.0.1 → 0.0.8
 
 === Fait

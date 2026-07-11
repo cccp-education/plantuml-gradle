@@ -1,5 +1,9 @@
 = Historique des Sessions
 
+== Session 169 (2026-07-11) — Kover Verification + Backlog Audit
+
+Kover main source set INSTRUCTION 92.93% ✅ ≥ 75% (LINE 95.76%, BRANCH 74.20%). `koverThresholdCheck` parse tout le XML (main+functionalTest) → 53.55% < 75% → FAIL (functionalTest 0% coverage plombe l'agrégat). Cucumber 26 failures, 9 skipped, timeout 10 minutes (préexistant, non investigué). Backlog vide, tous les EPICs terminés. Prochaine session : fix koverThresholdCheck (exclure functionalTest), investiguer Cucumber, consulter PLAN_GLOBAL.adoc. ✅
+
 == Session 168 (2026-07-11) — BOM Upgrade workspace-bom:0.0.1 → 0.0.8
 
 BOM `workspace-bom:0.0.1` → `0.0.8` (1 ligne `build.gradle.kts:25`). Maven Central latest = 0.0.8, `includeBuild("../workspace-bom")` local aussi en 0.0.8. compileKotlin ✅ (24s), test ✅ (57s, 13 tasks), publishToMavenLocal ✅ (15s). Baby-step : 1 changement, 1 vérification. Maintenance pure, zéro code métier modifié. Tous les EPICs sont terminés (13, PLT-I18N, PLT-BOUNDARY, rattrapage i18n, Bug Feature 18). ✅

@@ -1,28 +1,32 @@
-= PROMPT_REPRISE — Plantuml — Session 169
-:session: 169
+= PROMPT_REPRISE — Plantuml — Session 170
+:session: 170
 :date: 2026-07-11
 
-== État — BOM upgrade TERMINÉ + Tous EPICs clôturés
+== État — Kover main ≥ 75% vérifié, Backlog vide
 
-Session 168 : BOM `workspace-bom:0.0.1` → `0.0.8` (1 ligne `build.gradle.kts:25`).
-compileKotlin ✅, test ✅, publishToMavenLocal ✅. Maintenance pure, zéro code
-métier modifié.
+Session 169 : Kover main source set INSTRUCTION 92.93% ✅ ≥ 75%. Cucumber 26
+failures (timeout 10min, préexistant). Tous les EPICs terminés.
 
-Tous les EPICs sont terminés : EPIC 13 (tiers + cross-provider), PLT-I18N
-(28/28 pts), PLT-BOUNDARY (8/8 US), rattrapage i18n (9 langues traduites),
-Bug Feature 18 (MessageFormat quoting).
+== Mission session 170 — Fix koverThresholdCheck + Cucumber
 
-== Mission session 169 — Vérification Kover + Backlog
+1. **koverThresholdCheck** — ne compter que le source set `main` (exclure
+   functionalTest du calcul). Actuellement l'agrégat main+functionalTest
+   donne 53.55% < 75% → FAIL, mais main seul = 92.93%.
 
-Backlog vide. Vérifier Kover ≥ 75% (non vérifié depuis S166). Consulter
-PLAN_GLOBAL.adoc pour prochains EPICs cross-borough.
+2. **Cucumber 26 failures** — investiguer timeout 10 minutes (probablement
+   isolation GradleRunner dans les scénarios Cucumber).
+
+3. **PLAN_GLOBAL.adoc** — consulter pour prochains EPICs cross-borough
+   (backlog vide, tous les EPICs terminés).
 
 == Backlog — Prochains EPICs
 
 [cols="1,4,1"]
 |===
 | Priorité | Tâche | Statut
-| 🟢 P3 | Kover ≥ 75% — vérifier seuil maintenu | ⬜ maintenance
+| 🔴 P1 | Fix koverThresholdCheck — exclure functionalTest du calcul | ⬜
+| 🟡 P2 | Investiguer Cucumber 26 failures (timeout) | ⬜
+| 🟢 P3 | Consulter PLAN_GLOBAL.adoc — prochains EPICs cross-borough | ⬜
 |===
 
 == Méthodologie
@@ -37,4 +41,5 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 - BOM: `workspace-bom:0.0.8` ✅
 - `publishToMavenLocal` obligatoire après modif code plugin
 - conventions-gradle ✅ intégré (build.gradle.kts 0.0.2)
-- Voir `sessions/168-bom-upgrade-0.0.8.adoc`
+- Kover main: 92.93% INSTRUCTION ✅ ≥ 75%
+- Voir `sessions/169-kover-verification.adoc`
