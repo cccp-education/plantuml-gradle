@@ -1,31 +1,28 @@
-= PROMPT_REPRISE — Plantuml — Session 168
-:session: 168
-:date: 2026-07-09
+= PROMPT_REPRISE — Plantuml — Session 169
+:session: 169
+:date: 2026-07-11
 
-== État — Bug feature 18 FIXÉ + Rattrapage i18n TERMINÉ
+== État — BOM upgrade TERMINÉ + Tous EPICs clôturés
 
-Session 167 a fixé le bug feature 18 (quoting MessageFormat `''plantuml''` vs
-`'plantuml'`). 1 ligne changée dans `I18nErrorSteps.kt` (`get()` → `format()`).
-7/7 scénarios feature 18 PASS, 122/122 Cucumber PASS, 1312+ unitaires verts.
+Session 168 : BOM `workspace-bom:0.0.1` → `0.0.8` (1 ligne `build.gradle.kts:25`).
+compileKotlin ✅, test ✅, publishToMavenLocal ✅. Maintenance pure, zéro code
+métier modifié.
 
-Constat : l'EPIC rattrapage i18n (traduire 196 lignes × 9 langues) est déjà
-terminé — les 9 fichiers `Messages_*.properties` sont traduits (276 lignes ≠ EN
-chacun), 9 tests `Messages*TranslationTest.kt` passent.
+Tous les EPICs sont terminés : EPIC 13 (tiers + cross-provider), PLT-I18N
+(28/28 pts), PLT-BOUNDARY (8/8 US), rattrapage i18n (9 langues traduites),
+Bug Feature 18 (MessageFormat quoting).
 
-== Mission session 168 — BOM upgrade
+== Mission session 169 — Vérification Kover + Backlog
 
-`workspace-bom:0.0.1` → `0.0.7` (MEMPHIS Session 017). Maintenance pure.
-
-. Mettre à jour la version BOM dans `build.gradle.kts`
-. Vérifier `compileKotlin` + `test` + `publishToMavenLocal`
-. Baby-step : 1 changement, 1 vérification
+Backlog vide. Vérifier Kover ≥ 75% (non vérifié depuis S166). Consulter
+PLAN_GLOBAL.adoc pour prochains EPICs cross-borough.
 
 == Backlog — Prochains EPICs
 
 [cols="1,4,1"]
 |===
 | Priorité | Tâche | Statut
-| 🟢 P2 | BOM upgrade — `workspace-bom:0.0.1` → `0.0.7` | ⬜ maintenance
+| 🟢 P3 | Kover ≥ 75% — vérifier seuil maintenu | ⬜ maintenance
 |===
 
 == Méthodologie
@@ -37,7 +34,7 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 
 - GroupId: education.cccp.plantuml
 - Version publiée: 0.0.1 (Maven Central)
+- BOM: `workspace-bom:0.0.8` ✅
 - `publishToMavenLocal` obligatoire après modif code plugin
 - conventions-gradle ✅ intégré (build.gradle.kts 0.0.2)
-- BOM en retard : `workspace-bom:0.0.1` → `0.0.7` (maintenance)
-- Voir `sessions/167-fix-feature-18-messageformat-quoting.adoc`
+- Voir `sessions/168-bom-upgrade-0.0.8.adoc`

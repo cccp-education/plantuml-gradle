@@ -1,5 +1,24 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-07
 
+== Session 168 (2026-07-11) — BOM Upgrade workspace-bom:0.0.1 → 0.0.8
+
+=== Fait
+- BOM `workspace-bom:0.0.1` → `0.0.8` dans `build.gradle.kts:25` (1 ligne) ✅
+- Maven Central latest = 0.0.8, `includeBuild("../workspace-bom")` local aussi en 0.0.8 ✅
+- `./gradlew compileKotlin` BUILD SUCCESSFUL (24s) ✅
+- `./gradlew test` BUILD SUCCESSFUL (57s, 13 tasks) ✅
+- `./gradlew publishToMavenLocal` BUILD SUCCESSFUL (15s) ✅
+- Baby-step : 1 changement, 1 vérification ✅
+- Maintenance pure, zéro code métier modifié ✅
+
+=== Non fait
+- Kover ≥ 75% non vérifié (dernière vérification S147, 81.19%)
+
+=== Prochaine session
+- Vérifier Kover ≥ 75% (maintenance)
+- Backlog vide — tous les EPICs sont terminés
+- Consulter PLAN_GLOBAL.adoc pour prochains EPICs cross-borough
+
 == Session 167 (2026-07-09) — Fix Bug Feature 18 MessageFormat Quoting
 
 === Fait

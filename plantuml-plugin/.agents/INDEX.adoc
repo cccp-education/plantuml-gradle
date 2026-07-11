@@ -2,9 +2,9 @@
 
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
-_Derniere mise a jour_ : 2026-07-09  
+_Derniere mise a jour_ : 2026-07-11  
 _Session en cours_ : aucune  
-_Session terminee_ : 167 — Fix Bug Feature 18 MessageFormat Quoting. 1 ligne changée dans `I18nErrorSteps.kt` (`get()` → `format()`). 7/7 feature 18 PASS, 122/122 Cucumber PASS, 1312+ unitaires verts, publishToMavenLocal OK. Zéro production modifié. Constat : EPIC rattrapage i18n déjà terminé (9 fichiers `Messages_*.properties` traduits, 9 tests `Messages*TranslationTest.kt` passent).
+_Session terminee_ : 168 — BOM Upgrade workspace-bom:0.0.1 → 0.0.8. 1 ligne `build.gradle.kts:25`. compileKotlin ✅, test ✅, publishToMavenLocal ✅. Maintenance pure, zéro code métier modifié. Tous les EPICs sont terminés (13, PLT-I18N, PLT-BOUNDARY, rattrapage i18n, Bug Feature 18).
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
 '''
@@ -119,6 +119,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 
 |=== 
 | # | Date | Type | Sujet | Fichier | Score
+.1+^.^| 168 | 2026-07-11 | maintenance | BOM Upgrade workspace-bom:0.0.1 → 0.0.8 — 1 ligne `build.gradle.kts:25`, compileKotlin ✅, test ✅, publishToMavenLocal ✅. Maintenance pure, zéro code métier modifié. Tous les EPICs terminés | `168-bom-upgrade-0.0.8.adoc` | 9/10
 .1+^.^| 167 | 2026-07-09 | fix | Bug Feature 18 MessageFormat Quoting — 1 ligne `I18nErrorSteps.kt` (`get()` → `format()`), 7/7 feature 18 PASS, 122/122 Cucumber PASS, 1312+ unitaires verts, publishToMavenLocal OK. Zéro production modifié. Constat : EPIC rattrapage i18n déjà terminé | `167-fix-feature-18-messageformat-quoting.adoc` | 9/10
 .1+^.^| 166 | 2026-07-09 | BDD | US-BND-7 Cucumber full pipeline end-to-end — scénario `@full-pipeline` vérifie les 4 stratégies coexistant dans un rendu KG (Classes TRANSLATE, LlmService PRESERVE, pipeline BORROW, REAC PRESERVE registry). 6 steps Cucumber ajoutés (Given/When/Then) + 2 champs PlantumlWorld. 1312 unitaires 0 fail, 12/12 Cucumber boundary PASS, publishToMavenLocal OK. EPIC PLT-BOUNDARY CLOTUREE 8/8 US | `166-us-bnd-7-cucumber-full-pipeline.adoc` | 9/10
 .1+^.^| 165 | 2026-07-09 | DDD + TDD + BDD | US-BND-6 NonTranslatableTermRegistry — registre configurable YAML `terms: [list]` (Set minimal), `NonTranslatableTermRegistryLoader` (Jackson YAML), `TranslationResolver` param optionnel `nonTranslatableRegistry?` court-circuit PRESERVE avant classification (priorité sur classifier + glossary), 2 tasks câblées (registry vide défaut), 6 tests unitaires + 3 TranslationResolver (priorité + backward-compat), 2 scénarios Cucumber `@non-translatable` (REAC vs classifier, AFNOR vs glossary BORROW), 1303 unitaires 0 fail, 11/11 Cucumber boundary PASS, publishToMavenLocal OK. EPIC PLT-BOUNDARY 7/8 US | `165-us-bnd-6-non-translatable-term-registry.adoc` | 9/10
@@ -152,6 +153,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 | EPIC PLT-BOUNDARY : Translation Boundary (8 US, ~26 pts) | ✅ 100% | 8/8 | ✅ TERMINÉ — Session 166 (US-BND-7 Cucumber full pipeline end-to-end) |
 | EPIC rattrapage i18n : Traduction 196 lignes × 9 langues | ✅ 100% | — | ✅ TERMINÉ — 9 fichiers `Messages_*.properties` traduits, 9 tests `Messages*TranslationTest.kt` PASS |
 | Bug Feature 18 : Quoting MessageFormat `''plantuml''` vs `'plantuml'` | ✅ 100% | — | ✅ FIXÉ — Session 167 (1 ligne `I18nErrorSteps.kt`) |
+| BOM upgrade : `workspace-bom:0.0.1` → `0.0.8` | ✅ 100% | — | ✅ TERMINÉ — Session 168 (1 ligne `build.gradle.kts:25`) |
 | EPIC 13 : Multi-provider API Pool (tiers + cross-provider) | ✅ 100% | 6/6 | ✅ TERMINÉ — S161 5/6 tâches (KeyTier, TieredRotationStrategy, getNextKey descente, fallbackEnabled, YAML schema) + S162 cross-provider fallback (`CrossProviderFallbackOrchestrator`) |
 | CNV-6 : Migration conventions plugins education.cccp.build.* | ✅ 100% | — | ✅ TERMINÉ — Session 155 (build.gradle.kts 616→570, -46 lignes, variantes gardées) |
 | BKY-PUB-1 ✅ : Publication Maven Central | ✅ 100% | 9/10 | ✅ TERMINÉ — Session 147 (nmcp, 0.0.1)

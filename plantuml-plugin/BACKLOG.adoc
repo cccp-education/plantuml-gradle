@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-07-09 (Session 167 — Fix Bug Feature 18 MessageFormat Quoting + constat EPIC rattrapage i18n déjà terminé)
+:last_update: 2026-07-11 (Session 168 — BOM Upgrade workspace-bom:0.0.1 → 0.0.8)
 
 '''
 == ✅ EPIC 13 : Multi-provider API Pool — Rotation par tiers + Cross-provider
@@ -399,7 +399,13 @@ EPIC PLT-I18N a livré l'infrastructure i18n (`PlantumlMessages`, `ResourceBundl
 
 == Prochains EPICs
 
-1. **BOM upgrade** — 🟢 Maintenance — `workspace-bom:0.0.1` → `0.0.7` (MEMPHIS Session 017)
+1. **Kover ≥ 75%** — 🟢 Maintenance — Vérifier seuil maintenu (dernière vérification S147, 81.19%)
+2. **Consulter PLAN_GLOBAL.adoc** — prochains EPICs cross-borough (backlog vide, tous les EPICs terminés)
+
+== ✅ BOM upgrade — TERMINÉ (Session 168)
+
+`workspace-bom:0.0.1` → `0.0.8` (1 ligne `build.gradle.kts:25`). compileKotlin ✅,
+test ✅, publishToMavenLocal ✅. Maintenance pure, zéro code métier modifié.
 
 == ✅ EPIC rattrapage i18n — TERMINÉ (Session 167)
 

@@ -1,0 +1,30 @@
+= Session 168 — BOM Upgrade workspace-bom:0.0.1 → 0.0.8
+:session: 168
+:date: 2026-07-11
+:type: maintenance
+:score: 9/10
+
+== Contexte
+
+PROMPT_REPRISE visait `workspace-bom:0.0.7` mais la réalité Maven Central est
+`0.0.8` (dernière release). Le `includeBuild("../workspace-bom")` local est
+aussi en `0.0.8` (`build.gradle.kts` version = `"0.0.8"`).
+
+== Fait
+
+- BOM `workspace-bom:0.0.1` → `0.0.8` dans `build.gradle.kts:25` (1 ligne) ✅
+- `./gradlew compileKotlin` BUILD SUCCESSFUL (24s) ✅
+- `./gradlew test` BUILD SUCCESSFUL (57s, 13 tasks) ✅
+- `./gradlew publishToMavenLocal` BUILD SUCCESSFUL (15s) ✅
+- Baby-step : 1 changement, 1 vérification ✅
+
+== Non fait
+
+- (rien — maintenance pure, zéro code métier modifié)
+
+== Prochaine session
+
+- Backlog vide — tous les EPICs sont terminés (13, PLT-I18N, PLT-BOUNDARY,
+  rattrapage i18n, Bug Feature 18)
+- Vérifier s'il y a des EPICs en attente dans PLAN_GLOBAL.adoc ou BACKLOG.adoc
+- Maintenance possible : Kover ≥ 75% (non vérifié depuis S166)
