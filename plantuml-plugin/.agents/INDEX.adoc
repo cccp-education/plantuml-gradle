@@ -2,9 +2,9 @@
 
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
-_Derniere mise a jour_ : 2026-07-11  
-_Session en cours_ : 170 — Fix koverThresholdCheck + Cucumber + PLAN_GLOBAL.adoc  
-_Session terminee_ : 169 — Kover Verification + Backlog Audit. Kover main 92.93% ✅ ≥ 75%. Cucumber 26 failures (timeout, préexistant). Backlog vide, tous les EPICs terminés.
+_Derniere mise a jour_ : 2026-07-14  
+_Session en cours_ : 171 — ApiKeyPoolSteps.kt + timeout Cucumber + PLAN_GLOBAL.adoc  
+_Session terminee_ : 170 — Fix koverThresholdCheck (functionalTest exclu, 83.26% PASS) + Cucumber feature 15 i18n fixé (3 failures → 0, log diagnostic anglais fixe). Feature 14 (18 UndefinedStepException) reste.
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
 '''
@@ -119,6 +119,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 
 |=== 
 | # | Date | Type | Sujet | Fichier | Score
+.1+^.^| 170 | 2026-07-14 | fix | Fix koverThresholdCheck (functionalTest exclu, 83.26% PASS) + Cucumber feature 15 i18n fixé (3 failures → 0, log diagnostic anglais fixe non i18nisé). Feature 14 (18 UndefinedStepException) reste. `./gradlew test` zéro régression, publishToMavenLocal OK | `170-fix-kover-cucumber-i18n.adoc` | 9/10
 .1+^.^| 169 | 2026-07-11 | maintenance | Kover Verification + Backlog Audit — Kover main 92.93% ✅ ≥ 75%, `koverThresholdCheck` FAIL (agrégat main+functionalTest 53.55%), Cucumber 26 failures timeout préexistant, backlog vide | `169-kover-verification.adoc` | 8/10
 .1+^.^| 168 | 2026-07-11 | maintenance | BOM Upgrade workspace-bom:0.0.1 → 0.0.8 — 1 ligne `build.gradle.kts:25`, compileKotlin ✅, test ✅, publishToMavenLocal ✅. Maintenance pure, zéro code métier modifié. Tous les EPICs terminés | `168-bom-upgrade-0.0.8.adoc` | 9/10
 .1+^.^| 167 | 2026-07-09 | fix | Bug Feature 18 MessageFormat Quoting — 1 ligne `I18nErrorSteps.kt` (`get()` → `format()`), 7/7 feature 18 PASS, 122/122 Cucumber PASS, 1312+ unitaires verts, publishToMavenLocal OK. Zéro production modifié. Constat : EPIC rattrapage i18n déjà terminé | `167-fix-feature-18-messageformat-quoting.adoc` | 9/10
@@ -155,7 +156,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 | EPIC rattrapage i18n : Traduction 196 lignes × 9 langues | ✅ 100% | — | ✅ TERMINÉ — 9 fichiers `Messages_*.properties` traduits, 9 tests `Messages*TranslationTest.kt` PASS |
 | Bug Feature 18 : Quoting MessageFormat `''plantuml''` vs `'plantuml'` | ✅ 100% | — | ✅ FIXÉ — Session 167 (1 ligne `I18nErrorSteps.kt`) |
 | BOM upgrade : `workspace-bom:0.0.1` → `0.0.8` | ✅ 100% | — | ✅ TERMINÉ — Session 168 (1 ligne `build.gradle.kts:25`) |
-| Kover ≥ 75% : Vérification seuil main source set | ✅ 100% | — | ✅ VÉRIFIÉ — Session 169 (main 92.93% INSTRUCTION, LINE 95.76%, BRANCH 74.20%) |
+| Kover ≥ 75% : Vérification seuil main source set | ✅ 100% | — | ✅ FIXÉ — Session 170 (koverThresholdCheck PASS 83.26%, functionalTest exclu du calcul) |
 | EPIC 13 : Multi-provider API Pool (tiers + cross-provider) | ✅ 100% | 6/6 | ✅ TERMINÉ — S161 5/6 tâches (KeyTier, TieredRotationStrategy, getNextKey descente, fallbackEnabled, YAML schema) + S162 cross-provider fallback (`CrossProviderFallbackOrchestrator`) |
 | CNV-6 : Migration conventions plugins education.cccp.build.* | ✅ 100% | — | ✅ TERMINÉ — Session 155 (build.gradle.kts 616→570, -46 lignes, variantes gardées) |
 | BKY-PUB-1 ✅ : Publication Maven Central | ✅ 100% | 9/10 | ✅ TERMINÉ — Session 147 (nmcp, 0.0.1)

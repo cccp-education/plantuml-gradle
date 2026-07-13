@@ -1,5 +1,34 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-07
 
+== Session 170 (2026-07-14) — Fix koverThresholdCheck + Cucumber i18n failures
+
+=== Fait
+- `build.gradle.kts:475` : `includedSourceSets.addAll("main", "functionalTest")` → `includedSourceSets.add("main")` ✅
+- functionalTest est du code de test — l'inclure dans Kover est une erreur (0% coverage plombe l'agrégat 53.55%)
+- `./gradlew koverXmlReport -x cucumberTest -x functionalTest` BUILD SUCCESSFUL ✅
+- `./gradlew koverThresholdCheck` BUILD SUCCESSFUL ✅ — Instruction coverage 83.26% (missed=14435, covered=71820) ≥ 75%
+- Cucumber 21 failures investigués :
+  * Feature 14 (18 `UndefinedStepException`) — `ApiKeyPoolSteps.kt` jamais créé (backlog)
+  * Feature 15 (3 failures) — log `config.resolved_language` i18nisé (`已解析语言：zh`) vs test attend `Resolved language: zh`
+- `GeneratePlantumlDiagramsTask.kt:88` : `PlantumlMessages.format("config.resolved_language", lang, config.language)` → `logger.lifecycle("Resolved language: ${config.language}")` ✅
+- Log diagnostic technique en anglais fixe (non localisé) — i18n sert la compréhension utilisateur, pas les logs système
+- `./gradlew compileKotlin` BUILD SUCCESSFUL ✅
+- `./gradlew publishToMavenLocal` BUILD SUCCESSFUL ✅
+- `./gradlew test` BUILD SUCCESSFUL ✅ (zéro régression unitaire)
+- `./gradlew cucumberTest '-Pcucumber.tags=@yaml-config'` → PASSED ✅ (zh)
+- `./gradlew cucumberTest '-Pcucumber.tags=@gradle-properties'` → PASSED ✅ (es)
+- `./gradlew cucumberTest '-Pcucumber.tags=@env-var'` → PASSED ✅ (hi)
+
+=== Non fait
+- Feature 14 (18 `UndefinedStepException`) — `ApiKeyPoolSteps.kt` à implémenter (backlog, ~40 step definitions)
+- Timeout `cucumberTest` 10min — `forkEvery=1` redémarre la JVM 97 fois, atteint le timeout
+- Consultation PLAN_GLOBAL.adoc pour prochains EPICs cross-borough
+
+=== Prochaine session
+- Implémenter `ApiKeyPoolSteps.kt` pour feature 14 (18 scénarios BDD, baby-step DDD/TDD/BDD)
+- Augmenter timeout cucumberTest 10min → 15min (ou optimiser forkEvery)
+- Consulter PLAN_GLOBAL.adoc pour prochains EPICs cross-borough
+
 == Session 169 (2026-07-11) — Kover Verification + Backlog Audit
 
 === Fait

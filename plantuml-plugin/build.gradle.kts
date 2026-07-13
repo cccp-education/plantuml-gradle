@@ -469,10 +469,7 @@ tasks.named(functionalTest.processResourcesTaskName) {
 kover {
     currentProject {
         sources {
-            // Include main + functionalTest in coverage
-            // By default, Kover already includes 'main' and excludes 'test'
-            // We explicitly add functionalTest
-            includedSourceSets.addAll("main", "functionalTest")
+            includedSourceSets.add("main")
         }
     }
     reports {

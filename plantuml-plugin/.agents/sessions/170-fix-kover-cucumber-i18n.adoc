@@ -1,0 +1,66 @@
+= Session 170 — Fix koverThresholdCheck + Cucumber i18n failures
+:session: 170
+:date: 2026-07-14
+:type: fix
+:score: 9/10
+
+== Contexte
+
+Session 169 avait identifié 2 problèmes : `koverThresholdCheck` FAIL (agrégat
+main+functionalTest = 53.55% < 75%) et Cucumber 26 failures (timeout 10min,
+non investigué). Backlog vide, tous les EPICs terminés.
+
+== Fait
+
+=== P1 — Fix koverThresholdCheck ✅
+
+- `build.gradle.kts:475` : `includedSourceSets.addAll("main", "functionalTest")`
+  → `includedSourceSets.add("main")`
+- `functionalTest` est du code de test — l'inclure dans le périmètre Kover est
+  une erreur de conception (0% coverage plombe l'agrégat)
+- `./gradlew koverXmlReport -x cucumberTest -x functionalTest` BUILD SUCCESSFUL ✅
+- `./gradlew koverThresholdCheck` BUILD SUCCESSFUL ✅ — Instruction coverage
+  83.26% (missed=14435, covered=71820) ≥ 75%
+
+=== P2 — Investiger Cucumber 21 failures ✅
+
+Diagnostic complet des 21 failures :
+
+* **Feature 14 (18 failures)** : `14_api_key_pool.feature` — 18 scénarios
+  `UndefinedStepException` : les step definitions n'existent pas
+  (`ApiKeyPoolSteps.kt` jamais créé). Backlog restant.
+* **Feature 15 (3 failures)** : `15_i18n_language_switch.feature` — scénarios
+  `@yaml-config` (zh), `@gradle-properties` (es), `@env-var` (hi) FAIL.
+  Cause : `GeneratePlantumlDiagramsTask.kt:88` log `config.resolved_language`
+  i18nisé → `已解析语言：zh` / `Idioma resuelto: es` / `हल की गई भाषा: hi`,
+  mais le test Cucumber attend `Resolved language: zh` (anglais fixe).
+  Bug de conception i18n : un log de diagnostic technique ne doit pas être
+  localisé.
+
+=== P2 — Fix 3 failures Cucumber feature 15 ✅
+
+- `GeneratePlantumlDiagramsTask.kt:88` :
+  `PlantumlMessages.format("config.resolved_language", lang, config.language)`
+  → `logger.lifecycle("Resolved language: ${config.language}")`
+- Log de diagnostic technique en anglais fixe (non i18nisé)
+- `./gradlew compileKotlin` BUILD SUCCESSFUL ✅
+- `./gradlew publishToMavenLocal` BUILD SUCCESSFUL ✅
+- `./gradlew test` BUILD SUCCESSFUL ✅ (zéro régression unitaire)
+- `./gradlew cucumberTest '-Pcucumber.tags=@yaml-config'` → PASSED ✅
+- `./gradlew cucumberTest '-Pcucumber.tags=@gradle-properties'` → PASSED ✅
+- `./gradlew cucumberTest '-Pcucumber.tags=@env-var'` → PASSED ✅
+
+== Non fait
+
+- Feature 14 (18 `UndefinedStepException`) — `ApiKeyPoolSteps.kt` à implémenter
+  (backlog, ~40 step definitions)
+- Timeout `cucumberTest` 10min — `forkEvery=1` redémarre la JVM 97 fois,
+  atteint le timeout. Augmenter à 15min ou optimiser.
+- Consultation PLAN_GLOBAL.adoc pour prochains EPICs cross-borough
+
+== Prochaine session
+
+- Implémenter `ApiKeyPoolSteps.kt` pour feature 14 (18 scénarios BDD)
+  Baby-step DDD/TDD/BDD : 1 step à la fois, Red→Green→Refactor
+- Augmenter timeout cucumberTest 10min → 15min (ou optimiser forkEvery)
+- Consulter PLAN_GLOBAL.adoc pour prochains EPICs cross-borough

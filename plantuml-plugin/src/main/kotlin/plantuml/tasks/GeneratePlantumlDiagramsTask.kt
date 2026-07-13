@@ -85,7 +85,7 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         
         // Load configuration
         val config = loadConfiguration()
-        logger.lifecycle(PlantumlMessages.format("config.resolved_language", lang, config.language))
+        logger.lifecycle("Resolved language: ${config.language}")
         val promptsDir = project.findProperty("plantuml.prompts.dir") as? String
             ?: config.input.prompts
 

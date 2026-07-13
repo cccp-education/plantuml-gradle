@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-07-11 (Session 168 — BOM Upgrade workspace-bom:0.0.1 → 0.0.8)
+:last_update: 2026-07-14 (Session 170 — koverThresholdCheck FIX + Cucumber feature 15 i18n fix)
 
 '''
 == ✅ EPIC 13 : Multi-provider API Pool — Rotation par tiers + Cross-provider
@@ -399,8 +399,15 @@ EPIC PLT-I18N a livré l'infrastructure i18n (`PlantumlMessages`, `ResourceBundl
 
 == Prochains EPICs
 
-1. **Kover ≥ 75%** — 🟢 Maintenance — Vérifier seuil maintenu (dernière vérification S147, 81.19%)
-2. **Consulter PLAN_GLOBAL.adoc** — prochains EPICs cross-borough (backlog vide, tous les EPICs terminés)
+1. **EPIC Cucumber Feature 14** — 🟠 BDD — Implémenter `ApiKeyPoolSteps.kt`
+   (18 step definitions manquantes, `UndefinedStepException`). Baby-step
+   DDD/TDD/BDD : 1 step à la fois, Red→Green→Refactor. Scénarios : init
+   pool, add key, multiple keys/providers, ROUND_ROBIN, quota threshold,
+   expiration, metadata, service type, fallback, audit logging, versioning,
+   reset policy.
+2. **Timeout cucumberTest** — 🟡 Maintenance — Augmenter 10min → 15min
+   (`forkEvery=1` redémarre JVM 97 fois, atteint timeout).
+3. **Consulter PLAN_GLOBAL.adoc** — prochains EPICs cross-borough
 
 == ✅ BOM upgrade — TERMINÉ (Session 168)
 

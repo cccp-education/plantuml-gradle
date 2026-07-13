@@ -1,31 +1,34 @@
-= PROMPT_REPRISE — Plantuml — Session 170
-:session: 170
-:date: 2026-07-11
+= PROMPT_REPRISE — Plantuml — Session 171
+:session: 171
+:date: 2026-07-14
 
-== État — Kover main ≥ 75% vérifié, Backlog vide
+== État — koverThresholdCheck PASS 83.26%, feature 15 fixée
 
-Session 169 : Kover main source set INSTRUCTION 92.93% ✅ ≥ 75%. Cucumber 26
-failures (timeout 10min, préexistant). Tous les EPICs terminés.
+Session 170 : koverThresholdCheck FIXÉ (functionalTest exclu, 83.26% ≥ 75%).
+Cucumber feature 15 i18n fixé (3 failures → 0, log diagnostic anglais fixe).
+Feature 14 (18 UndefinedStepException) reste à implémenter.
 
-== Mission session 170 — Fix koverThresholdCheck + Cucumber
+== Mission session 171 — ApiKeyPoolSteps.kt + timeout Cucumber
 
-1. **koverThresholdCheck** — ne compter que le source set `main` (exclure
-   functionalTest du calcul). Actuellement l'agrégat main+functionalTest
-   donne 53.55% < 75% → FAIL, mais main seul = 92.93%.
+1. **ApiKeyPoolSteps.kt** — implémenter les 18 step definitions manquantes
+   pour `14_api_key_pool.feature` (`UndefinedStepException`). Baby-step
+   DDD/TDD/BDD : 1 step à la fois, Red→Green→Refactor. Les scénarios
+   couvrent : init pool, add key, multiple keys/providers, ROUND_ROBIN
+   selection, quota threshold, expiration, metadata, service type filtering,
+   fallback enabled/disabled, audit logging, versioning, reset policy.
 
-2. **Cucumber 26 failures** — investiguer timeout 10 minutes (probablement
-   isolation GradleRunner dans les scénarios Cucumber).
+2. **Timeout cucumberTest** — augmenter 10min → 15min (forkEvery=1 redémarre
+   la JVM 97 fois, atteint le timeout).
 
-3. **PLAN_GLOBAL.adoc** — consulter pour prochains EPICs cross-borough
-   (backlog vide, tous les EPICs terminés).
+3. **PLAN_GLOBAL.adoc** — consulter pour prochains EPICs cross-borough.
 
 == Backlog — Prochains EPICs
 
 [cols="1,4,1"]
 |===
 | Priorité | Tâche | Statut
-| 🔴 P1 | Fix koverThresholdCheck — exclure functionalTest du calcul | ⬜
-| 🟡 P2 | Investiguer Cucumber 26 failures (timeout) | ⬜
+| 🔴 P1 | Implémenter ApiKeyPoolSteps.kt (18 step definitions feature 14) | ⬜
+| 🟡 P2 | Augmenter timeout cucumberTest 10min → 15min | ⬜
 | 🟢 P3 | Consulter PLAN_GLOBAL.adoc — prochains EPICs cross-borough | ⬜
 |===
 
@@ -41,5 +44,6 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 - BOM: `workspace-bom:0.0.8` ✅
 - `publishToMavenLocal` obligatoire après modif code plugin
 - conventions-gradle ✅ intégré (build.gradle.kts 0.0.2)
-- Kover main: 92.93% INSTRUCTION ✅ ≥ 75%
-- Voir `sessions/169-kover-verification.adoc`
+- Kover main: 83.26% INSTRUCTION ✅ ≥ 75% (koverThresholdCheck PASS)
+- Cucumber: 97 tests, 18 failures (feature 14 UndefinedStepException), 10 skipped
+- Voir `sessions/170-fix-kover-cucumber-i18n.adoc`

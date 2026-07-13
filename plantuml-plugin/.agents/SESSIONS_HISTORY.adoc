@@ -1,5 +1,9 @@
 = Historique des Sessions
 
+== Session 170 (2026-07-14) — Fix koverThresholdCheck + Cucumber i18n failures
+
+P1 koverThresholdCheck FIXÉ : `build.gradle.kts:475` `includedSourceSets.addAll("main", "functionalTest")` → `add("main")`. functionalTest est du code de test — l'inclure dans Kover est une erreur (0% coverage plombe l'agrégat 53.55%). `koverThresholdCheck` PASS 83.26% ≥ 75%. P2 Cucumber 21 failures investigués : feature 14 (18 `UndefinedStepException` — `ApiKeyPoolSteps.kt` jamais créé, backlog), feature 15 (3 failures — log `config.resolved_language` i18nisé `已解析语言：zh` vs test attend `Resolved language: zh`). Fix : `GeneratePlantumlDiagramsTask.kt:88` `PlantumlMessages.format(...)` → `logger.lifecycle("Resolved language: ${config.language}")` (log diagnostic anglais fixe, non localisé). 3/3 scénarios `@yaml-config`, `@gradle-properties`, `@env-var` PASS. `./gradlew test` zéro régression. publishToMavenLocal OK. ✅
+
 == Session 169 (2026-07-11) — Kover Verification + Backlog Audit
 
 Kover main source set INSTRUCTION 92.93% ✅ ≥ 75% (LINE 95.76%, BRANCH 74.20%). `koverThresholdCheck` parse tout le XML (main+functionalTest) → 53.55% < 75% → FAIL (functionalTest 0% coverage plombe l'agrégat). Cucumber 26 failures, 9 skipped, timeout 10 minutes (préexistant, non investigué). Backlog vide, tous les EPICs terminés. Prochaine session : fix koverThresholdCheck (exclure functionalTest), investiguer Cucumber, consulter PLAN_GLOBAL.adoc. ✅
