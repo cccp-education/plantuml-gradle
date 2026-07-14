@@ -44,6 +44,14 @@ class PlantumlWorld {
     var boundaryGraph: plantuml.KnowledgeGraph? = null
     var boundaryRenderedDiagram: String? = null
 
+    var apiKeyPool: plantuml.apikey.ApiKeyPool? = null
+    var apiKeyPoolEntries: MutableList<plantuml.apikey.ApiKeyEntry> = mutableListOf()
+    var apiKeyPoolSelectedKeys: MutableList<plantuml.apikey.ApiKeyEntry> = mutableListOf()
+    var apiKeyPoolConfig: plantuml.apikey.ApiKeyPoolConfig? = null
+    var apiKeyPoolAuditEnabled: Boolean = true
+    var apiKeyPoolFallbackEnabled: Boolean = true
+    var apiKeyPoolVersion: String = "1.0"
+
     private val asyncJobs = mutableListOf<Deferred<BuildResult>>()
     
     private val version: String = System.getProperty("plugin.version", "0.0.0")
@@ -555,6 +563,13 @@ class PlantumlWorld {
         boundaryDiagram = null
         boundaryGraph = null
         boundaryRenderedDiagram = null
+        apiKeyPool = null
+        apiKeyPoolEntries.clear()
+        apiKeyPoolSelectedKeys.clear()
+        apiKeyPoolConfig = null
+        apiKeyPoolAuditEnabled = true
+        apiKeyPoolFallbackEnabled = true
+        apiKeyPoolVersion = "1.0"
         System.clearProperty("plantuml.test.disk.full")
         System.clearProperty("plantuml.test.rag.mode")
     }

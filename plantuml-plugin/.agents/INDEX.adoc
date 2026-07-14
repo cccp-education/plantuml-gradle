@@ -3,8 +3,8 @@
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
 _Derniere mise a jour_ : 2026-07-14  
-_Session en cours_ : 171 — ApiKeyPoolSteps.kt + timeout Cucumber + PLAN_GLOBAL.adoc  
-_Session terminee_ : 170 — Fix koverThresholdCheck (functionalTest exclu, 83.26% PASS) + Cucumber feature 15 i18n fixé (3 failures → 0, log diagnostic anglais fixe). Feature 14 (18 UndefinedStepException) reste.
+_Session en cours_ : 172 — Incremental Processing failures + PLAN_GLOBAL.adoc  
+_Session terminee_ : 171 — ApiKeyPoolSteps.kt créé (30+ steps, 18/18 feature 14 PASS), domaine getNextRoundRobin() skip quota (BDD Red→Green), timeout cucumberTest 10→15min. 108 PASS cucumber complet, 5 FAIL préexistantes.
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
 '''
@@ -119,6 +119,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 
 |=== 
 | # | Date | Type | Sujet | Fichier | Score
+.1+^.^| 171 | 2026-07-14 | BDD | ApiKeyPoolSteps.kt créé (~330 lignes, 30+ steps) — 18/18 scénarios feature 14 PASS. Domaine `getNextRoundRobin()` modifié pour skip quota saturé (BDD Red→Green). Timeout cucumberTest 10min → 15min. 108 PASS cucumber complet, 5 FAIL préexistantes (Incremental Processing). publishToMavenLocal OK | `171-api-key-pool-steps-timeout.adoc` | 9/10
 .1+^.^| 170 | 2026-07-14 | fix | Fix koverThresholdCheck (functionalTest exclu, 83.26% PASS) + Cucumber feature 15 i18n fixé (3 failures → 0, log diagnostic anglais fixe non i18nisé). Feature 14 (18 UndefinedStepException) reste. `./gradlew test` zéro régression, publishToMavenLocal OK | `170-fix-kover-cucumber-i18n.adoc` | 9/10
 .1+^.^| 169 | 2026-07-11 | maintenance | Kover Verification + Backlog Audit — Kover main 92.93% ✅ ≥ 75%, `koverThresholdCheck` FAIL (agrégat main+functionalTest 53.55%), Cucumber 26 failures timeout préexistant, backlog vide | `169-kover-verification.adoc` | 8/10
 .1+^.^| 168 | 2026-07-11 | maintenance | BOM Upgrade workspace-bom:0.0.1 → 0.0.8 — 1 ligne `build.gradle.kts:25`, compileKotlin ✅, test ✅, publishToMavenLocal ✅. Maintenance pure, zéro code métier modifié. Tous les EPICs terminés | `168-bom-upgrade-0.0.8.adoc` | 9/10

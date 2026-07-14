@@ -1,35 +1,35 @@
-= PROMPT_REPRISE — Plantuml — Session 171
-:session: 171
-:date: 2026-07-14
+= PROMPT_REPRISE — Plantuml — Session 172
+:session: 172
+:date: 2026-07-15
 
-== État — koverThresholdCheck PASS 83.26%, feature 15 fixée
+== État — Feature 14 complète 18/18 PASS, timeout 15min
 
-Session 170 : koverThresholdCheck FIXÉ (functionalTest exclu, 83.26% ≥ 75%).
-Cucumber feature 15 i18n fixé (3 failures → 0, log diagnostic anglais fixe).
-Feature 14 (18 UndefinedStepException) reste à implémenter.
+Session 171 : ApiKeyPoolSteps.kt créé (30+ step definitions), 18/18 scénarios
+feature 14 PASS. Domaine `getNextRoundRobin()` modifié pour skip quota saturé
+(BDD Red→Green). Timeout cucumberTest 10min → 15min. 108 PASS cucumber complet,
+5 FAIL préexistantes (Incremental Processing).
 
-== Mission session 171 — ApiKeyPoolSteps.kt + timeout Cucumber
+== Mission session 172 — Incremental Processing + PLAN_GLOBAL
 
-1. **ApiKeyPoolSteps.kt** — implémenter les 18 step definitions manquantes
-   pour `14_api_key_pool.feature` (`UndefinedStepException`). Baby-step
-   DDD/TDD/BDD : 1 step à la fois, Red→Green→Refactor. Les scénarios
-   couvrent : init pool, add key, multiple keys/providers, ROUND_ROBIN
-   selection, quota threshold, expiration, metadata, service type filtering,
-   fallback enabled/disabled, audit logging, versioning, reset policy.
+1. **Incremental Processing failures** — 5 scénarios Cucumber en FAILED
+   (feature 9) depuis session 169 minimum. GradleRunner `generatePlantumlDiagrams`
+   échoue. Investigation : est-ce un problème de mock LLM, de config, ou de
+   tâche Gradle ? Baby-step DDD/TDD/BDD : 1 scénario à la fois, Red→Green.
 
-2. **Timeout cucumberTest** — augmenter 10min → 15min (forkEvery=1 redémarre
-   la JVM 97 fois, atteint le timeout).
+2. **Consulter PLAN_GLOBAL.adoc** — prochains EPICs cross-borough (racine
+   workspace). Identifier les EPICs candidats pour plantuml-gradle.
 
-3. **PLAN_GLOBAL.adoc** — consulter pour prochains EPICs cross-borough.
+3. **Kover ≥ 75%** — vérifier maintien après ajout ApiKeyPoolSteps.kt (83.26%
+   baseline session 170).
 
 == Backlog — Prochains EPICs
 
 [cols="1,4,1"]
 |===
 | Priorité | Tâche | Statut
-| 🔴 P1 | Implémenter ApiKeyPoolSteps.kt (18 step definitions feature 14) | ⬜
-| 🟡 P2 | Augmenter timeout cucumberTest 10min → 15min | ⬜
-| 🟢 P3 | Consulter PLAN_GLOBAL.adoc — prochains EPICs cross-borough | ⬜
+| 🔴 P1 | Fix 5 scénarios Incremental Processing (feature 9) | ⬜
+| 🟡 P2 | Consulter PLAN_GLOBAL.adoc — prochains EPICs cross-borough | ⬜
+| 🟢 P3 | Vérifier Kover ≥ 75% après ApiKeyPoolSteps.kt | ⬜
 |===
 
 == Méthodologie
@@ -45,5 +45,5 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 - `publishToMavenLocal` obligatoire après modif code plugin
 - conventions-gradle ✅ intégré (build.gradle.kts 0.0.2)
 - Kover main: 83.26% INSTRUCTION ✅ ≥ 75% (koverThresholdCheck PASS)
-- Cucumber: 97 tests, 18 failures (feature 14 UndefinedStepException), 10 skipped
-- Voir `sessions/170-fix-kover-cucumber-i18n.adoc`
+- Cucumber: 108 PASS, 5 FAIL préexistantes (Incremental Processing), 18/18 feature 14 ✅
+- Voir `sessions/171-api-key-pool-steps-timeout.adoc`

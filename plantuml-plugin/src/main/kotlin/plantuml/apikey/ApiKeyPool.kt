@@ -64,11 +64,26 @@ class ApiKeyPool(
 
     /**
      * Get next key using round-robin strategy.
+     *
+     * Saturated keys (quota threshold exceeded) are skipped. If all keys are
+     * saturated, the round-robin continues with the original entry to guarantee
+     * a key is always returned.
      */
     private fun getNextRoundRobin(): ApiKeyEntry {
-        val entry = entries[currentIndex % entries.size]
-        currentIndex = (currentIndex + 1) % entries.size
-        return entry
+        val startIndex = currentIndex
+        var attempts = 0
+        while (attempts < entries.size) {
+            val candidate = entries[currentIndex % entries.size]
+            if (!tracker.isQuotaExceeded(candidate)) {
+                currentIndex = (currentIndex + 1) % entries.size
+                return candidate
+            }
+            currentIndex = (currentIndex + 1) % entries.size
+            attempts++
+        }
+        val fallback = entries[startIndex % entries.size]
+        currentIndex = (startIndex + 1) % entries.size
+        return fallback
     }
 
     /**

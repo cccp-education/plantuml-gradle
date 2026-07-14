@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-07-14 (Session 170 — koverThresholdCheck FIX + Cucumber feature 15 i18n fix)
+:last_update: 2026-07-14 (Session 171 — ApiKeyPoolSteps.kt 18/18 PASS + timeout 15min)
 
 '''
 == ✅ EPIC 13 : Multi-provider API Pool — Rotation par tiers + Cross-provider
@@ -399,15 +399,21 @@ EPIC PLT-I18N a livré l'infrastructure i18n (`PlantumlMessages`, `ResourceBundl
 
 == Prochains EPICs
 
-1. **EPIC Cucumber Feature 14** — 🟠 BDD — Implémenter `ApiKeyPoolSteps.kt`
-   (18 step definitions manquantes, `UndefinedStepException`). Baby-step
-   DDD/TDD/BDD : 1 step à la fois, Red→Green→Refactor. Scénarios : init
-   pool, add key, multiple keys/providers, ROUND_ROBIN, quota threshold,
-   expiration, metadata, service type, fallback, audit logging, versioning,
-   reset policy.
-2. **Timeout cucumberTest** — 🟡 Maintenance — Augmenter 10min → 15min
-   (`forkEvery=1` redémarre JVM 97 fois, atteint timeout).
-3. **Consulter PLAN_GLOBAL.adoc** — prochains EPICs cross-borough
+1. **EPIC Incremental Processing** — 🔴 BDD — Fix 5 scénarios Cucumber en
+   FAILED (feature 9) depuis session 169 minimum. GradleRunner
+   `generatePlantumlDiagrams` échoue. Investigation : mock LLM, config, ou
+   tâche Gradle ? Baby-step DDD/TDD/BDD : 1 scénario à la fois.
+2. **Consulter PLAN_GLOBAL.adoc** — 🟡 Roadmap — Prochains EPICs cross-borough
+   (racine workspace). Identifier les EPICs candidats pour plantuml-gradle.
+3. **Kover ≥ 75%** — 🟢 Maintenance — Vérifier maintien après ajout
+   ApiKeyPoolSteps.kt (83.26% baseline session 170).
+
+== ✅ EPIC Cucumber Feature 14 — TERMINÉ (Session 171)
+
+`ApiKeyPoolSteps.kt` créé (~330 lignes, 30+ step definitions). 18/18 scénarios
+PASS. Domaine `getNextRoundRobin()` modifié pour skip quota saturé (BDD
+Red→Green). Timeout cucumberTest 10min → 15min. 108 PASS cucumber complet,
+5 FAIL préexistantes (Incremental Processing).
 
 == ✅ BOM upgrade — TERMINÉ (Session 168)
 

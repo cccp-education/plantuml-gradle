@@ -315,7 +315,7 @@ val cucumberTest = tasks.register<Test>("cucumberTest") {
     jvmArgs("-XX:TieredStopAtLevel=1")
 
     // FIX: Timeout per test to prevent hanging
-    timeout.set(Duration.ofMinutes(10))
+    timeout.set(Duration.ofMinutes(15))
 
     // Cleanup after test execution
     doLast {

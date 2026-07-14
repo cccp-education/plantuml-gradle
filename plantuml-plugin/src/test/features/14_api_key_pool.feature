@@ -1,3 +1,4 @@
+@api-key-pool
 Feature: API Key Pool Management
 
   Scenario: Initialize empty API key pool
@@ -28,14 +29,14 @@ Feature: API Key Pool Management
 
   Scenario: Select next key with ROUND_ROBIN strategy
     Given a pool with 3 GOOGLE keys
-    When I select the next key 3 times
+    When I select the next pool key 3 times
     Then each selection should return a different key
     And the 4th selection should return the first key
 
   Scenario: Select key respects quota threshold
     Given a pool with 2 GOOGLE keys
     And the first key has consumed 85% of its quota
-    When I select the next key
+    When I select the next pool key
     Then the second key should be selected
 
   Scenario: API key with expiration date

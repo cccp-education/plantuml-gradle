@@ -1,0 +1,100 @@
+= Session 171 — ApiKeyPoolSteps.kt + timeout Cucumber
+:date: 2026-07-14
+:session: 171
+:type: BDD
+:score: 9/10
+
+== Mission
+
+Implémenter les 18 step definitions manquantes pour `14_api_key_pool.feature`
+(`UndefinedStepException`) + augmenter timeout cucumberTest 10min → 15min.
+
+Méthodologie : baby-step DDD/TDD/BDD (unit → functional → cucumber), agile
+software craftsmanship. Red→Green→Refactor, 1 step à la fois.
+
+== Fait
+
+=== 1. ApiKeyPoolSteps.kt — 18/18 scénarios PASS
+
+* **Fichier créé** : `src/test/scenarios/plantuml/scenarios/ApiKeyPoolSteps.kt`
+  (~330 lignes, 30+ step definitions)
+* **PlantumlWorld.kt** : 8 champs dédiés ajoutés (apiKeyPool, apiKeyPoolEntries,
+  apiKeyPoolSelectedKeys, apiKeyPoolConfig, apiKeyPoolAuditEnabled,
+  apiKeyPoolFallbackEnabled, apiKeyPoolVersion) + cleanup()
+* **Feature 14** : tag `@api-key-pool` ajouté pour filtrage `-Pcucumber.tags`
+* **Feature 14** : steps qualifiés "pool key" pour éviter collision avec
+  `TieredRotationSteps.kt` (feature 19) qui partageait "I select the next key"
+* **Patterns Cucumber** : `{word}` pour providers sans guillemets (GOOGLE,
+  HUGGINGFACE, GROQ), steps singulier/pluriel ("1 key" vs "3 keys")
+
+=== 2. Domaine ApiKeyPool.kt — getNextRoundRobin() skip quota
+
+* **BDD Red→Green** : scénario 6 "Select key respects quota threshold" révèle
+  que ROUND_ROBIN ne skip pas les clés saturées
+* **Fix domaine** : `getNextRoundRobin()` modifié pour skip les clés dont le
+  quota est dépassé. Si toutes saturées, fallback sur l'entry originale
+  (garantie qu'une clé est toujours retournée)
+* **Tests unitaires** : `ApiKeyPoolTest.kt` 17/17 PASS (zéro régression)
+* **Bilan** : 1 modification production (ApiKeyPool.kt:68-84), justifiée par BDD
+
+=== 3. Timeout cucumberTest 10min → 15min
+
+* `build.gradle.kts:318` : `Duration.ofMinutes(10)` → `Duration.ofMinutes(15)`
+* `forkEvery=1` redémarre la JVM 97 fois, 10min était insuffisant
+
+=== 4. Validation
+
+* `compileKotlin` ✅
+* `compileTestKotlin` ✅
+* `test` (unitaires) ✅ — zéro régression
+* `publishToMavenLocal` ✅
+* `cucumberTest -Pcucumber.tags="@api-key-pool"` — 18/18 PASS
+* `cucumberTest` (complet) — 108 PASS, 5 FAIL préexistantes (Incremental
+  Processing, GradleRunner `generatePlantumlDiagrams` — préexistantes depuis
+  session 169, non liées à mes changements)
+
+== Scénarios implémentés (18/18)
+
+1. Initialize empty API key pool ✅
+2. Add API key to pool ✅
+3. Add multiple API keys for same provider ✅
+4. Add API keys for multiple providers ✅
+5. Select next key with ROUND_ROBIN strategy ✅
+6. Select key respects quota threshold ✅ (domaine modifié)
+7. API key with expiration date ✅
+8. API key without expiration date ✅
+9. Quota configuration with custom threshold ✅
+10. API key metadata storage ✅
+11. Service type filtering ✅
+12. Fallback enabled configuration ✅
+13. Fallback disabled configuration ✅
+14. Audit logging enabled ✅
+15. Audit logging disabled ✅
+16. Pool configuration versioning ✅
+17. Reset policy DAILY ✅
+18. Reset policy MANUAL ✅
+
+== Fichiers modifiés
+
+* `src/main/kotlin/plantuml/apikey/ApiKeyPool.kt` — getNextRoundRobin() skip quota
+* `src/test/scenarios/plantuml/scenarios/ApiKeyPoolSteps.kt` — créé, 30+ steps
+* `src/test/scenarios/plantuml/scenarios/PlantumlWorld.kt` — 8 champs + cleanup
+* `src/test/features/14_api_key_pool.feature` — tag @api-key-pool + steps qualifiés
+* `build.gradle.kts` — timeout cucumberTest 10min → 15min
+
+== Prochaine session
+
+1. **Consulter PLAN_GLOBAL.adoc** — prochains EPICs cross-borough
+2. **Incremental Processing failures** — 5 scénarios préexistants en FAILED
+   (GradleRunner `generatePlantumlDiagrams`) — investigation nécessaire
+3. **Kover ≥ 75%** — vérifier maintien après ajout ApiKeyPoolSteps.kt
+
+== Rappels
+
+- GroupId: education.cccp.plantuml
+- Version publiée: 0.0.1 (Maven Central)
+- BOM: `workspace-bom:0.0.8` ✅
+- `publishToMavenLocal` obligatoire après modif code plugin
+- conventions-gradle ✅ intégré (build.gradle.kts 0.0.2)
+- Kover main: 83.26% INSTRUCTION ✅ ≥ 75% (koverThresholdCheck PASS)
+- Cucumber: 18/18 feature 14 PASS, 5 FAIL préexistantes (Incremental Processing)

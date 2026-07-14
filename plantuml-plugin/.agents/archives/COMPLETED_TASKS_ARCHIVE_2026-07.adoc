@@ -332,3 +332,21 @@
 - Bug pré-existant : `KnowledgeGraphDiagramFunctionalTest.should fail when graphify-out graph json does not exist` (à triager)
 - US-I18N-7 doc : `README_truth.adoc`, `CHANGELOG.adoc`, `PLUGIN_SELF_DOCUMENTATION.adoc` (non bloquants)
 - Cadrage prochain EPIC (consulter BACKLOG.adoc + PLAN_GLOBAL.adoc)
+
+== Session 171 (2026-07-14) — ApiKeyPoolSteps.kt + timeout Cucumber
+
+=== Fait
+- `ApiKeyPoolSteps.kt` créé (~330 lignes, 30+ step definitions Cucumber) ✅
+- 18/18 scénarios feature 14 PASS (init pool, add key, multiple keys/providers, ROUND_ROBIN, quota threshold, expiration, metadata, service type filtering, fallback enabled/disabled, audit logging, versioning, reset policy DAILY/MANUAL) ✅
+- `PlantumlWorld.kt` étendu +8 champs dédiés (apiKeyPool, apiKeyPoolEntries, apiKeyPoolSelectedKeys, apiKeyPoolConfig, apiKeyPoolAuditEnabled, apiKeyPoolFallbackEnabled, apiKeyPoolVersion) + cleanup() ✅
+- Feature 14 taggée `@api-key-pool` pour filtrage `-Pcucumber.tags` ✅
+- Steps qualifiés "pool key" pour éviter collision avec `TieredRotationSteps.kt` (feature 19) ✅
+- **Domaine modifié (BDD Red→Green)** : `ApiKeyPool.getNextRoundRobin()` skip les clés dont le quota est dépassé — 17/17 `ApiKeyPoolTest` PASS (zéro régression) ✅
+- Timeout cucumberTest 10min → 15min (`build.gradle.kts:318`) ✅
+- compileKotlin + compileTestKotlin + test + publishToMavenLocal SUCCESS ✅
+- Cucumber complet : 108 PASS / 5 FAIL préexistantes (Incremental Processing — GradleRunner `generatePlantumlDiagrams`) ✅
+
+=== Prochaine session
+- Fix 5 scénarios Incremental Processing (feature 9) — GradleRunner `generatePlantumlDiagrams` échoue (préexistant depuis session 169)
+- Consulter PLAN_GLOBAL.adoc — prochains EPICs cross-borough
+- Vérifier Kover ≥ 75% après ajout ApiKeyPoolSteps.kt (83.26% baseline S170)
