@@ -1,5 +1,31 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-07
 
+== Session 174 (2026-07-15) — Quick wins QW-1 + QW-2 + EP-1 incremental maturity 3/4
+
+=== Fait
+- QW-1 : `validateDiagram()` parsing réel — Jackson `readValue(ValidationFeedback::class.java)` + `KotlinModule` ✅
+- QW-1 : Fallback gracieux (score=5) si parse échoue + log warn i18n ✅
+- QW-1 : Clé i18n `processor.validation_parse_failed` × 11 fichiers `Messages_*.properties` (10 langues + default) ✅
+- QW-1 : Fix régression `DiagramProcessorPrivateMethodsTest` (assertion `isValid`/`valid` avec KotlinModule) ✅
+- QW-1 : 2 tests Red→Green (`should parse LLM JSON`, `should fallback on invalid JSON`) ✅
+- QW-2 : `api` → `implementation` — 8 dépendances migrées (jgit, commons-io, plantuml-ai, testcontainers, jackson×3, plantuml-engine) ✅
+- QW-2 : `compileKotlin` OK + `test` OK, zéro régression ✅
+- EP-1 (d) : `IncrementalEvent` sealed class (`PromptSkipped`, `PromptProcessed`, `OutputsCleaned`) + `onEvent()` listener ✅
+- EP-1 (d) : 7 tests `IncrementalEventTest.kt` ✅
+- EP-1 (b) : `IncrementalEventListener` fun interface + `IncrementalAuditLogger` (trace horodatée) ✅
+- EP-1 (b) : 7 tests `IncrementalAuditLoggerTest.kt` ✅
+- EP-1 (a) : `IncrementalConfig` (checksumsDir, auditLog, auditEnabled) câblé dans `PlantumlConfig` ✅
+- EP-1 (a) : `GeneratePlantumlDiagramsTask` lit `config.incremental` au lieu du hardcodé ✅
+- EP-1 (a) : 5 tests `IncrementalConfigTest.kt` ✅
+- `./gradlew test` BUILD SUCCESSFUL (2528 tests, 0 failure) ✅
+- `./gradlew cucumberTest -Pcucumber.tags="@incremental"` 5/5 PASS ✅
+- `./gradlew publishToMavenLocal` BUILD SUCCESSFUL ✅
+
+=== Prochaine session
+- EP-1 (c) : RAG reindex incrémental dans `CollectPlantumlIndexTask`
+- QW-3 : README_truth.adoc + CHANGELOG.adoc mise à jour
+- Fichier à lire en priorité : `PROMPT_REPRISE.adoc`
+
 == Session 172 (2026-07-15) — Incremental Processing : Domaine DDD + 5/5 Cucumber PASS
 
 === Fait

@@ -22,6 +22,7 @@ data class PlantumlConfig(
     val git: GitConfig = GitConfig(),
     val rag: RagConfig = RagConfig(),
     val diagramDocs: DiagramDocsConfig = DiagramDocsConfig(),
+    val incremental: plantuml.incremental.IncrementalConfig = plantuml.incremental.IncrementalConfig(),
     val language: String = "en",
     val supportedLanguages: List<String> = listOf("en")
 ) {

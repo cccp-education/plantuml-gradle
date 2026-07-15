@@ -1,5 +1,24 @@
 = Idées de choses à faire
 
-== Integrer un pool de clé gemini/ollama.cloud/huggingface/mistral/groq rotatif suivant le ratio de freemium dans la configuration yaml du context du plugin plantuml
+_Voir BACKLOG.adoc section "Prochains EPICs — pistes consolidées" pour le
+détail priorisé et les sources (code review, audit code)._
 
-== passer des vrai clé et credential pour une couverture de test production-close, avec un context de plugin dedié aux tests réel en local et github action secret, juste sur demande avec un parametre dans la ligne de commande pour activé la condition reel a la place des mocks
+== Pool de clés freemium rotatif
+
+Integrer un pool de clé gemini/ollama.cloud/huggingface/mistral/groq rotatif
+suivant le ratio de freemium dans la configuration yaml du context du plugin
+plantuml.
+
+→ **EP-3** dans BACKLOG.adoc. EPIC 6 + EPIC 13 livrent déjà la rotation
+multi-provider. Reste : ratio freemium dynamique (poids basés sur quota réel).
+
+== Tests production-close
+
+Passer des vrais clé et credential pour une couverture de test
+production-close, avec un context de plugin dedié aux tests réel en local et
+github action secret, juste sur demande avec un parametre dans la ligne de
+commande pour activé la condition reel a la place des mocks.
+
+→ **EP-2** dans BACKLOG.adoc. Les 6 tests `@real-llm` existent mais ne
+s'exécutent jamais. Parameter CLI + context dédié + CI secrets à mettre en
+place.

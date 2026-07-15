@@ -1,0 +1,72 @@
+= Session 173 — Consolidation backlog + code review audit
+:date: 2026-07-15
+:type: governance
+:score: 8/10
+
+== Mission
+
+À la suite de la session 172 (Incremental Processing), l'utilisateur a
+demandé un inventaire complet de ce qui reste à faire pour plantuml-gradle :
+backlog, TODO, et code reviews non traitées.
+
+== Démarche
+
+Lecture croisée des sources :
+- `BACKLOG.adoc` — items ouverts
+- `TODO.adoc` — idées informelles
+- `.agents/archives/CODE_REVIEW_2026-04.adoc` — code review v3 (8.2/10)
+- `configuration/.agents/code_review/GLOBAL_CODE_REVIEW_v7.adoc` — review
+  globale cross-borough (2026-05-13)
+- Audit du code actuel (`DiagramProcessor.kt`, `build.gradle.kts`,
+  `ConfigMerger.kt`) pour vérifier quels items sont encore pertinents
+
+== Inventaire consolidé
+
+=== Quick wins (< 1h)
+
+- **QW-1** : `validateDiagram()` parsing réel — LLM appelé mais réponse
+  jetée, retourne toujours `score=8` (`DiagramProcessor.kt:497-508`)
+- **QW-2** : `api` → `implementation` audit — 8 dépendances `api()` exposent
+  ~20 transitives aux consommateurs (`build.gradle.kts:39-50`)
+- **QW-3** : `README_truth.adoc` + `CHANGELOG.adoc` — mise à jour i18n +
+  incremental processing
+
+=== EPICs substantiels (1-3 sessions)
+
+- **EP-1** : Maturité domaine `plantuml.incremental` — config YAML checksums,
+  audit log, intégration `collectPlantumlIndex`, events domaine
+- **EP-2** : Tests production-close — parameter CLI mock→réel, context dédié,
+  CI secrets (6 tests `@real-llm` existent, jamais exécutés)
+- **EP-3** : Pool freemium ratio dynamique — poids basés sur quota réel dans
+  YAML (EPIC 6 + 13 livrent la rotation, reste le ratio)
+
+=== Polish (low priority)
+
+- **PL-1** : Configuration Cache — réévaluer compat AsciidoctorJ 3.0.1
+- **PL-2** : KDoc exhaustif sur classes publiques
+- **PL-3** : ktlint/detekt (dépend conventions-gradle ABIDJAN)
+- **PL-4** : Consulter `PLAN_GLOBAL.adoc` (racine workspace)
+
+=== Items déjà résolus (vérifiés dans le code)
+
+- ✅ JSON sérialisation — Jackson ObjectMapper (S précédente)
+- ✅ Double appel `validateDiagram()` — corrigé (variable réutilisée)
+- ✅ Debug logs `lifecycle()` → `logger.debug()` — corrigé
+- ✅ Port PostgreSQL hardcodé 5432 — devenu configurable
+- ✅ `println()` résiduels — zéro (vérifié `grep`)
+- ✅ Commentaires français — migrés en anglais (i18n EPIC)
+- ✅ Kover 75% threshold — en place (83.26% ✅)
+- ✅ RAG testcontainers — en place (3 modes)
+- ✅ `.agents/` placement — choix délibéré documenté dans AGENT.adoc
+
+== Fichiers modifiés
+
+- `BACKLOG.adoc` — section "Prochains EPICs" remplacée par inventaire
+  consolidé (QW-1..3, EP-1..3, PL-1..4, note `.agents/`)
+- `TODO.adoc` — reformatté avec pointeurs vers BACKLOG.adoc
+
+== Prochaine session
+
+Quick wins QW-1 (validateDiagram parsing réel) ou QW-2 (api→implementation)
+en baby-step TDD. Ou EP-1 (maturité incremental) si l'utilisateur préfère
+un EPIC substantiel.

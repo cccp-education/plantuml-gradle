@@ -1,38 +1,44 @@
-= PROMPT_REPRISE — Plantuml — Session 173
-:session: 173
-:date: 2026-07-15
+= PROMPT_REPRISE — Plantuml — Session 175
+:session: 175
+:date: 2026-07-16
 
-== État — Incremental Processing TERMINÉ, 122/122 Cucumber PASS
+== État — EP-1 incremental 3/4, QW-1+QW-2 terminés
 
-Session 172 : Domaine `plantuml.incremental` créé (ChecksumStore +
-IncrementalProcessor, 14 tests unitaires). Intégration dans
-GeneratePlantumlDiagramsTask (skip unchanged, cleanup orphelins,
-checksum, save .yml sanitizé). 5/5 scénarios feature 9 PASS.
-122/122 Cucumber complet (0 FAIL). Kover 83.26% maintenu.
+Session 174 : QW-1 validateDiagram parsing réel (Jackson + KotlinModule +
+fallback). QW-2 api→implementation (8 deps migrées). EP-1 incremental maturity
+3/4 : events domaine (d), audit log (b), config YAML (a). RAG reindex (c)
+restant. +20 tests unitaires, 0 régression, publishToMavenLocal OK.
 
-== Mission session 173 — PLAN_GLOBAL + prochains EPICs
+== Mission session 175 — EP-1 (c) RAG reindex incrémental
 
-1. **Consulter PLAN_GLOBAL.adoc** (racine workspace) — prochains EPICs
-   cross-borough. Identifier les EPICs candidats pour plantuml-gradle.
-   Mapper le domaine `plantuml.incremental` fraîchement créé avec les
-   besoins du pipeline MVP0.
+**Objectif** : Intégrer le domaine `plantuml.incremental` dans
+`CollectPlantumlIndexTask` pour skip les `.puml` dont le diagramme source n'a
+pas changé (via checksum comparison).
 
-2. **Évaluer maturité production du domaine incremental** —
-   `IncrementalProcessor` est fonctionnel mais minimal. Identifier les
-   gaps : audit log, events, configuration YAML du dir checksums,
-   intégration avec `collectPlantumlIndex` (RAG reindex incrémental).
+**Plan baby-step DDD/TDD/BDD** :
+1. Unit : `IncrementalProcessor` expose une méthode pour vérifier si un
+   `.puml` a changé (comparer checksum du `.prompt` source avec le `.puml`
+   généré).
+2. Functional : `CollectPlantumlIndexTask` skip les `.puml` inchangés.
+3. Cucumber : scénario `@incremental-rag` — prompt modifié → reindex, prompt
+   inchangé → skip.
 
-3. **Kover ≥ 75%** — 83.26% baseline maintenue. Vérifier après toute
-   modif.
+**Fichiers clés** :
+- `src/main/kotlin/plantuml/tasks/CollectPlantumlIndexTask.kt:132-148`
+- `src/main/kotlin/plantuml/incremental/IncrementalProcessor.kt`
+- `src/main/kotlin/plantuml/incremental/ChecksumStore.kt`
 
-== Backlog — Prochains EPICs
+== Backlog — priorisé
 
 [cols="1,4,1"]
 |===
-| Priorité | Tâche | Statut
-| 🟡 P1 | Consulter PLAN_GLOBAL.adoc — prochains EPICs cross-borough | ⬜
-| 🟡 P2 | Évaluer maturité production domaine incremental (audit, config, RAG) | ⬜
-| 🟢 P3 | Vérifier Kover ≥ 75% après modif | ⬜
+| Priorité | Tâche | Est.
+| 🔴 EP-1c | RAG reindex incrémental dans CollectPlantumlIndexTask | ~1 session
+| 🟡 QW-3 | README_truth.adoc + CHANGELOG.adoc | ~1h
+| 🟡 EP-2 | Tests production-close (real-llm) | ~1 session
+| 🟡 EP-3 | Pool freemium ratio dynamique | ~1-2 sessions
+| 🟢 PL-1 | Configuration Cache réévaluation | ~30min
+| 🟢 PL-4 | Consulter PLAN_GLOBAL.adoc | ~30min
 |===
 
 == Méthodologie
@@ -46,8 +52,8 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 - Version publiée: 0.0.1 (Maven Central)
 - BOM: `workspace-bom:0.0.8` ✅
 - `publishToMavenLocal` obligatoire après modif code plugin
-- conventions-gradle ✅ intégré (build.gradle.kts 0.0.2)
-- Kover main: 83.26% INSTRUCTION ✅ ≥ 75% (koverThresholdCheck PASS)
+- Kover main: 83.26% INSTRUCTION ✅ ≥ 75%
 - Cucumber: 122 PASS, 0 FAIL, 9 SKIP
-- Domaine `plantuml.incremental` : ChecksumStore + IncrementalProcessor (14 tests)
-- Voir `sessions/172-incremental-processing-domain-ddd.adoc`
+- Domaine `plantuml.incremental` : 32 tests (ChecksumStore 7 + IncrementalProcessor 7
+  + Events 7 + AuditLogger 7 + Config 5 - 1 overlap)
+- Voir `sessions/174-quick-wins-incremental-maturity.adoc`

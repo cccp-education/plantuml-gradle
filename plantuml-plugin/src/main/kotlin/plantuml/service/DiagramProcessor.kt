@@ -3,6 +3,7 @@ package plantuml.service
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.KotlinModule
 import dev.langchain4j.model.chat.ChatModel
 import org.slf4j.Logger
 import plantuml.PlantumlCode
@@ -63,6 +64,7 @@ class DiagramProcessor(
 
     private val objectMapper: ObjectMapper = ObjectMapper()
         .registerModule(JavaTimeModule())
+        .registerModule(KotlinModule.Builder().build())
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
     /**
@@ -496,17 +498,17 @@ class DiagramProcessor(
         // Send to LLM for validation
         val validationResult = chatModel.chat(validationPrompt)
 
-        // Parse the JSON response (in a real implementation, we would parse the JSON properly)
-        // For now, we'll return a placeholder with some realistic values
-        return ValidationFeedback(
-            score = 8,
-            feedback = "Good diagram structure with clear relationships. The component layout is logical.",
-            recommendations = listOf(
-                "Add more detailed component descriptions",
-                "Include data flow annotations",
-                "Consider adding boundary boxes for subsystems"
+        // Parse the JSON response into ValidationFeedback, with fallback on parse failure
+        return try {
+            objectMapper.readValue(validationResult, ValidationFeedback::class.java)
+        } catch (e: Exception) {
+            logger.warn(PlantumlMessages.format("processor.validation_parse_failed", "en", e.message ?: ""))
+            ValidationFeedback(
+                score = 5,
+                feedback = "Unable to parse LLM validation response, returning default feedback.",
+                recommendations = emptyList()
             )
-        )
+        }
     }
 
     /**

@@ -36,18 +36,18 @@ dependencies {
     implementation(libs.bundles.asciidoctor)
     implementation(libs.node.gradle)
 
-    api(libs.bundles.plantuml)
-    api(libs.bundles.jgit)
-    api(libs.commons.io)
-    api(libs.bundles.plantuml.ai)
+    implementation(libs.bundles.plantuml)
+    implementation(libs.bundles.jgit)
+    implementation(libs.commons.io)
+    implementation(libs.bundles.plantuml.ai)
 
-    // Testcontainers for RAG integration tests
-    api(libs.testcontainers.pg)
+    // Testcontainers for RAG integration (CollectPlantumlIndexTask uses PostgreSQLContainer)
+    implementation(libs.testcontainers.pg)
 
     // Jackson for JSON serialization (using BOM versions)
-    api("com.fasterxml.jackson.module:jackson-module-kotlin")
-    api("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
-    api("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
     // Coroutines - IMPORTANT for the asynchronous tests
     testImplementation(libs.bundles.coroutines)

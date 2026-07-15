@@ -1,10 +1,10 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 172 (15 juillet 2026)
+_Dernière mise à jour_ : Session 174 (15 juillet 2026)
 
 === Résumé Global
 
-* **Total tests unitaires** : 2508/2508 PASS (0 failure) Session 172 — zéro régression après domaine `plantuml.incremental` ✅
+* **Total tests unitaires** : 2528/2528 PASS (0 failure) Session 174 — +20 vs S172 ✅
 * **Tests fonctionnels GradleRunner KG** : 15/15 PASSED ✅
 * **Tests fonctionnels TieredRotation** : 5/5 PASS ✅
 * **Tests fonctionnels CrossProviderFallback** : 5/5 PASS ✅
@@ -14,20 +14,25 @@ _Dernière mise à jour_ : Session 172 (15 juillet 2026)
 * **Tests Cucumber translation boundary** : 12/12 scénarios feature 21 PASS ✅
 * **Tests Cucumber API Key Pool** : 18/18 scénarios feature 14 PASS ✅
 * **Tests Cucumber Incremental Processing** : 5/5 scénarios feature 9 PASS ✅ (Session 172 — domaine `plantuml.incremental` créé)
-* **Tests Cucumber total** : 122 PASS / 0 FAIL / 9 SKIP ✅ (Session 172 — zéro échec)
+* **Tests Cucumber total** : 122 PASS / 0 FAIL / 9 SKIP ✅ (Session 174 — @incremental PASS)
 * **Tests i18n translation** : 9 tests `Messages*TranslationTest.kt` PASS (es, pt, zh, hi, ar, bn, ru, ur, fr) ✅
 * **Tests real-llm (Ollama local)** : 6 créés, 0 FAILED (non exécutés — nécessite Ollama)
 * **Tests fine-tune SmolLM2 (testcontainer Python)** : 3 crees, 3/3 PASS
 * **Tests Knowledge Graph** : 90 unitaires + 15 fonctionnels
-* **Tests domaine `plantuml.incremental`** : 14 tests (7 ChecksumStore + 7 IncrementalProcessor) ✅ (Session 172)
-* **Kover main source set** : INSTRUCTION 83.26% (Session 172, koverThresholdCheck PASS) ✅ ≥ 75%
+* **Tests domaine `plantuml.incremental`** : 32 tests (7 ChecksumStore + 7 IncrementalProcessor + 7 IncrementalEvent + 7 IncrementalAuditLogger + 5 IncrementalConfig - 1 overlap) ✅ (Session 174)
+* **Kover main source set** : INSTRUCTION 83.26% (Session 172, koverThresholdCheck PASS) ✅ ≥ 75% — non revérifié S174
 * **Kover main+functionalTest** : N/A — functionalTest exclu du calcul (S170 fix, code de test hors périmètre)
-* **Cucumber** : 122 PASS, 0 FAIL, 9 SKIP (Session 172 — Incremental Processing fixé), timeout 15min
+* **Cucumber** : 122 PASS, 0 FAIL, 9 SKIP (Session 174), timeout 15min
 
-=== Nouveaux Tests — Session 172 (Incremental Processing : Domaine DDD + 5/5 Cucumber PASS)
+=== Nouveaux Tests — Session 174 (QW-1 + QW-2 + EP-1 incremental maturity)
 
-* **ChecksumStoreTest.kt** (nouveau, 7 tests) : computeChecksum (SHA-256 64 chars), storeChecksum, getStoredChecksum, hasPromptChanged (unchanged/changed/no-checksum)
-* **IncrementalProcessorTest.kt** (nouveau, 7 tests) : decideProcessing (skip unchanged, process changed, process new, force reprocess), markAsProcessed, cleanupOrphanedOutputs, sanitizeFileName
+* **DiagramProcessorErrorHandlingTest.kt** (+2 tests) :
+  - `should parse LLM JSON validation response into ValidationFeedback` — parse score=9, feedback, recommendations
+  - `should fallback to default ValidationFeedback when LLM returns invalid JSON` — fallback score=5
+* **IncrementalEventTest.kt** (nouveau, 7 tests) : PromptSkipped/PromptProcessed/OutputsCleaned data, emit on decideProcessing SKIP, emit on markAsProcessed, emit on cleanupOrphanedOutputs
+* **IncrementalAuditLoggerTest.kt** (nouveau, 7 tests) : create file, log PromptSkipped/OutputsCleaned/PromptProcessed, append multiple, implements IncrementalEventListener, wire to processor
+* **IncrementalConfigTest.kt** (nouveau, 5 tests) : default checksumsDir, default auditLog, auditEnabled default true, custom checksumsDir, disable audit
+* **DiagramProcessorPrivateMethodsTest.kt** (fix 1 test) : assertion `isValid`/`valid` avec KotlinModule Jackson
 * **IncrementalProcessingSteps.kt** (modifié) : mock LLM injecté dans les 6 `Given` (startIncrementalMockLlm helper)
 * **GeneratePlantumlDiagramsTask.kt** (modifié) : intégration IncrementalProcessor (skip/cleanup/checksum/save .yml sanitizé)
 * **Messages_*.properties** (11 fichiers) : 2 clés i18n (`generate.skipped`, `generate.skipped_summary`)

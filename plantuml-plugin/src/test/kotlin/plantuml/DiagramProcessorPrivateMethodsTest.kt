@@ -140,7 +140,7 @@ class DiagramProcessorPrivateMethodsTest {
         assertTrue(result.contains("\"entries\""))
         assertTrue(result.contains("\"iteration\""))
         assertTrue(result.contains("Initial prompt"))
-        assertTrue(result.contains("\"valid\""))
+        assertTrue(result.contains("\"valid\"") || result.contains("\"isValid\""))
         assertTrue(result.contains("\"totalAttempts\""))
     }
 

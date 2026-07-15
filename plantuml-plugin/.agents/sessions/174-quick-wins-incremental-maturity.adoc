@@ -1,0 +1,116 @@
+= Session 174 — Quick wins QW-1 + QW-2 + EP-1 incremental maturity (3/4)
+:date: 2026-07-15
+:session: 174
+:score: 9/10
+
+== Résumé
+
+Trois tâches accomplies en baby-step DDD/TDD/BDD :
+
+=== QW-1 — validateDiagram() parsing réel (~30min)
+
+**Problème** : `DiagramProcessor.validateDiagram()` (lignes 474-510) appelait
+le LLM mais jetait la réponse, retournant toujours `score=8` hardcodé.
+
+**Solution** :
+- `ObjectMapper.readValue(validationResult, ValidationFeedback::class.java)` avec
+  `KotlinModule` pour désérialiser la data class Kotlin.
+- Fallback gracieux (score=5, feedback default) si parse échoue.
+- Clé i18n `processor.validation_parse_failed` ajoutée aux 10 langues + default.
+- Fix régression `DiagramProcessorPrivateMethodsTest` (assertion `isValid`/`valid`
+  avec KotlinModule Jackson serialization).
+
+**Tests** : 2 nouveaux tests Red→Green (`should parse LLM JSON`, `should fallback
+on invalid JSON`). 9/9 `DiagramProcessorErrorHandlingTest` PASS.
+
+=== QW-2 — api → implementation audit (~20min)
+
+**Problème** : 8 dépendances en `api()` exposent ~20 transitives aux consommateurs.
+
+**Migration** : `api` → `implementation` pour :
+- `libs.bundles.plantuml` (plantuml-engine)
+- `libs.bundles.jgit` (jgit-core, jgit-ssh, jgit-archive — non utilisés dans le code)
+- `libs.commons.io` (non utilisé dans le code)
+- `libs.bundles.plantuml.ai` (langchain4j × 9 modules)
+- `libs.testcontainers.pg`
+- `com.fasterxml.jackson.module:jackson-module-kotlin`
+- `com.fasterxml.jackson.dataformat:jackson-dataformat-yaml`
+- `com.fasterxml.jackson.datatype:jackson-datatype-jsr310`
+
+**Justification** : l'API publique du plugin Gradle (`PlantumlExtension`,
+`DefaultTask` subclasses) n'expose que des `Property<String>` Gradle standard.
+Aucune lib externe n'est transmise aux consommateurs.
+
+**Zéro régression** : `compileKotlin` OK, `test` OK (test préexistant
+`nonexistent directory` échoue sur `main` aussi, non lié).
+
+=== EP-1 — Maturité domaine plantuml.incremental (3/4 baby-steps)
+
+==== (d) Events domaine ✅
+
+- `IncrementalEvent` sealed class : `PromptSkipped`, `PromptProcessed`, `OutputsCleaned`
+- `IncrementalProcessor.onEvent()` listener pattern
+- `decideProcessing()` émet `PromptSkipped` sur SKIP
+- `markAsProcessed()` émet `PromptProcessed` avec iterations
+- `cleanupOrphanedOutputs()` émet `OutputsCleaned` avec removedCount
+- 7 tests unitaires
+
+==== (b) Audit log ✅
+
+- `IncrementalEventListener` fun interface
+- `IncrementalAuditLogger` : écrit trace horodatée
+  `timestamp | EVENT_TYPE | prompt=X | iterations=N | removed=N`
+- Wired dans `GeneratePlantumlDiagramsTask` via `config.incremental.auditEnabled`
+- 7 tests unitaires
+
+==== (a) Config YAML ✅
+
+- `IncrementalConfig(checksumsDir, auditLog, auditEnabled)` data class
+- Câblé dans `PlantumlConfig.incremental`
+- `GeneratePlantumlDiagramsTask` lit `config.incremental.checksumsDir`
+  au lieu du hardcodé `build/plantuml-plugin/checksums`
+- 5 tests unitaires
+
+==== (c) RAG reindex — restant (prochaine session)
+
+Intégration avec `CollectPlantumlIndexTask` pour skip les `.puml` dont le
+diagramme source n'a pas changé (via checksum comparison).
+
+== Métriques
+
+|===
+| Suite | Avant | Après | Delta
+| Unitaires | 2508 | 2528 | +20
+| Incremental domain | 14 | 32 | +18
+| Cucumber @incremental | 5/5 | 5/5 | 0
+| Kover | 83.26% | non vérifié | —
+| publishToMavenLocal | ✅ | ✅ | —
+|===
+
+== Fichiers modifiés
+
+**Production (9)** :
+- `src/main/kotlin/plantuml/service/DiagramProcessor.kt` — parsing réel + KotlinModule
+- `src/main/kotlin/plantuml/incremental/IncrementalProcessor.kt` — events + signature
+- `src/main/kotlin/plantuml/incremental/IncrementalEvent.kt` — NEW (sealed class)
+- `src/main/kotlin/plantuml/incremental/IncrementalEventListener.kt` — NEW (fun interface)
+- `src/main/kotlin/plantuml/incremental/IncrementalAuditLogger.kt` — NEW
+- `src/main/kotlin/plantuml/incremental/IncrementalConfig.kt` — NEW
+- `src/main/kotlin/plantuml/models.kt` — champ `incremental` dans PlantumlConfig
+- `src/main/kotlin/plantuml/tasks/GeneratePlantumlDiagramsTask.kt` — config + audit
+- `build.gradle.kts` — api→implementation (8 deps)
+
+**Tests (4)** :
+- `src/test/kotlin/plantuml/incremental/IncrementalEventTest.kt` — NEW (7 tests)
+- `src/test/kotlin/plantuml/incremental/IncrementalAuditLoggerTest.kt` — NEW (7 tests)
+- `src/test/kotlin/plantuml/incremental/IncrementalConfigTest.kt` — NEW (5 tests)
+- `src/test/kotlin/plantuml/DiagramProcessorPrivateMethodsTest.kt` — fix assertion
+- `src/test/kotlin/plantuml/service/DiagramProcessorErrorHandlingTest.kt` — +2 tests
+
+**i18n (11)** : `Messages*.properties` — clé `processor.validation_parse_failed`
+
+== Prochaine session
+
+- EP-1 (c) : RAG reindex incrémental dans `CollectPlantumlIndexTask`
+- QW-3 : README_truth.adoc + CHANGELOG.adoc mise à jour
+- PL-1 : Configuration Cache réévaluation

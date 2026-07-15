@@ -130,9 +130,16 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         )
 
         // Incremental processing: checksum-based skip + orphan cleanup
-        val checksumsDir = File(project.buildDir, "plantuml-plugin/checksums")
+        val checksumsDir = File(project.buildDir, config.incremental.checksumsDir.removePrefix("build/"))
         val incrementalProcessor = IncrementalProcessor(checksumsDir)
         val forceReprocess = project.gradle.startParameter.isRerunTasks
+
+        // Audit log: wire IncrementalAuditLogger as event listener if enabled
+        if (config.incremental.auditEnabled) {
+            val auditLogFile = File(project.buildDir, config.incremental.auditLog.removePrefix("build/"))
+            val auditLogger = plantuml.incremental.IncrementalAuditLogger(auditLogFile)
+            incrementalProcessor.onEvent(auditLogger::log)
+        }
 
         // Cleanup orphaned outputs (prompts that no longer exist)
         val imagesDir = project.file(config.output.images)

@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-07-15 (Session 172 — Incremental Processing domaine DDD + 5/5 Cucumber PASS)
+:last_update: 2026-07-15 (Session 174 — QW-1 + QW-2 terminés, EP-1 incremental maturity 3/4)
 
 '''
 == ✅ EPIC 13 : Multi-provider API Pool — Rotation par tiers + Cross-provider
@@ -89,13 +89,13 @@ Sessions 145-147. Publié via nmcp (Central Portal).
 
 '''
 
-== 📊 État des Tests (Session 172)
+== 📊 État des Tests (Session 174)
 
 |===
 | Suite | Tests | Statut
-| Unitaires | 2508 | ✅ 100% PASS (0 failure)
+| Unitaires | 2528 | ✅ 100% PASS (0 failure)
 | Cucumber | 122 | ✅ 122 PASS / 0 FAIL / 9 SKIP
-| Kover | 83.26% | ✅ ≥ 75% seuil
+| Kover | 83.26% | ✅ ≥ 75% seuil (non revérifié S174)
 |===
 
 '''
@@ -397,15 +397,115 @@ EPIC PLT-I18N a livré l'infrastructure i18n (`PlantumlMessages`, `ResourceBundl
 
 '''
 
-== Prochains EPICs
+== Prochains EPICs — pistes consolidées
 
-1. **Consulter PLAN_GLOBAL.adoc** — 🟡 Roadmap — Prochains EPICs cross-borough
-   (racine workspace). Identifier les EPICs candidats pour plantuml-gradle.
-2. **Maturité production domaine incremental** — 🟡 Évaluation —
-   `IncrementalProcessor` est fonctionnel mais minimal. Gaps : audit log,
-   events, configuration YAML du dir checksums, intégration avec
-   `collectPlantumlIndex` (RAG reindex incrémental).
-3. **Kover ≥ 75%** — 🟢 Maintenance — 83.26% baseline maintenue (S172).
+_Sources_ : BACKLOG S172, TODO.adoc, CODE_REVIEW_2026-04.adoc (v3, 8.2/10),
+GLOBAL_CODE_REVIEW_v7 (2026-05-13), audit code actuel S172.
+
+=== 🟡 Quick wins (< 1h chacun)
+
+[cols="1,4,3,1"]
+|===
+| # | Tâche | Fichier / Cible | Est.
+
+| QW-1
+| **`validateDiagram()` parsing réel** ✅ TERMINÉ S174
+| `DiagramProcessor.kt:497-508`
+| ✅
+
+| QW-2
+| **`api` → `implementation` audit** ✅ TERMINÉ S174
+| `build.gradle.kts:39-50`
+| ✅
+
+| QW-3
+| **`README_truth.adoc` + `CHANGELOG.adoc`** — mise à jour avec i18n (10 langues,
+  PLT-I18N), Translation Boundary (PLT-BOUNDARY), Incremental Processing (S172),
+  EP-1 incremental maturity (S174 events + audit log + config).
+  US-I18N-7 notait "restent à faire (non bloquants)".
+| `README_truth.adoc`, `CHANGELOG.adoc`
+| ~1h
+|===
+
+=== 🟡 EPICs substantiels (1-3 sessions)
+
+[cols="1,4,3,1"]
+|===
+| # | Tâche | Détail | Est.
+
+| EP-1
+| **Maturité domaine `plantuml.incremental`** — `IncrementalProcessor` est
+  fonctionnel mais minimal. Gaps identifiés :
+  (a) Configuration YAML du dir checksums (hardcodé `build/plantuml-plugin/checksums`) ✅ S174
+  (b) Audit log — pas de traçabilité des skip/process/cleanup ✅ S174
+  (c) Intégration avec `collectPlantumlIndex` — RAG reindex incrémental
+      (skip prompts dont le diagramme n'a pas changé) — RESTANT
+  (d) Events domaine — émettre `PromptSkipped` / `PromptProcessed` / `OutputsCleaned` ✅ S174
+  Baby-step DDD/TDD/BDD.
+| `plantuml.incremental`, `CollectPlantumlIndexTask`
+| ~1 session restante (c)
+
+| EP-2
+| **Tests production-close** — parameter CLI (`-Pplantuml.real.test=true`) pour
+  activer vraies clés/credentials vs mocks. Les 6 tests `@real-llm` existent
+  mais ne s'exécutent jamais (exclusion par défaut). Mettre en place :
+  (a) Context de plugin dédié aux tests réel (`plantuml-real-context.yml` gitignoré)
+  (b) Parameter CLI pour basculer mock → réel
+  (c) GitHub Actions secret pour CI (clés API en env vars)
+  Source : TODO.adoc item 2.
+| `build.gradle.kts`, `PlantumlWorld.kt`, CI
+| ~1 session
+
+| EP-3
+| **Pool freemium ratio dynamique** — EPIC 6 (ApiKeyPool) + EPIC 13
+  (TieredRotation + CrossProvider) livrent la rotation multi-provider. Reste :
+  poids basés sur quota réel (ratio freemium dans la config YAML du context).
+  Source : TODO.adoc item 1.
+| `ApiKeyPool`, `TieredRotationStrategy`, YAML schema
+| ~1-2 sessions
+|===
+
+=== 🟢 Polish (low priority)
+
+[cols="1,4,3,1"]
+|===
+| # | Tâche | Fichier / Cible | Est.
+
+| PL-1
+| **Configuration Cache** — `configurationCache = false` (ligne 547).
+  Asciidoctor-gradle était incompatible à l'époque. Réévaluer si la version
+  actuelle d'AsciidoctorJ (3.0.1, Java 25) supporte le config cache.
+| `build.gradle.kts:547`
+| ~30min
+
+| PL-2
+| **KDoc exhaustif** — KDoc présent sur tâches/services principaux mais pas
+  sur toutes les classes publiques (models, config, boundary). Compléter pour
+  atteindre une documentation professionnelle.
+| `src/main/kotlin/` global
+| ~2h
+
+| PL-3
+| **ktlint ou detekt** — concern transverse (aucun borough n'a ktlint/detekt).
+  Si conventions-gradle (ABIDJAN) ajoute un plugin lint, plantuml devrait le
+  consommer. Source : GLOBAL_CODE_REVIEW_v7.
+| `build.gradle.kts` (conventions)
+| dépend ABIDJAN
+
+| PL-4
+| **Consulter `PLAN_GLOBAL.adoc`** — racine workspace. Identifier les EPICs
+  cross-borough candidats pour plantuml-gradle. Lecture seule, pas de code.
+| racine workspace
+| ~30min lecture
+|===
+
+=== 📌 Note — `.agents/` placement
+
+La GLOBAL_CODE_REVIEW_v7 recommandait de déplacer `.agents/` de
+`plantuml-plugin/` vers la racine `plantuml-gradle/`. C'est un **choix
+délibéré** documenté dans `AGENT.adoc` : la racine de travail EST
+`plantuml-plugin/`, la racine git ne contient que le repo + bootstrap.
+Non bloquant, non actionné.
 
 == ✅ EPIC Incremental Processing — TERMINÉ (Session 172)
 

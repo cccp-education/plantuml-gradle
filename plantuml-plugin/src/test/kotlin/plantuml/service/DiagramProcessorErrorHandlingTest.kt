@@ -6,6 +6,7 @@ import org.mockito.Mockito.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import plantuml.PlantumlConfig
+import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -187,6 +188,68 @@ class DiagramProcessorErrorHandlingTest {
         assertNotNull(result)
         // History should be archived because there were multiple attempts
         assertTrue(result.conversation.size >= 2)
+    }
+
+    @Test
+    fun `should parse LLM JSON validation response into ValidationFeedback`() {
+        val mockPlantumlService = mock(PlantumlService::class.java)
+        val mockChatModel = mock(ChatModel::class.java)
+        val mockConfig = mock(PlantumlConfig::class.java)
+        val mockLangchainConfig = mock(plantuml.LangchainConfig::class.java)
+
+        val llmJsonResponse = """{"score": 9, "feedback": "Excellent diagram with clear architecture", "recommendations": ["Add legend", "Use consistent colors"]}"""
+
+        `when`(mockConfig.langchain4j).thenReturn(mockLangchainConfig)
+        `when`(mockLangchainConfig.validationPrompt).thenReturn("Validate this PlantUML")
+        `when`(mockChatModel.chat(anyString())).thenReturn(llmJsonResponse)
+
+        val processor = DiagramProcessor(mockPlantumlService, mockChatModel, mockConfig)
+
+        val diagram = plantuml.PlantumlDiagram(
+            conversation = listOf("Test"),
+            plantuml = plantuml.PlantumlCode(
+                code = "@startuml\nactor User\n@enduml",
+                description = "Test"
+            )
+        )
+
+        val result = processor.validateDiagram(diagram)
+
+        assertEquals(9, result.score)
+        assertEquals("Excellent diagram with clear architecture", result.feedback)
+        assertEquals(2, result.recommendations.size)
+        assertEquals("Add legend", result.recommendations[0])
+        assertEquals("Use consistent colors", result.recommendations[1])
+    }
+
+    @Test
+    fun `should fallback to default ValidationFeedback when LLM returns invalid JSON`() {
+        val mockPlantumlService = mock(PlantumlService::class.java)
+        val mockChatModel = mock(ChatModel::class.java)
+        val mockConfig = mock(PlantumlConfig::class.java)
+        val mockLangchainConfig = mock(plantuml.LangchainConfig::class.java)
+
+        val garbageResponse = "This is not JSON at all"
+
+        `when`(mockConfig.langchain4j).thenReturn(mockLangchainConfig)
+        `when`(mockLangchainConfig.validationPrompt).thenReturn("Validate this PlantUML")
+        `when`(mockChatModel.chat(anyString())).thenReturn(garbageResponse)
+
+        val processor = DiagramProcessor(mockPlantumlService, mockChatModel, mockConfig)
+
+        val diagram = plantuml.PlantumlDiagram(
+            conversation = listOf("Test"),
+            plantuml = plantuml.PlantumlCode(
+                code = "@startuml\nactor User\n@enduml",
+                description = "Test"
+            )
+        )
+
+        val result = processor.validateDiagram(diagram)
+
+        assertTrue(result.score in 1..10, "Fallback score should be in valid range 1-10")
+        assertNotNull(result.feedback)
+        assertTrue(result.feedback.isNotEmpty(), "Fallback feedback should not be empty")
     }
 
     @Test
