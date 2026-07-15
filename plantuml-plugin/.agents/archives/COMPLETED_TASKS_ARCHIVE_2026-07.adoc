@@ -1,6 +1,28 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-07
 
-== Session 170 (2026-07-14) — Fix koverThresholdCheck + Cucumber i18n failures
+== Session 172 (2026-07-15) — Incremental Processing : Domaine DDD + 5/5 Cucumber PASS
+
+=== Fait
+- Diagnostic 5 scénarios Cucumber feature 9 en échec : crash réseau `ConnectException` Ollama:11438 (aucun mock LLM dans `IncrementalProcessingSteps`) ✅
+- BDD infrastructure : mock LLM injecté dans les 6 `Given` de `IncrementalProcessingSteps.kt` (helper `startIncrementalMockLlm()`) ✅
+- DDD/TDD unit : `ChecksumStore.kt` créé (SHA-256, store/get/hasPromptChanged, 7 tests) ✅
+- DDD/TDD unit : `IncrementalProcessor.kt` créé (decideProcessing SKIP/PROCESS, markAsProcessed, cleanupOrphanedOutputs, sanitizeFileName, 7 tests) ✅
+- Intégration fonctionnelle : `GeneratePlantumlDiagramsTask.kt` — skip unchanged (checksum), cleanup orphelins, store checksum avant traitement, save `{sanitized}.yml` dans `generated/diagrams`, détection `--rerun-tasks` via `project.gradle.startParameter.isRerunTasks` ✅
+- i18n : 2 clés (`generate.skipped`, `generate.skipped_summary`) × 11 fichiers `Messages_*.properties` (EN + 9 traductions + default) ✅
+- Fix régression File Edge Cases : sanitization nom fichier `.yml` (`[^a-zA-Z0-9._-]` → `_`) ✅
+- `./gradlew compileKotlin` BUILD SUCCESSFUL ✅
+- `./gradlew publishToMavenLocal` BUILD SUCCESSFUL ✅
+- `./gradlew test --tests "plantuml.incremental.*"` 14/14 PASS ✅
+- `./gradlew test` 2508 PASS (0 failure) ✅
+- `./gradlew cucumberTest -Pcucumber.tags="@incremental"` 5/5 PASS ✅
+- `./gradlew cucumberTest` 122 PASS / 0 FAIL / 9 SKIP ✅ (zéro échec — première fois depuis S169)
+- `./gradlew koverThresholdCheck` PASS 83.26% ≥ 75% ✅
+
+=== Prochaine session
+- Consulter `PLAN_GLOBAL.adoc` (racine workspace) — prochains EPICs cross-borough
+- Évaluer maturité production du domaine `plantuml.incremental` (audit log, config YAML, RAG reindex incrémental)
+
+== Session 171 (2026-07-14) — ApiKeyPoolSteps.kt + timeout Cucumber
 
 === Fait
 - `build.gradle.kts:475` : `includedSourceSets.addAll("main", "functionalTest")` → `includedSourceSets.add("main")` ✅

@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-07-14 (Session 171 — ApiKeyPoolSteps.kt 18/18 PASS + timeout 15min)
+:last_update: 2026-07-15 (Session 172 — Incremental Processing domaine DDD + 5/5 Cucumber PASS)
 
 '''
 == ✅ EPIC 13 : Multi-provider API Pool — Rotation par tiers + Cross-provider
@@ -89,13 +89,13 @@ Sessions 145-147. Publié via nmcp (Central Portal).
 
 '''
 
-== 📊 État des Tests (Session 147)
+== 📊 État des Tests (Session 172)
 
 |===
 | Suite | Tests | Statut
-| Unitaires | 380 | ✅ 100% PASS
-| Functional | 38 | ✅ 0 FAIL, 7 SKIP
-| Kover | 81.19% | ✅ ≥ 75% seuil
+| Unitaires | 2508 | ✅ 100% PASS (0 failure)
+| Cucumber | 122 | ✅ 122 PASS / 0 FAIL / 9 SKIP
+| Kover | 83.26% | ✅ ≥ 75% seuil
 |===
 
 '''
@@ -399,14 +399,23 @@ EPIC PLT-I18N a livré l'infrastructure i18n (`PlantumlMessages`, `ResourceBundl
 
 == Prochains EPICs
 
-1. **EPIC Incremental Processing** — 🔴 BDD — Fix 5 scénarios Cucumber en
-   FAILED (feature 9) depuis session 169 minimum. GradleRunner
-   `generatePlantumlDiagrams` échoue. Investigation : mock LLM, config, ou
-   tâche Gradle ? Baby-step DDD/TDD/BDD : 1 scénario à la fois.
-2. **Consulter PLAN_GLOBAL.adoc** — 🟡 Roadmap — Prochains EPICs cross-borough
+1. **Consulter PLAN_GLOBAL.adoc** — 🟡 Roadmap — Prochains EPICs cross-borough
    (racine workspace). Identifier les EPICs candidats pour plantuml-gradle.
-3. **Kover ≥ 75%** — 🟢 Maintenance — Vérifier maintien après ajout
-   ApiKeyPoolSteps.kt (83.26% baseline session 170).
+2. **Maturité production domaine incremental** — 🟡 Évaluation —
+   `IncrementalProcessor` est fonctionnel mais minimal. Gaps : audit log,
+   events, configuration YAML du dir checksums, intégration avec
+   `collectPlantumlIndex` (RAG reindex incrémental).
+3. **Kover ≥ 75%** — 🟢 Maintenance — 83.26% baseline maintenue (S172).
+
+== ✅ EPIC Incremental Processing — TERMINÉ (Session 172)
+
+Domaine `plantuml.incremental` créé (ChecksumStore + IncrementalProcessor,
+14 tests unitaires). Intégration dans GeneratePlantumlDiagramsTask :
+skip unchanged prompts (checksum), cleanup outputs orphelins, force
+reprocess via `--rerun-tasks`, save `{sanitized}.yml` dans
+`generated/diagrams`. Mock LLM injecté dans IncrementalProcessingSteps.
+5/5 scénarios Cucumber @incremental PASS. 122/122 Cucumber complet
+(0 FAIL). Kover 83.26% ✅.
 
 == ✅ EPIC Cucumber Feature 14 — TERMINÉ (Session 171)
 

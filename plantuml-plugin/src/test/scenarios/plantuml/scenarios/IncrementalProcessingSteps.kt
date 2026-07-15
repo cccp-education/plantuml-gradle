@@ -10,6 +10,19 @@ import java.security.MessageDigest
 
 class IncrementalProcessingSteps(private val world: PlantumlWorld) {
 
+    private fun startIncrementalMockLlm() {
+        world.startMockLlm(
+            """
+            {
+              "plantuml": {
+                "code": "@startuml\nactor User\n@enduml",
+                "description": "Generated diagram"
+              }
+            }
+        """.trimIndent()
+        )
+    }
+
     @Given("a prompt file was already processed successfully")
     fun promptWasAlreadyProcessedSuccessfully() {
         world.createGradleProject()
@@ -35,6 +48,7 @@ class IncrementalProcessingSteps(private val world: PlantumlWorld) {
         val checksumFile = File(checksumsDir, "incremental-test.sha256")
         val checksum = calculateChecksum(promptFile)
         checksumFile.writeText(checksum)
+        startIncrementalMockLlm()
     }
 
     @Given("the prompt file has not been modified")
@@ -98,6 +112,7 @@ class IncrementalProcessingSteps(private val world: PlantumlWorld) {
             status: success
             """.trimIndent()
         )
+        startIncrementalMockLlm()
     }
 
     @Given("the prompt file content has been modified")
@@ -105,6 +120,17 @@ class IncrementalProcessingSteps(private val world: PlantumlWorld) {
         val promptsDir = File(world.projectDir, "prompts")
         val promptFile = File(promptsDir, "incremental-test.prompt")
         promptFile.writeText("Create a different diagram with more elements")
+        world.stopMockLlm()
+        world.startMockLlm(
+            """
+            {
+              "plantuml": {
+                "code": "@startuml\ntitle different\nactor User\n@enduml",
+                "description": "Generated different diagram"
+              }
+            }
+        """.trimIndent()
+        )
     }
 
     @Then("the modified prompt should be reprocessed")
@@ -150,6 +176,7 @@ class IncrementalProcessingSteps(private val world: PlantumlWorld) {
             val imageFile = File(imagesDir, "prompt-$i.png")
             imageFile.writeBytes(byteArrayOf(0x89.toByte(), 0x50.toByte(), 0x4E.toByte(), 0x47.toByte()))
         }
+        startIncrementalMockLlm()
     }
 
     @Given("one prompt file is deleted")
@@ -190,6 +217,7 @@ class IncrementalProcessingSteps(private val world: PlantumlWorld) {
         val promptsDir = File(world.projectDir, "prompts").apply { mkdirs() }
         val promptFile = File(promptsDir, "checksum-test.prompt")
         promptFile.writeText("Create a diagram with known content")
+        startIncrementalMockLlm()
     }
 
     @Then("a checksum should be stored for the prompt")
@@ -246,6 +274,7 @@ class IncrementalProcessingSteps(private val world: PlantumlWorld) {
             val imageFile = File(imagesDir, "rerun-test-$i.png")
             imageFile.writeBytes(byteArrayOf(0x89.toByte(), 0x50.toByte(), 0x4E.toByte(), 0x47.toByte()))
         }
+        startIncrementalMockLlm()
     }
 
     @When("I run generatePlantumlDiagrams task with --rerun-tasks")

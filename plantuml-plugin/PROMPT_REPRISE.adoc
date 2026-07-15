@@ -1,35 +1,38 @@
-= PROMPT_REPRISE — Plantuml — Session 172
-:session: 172
+= PROMPT_REPRISE — Plantuml — Session 173
+:session: 173
 :date: 2026-07-15
 
-== État — Feature 14 complète 18/18 PASS, timeout 15min
+== État — Incremental Processing TERMINÉ, 122/122 Cucumber PASS
 
-Session 171 : ApiKeyPoolSteps.kt créé (30+ step definitions), 18/18 scénarios
-feature 14 PASS. Domaine `getNextRoundRobin()` modifié pour skip quota saturé
-(BDD Red→Green). Timeout cucumberTest 10min → 15min. 108 PASS cucumber complet,
-5 FAIL préexistantes (Incremental Processing).
+Session 172 : Domaine `plantuml.incremental` créé (ChecksumStore +
+IncrementalProcessor, 14 tests unitaires). Intégration dans
+GeneratePlantumlDiagramsTask (skip unchanged, cleanup orphelins,
+checksum, save .yml sanitizé). 5/5 scénarios feature 9 PASS.
+122/122 Cucumber complet (0 FAIL). Kover 83.26% maintenu.
 
-== Mission session 172 — Incremental Processing + PLAN_GLOBAL
+== Mission session 173 — PLAN_GLOBAL + prochains EPICs
 
-1. **Incremental Processing failures** — 5 scénarios Cucumber en FAILED
-   (feature 9) depuis session 169 minimum. GradleRunner `generatePlantumlDiagrams`
-   échoue. Investigation : est-ce un problème de mock LLM, de config, ou de
-   tâche Gradle ? Baby-step DDD/TDD/BDD : 1 scénario à la fois, Red→Green.
+1. **Consulter PLAN_GLOBAL.adoc** (racine workspace) — prochains EPICs
+   cross-borough. Identifier les EPICs candidats pour plantuml-gradle.
+   Mapper le domaine `plantuml.incremental` fraîchement créé avec les
+   besoins du pipeline MVP0.
 
-2. **Consulter PLAN_GLOBAL.adoc** — prochains EPICs cross-borough (racine
-   workspace). Identifier les EPICs candidats pour plantuml-gradle.
+2. **Évaluer maturité production du domaine incremental** —
+   `IncrementalProcessor` est fonctionnel mais minimal. Identifier les
+   gaps : audit log, events, configuration YAML du dir checksums,
+   intégration avec `collectPlantumlIndex` (RAG reindex incrémental).
 
-3. **Kover ≥ 75%** — vérifier maintien après ajout ApiKeyPoolSteps.kt (83.26%
-   baseline session 170).
+3. **Kover ≥ 75%** — 83.26% baseline maintenue. Vérifier après toute
+   modif.
 
 == Backlog — Prochains EPICs
 
 [cols="1,4,1"]
 |===
 | Priorité | Tâche | Statut
-| 🔴 P1 | Fix 5 scénarios Incremental Processing (feature 9) | ⬜
-| 🟡 P2 | Consulter PLAN_GLOBAL.adoc — prochains EPICs cross-borough | ⬜
-| 🟢 P3 | Vérifier Kover ≥ 75% après ApiKeyPoolSteps.kt | ⬜
+| 🟡 P1 | Consulter PLAN_GLOBAL.adoc — prochains EPICs cross-borough | ⬜
+| 🟡 P2 | Évaluer maturité production domaine incremental (audit, config, RAG) | ⬜
+| 🟢 P3 | Vérifier Kover ≥ 75% après modif | ⬜
 |===
 
 == Méthodologie
@@ -45,5 +48,6 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 - `publishToMavenLocal` obligatoire après modif code plugin
 - conventions-gradle ✅ intégré (build.gradle.kts 0.0.2)
 - Kover main: 83.26% INSTRUCTION ✅ ≥ 75% (koverThresholdCheck PASS)
-- Cucumber: 108 PASS, 5 FAIL préexistantes (Incremental Processing), 18/18 feature 14 ✅
-- Voir `sessions/171-api-key-pool-steps-timeout.adoc`
+- Cucumber: 122 PASS, 0 FAIL, 9 SKIP
+- Domaine `plantuml.incremental` : ChecksumStore + IncrementalProcessor (14 tests)
+- Voir `sessions/172-incremental-processing-domain-ddd.adoc`

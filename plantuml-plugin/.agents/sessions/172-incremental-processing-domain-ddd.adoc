@@ -1,0 +1,99 @@
+= Session 172 — Incremental Processing : Domaine DDD + 5/5 Cucumber PASS
+:date: 2026-07-15
+:type: DDD + TDD + BDD
+:score: 9/10
+
+== Mission
+
+Fix 5 scénarios Cucumber Incremental Processing (feature 9) en échec
+depuis session 169 minimum. Baby-step DDD/TDD/BDD.
+
+== Diagnostic
+
+Les 5 scénarios échouaient par crash réseau (`java.net.ConnectException`
+vers Ollama:11438) car aucun mock LLM n'était démarré dans
+`IncrementalProcessingSteps`. La cause racine : les steps ne appelaient
+jamais `world.startMockLlm(...)`, donc le build Gradle tentait un appel
+réel à Ollama → `UnexpectedBuildFailure` → `buildResult=null` → assertions
+"Expecting actual not to be null".
+
+== Démarche baby-step DDD/TDD/BDD
+
+=== 1. BDD infrastructure (Red)
+
+Injection du mock LLM dans les 6 `Given` de `IncrementalProcessingSteps`
+(pattern des autres steps files). Après fix : 4 Reds significatifs
+(assertions sur output/checksum/cleanup) + 1 PASS (force reprocess).
+
+=== 2. DDD/TDD unit (Green) — Nouveau domaine `plantuml.incremental`
+
+`ChecksumStore` (7 tests) :
+- `computeChecksum()` — SHA-256 64 chars
+- `storeChecksum()` / `getStoredChecksum()` — persistance fichier
+- `hasPromptChanged()` — comparaison checksum
+
+`IncrementalProcessor` (7 tests) :
+- `decideProcessing()` — SKIP si checksum match + pas de force, PROCESS sinon
+- `markAsProcessed()` — store checksum avant traitement
+- `cleanupOrphanedOutputs()` — supprime outputs sans prompt correspondant
+- `sanitizeFileName()` — remplace caractères spéciaux par `_`
+
+Total : 14 tests unitaires PASS.
+
+=== 3. Intégration fonctionnelle — `GeneratePlantumlDiagramsTask`
+
+- Skip unchanged prompts (checksum match) sauf `--rerun-tasks`
+  (détecté via `project.gradle.startParameter.isRerunTasks`)
+- Cleanup outputs orphelins avant la boucle de traitement
+- Store checksum avant traitement (avant `promptFile.delete()`)
+- Sauvegarde diagramme `{sanitized-name}.yml` dans `generated/diagrams`
+- 2 clés i18n (`generate.skipped`, `generate.skipped_summary`) × 11 fichiers
+  `Messages_*.properties` (EN + 9 traductions + default)
+
+=== 4. Cucumber Green — 5/5 scénarios `@incremental` PASS
+
+- Skip unchanged prompts on re-run ✅
+- Reprocess modified prompts ✅
+- Cleanup outputs when prompts are deleted ✅
+- Use checksum-based change detection ✅
+- Force reprocessing with clean flag ✅
+
+=== 5. Fix régression File Edge Cases
+
+Le scénario "Handle filenames with special characters" cassait car le
+nouveau `.yml` sauvegardé dans `generated/diagrams` portait le nom non
+sanitizé du prompt (`my-complex diagram (v1.0).yml`). Fix : sanitization
+du nom de fichier (`[^a-zA-Z0-9._-]` → `_`) dans la tâche + le cleanup.
+
+== Résultats
+
+|===
+| Métrique | Avant | Après
+| Cucumber `@incremental` | 5 FAIL | 5 PASS ✅
+| Cucumber complet | 113 PASS / 5 FAIL / 9 SKIP | 122 PASS / 0 FAIL / 9 SKIP ✅
+| Tests unitaires | 2494 (4 FAIL) | 2508 PASS ✅
+| Kover main | 83.26% | 83.26% ✅ (≥ 75%)
+| `compileKotlin` | ✅ | ✅
+| `publishToMavenLocal` | — | ✅
+|===
+
+== Fichiers modifiés
+
+=== Production (5)
+- `src/main/kotlin/plantuml/incremental/ChecksumStore.kt` (nouveau, 31 lignes)
+- `src/main/kotlin/plantuml/incremental/IncrementalProcessor.kt` (nouveau, 45 lignes)
+- `src/main/kotlin/plantuml/tasks/GeneratePlantumlDiagramsTask.kt` (intégration incremental + sanitization + save .yml)
+- `src/main/resources/i18n/Messages_en.properties` + `Messages.properties` + 9 `Messages_*.properties` (2 clés × 11 fichiers)
+
+=== Tests (3)
+- `src/test/kotlin/plantuml/incremental/ChecksumStoreTest.kt` (nouveau, 7 tests)
+- `src/test/kotlin/plantuml/incremental/IncrementalProcessorTest.kt` (nouveau, 7 tests)
+- `src/test/scenarios/plantuml/scenarios/IncrementalProcessingSteps.kt` (mock LLM injection)
+
+== Prochaine session
+
+1. 🟡 P2 — Consulter `PLAN_GLOBAL.adoc` (racine workspace) — prochains EPICs
+   cross-borough candidats pour plantuml-gradle.
+2. 🟢 P3 — Kover vérifié 83.26% ✅ (maintenu).
+3. Éventuellement : refactor `IncrementalProcessor` vers design plus riche
+   (events, audit log) si besoin production.

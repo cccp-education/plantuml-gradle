@@ -13,6 +13,8 @@ import plantuml.boundary.IdiomaticGlossary
 import plantuml.boundary.NonTranslatableTermRegistry
 import plantuml.boundary.TextClassifier
 import plantuml.boundary.TranslationResolver
+import plantuml.incremental.IncrementalProcessor
+import plantuml.incremental.ProcessingDecision
 import plantuml.service.DiagramProcessor
 import plantuml.service.LlmService
 import plantuml.service.PlantumlService
@@ -127,8 +129,33 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
             nonTranslatableRegistry = NonTranslatableTermRegistry()
         )
 
+        // Incremental processing: checksum-based skip + orphan cleanup
+        val checksumsDir = File(project.buildDir, "plantuml-plugin/checksums")
+        val incrementalProcessor = IncrementalProcessor(checksumsDir)
+        val forceReprocess = project.gradle.startParameter.isRerunTasks
+
+        // Cleanup orphaned outputs (prompts that no longer exist)
+        val imagesDir = project.file(config.output.images)
+        val diagramsDir = project.file(config.output.diagrams)
+        incrementalProcessor.cleanupOrphanedOutputs(promptsDirectory, diagramsDir, imagesDir)
+
+        var processedCount = 0
+        var skippedCount = 0
+
         promptFiles.forEach { promptFile ->
+            val decision = incrementalProcessor.decideProcessing(promptFile, forceReprocess)
+            if (decision == ProcessingDecision.SKIP) {
+                logger.lifecycle(PlantumlMessages.format("generate.skipped", lang, promptFile.name))
+                skippedCount++
+                return@forEach
+            }
+            incrementalProcessor.markAsProcessed(promptFile)
             processSinglePrompt(promptFile, config, diagramProcessor, resolver, lang)
+            processedCount++
+        }
+
+        if (skippedCount > 0) {
+            logger.lifecycle(PlantumlMessages.format("generate.skipped_summary", lang, skippedCount))
         }
     }
 
@@ -292,6 +319,26 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
                 if (config.langchain4j.validation && validation != null) {
                     diagramProcessor.saveForRagTraining(diagram, validation)
                 }
+            } catch (e: Exception) {
+                logger.lifecycle(PlantumlMessages.format("generate.rag_warning", lang, e.message ?: "Unknown error"))
+            }
+
+            // Save diagram YAML to diagrams directory for incremental tracking
+            try {
+                val diagDir = project.file(config.output.diagrams)
+                diagDir.mkdirs()
+                val sanitized = promptFile.nameWithoutExtension.replace("[^a-zA-Z0-9._-]".toRegex(), "_")
+                val diagYamlFile = File(diagDir, "$sanitized.yml")
+                val diagData = mapOf(
+                    "plantuml" to mapOf(
+                        "code" to diagram.plantuml.code,
+                        "description" to diagram.plantuml.description
+                    ),
+                    "status" to "success"
+                )
+                diagYamlFile.writeText(
+                    objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(diagData)
+                )
             } catch (e: Exception) {
                 logger.lifecycle(PlantumlMessages.format("generate.rag_warning", lang, e.message ?: "Unknown error"))
             }
