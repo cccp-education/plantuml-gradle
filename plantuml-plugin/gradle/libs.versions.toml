@@ -1,5 +1,5 @@
 [versions]
-plantuml = "0.0.1"
+plantuml = "0.0.2"
 plantuml-engine = "1.2026.0"
 readme = "0.0.1"
 asciidoctor-gradle = "5.0.0-alpha.1"

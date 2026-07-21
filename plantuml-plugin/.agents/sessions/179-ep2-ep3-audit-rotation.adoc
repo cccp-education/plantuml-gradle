@@ -126,3 +126,11 @@ Baby-step DDD/TDD/BDD (unit → functional → cucumber), Red→Green→Refactor
 8/10 — EP-2 livré avec workflow CI + feature BDD + fix bug ambiguïté. EP-3
 constaté déjà terminé (pas de nouvelle valeur). PL-3 bloqué hors-scope.
 Audit + rotation backup propres. Zéro code métier modifié (test + config + gouvernance).
+
+== Bump version (post-clôture)
+
+- `plantuml-plugin`: 0.0.1 → 0.0.2 (catalogue + BOM 0.0.11)
+- `document-gradle`: BOM 0.0.6 → 0.0.11 + plantuml-plugin 0.0.1 → 0.0.2
+- `workspace-bom`: constraint plantuml 0.0.2 déjà présente (commit dcb3274)
+- `publishToMavenLocal` plantuml + BOM ✅, `compileKotlin` plantuml + document ✅
+- Non publié sur Maven Central (pas de permission explicite)
