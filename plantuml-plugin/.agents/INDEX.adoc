@@ -3,8 +3,8 @@
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
 _Dernière mise a jour_ : 2026-07-21  
-_Session en cours_ : 178 — PL-2 KDoc exhaustif + PL-3 ktlint/detekt  
-_Session terminee_ : 177 — PL-1 + PL-4 + EPIC G-03 + O-07 + K-06. PL-1 (configurationCache = true, asciidoctor retiré, timeout 120s, compileKotlin ✅), PL-4 (lecture PLAN_GLOBAL.adoc → 3 EPICs cross-borough), G-03 (7 fichiers gouvernance com.cheroliv→education.cccp), O-07 (vérifié déjà fait), K-06 (PLAN_GLOBAL.adoc section plantuml mise à jour). Gouvernance pure, zéro code métier modifié.
+_Session en cours_ : 179 — À définir (maintenance/polish)  
+_Session terminee_ : 178 — PL-2 KDoc exhaustif (43 fichiers source, 4 lots, compileKotlin ✅) + PL-3 annulé (ABIDJAN sans plugin lint). Tous les EPICs métier terminés, plugin en maintenance.
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
 '''

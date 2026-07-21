@@ -1,32 +1,26 @@
-= PROMPT_REPRISE — Plantuml — Session 178
-:session: 178
+= PROMPT_REPRISE — Plantuml — Session 179
+:session: 179
 :date: 2026-07-21
 
-== État — PL-1 ✅, PL-4 ✅, G-03 ✅, O-07 ✅, K-06 ✅
+== État — PL-2 ✅, PL-3 ❌ (bloqué ABIDJAN)
 
-Session 177 : PL-1 (configurationCache = true, asciidoctor retiré, timeout 120s,
-compileKotlin ✅), PL-4 (lecture PLAN_GLOBAL.adoc → 3 EPICs cross-borough
-identifiés), G-03 (7 fichiers gouvernance com.cheroliv→education.cccp migrés),
-O-07 (vérifié déjà fait), K-06 (PLAN_GLOBAL.adoc section plantuml mise à jour :
-177 sessions, tous EPICs terminés, Kover 83.26%, 2531 unitaires + 128 Cucumber).
+Session 178 : PL-2 KDoc exhaustif sur 43 fichiers source (4 lots, compileKotlin ✅).
+PL-3 annulé — conventions-gradle (ABIDJAN) n'a pas de plugin ktlint/detekt.
 
-== Mission session 178 — Polish (PL-2 + PL-3)
+== Mission session 179 — À définir
 
-**Objectif** : Polish basse priorité — KDoc exhaustif + ktlint/detekt.
-
-**Plan baby-step** :
-1. PL-2 : KDoc exhaustif sur toutes les classes publiques (models, config,
-   boundary). ~2h.
-2. PL-3 : ktlint ou detekt — dépend ABIDJAN (conventions-gradle). Si
-   conventions-gradle a ajouté un plugin lint, le consommer.
+Tous les EPICs métier sont terminés. Le plugin est en maintenance/polish.
+Pistes restantes :
+- PL-3 : ktlint/detekt — dépend ABIDJAN (bloqué)
+- Audit gouvernance : vérifier si des fichiers EAGER dépassent 100 lignes
+- Rotation backup si N % 10 == 0 (session 180)
 
 == Backlog — priorisé
 
 [cols="1,4,1"]
 |===
 | Priorité | Tâche | Est.
-| 🟢 PL-2 | KDoc exhaustif | ~2h
-| 🟢 PL-3 | ktlint ou detekt | dépend ABIDJAN
+| 🟡 PL-3 | ktlint ou detekt | dépend ABIDJAN
 |===
 
 == Méthodologie
@@ -44,4 +38,4 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 - Cucumber: 128 PASS, 0 FAIL, 9 SKIP
 - Configuration Cache: activé ✅
 - Tous les EPICs métier terminés
-- Voir `sessions/177-pl1-pl4-epic-g03-o07-k06.adoc`
+- Voir `sessions/178-pl2-kdoc-exhaustif.adoc`

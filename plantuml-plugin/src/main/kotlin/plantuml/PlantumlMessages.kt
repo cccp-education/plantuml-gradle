@@ -9,6 +9,19 @@ import java.util.Locale
 import java.util.PropertyResourceBundle
 import java.util.ResourceBundle
 
+/**
+ * Internationalization (i18n) message resolver for the PlantUML plugin.
+ *
+ * Loads messages from `i18n/Messages_{code}.properties` resource bundles
+ * using UTF-8 encoding. Supports 10 languages: en, zh, hi, es, fr, ar, bn,
+ * pt, ru, ur.
+ *
+ * Usage:
+ * ```
+ * PlantumlMessages.get("task.generate.group", "fr")
+ * PlantumlMessages.format("generate.processing", "fr", 5)
+ * ```
+ */
 object PlantumlMessages {
 
     private val baseName = "i18n/Messages"
@@ -34,16 +47,39 @@ object PlantumlMessages {
         }
     }
 
+    /**
+     * Loads the [ResourceBundle] for a given language code.
+     *
+     * @param code Language code (e.g., "en", "fr", "zh")
+     * @return The resource bundle for the requested language
+     */
     fun forLanguage(code: String): ResourceBundle {
         val locale = localeFor(code)
         return ResourceBundle.getBundle(baseName, locale, utf8Control)
     }
 
+    /**
+     * Retrieves a simple message by key.
+     *
+     * @param key Message key in the properties file
+     * @param language Language code (default: "en")
+     * @return The resolved message string
+     */
     fun get(key: String, language: String = "en"): String {
         val bundle = forLanguage(language)
         return bundle.getString(key)
     }
 
+    /**
+     * Retrieves and formats a parameterized message.
+     *
+     * Uses [MessageFormat] for placeholder substitution (e.g., `{0}`, `{1}`).
+     *
+     * @param key Message key in the properties file
+     * @param language Language code (default: "en")
+     * @param args Positional arguments for [MessageFormat]
+     * @return The formatted message string
+     */
     fun format(key: String, language: String = "en", vararg args: Any): String {
         val pattern = get(key, language)
         return MessageFormat.format(pattern, *args)

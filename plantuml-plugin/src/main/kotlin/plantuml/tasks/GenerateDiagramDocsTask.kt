@@ -9,6 +9,22 @@ import plantuml.PlantumlMessages
 import plantuml.service.GraphifyPromptAdapter
 import java.io.File
 
+/**
+ * Gradle task: `generateDiagramDocs`
+ *
+ * Generates PlantUML prompt files from a graphify knowledge graph for
+ * automated diagram documentation. Reads `graphify-out/graph.json` and
+ * creates `.prompt` files for each community (subgraph).
+ *
+ * **Usage**:
+ * ```bash
+ * # Generate prompts for a specific subgraph
+ * ./gradlew generateDiagramDocs -Pplantuml.diagram.subgraph="service layer"
+ *
+ * # Generate prompts for all communities
+ * ./gradlew generateDiagramDocs -Pplantuml.diagram.all=true
+ * ```
+ */
 @DisableCachingByDefault(because = "Depends on Graphify output which may change")
 abstract class GenerateDiagramDocsTask : DefaultTask() {
 
@@ -19,6 +35,11 @@ abstract class GenerateDiagramDocsTask : DefaultTask() {
         description = PlantumlMessages.get("task.diagramdocs.description", lang)
     }
 
+    /**
+     * Main task action: generates prompt files from the knowledge graph.
+     *
+     * @throws GradleException if `graphify-out/graph.json` does not exist
+     */
     @TaskAction
     fun generateDocs() {
         val graphFile = project.rootDir.resolve("graphify-out/graph.json")

@@ -4,6 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import plantuml.PlantumlMessages
 import java.io.File
 
+/**
+ * Generates PlantUML prompt files from a graphify knowledge graph JSON.
+ *
+ * Reads `graph.json` produced by graphify-gradle and creates `.prompt` files
+ * for each community (subgraph), enabling automated diagram generation via
+ * [GeneratePlantumlDiagramsTask].
+ *
+ * @param graphFile Path to the graphify `graph.json` output
+ * @param promptsDir Directory where generated `.prompt` files are written
+ */
 class GraphifyPromptAdapter(
     private val graphFile: File,
     private val promptsDir: File
@@ -11,6 +21,14 @@ class GraphifyPromptAdapter(
 
     private val mapper = ObjectMapper()
 
+    /**
+     * Result of generating a prompt for a single subgraph.
+     *
+     * @property promptFile The generated `.prompt` file
+     * @property communityName Name of the community
+     * @property nodes Node names in the community
+     * @property edges Edge descriptions in the community
+     */
     data class SubgraphResult(
         val promptFile: File,
         val communityName: String,
@@ -18,6 +36,13 @@ class GraphifyPromptAdapter(
         val edges: List<String>
     )
 
+    /**
+     * Generates a prompt file for a specific subgraph by name.
+     *
+     * @param subgraphName Community name to match (case-insensitive substring)
+     * @return The [SubgraphResult] with the generated prompt file
+     * @throws IllegalArgumentException if no matching community is found
+     */
     fun generatePrompt(subgraphName: String): SubgraphResult {
         val graph = mapper.readTree(graphFile)
 
@@ -43,6 +68,12 @@ class GraphifyPromptAdapter(
         return SubgraphResult(promptFile, communityName, nodes, edges)
     }
 
+    /**
+     * Generates prompt files for all communities in the graph.
+     *
+     * @return List of [SubgraphResult] for every community
+     * @throws IllegalArgumentException if the graph has no communities
+     */
     fun generateAllPrompts(): List<SubgraphResult> {
         val graph = mapper.readTree(graphFile)
         val communities = graph.get("communities")

@@ -9,11 +9,27 @@ import plantuml.KnowledgeGraphNode
 import plantuml.PlantumlMessages
 import java.io.File
 
+/**
+ * Parses a knowledge graph JSON file into the [KnowledgeGraph] domain model.
+ *
+ * Supports three input formats:
+ * - **Legacy**: Communities array with nested nodes and edges
+ * - **Graphify**: Flat nodes/links with community IDs and label-based references
+ * - **Flat**: Simple nodes and edges without community structure
+ *
+ * @param graphFile Path to the graph JSON file (typically `graphify-out/graph.json`)
+ */
 class KnowledgeGraphParser(
     private val graphFile: File
 ) {
     private val mapper = ObjectMapper()
 
+    /**
+     * Parses the graph file and returns a fully populated [KnowledgeGraph].
+     *
+     * @return The parsed knowledge graph
+     * @throws IllegalArgumentException if the graph file does not exist
+     */
     fun parse(): KnowledgeGraph {
         if (!graphFile.exists()) {
             throw IllegalArgumentException(

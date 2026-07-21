@@ -4,6 +4,14 @@ import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
+/**
+ * File-based audit logger for incremental processing events.
+ *
+ * Implements [IncrementalEventListener] to receive events and writes
+ * timestamped log lines to the configured log file.
+ *
+ * @property logFile The file where audit entries are appended
+ */
 class IncrementalAuditLogger(private val logFile: File) : IncrementalEventListener {
 
     init {
@@ -17,6 +25,11 @@ class IncrementalAuditLogger(private val logFile: File) : IncrementalEventListen
         log(event)
     }
 
+    /**
+     * Logs an incremental processing event to the audit file.
+     *
+     * @param event The event to log
+     */
     fun log(event: IncrementalEvent) {
         val timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
         val line = when (event) {

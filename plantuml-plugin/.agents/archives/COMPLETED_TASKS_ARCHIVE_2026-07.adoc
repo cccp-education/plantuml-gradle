@@ -1,5 +1,16 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-07
 
+== Session 178 (2026-07-21) — PL-2 KDoc Exhaustif + PL-3 ktlint/detekt
+
+=== Fait
+- PL-2 ✅ : KDoc exhaustif sur 43 fichiers source (models, config, boundary, tasks, services, apikey, incremental). Baby-step 4 lots, compileKotlin après chaque lot.
+- PL-3 ❌ : Annulé — conventions-gradle (ABIDJAN) n'a pas de plugin ktlint/detekt.
+
+=== Prochaine session
+- PL-3 : ktlint/detekt — dépend ABIDJAN (bloqué)
+- Audit gouvernance EAGER si nécessaire
+- Rotation backup session 180 (N % 10 == 0)
+
 == Session 177 (2026-07-21) — PL-1 + PL-4 + EPIC G-03 + O-07 + K-06
 
 === Fait

@@ -1,5 +1,11 @@
 package plantuml.boundary
 
+/**
+ * Classifies raw text into a [TranslationCategory] using heuristics.
+ *
+ * Known presentation labels and lexical terms are matched exactly;
+ * everything else is treated as [TranslationCategory.SEMANTIC_IDENTITY].
+ */
 class TextClassifier {
 
     private val presentationLabels = setOf(
@@ -36,6 +42,12 @@ class TextClassifier {
         "saga"
     )
 
+    /**
+     * Classifies [text] into a [TranslatableText] with the appropriate category.
+     *
+     * @param text The raw text to classify
+     * @return A [TranslatableText] annotated with its category
+     */
     fun classify(text: String): TranslatableText {
         val category = when {
             presentationLabels.contains(text) -> TranslationCategory.PRESENTATION

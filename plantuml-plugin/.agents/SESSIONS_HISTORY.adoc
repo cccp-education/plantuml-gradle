@@ -1,5 +1,9 @@
 = Historique des Sessions
 
+== Session 178 (2026-07-21) — PL-2 KDoc Exhaustif + PL-3 ktlint/detekt
+
+PL-2 : KDoc exhaustif ajouté sur les 43 fichiers source du plugin (models, config, boundary, tasks, services, apikey, incremental). Baby-step : 4 lots de fichiers, compileKotlin après chaque lot. PL-3 : annulé — conventions-gradle (ABIDJAN) n'a pas de plugin ktlint/detekt. Aucun borough n'a de linting automatisé. Zéro code métier modifié (KDoc uniquement). ✅
+
 == Session 177 (2026-07-21) — PL-1 + PL-4 + EPIC G-03 + O-07 + K-06
 
 PL-1 : configurationCache = true (AsciidoctorJ 3.0.1 + Java 25), asciidoctor bundle retiré (zéro usage), timeout 60s→120s, compileKotlin ✅. PL-4 : lecture PLAN_GLOBAL.adoc → 3 EPICs cross-borough identifiés. G-03 : 7 fichiers gouvernance com.cheroliv→education.cccp migrés (ARCHITECTURE, TROUBLESHOOTING ×2, HISTORIQUE, README_truth_fr, finetuning-protocole, EPIC_CONSOLIDATION). O-07 : vérifié déjà fait (zéro engine dans INDEX.adoc). K-06 : PLAN_GLOBAL.adoc section plantuml mise à jour (177 sessions, tous EPICs terminés, Kover 83.26%, 2531 unitaires + 128 Cucumber). Gouvernance pure, zéro code métier modifié. ✅

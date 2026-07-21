@@ -7,6 +7,16 @@ import plantuml.KnowledgeGraphEdge
 import plantuml.KnowledgeGraphNode
 import plantuml.boundary.TranslationResolver
 
+/**
+ * Renders a [KnowledgeGraph] as PlantUML source code.
+ *
+ * Produces a styled PlantUML diagram with:
+ * - Community-based packages with color-coded backgrounds
+ * - Class and file folders within each community
+ * - Cross-community and intra-community edges with type-specific arrows
+ * - Legend showing edge type conventions
+ * - Optional i18n via [TranslationResolver]
+ */
 class KnowledgeGraphRenderer {
 
     private val communityColors = listOf(
@@ -27,6 +37,19 @@ class KnowledgeGraphRenderer {
         Regex(".*`.*`.*")
     )
 
+    /**
+     * Renders a knowledge graph as PlantUML source code.
+     *
+     * @param graph The knowledge graph to render
+     * @param communityFilter Optional community name filter (substring match)
+     * @param edgeTypes Edge types to include (default: all)
+     * @param minConfidence Minimum confidence threshold for edges (0.0–1.0)
+     * @param maxNodes Maximum number of nodes to render
+     * @param nodeTypes Optional node type filter (e.g., setOf("class"))
+     * @param resolver Optional [TranslationResolver] for i18n labels
+     * @param language Target language code for i18n
+     * @return Valid PlantUML source code wrapped in @startuml/@enduml
+     */
     fun render(
         graph: KnowledgeGraph,
         communityFilter: String? = null,
@@ -299,6 +322,15 @@ class KnowledgeGraphRenderer {
         sb.appendLine()
     }
 
+    /**
+     * Sanitizes a node name into a valid PlantUML identifier.
+     *
+     * Replaces special characters with underscores and prefixes
+     * identifiers starting with a digit.
+     *
+     * @param name The raw node name
+     * @return A valid PlantUML identifier
+     */
     fun sanitizeId(name: String): String {
         val sanitized = cleanLabel(name).replace(" ", "_")
             .replace(".", "_")
@@ -322,6 +354,12 @@ class KnowledgeGraphRenderer {
             .trim()
     }
 
+    /**
+     * Checks whether a node represents a method (ends with `()`, starts with `.`, or contains backticks).
+     *
+     * @param node The node to check
+     * @return true if the node matches method naming patterns
+     */
     fun isMethodNode(node: KnowledgeGraphNode): Boolean {
         return methodPatterns.any { it.matches(node.name) }
     }

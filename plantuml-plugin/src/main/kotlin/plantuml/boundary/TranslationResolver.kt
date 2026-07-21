@@ -1,5 +1,13 @@
 package plantuml.boundary
 
+/**
+ * Result of resolving a text through the translation pipeline.
+ *
+ * @property sourceText The original untranslated text
+ * @property translated The resolved (possibly translated) output
+ * @property strategy The [TranslationStrategy] that was applied
+ * @property category The [TranslationCategory] of the source text
+ */
 data class ResolvedText(
     val sourceText: String,
     val translated: String,
@@ -7,6 +15,20 @@ data class ResolvedText(
     val category: TranslationCategory
 )
 
+/**
+ * Orchestrates the full translation resolution pipeline.
+ *
+ * For a given text and language:
+ * 1. Checks the [NonTranslatableTermRegistry] (client-specific terms)
+ * 2. Classifies the text via [TextClassifier]
+ * 3. Decides the strategy based on category and [IdiomaticGlossary]
+ * 4. Applies the strategy to produce the final translated text
+ *
+ * @param classifier Classifies text into a [TranslationCategory]
+ * @param glossary Idiomatic glossary for domain terms
+ * @param messageResolver Resolves i18n message keys (e.g., from [plantuml.PlantumlMessages])
+ * @param nonTranslatableRegistry Optional registry of terms that must never be translated
+ */
 class TranslationResolver(
     private val classifier: TextClassifier,
     private val glossary: IdiomaticGlossary,
@@ -14,6 +36,13 @@ class TranslationResolver(
     private val nonTranslatableRegistry: NonTranslatableTermRegistry? = null
 ) {
 
+    /**
+     * Resolves a text for the given language through the full pipeline.
+     *
+     * @param text The raw text to resolve
+     * @param language Target language code (e.g., "fr", "zh")
+     * @return A [ResolvedText] with the translated output and metadata
+     */
     fun resolve(text: String, language: String): ResolvedText {
         if (nonTranslatableRegistry?.contains(text) == true) {
             return ResolvedText(

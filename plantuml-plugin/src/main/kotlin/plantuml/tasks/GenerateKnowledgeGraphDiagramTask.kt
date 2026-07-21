@@ -16,6 +16,26 @@ import plantuml.service.KnowledgeGraphRenderer
 import plantuml.service.PlantumlService
 import java.io.File
 
+/**
+ * Gradle task: `generateKnowledgeGraphDiagram`
+ *
+ * Generates a PlantUML diagram from a graphify knowledge graph JSON file.
+ * Reads `graphify-out/graph.json`, parses it into a [KnowledgeGraph],
+ * renders it as PlantUML source, validates syntax, and generates a PNG image.
+ *
+ * **Configuration** (via CLI properties):
+ * - `-Pplantuml.kg.community=<name>` — Filter by community name
+ * - `-Pplantuml.kg.edgeTypes=EXTRACTED,INFERRED` — Comma-separated edge types
+ * - `-Pplantuml.kg.minConfidence=0.5` — Minimum edge confidence
+ * - `-Pplantuml.kg.maxNodes=50` — Maximum nodes to render
+ * - `-Pplantuml.kg.nodeTypes=class,code` — Filter by node type
+ * - `-Pplantuml.kg.outputDir=diagrams/kg` — Output directory
+ *
+ * **Usage**:
+ * ```bash
+ * ./gradlew generateKnowledgeGraphDiagram
+ * ```
+ */
 @DisableCachingByDefault(because = "Depends on graph.json which may change")
 abstract class GenerateKnowledgeGraphDiagramTask : DefaultTask() {
 
@@ -26,6 +46,11 @@ abstract class GenerateKnowledgeGraphDiagramTask : DefaultTask() {
         description = PlantumlMessages.get("task.kg.description", lang)
     }
 
+    /**
+     * Main task action: generates a knowledge graph PlantUML diagram.
+     *
+     * @throws GradleException if `graphify-out/graph.json` does not exist
+     */
     @TaskAction
     fun generateKnowledgeGraph() {
         val graphFile = project.rootDir.resolve("graphify-out/graph.json")

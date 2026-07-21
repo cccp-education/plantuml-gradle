@@ -476,27 +476,27 @@ GLOBAL_CODE_REVIEW_v7 (2026-05-13), audit code actuel S172.
   Asciidoctor-gradle était incompatible à l'époque. Réévaluer si la version
   actuelle d'AsciidoctorJ (3.0.1, Java 25) supporte le config cache.
 | `build.gradle.kts:547`
-| ~30min
+| ✅ S177
 
 | PL-2
 | **KDoc exhaustif** — KDoc présent sur tâches/services principaux mais pas
   sur toutes les classes publiques (models, config, boundary). Compléter pour
   atteindre une documentation professionnelle.
 | `src/main/kotlin/` global
-| ~2h
+| ✅ S178
 
 | PL-3
 | **ktlint ou detekt** — concern transverse (aucun borough n'a ktlint/detekt).
   Si conventions-gradle (ABIDJAN) ajoute un plugin lint, plantuml devrait le
   consommer. Source : GLOBAL_CODE_REVIEW_v7.
 | `build.gradle.kts` (conventions)
-| dépend ABIDJAN
+| ❌ BLOQUÉ ABIDJAN
 
 | PL-4
 | **Consulter `PLAN_GLOBAL.adoc`** — racine workspace. Identifier les EPICs
   cross-borough candidats pour plantuml-gradle. Lecture seule, pas de code.
 | racine workspace
-| ~30min lecture
+| ✅ S177
 |===
 
 === 📌 Note — `.agents/` placement

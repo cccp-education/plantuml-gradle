@@ -1,0 +1,60 @@
+= Session 178 — PL-2 KDoc Exhaustif + PL-3 ktlint/detekt
+:session: 178
+:date: 2026-07-21
+:status: ✅ TERMINÉ
+
+== Résumé
+
+PL-2 : KDoc exhaustif ajouté sur les 43 fichiers source du plugin. PL-3 : annulé
+(ABIDJAN conventions-gradle n'a pas de plugin ktlint/detekt).
+
+== Fait
+
+- PL-2 ✅ : KDoc sur toutes les classes publiques, data classes, enums, et fonctions
+  publiques des 43 fichiers source (models, config, boundary, tasks, services, apikey,
+  incremental). Baby-step : 4 lots de fichiers, compileKotlin après chaque lot.
+- PL-3 ❌ : Annulé — conventions-gradle (ABIDJAN) n'a pas de plugin ktlint/detekt.
+  Aucun borough n'a de linting automatisé. À réactiver quand ABIDJAN l'ajoutera.
+
+== Fichiers modifiés (KDoc ajouté)
+
+- `src/main/kotlin/plantuml/kgmodels.kt` — EdgeType, KnowledgeGraphEdge, KnowledgeGraphNode, KnowledgeGraphCommunity, KnowledgeGraph
+- `src/main/kotlin/plantuml/boundary/TranslationCategory.kt`
+- `src/main/kotlin/plantuml/boundary/TranslationStrategy.kt`
+- `src/main/kotlin/plantuml/boundary/TranslatableText.kt`
+- `src/main/kotlin/plantuml/boundary/ClassifiedText.kt`
+- `src/main/kotlin/plantuml/boundary/TextClassifier.kt`
+- `src/main/kotlin/plantuml/boundary/GlossaryEntry.kt`
+- `src/main/kotlin/plantuml/boundary/IdiomaticGlossary.kt`
+- `src/main/kotlin/plantuml/boundary/IdiomaticGlossaryLoader.kt`
+- `src/main/kotlin/plantuml/boundary/TranslationResolver.kt` — ResolvedText + TranslationResolver
+- `src/main/kotlin/plantuml/boundary/NonTranslatableTermRegistry.kt`
+- `src/main/kotlin/plantuml/boundary/NonTranslatableTermRegistryLoader.kt`
+- `src/main/kotlin/plantuml/incremental/IncrementalConfig.kt`
+- `src/main/kotlin/plantuml/incremental/IncrementalEvent.kt` — IncrementalEvent, PromptSkipped, PromptProcessed, OutputsCleaned
+- `src/main/kotlin/plantuml/incremental/IncrementalEventListener.kt`
+- `src/main/kotlin/plantuml/incremental/ChecksumStore.kt`
+- `src/main/kotlin/plantuml/incremental/IncrementalProcessor.kt` — ProcessingDecision + IncrementalProcessor
+- `src/main/kotlin/plantuml/incremental/IncrementalAuditLogger.kt`
+- `src/main/kotlin/plantuml/apikey/TieredRotationStrategy.kt`
+- `src/main/kotlin/plantuml/apikey/FreemiumWeightCalculator.kt`
+- `src/main/kotlin/plantuml/service/GraphifyPromptAdapter.kt` — SubgraphResult + GraphifyPromptAdapter
+- `src/main/kotlin/plantuml/service/KnowledgeGraphParser.kt`
+- `src/main/kotlin/plantuml/service/KnowledgeGraphRenderer.kt`
+- `src/main/kotlin/plantuml/PlantumlMessages.kt`
+- `src/main/kotlin/plantuml/tasks/GenerateDiagramDocsTask.kt`
+- `src/main/kotlin/plantuml/tasks/GenerateKnowledgeGraphDiagramTask.kt`
+- `src/main/kotlin/plantuml/models.kt` — DiagramDocsConfig
+
+== Validation
+
+- `./gradlew compileKotlin` ✅ BUILD SUCCESSFUL (4 lots, 4 compilations OK)
+- Zéro régression, zéro code métier modifié (KDoc uniquement)
+
+== Prochaine session
+
+- PL-3 : ktlint/detekt — dépend ABIDJAN (conventions-gradle). À réactiver quand
+  ABIDJAN ajoutera un plugin lint.
+- QW-3 : README_truth.adoc + CHANGELOG.adoc déjà faits S176.
+- EP-1, EP-2, EP-3 : déjà terminés S174-S176.
+- Tous les EPICs métier sont terminés. Le plugin est en maintenance/polish.

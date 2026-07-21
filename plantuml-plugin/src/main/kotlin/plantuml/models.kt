@@ -251,6 +251,17 @@ data class ValidationFeedback(
     val recommendations: List<String>
 )
 
+/**
+ * Configuration for automated diagram documentation generation.
+ *
+ * Controls the `generateDiagramDocs` task which creates prompt files
+ * from graphify knowledge graph communities.
+ *
+ * @property enabled Whether diagram docs generation is active (default: true)
+ * @property outputDir Directory for generated diagram documentation (default: "diagrams/auto")
+ * @property subgraphs List of subgraph names to generate prompts for
+ * @property model LLM model to use for diagram generation (default: "qwen3.5-cloud")
+ */
 data class DiagramDocsConfig(
     val enabled: Boolean = true,
     val outputDir: String = "diagrams/auto",
