@@ -4,7 +4,7 @@ _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
 _Dernière mise a jour_ : 2026-07-21  
 _Session en cours_ : 180 — Rotation backup (multiple de 10)  
-_Session terminee_ : 179 — EP-2 tests production-close (workflow CI `real_llm_test.yml` + feature Cucumber `22_real_llm.feature` 3 scénarios `@realllm` + fix bug `AmbiguousStepDefinitionsException`). EP-3 constaté déjà terminé (S176). Rotation backup sessions 126-178 (50→5 fichiers). Audit gouvernance (EAGER 766 lignes). Tous les EPICs métier terminés, plugin en maintenance.
+_Session terminee_ : 179 — EP-2 tests production-close (workflow CI `real_llm_test.yml` + feature Cucumber `22_real_llm.feature` 3 scénarios `@realllm` + fix bug `AmbiguousStepDefinitionsException`). EP-3 constaté déjà terminé (S176). Rotation backup sessions 126-178 (50→5 fichiers). Audit gouvernance (EAGER 766 lignes). Bump 0.0.1→0.0.2 + publication Maven Central (bundle 92463d37). Consommateurs mis à niveau (document-gradle BOM 0.0.11). Tous les EPICs métier terminés, plugin en maintenance.
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
 '''

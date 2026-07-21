@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-07-21 (Session 179 — EP-2 + EP-3 TERMINÉS, bump 0.0.2, rotation backup)
+:last_update: 2026-07-21 (Session 179 — EP-2 + EP-3 TERMINÉS, pub 0.0.2 Central, rotation backup)
 
 '''
 == ✅ EPIC 13 : Multi-provider API Pool — Rotation par tiers + Cross-provider

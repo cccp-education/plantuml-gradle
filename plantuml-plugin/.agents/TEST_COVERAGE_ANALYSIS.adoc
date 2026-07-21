@@ -1,6 +1,6 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 179 (21 juillet 2026)
+_Dernière mise à jour_ : Session 179 (21 juillet 2026) — pub 0.0.2 Maven Central
 
 === Résumé Global
 

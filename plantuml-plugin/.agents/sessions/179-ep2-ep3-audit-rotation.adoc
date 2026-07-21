@@ -131,6 +131,9 @@ Audit + rotation backup propres. Zéro code métier modifié (test + config + go
 
 - `plantuml-plugin`: 0.0.1 → 0.0.2 (catalogue + BOM 0.0.11)
 - `document-gradle`: BOM 0.0.6 → 0.0.11 + plantuml-plugin 0.0.1 → 0.0.2
-- `workspace-bom`: constraint plantuml 0.0.2 déjà présente (commit dcb3274)
+- `workspace-bom`: constraint plantuml 0.0.2 déjà présente (commit dcb3274, BOM 0.0.11 sur Central ✅)
 - `publishToMavenLocal` plantuml + BOM ✅, `compileKotlin` plantuml + document ✅
-- Non publié sur Maven Central (pas de permission explicite)
+- **Publication Maven Central** : `publishAggregationToCentralPortal` ✅
+  - Bundle `92463d37-de2f-41bb-87cb-fd9fa19f4d02` uploadé (AUTOMATIC)
+  - Statut `publishing` au moment du push (propagation repo1.maven.org en cours)
+- Commits pushés : `ed472e4` (plantuml-gradle), `4546a17` (document-gradle)

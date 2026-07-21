@@ -35,8 +35,8 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 == Rappels
 
 - GroupId: education.cccp.plantuml
-- Version publiée: 0.0.1 (Maven Central), 0.0.2 (mavenLocal, non publié Central)
-- BOM: `workspace-bom:0.0.11` ✅ (bump S179, constraint plantuml 0.0.2 déjà dans BOM)
+- Version publiée: 0.0.2 (Maven Central, bundle 92463d37, propagation en cours)
+- BOM: `workspace-bom:0.0.11` ✅ (constraint plantuml 0.0.2)
 - `publishToMavenLocal` obligatoire après modif code plugin
 - Kover main: 83.26% INSTRUCTION ✅ ≥ 75%
 - Cucumber: 128 PASS, 0 FAIL, 9 SKIP (+ 3 @realllm SKIPPED si Ollama absent)
