@@ -1,0 +1,55 @@
+# PlantUML Real LLM Test Configuration
+# Copy this file to plantuml-real-context.yml and fill in your credentials.
+# plantuml-real-context.yml is gitignored — never commit real credentials.
+#
+# Usage:
+#   cp plantuml-real-context.example.yml plantuml-real-context.yml
+#   ./gradlew cucumberTest -Pcucumber.tags="@real-llm"
+
+input:
+  prompts: "prompts"
+
+output:
+  diagrams: "generated/diagrams"
+  images: "generated/images"
+  validations: "generated/validations"
+  rag: "generated/rag"
+
+langchain4j:
+  maxIterations: 5
+  model: "ollama"
+
+  ollama:
+    baseUrl: "http://localhost:11438"
+    modelName: "smollm:135m"
+
+  openai:
+    apiKey: "<YOUR_OPENAI_API_KEY>"
+    modelName: "gpt-4o-mini"
+
+  gemini:
+    apiKey: "<YOUR_GEMINI_API_KEY>"
+    modelName: "gemini-2.5-flash"
+
+  mistral:
+    apiKey: "<YOUR_MISTRAL_API_KEY>"
+    modelName: "mistral-small-latest"
+
+  claude:
+    apiKey: "<YOUR_CLAUDE_API_KEY>"
+    modelName: "claude-3-haiku-20240307"
+
+  huggingface:
+    apiKey: "<YOUR_HUGGINGFACE_API_KEY>"
+    modelName: "Qwen/Qwen2.5-Coder-32B-Instruct"
+
+  groq:
+    apiKey: "<YOUR_GROQ_API_KEY>"
+    modelName: "llama-3.3-70b-versatile"
+
+git:
+  userName: "github-actions[bot]"
+  userEmail: "github-actions[bot]@users.noreply.github.com"
+  commitMessage: "chore: update PlantUML diagrams [skip ci]"
+  watchedBranches:
+    - "main"

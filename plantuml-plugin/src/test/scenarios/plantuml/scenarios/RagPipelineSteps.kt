@@ -8,6 +8,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
 import org.testcontainers.containers.PostgreSQLContainer
 import java.io.File
+import java.security.MessageDigest
 import java.time.Duration
 
 class RagPipelineSteps(private val world: PlantumlWorld) {
@@ -219,8 +220,10 @@ class RagPipelineSteps(private val world: PlantumlWorld) {
     fun verifyUnchangedPromptsSkipped() {
         assertThat(world.buildResult).isNotNull
         assertThat(world.buildResult!!.output).containsAnyOf(
-            "BUILD SUCCESSFUL",
-            "Rebuilding RAG"
+            "Skipped",
+            "skipped",
+            "unchanged",
+            "Unchanged"
         )
     }
 
@@ -240,5 +243,69 @@ class RagPipelineSteps(private val world: PlantumlWorld) {
         val ragDir = File(world.projectDir, "generated/rag")
         val historyFiles = ragDir.listFiles { file -> file.name.contains("attempt-history") }
         assertThat(historyFiles).isNotNull
+    }
+
+    @Given("a puml file {string} exists in the RAG directory")
+    fun pumlFileExistsInRagDirectory(fileName: String) {
+        val ragDir = File(world.projectDir, "build/plantuml-plugin/generated/rag").apply { mkdirs() }
+        val pumlFile = File(ragDir, fileName)
+        pumlFile.writeText("@startuml\nactor User\n@enduml")
+    }
+
+    @Given("a checksum is stored for the prompt")
+    fun checksumIsStoredForThePrompt() {
+        val promptsDir = File(world.projectDir, "prompts")
+        val promptFile = File(promptsDir, "rag-inc-test.prompt")
+        val checksumsDir = File(world.projectDir, "build/plantuml-plugin/checksums").apply { mkdirs() }
+        val checksum = calculateChecksum(promptFile)
+        File(checksumsDir, "rag-inc-test.sha256").writeText(checksum)
+    }
+
+    @Given("the prompt file content is modified to {string}")
+    fun promptFileContentIsModifiedTo(newContent: String) {
+        val promptsDir = File(world.projectDir, "prompts")
+        val promptFile = File(promptsDir, "rag-inc-test.prompt")
+        promptFile.writeText(newContent)
+    }
+
+    @When("I run collectPlantumlIndex task in simulation mode")
+    fun runCollectPlantumlIndexTaskInSimulationMode() = runBlocking {
+        val properties = mutableMapOf<String, String>()
+        val systemProperties = mutableMapOf<String, String>()
+        world.projectDir?.let {
+            systemProperties["plugin.project.dir"] = it.absolutePath
+        }
+        properties["plantuml.test.mode"] = "true"
+        world.executeGradle("collectPlantumlIndex", properties = properties, systemProperties = systemProperties)
+    }
+
+    @Then("the puml file should be skipped in RAG reindex")
+    fun pumlFileShouldBeSkippedInRagReindex() {
+        assertThat(world.buildResult).isNotNull
+        assertThat(world.buildResult!!.output).containsAnyOf(
+            "Skipped",
+            "skipped",
+            "unchanged",
+            "Unchanged"
+        )
+    }
+
+    @Then("the puml file should be reindexed in RAG")
+    fun pumlFileShouldBeReindexedInRag() {
+        assertThat(world.buildResult).isNotNull
+        assertThat(world.buildResult!!.output).containsAnyOf(
+            "Found",
+            "found",
+            "indexing",
+            "Indexing",
+            "Rebuilding RAG"
+        )
+    }
+
+    private fun calculateChecksum(file: File): String {
+        val bytes = file.readBytes()
+        val md = MessageDigest.getInstance("SHA-256")
+        val digest = md.digest(bytes)
+        return digest.joinToString("") { "%02x".format(it) }
     }
 }

@@ -5,7 +5,7 @@
 :icons: font
 :lang: en
 :hardbreaks-option:
-:plugin-version: 0.0.5
+:plugin-version: 0.0.1
 
 ++++
 <p align="right">
@@ -22,7 +22,7 @@ image:https://img.shields.io/badge/License-Apache%202.0-blue.svg[License]
 
 == Description
 
-`com.cheroliv.plantuml` is a Gradle plugin that generates PlantUML diagrams via AI (LangChain4j) from `.prompt` files.
+`education.cccp.plantuml` is a Gradle plugin that generates PlantUML diagrams via AI (LangChain4j) from `.prompt` files.
 It exposes a minimal DSL to the consumer and handles all repository, dependency, and task configuration internally.
 It integrates a RAG (Retrieval-Augmented Generation) pipeline for automated PlantUML diagram generation via multiple LLM providers.
 
@@ -116,12 +116,12 @@ RRT --> Embed
 
 === Plugin ID
 
-The plugin ID is `com.cheroliv.plantuml`, applied via:
+The plugin ID is `education.cccp.plantuml`, applied via:
 
 [source,kotlin]
 ----
 plugins {
-    id("com.cheroliv.plantuml") version "0.0.5"
+    id("education.cccp.plantuml") version "0.0.1"
 }
 ----
 
@@ -843,7 +843,7 @@ plantuml {
 plantuml = "{plugin-version}"
 
 [plugins]
-plantuml = { id = "com.cheroliv.plantuml", version.ref = "plantuml" }
+plantuml = { id = "education.cccp.plantuml", version.ref = "plantuml" }
 ----
 
 === gradle.properties (recommended)
@@ -1066,13 +1066,138 @@ ls -la generated/images/
 ./gradlew clean processPlantumlPrompts
 ----
 
+== Internationalization (i18n) — 10 Languages
+
+The plugin supports 10 languages for all user-facing messages (logger, exceptions,
+task descriptions). Prompts sent to LLMs remain in English (prompt engineering, not i18n).
+
+=== Architecture
+
+[source]
+----
+PlantumlConfig.language ──► ConfigMerger (4 layers: CLI > env > YAML > gradle.properties)
+    │
+    ▼
+PlantumlMessages.forLanguage(code) ──► ResourceBundle.getBundle("i18n/Messages", locale)
+    │
+    ▼
+PlantumlMessages.get("key")           → String simple
+PlantumlMessages.format("key", args)  → String formaté (MessageFormat)
+----
+
+=== Supported Languages
+
+[cols="1,2"]
+|===
+| Code | Language
+| `en` | English (default)
+| `zh` | Chinese Mandarin (中文)
+| `hi` | Hindi (हिन्दी)
+| `es` | Spanish (Español)
+| `fr` | French (Français)
+| `ar` | Arabic (العربية)
+| `bn` | Bengali (বাংলা)
+| `pt` | Portuguese (Português)
+| `ru` | Russian (Русский)
+| `ur` | Urdu (اردو)
+|===
+
+=== Configuration
+
+[source,kotlin]
+----
+plantuml {
+    language = "fr"
+    supportedLanguages = listOf("en", "fr", "es")
+}
+----
+
+The language is resolved via the 4-layer ConfigMerger cascade. If the requested
+language is not in `supportedLanguages`, the plugin falls back to `en`.
+
+=== Message Files
+
+10 `Messages_{code}.properties` files in `src/main/resources/i18n/` with ~100 keys
+each. `PlantumlMessages` wraps `java.util.ResourceBundle` + `java.text.MessageFormat`
+for parameterized messages.
+
+== Translation Boundary — PLT-BOUNDARY
+
+The i18n infrastructure serves comprehension. Any translation that reduces
+comprehension is a defect. The plugin distinguishes three text natures with
+three strategies:
+
+[cols="1,3,2"]
+|===
+| Nature | Examples | Strategy
+| Presentation | `"Classes"`, `"Files"`, `"Empty Knowledge Graph"` | TRANSLATE (word-for-word via Messages_*.properties)
+| Semantic Identity | `LlmService`, `calls`, `community_0`, math formulas | PRESERVE (as-is)
+| Lexical Field | `pipeline`, `rollback`, `dependency injection` | TRANSLATE (idiomatic) / BORROW (loanword)
+|===
+
+=== Domain Components
+
+* `TranslationCategory` — enum: `PRESENTATION`, `SEMANTIC_IDENTITY`, `LEXICAL_FIELD`
+* `TranslationStrategy` — enum: `TRANSLATE`, `BORROW`, `PRESERVE`
+* `TextClassifier` — classifies text into a TranslationCategory
+* `IdiomaticGlossary` — YAML-configurable term → {language → translation + strategy}
+* `NonTranslatableTermRegistry` — YAML-configurable client-domain terms (REAC, AFNOR, FPA)
+* `TranslationResolver` — applies the correct strategy per category + glossary
+
+=== Integration
+
+Both `KnowledgeGraphRenderer` and `DiagramProcessor` use `TranslationResolver`:
+structural labels are translated, semantic identifiers are preserved, and
+lexical-field terms follow the idiomatic glossary. The full pipeline is verified
+by 12 Cucumber boundary scenarios + 1 end-to-end scenario.
+
+== Incremental Processing
+
+The `plantuml.incremental` domain avoids redundant LLM calls by tracking prompt
+checksums. Only prompts whose content has changed are re-processed.
+
+=== Domain Components
+
+* `ChecksumStore` — persists SHA-256 checksums of prompt files to `build/plantuml-plugin/checksums/`
+* `IncrementalProcessor` — compares current checksum vs stored, skips unchanged prompts, cleans up orphaned outputs
+* `IncrementalConfig` — YAML-configurable: `checksumsDir`, `auditLog`, `auditEnabled`
+* `IncrementalAuditLogger` — timestamped trace of skip/process/cleanup decisions
+* Domain events — `PromptSkipped`, `PromptProcessed`, `OutputsCleaned` sealed class
+
+=== Usage
+
+[source,bash]
+----
+# Normal run — skips unchanged prompts
+./gradlew processPlantumlPrompts
+
+# Force reprocess all prompts
+./gradlew processPlantumlPrompts --rerun-tasks
+----
+
+=== RAG Reindex Integration
+
+`CollectPlantumlIndexTask` uses `IncrementalProcessor.shouldReindexPuml()` to
+skip RAG reindexing for prompts whose diagram hasn't changed. Only the delta
+is reindexed — never the full corpus.
+
+=== Test Coverage
+
+* 35 unit tests in `plantuml.incremental` (ChecksumStore 7, IncrementalProcessor 10, Events 7, AuditLogger 7, Config 5)
+* 7 Cucumber scenarios `@incremental` + `@incremental-rag` PASS
+* Kover main: 83.26% INSTRUCTION ≥ 75%
+
 == Roadmap
 
+* ✅ i18n — 10 languages, ResourceBundle + MessageFormat, 4-layer ConfigMerger cascade.
+* ✅ Translation Boundary — 3 text natures × 3 strategies, 12 Cucumber boundary scenarios.
+* ✅ Incremental Processing — checksum-based skip, cleanup orphans, RAG reindex delta.
+* ✅ Multi-provider API Pool — tiered rotation (Enterprise > Pro > Free), cross-provider fallback.
+* ✅ Knowledge Graph Diagram — deterministic PlantUML from `graphify-out/graph.json`.
+* ✅ Maven Central publication — `education.cccp:plantuml-plugin:0.0.1`.
 * Configuration Cache support — blocked on native ONNX library reload constraints.
-* Cucumber tests for the full RAG pipeline.
-* Support for additional PlantUML diagram types.
-* Extended DSL configuration (custom output directories, includes/excludes).
-* Real-time incremental processing when editing prompts.
+* Production-close tests — real LLM integration tests with CLI parameter toggle.
+* Pool freemium ratio — dynamic weight based on actual quota usage.
 
 NOTE: The plugin explicitly declares `configurationCache = false` on the Gradle Plugin Portal.
 Do not enable the Gradle Configuration Cache with this plugin — RAG tasks run `OUT_OF_PROCESS`

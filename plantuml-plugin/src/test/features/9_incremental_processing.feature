@@ -41,3 +41,20 @@ Feature: Incremental Processing
     Given prompts were already processed
     When I run generatePlantumlDiagrams task with --rerun-tasks
     Then all prompts should be reprocessed regardless of change status
+
+  @incremental-rag @rag-reindex
+  Scenario: RAG reindex skips puml when source prompt unchanged
+    Given a prompt file "rag-inc-test.prompt" with content "Create a diagram for RAG"
+    And a puml file "rag-inc-test.puml" exists in the RAG directory
+    And a checksum is stored for the prompt
+    When I run collectPlantumlIndex task in simulation mode
+    Then the puml file should be skipped in RAG reindex
+
+  @incremental-rag @rag-reindex
+  Scenario: RAG reindex processes puml when source prompt changed
+    Given a prompt file "rag-inc-test.prompt" with content "Create a diagram for RAG"
+    And a puml file "rag-inc-test.puml" exists in the RAG directory
+    And a checksum is stored for the prompt
+    And the prompt file content is modified to "Create a different diagram for RAG"
+    When I run collectPlantumlIndex task in simulation mode
+    Then the puml file should be reindexed in RAG

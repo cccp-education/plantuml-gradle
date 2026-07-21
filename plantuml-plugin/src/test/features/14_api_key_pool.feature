@@ -103,3 +103,36 @@ Feature: API Key Pool Management
     Given an API key with MANUAL reset policy
     When I trigger manual reset
     Then the quota should reset
+
+  @freemium
+  Scenario: Freemium ratio disabled by default
+    Given a pool with 2 FREE keys and 1 ENTERPRISE key
+    And freemium ratio is 0.0
+    And the pool is initialized with TIERED strategy
+    When I select the next pool key
+    Then the ENTERPRISE key should be selected
+
+  @freemium
+  Scenario: Freemium ratio 0.5 balances free and paid
+    Given a pool with 2 FREE keys and 1 ENTERPRISE key
+    And freemium ratio is 0.5
+    And the pool is initialized with TIERED strategy
+    When I select the next pool key
+    Then the ENTERPRISE key should be selected
+
+  @freemium
+  Scenario: Freemium ratio 1.0 prioritizes free keys
+    Given a pool with 2 FREE keys and 1 ENTERPRISE key
+    And freemium ratio is 1.0
+    And the pool is initialized with TIERED strategy
+    When I select the next pool key
+    Then a FREE key should be selected
+
+  @freemium
+  Scenario: Freemium weight decreases as usage increases
+    Given a pool with only 2 FREE keys
+    And freemium ratio is 0.5
+    And the pool is initialized with TIERED strategy
+    And the first key has consumed 50% of its quota
+    When I select the next pool key
+    Then the second key should be selected

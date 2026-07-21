@@ -8,6 +8,7 @@ import plantuml.apikey.ApiKeyEntry
 import plantuml.apikey.ApiKeyPool
 import plantuml.apikey.ApiKeyPoolConfig
 import plantuml.apikey.Provider
+import plantuml.apikey.KeyTier
 import plantuml.apikey.QuotaConfig
 import plantuml.apikey.ResetPolicy
 import plantuml.apikey.RotationStrategy
@@ -203,6 +204,15 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
 
     @Given("the first key has consumed {int}% of its quota")
     fun theFirstKeyHasConsumedPercentOfQuota(percent: Int) {
+        if (world.apiKeyPool == null) {
+            world.apiKeyPool = ApiKeyPool(
+                entries = world.apiKeyPoolEntries.toList(),
+                rotationStrategy = RotationStrategy.TIERED,
+                fallbackEnabled = world.apiKeyPoolFallbackEnabled,
+                auditEnabled = world.apiKeyPoolAuditEnabled,
+                freemiumRatio = freemiumRatio
+            )
+        }
         val firstEntry = world.apiKeyPool!!.getAllKeys().first()
         val limit = firstEntry.quota.limitValue
         val consumeCount = (limit * percent / 100)
@@ -568,6 +578,76 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
         world.apiKeyPool!!.manualReset(entry.id)
     }
 
+    private var freemiumRatio: Double = 0.0
+
+    @Given("a pool with {int} FREE keys and {int} ENTERPRISE key")
+    fun poolWithFreeKeysAndEnterpriseKey(freeCount: Int, enterpriseCount: Int) {
+        world.apiKeyPoolEntries.clear()
+        repeat(freeCount) { i ->
+            world.apiKeyPoolEntries.add(
+                createEntry(
+                    id = "free-$i",
+                    provider = Provider.GOOGLE,
+                    tier = KeyTier.FREE,
+                    weight = 10
+                )
+            )
+        }
+        repeat(enterpriseCount) { i ->
+            world.apiKeyPoolEntries.add(
+                createEntry(
+                    id = "ent-$i",
+                    provider = Provider.GOOGLE,
+                    tier = KeyTier.ENTERPRISE,
+                    weight = 10
+                )
+            )
+        }
+    }
+
+    @Given("a pool with only {int} FREE keys")
+    fun poolWithFreeKeys(count: Int) {
+        world.apiKeyPoolEntries.clear()
+        repeat(count) { i ->
+            world.apiKeyPoolEntries.add(
+                createEntry(
+                    id = "free-$i",
+                    provider = Provider.GOOGLE,
+                    tier = KeyTier.FREE,
+                    weight = 10
+                )
+            )
+        }
+    }
+
+    @Given("freemium ratio is {double}")
+    fun freemiumRatioIs(ratio: Double) {
+        freemiumRatio = ratio
+    }
+
+    @Given("the pool is initialized with TIERED strategy")
+    fun thePoolIsInitializedWithTieredStrategy() {
+        world.apiKeyPool = ApiKeyPool(
+            entries = world.apiKeyPoolEntries.toList(),
+            rotationStrategy = RotationStrategy.TIERED,
+            fallbackEnabled = world.apiKeyPoolFallbackEnabled,
+            auditEnabled = world.apiKeyPoolAuditEnabled,
+            freemiumRatio = freemiumRatio
+        )
+    }
+
+    @Then("the ENTERPRISE key should be selected")
+    fun theEnterpriseKeyShouldBeSelected() {
+        val lastSelected = world.apiKeyPoolSelectedKeys.last()
+        assertThat(lastSelected.tier).isEqualTo(KeyTier.ENTERPRISE)
+    }
+
+    @Then("a FREE key should be selected")
+    fun aFreeKeyShouldBeSelected() {
+        val lastSelected = world.apiKeyPoolSelectedKeys.last()
+        assertThat(lastSelected.tier).isEqualTo(KeyTier.FREE)
+    }
+
     private fun parseProvider(name: String): Provider = when (name.uppercase()) {
         "GOOGLE" -> Provider.GOOGLE
         "HUGGINGFACE" -> Provider.HUGGINGFACE
@@ -586,7 +666,9 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
         quota: QuotaConfig = QuotaConfig(),
         expirationDate: LocalDateTime? = null,
         metadata: Map<String, String> = emptyMap(),
-        resetPolicy: ResetPolicy = ResetPolicy.DAILY
+        resetPolicy: ResetPolicy = ResetPolicy.DAILY,
+        tier: KeyTier = KeyTier.FREE,
+        weight: Int = 1
     ): ApiKeyEntry = ApiKeyEntry(
         id = id,
         email = "test@$id.com",
@@ -596,6 +678,8 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
         services = services,
         quota = quota.copy(resetPolicy = resetPolicy),
         expirationDate = expirationDate,
-        metadata = metadata
+        metadata = metadata,
+        tier = tier,
+        weight = weight
     )
 }

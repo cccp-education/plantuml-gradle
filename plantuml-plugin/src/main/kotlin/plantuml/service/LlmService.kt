@@ -49,35 +49,36 @@ class LlmService(
     private fun initializeApiKeyPools() {
         val rotation = parseRotationStrategy(config.langchain4j.rotationStrategy)
         val fallback = config.langchain4j.fallbackEnabled
+        val freemiumRatio = config.langchain4j.freemiumRatio
 
         val openaiPool = config.langchain4j.openai.pool
         if (openaiPool.isNotEmpty()) {
-            apiKeyPools["openai"] = ApiKeyPool(openaiPool.map { it.toApiKeyEntry() }, rotation, fallbackEnabled = fallback)
+            apiKeyPools["openai"] = ApiKeyPool(openaiPool.map { it.toApiKeyEntry() }, rotation, fallbackEnabled = fallback, freemiumRatio = freemiumRatio)
         }
 
         val geminiPool = config.langchain4j.gemini.pool
         if (geminiPool.isNotEmpty()) {
-            apiKeyPools["gemini"] = ApiKeyPool(geminiPool.map { it.toApiKeyEntry() }, rotation, fallbackEnabled = fallback)
+            apiKeyPools["gemini"] = ApiKeyPool(geminiPool.map { it.toApiKeyEntry() }, rotation, fallbackEnabled = fallback, freemiumRatio = freemiumRatio)
         }
 
         val mistralPool = config.langchain4j.mistral.pool
         if (mistralPool.isNotEmpty()) {
-            apiKeyPools["mistral"] = ApiKeyPool(mistralPool.map { it.toApiKeyEntry() }, rotation, fallbackEnabled = fallback)
+            apiKeyPools["mistral"] = ApiKeyPool(mistralPool.map { it.toApiKeyEntry() }, rotation, fallbackEnabled = fallback, freemiumRatio = freemiumRatio)
         }
 
         val claudePool = config.langchain4j.claude.pool
         if (claudePool.isNotEmpty()) {
-            apiKeyPools["claude"] = ApiKeyPool(claudePool.map { it.toApiKeyEntry() }, rotation, fallbackEnabled = fallback)
+            apiKeyPools["claude"] = ApiKeyPool(claudePool.map { it.toApiKeyEntry() }, rotation, fallbackEnabled = fallback, freemiumRatio = freemiumRatio)
         }
 
         val huggingfacePool = config.langchain4j.huggingface.pool
         if (huggingfacePool.isNotEmpty()) {
-            apiKeyPools["huggingface"] = ApiKeyPool(huggingfacePool.map { it.toApiKeyEntry() }, rotation, fallbackEnabled = fallback)
+            apiKeyPools["huggingface"] = ApiKeyPool(huggingfacePool.map { it.toApiKeyEntry() }, rotation, fallbackEnabled = fallback, freemiumRatio = freemiumRatio)
         }
 
         val groqPool = config.langchain4j.groq.pool
         if (groqPool.isNotEmpty()) {
-            apiKeyPools["groq"] = ApiKeyPool(groqPool.map { it.toApiKeyEntry() }, rotation, fallbackEnabled = fallback)
+            apiKeyPools["groq"] = ApiKeyPool(groqPool.map { it.toApiKeyEntry() }, rotation, fallbackEnabled = fallback, freemiumRatio = freemiumRatio)
         }
     }
 
@@ -173,10 +174,12 @@ class LlmService(
         
         // Return null only in simple test mode without mock LLM server
         // If mock LLM server is configured (localhost baseUrl), use real Ollama model
+        // If plantuml.real.test=true, bypass the null guard and create a real ChatModel
         val isTestMode = System.getProperty("plantuml.test.mode") == "true" || System.getenv("TEST_ENV") == "true"
         val isMockConfigured = config.langchain4j.ollama.baseUrl.contains("localhost")
+        val isRealTest = System.getProperty("plantuml.real.test") == "true"
         
-        if (isTestMode && !isMockConfigured) {
+        if (isTestMode && !isMockConfigured && !isRealTest) {
             return null
         }
         

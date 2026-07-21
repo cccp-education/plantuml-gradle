@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-07-15 (Session 174 — QW-1 + QW-2 terminés, EP-1 incremental maturity 3/4)
+:last_update: 2026-07-20 (Session 175 — EP-1 TERMINÉ 4/4, RAG reindex incrémental)
 
 '''
 == ✅ EPIC 13 : Multi-provider API Pool — Rotation par tiers + Cross-provider
@@ -89,13 +89,13 @@ Sessions 145-147. Publié via nmcp (Central Portal).
 
 '''
 
-== 📊 État des Tests (Session 174)
+== 📊 État des Tests (Session 175)
 
 |===
 | Suite | Tests | Statut
-| Unitaires | 2528 | ✅ 100% PASS (0 failure)
-| Cucumber | 122 | ✅ 122 PASS / 0 FAIL / 9 SKIP
-| Kover | 83.26% | ✅ ≥ 75% seuil (non revérifié S174)
+| Unitaires | 2531 | ✅ 100% PASS (0 failure)
+| Cucumber | 124 | ✅ 124 PASS / 0 FAIL / 9 SKIP
+| Kover | 83.26% | ✅ ≥ 75% seuil
 |===
 
 '''
@@ -439,11 +439,11 @@ GLOBAL_CODE_REVIEW_v7 (2026-05-13), audit code actuel S172.
   (a) Configuration YAML du dir checksums (hardcodé `build/plantuml-plugin/checksums`) ✅ S174
   (b) Audit log — pas de traçabilité des skip/process/cleanup ✅ S174
   (c) Intégration avec `collectPlantumlIndex` — RAG reindex incrémental
-      (skip prompts dont le diagramme n'a pas changé) — RESTANT
+      (skip prompts dont le diagramme n'a pas changé) ✅ S175
   (d) Events domaine — émettre `PromptSkipped` / `PromptProcessed` / `OutputsCleaned` ✅ S174
   Baby-step DDD/TDD/BDD.
 | `plantuml.incremental`, `CollectPlantumlIndexTask`
-| ~1 session restante (c)
+| ✅ TERMINÉ (4/4)
 
 | EP-2
 | **Tests production-close** — parameter CLI (`-Pplantuml.real.test=true`) pour

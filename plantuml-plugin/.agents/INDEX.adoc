@@ -2,9 +2,9 @@
 
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
-_Dernière mise a jour_ : 2026-07-15  
-_Session en cours_ : 175 — EP-1 (c) RAG reindex incrémental dans CollectPlantumlIndexTask  
-_Session terminee_ : 174 — QW-1 validateDiagram parsing réel (Jackson + KotlinModule + fallback) + QW-2 api→implementation (8 deps) + EP-1 incremental maturity 3/4 (events, audit log, config). +20 tests unitaires, 0 régression, publishToMavenLocal OK.
+_Dernière mise a jour_ : 2026-07-21  
+_Session en cours_ : 177 — PL-1 Configuration Cache + PL-4 PLAN_GLOBAL.adoc  
+_Session terminee_ : 176 — QW-3 + EP-2 + EP-3. QW-3 (README_truth.adoc + CHANGELOG.adoc + PLUGIN_SELF_DOCUMENTATION), EP-2 (real-llm test infrastructure : plantuml-real-context.example.yml, LlmService real.test toggle, RealLlmSteps.kt), EP-3 (FreemiumWeightCalculator 9 tests + TieredRotationStrategy freemium + YAML config + 4 Cucumber @freemium PASS). compileKotlin ✅, test ✅, publishToMavenLocal ✅.
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
 '''

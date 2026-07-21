@@ -17,6 +17,7 @@ import org.testcontainers.containers.PostgreSQLContainer
 import plantuml.PlantumlConfig
 import plantuml.PlantumlManager
 import plantuml.PlantumlMessages
+import plantuml.incremental.IncrementalProcessor
 import java.io.File
 
 /**
@@ -170,12 +171,24 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
             emptyArray()
         }
 
-        if (diagramFiles.isEmpty() && historyFiles.isEmpty()) {
+        val promptsDir = project.file(config.input.prompts)
+        val checksumsDir = File(project.buildDir, config.incremental.checksumsDir.removePrefix("build/"))
+        val incrementalProcessor = IncrementalProcessor(checksumsDir)
+
+        val (toReindex, skipped) = diagramFiles.partition { pumlFile ->
+            incrementalProcessor.shouldReindexPuml(pumlFile, promptsDir)
+        }
+        skipped.forEach { pumlFile ->
+            logger.lifecycle(PlantumlMessages.format("collect.skipped_unchanged", lang, pumlFile.name))
+        }
+        val filteredDiagramFiles = toReindex.toTypedArray()
+
+        if (filteredDiagramFiles.isEmpty() && historyFiles.isEmpty()) {
             logger.lifecycle(PlantumlMessages.get("collect.no_data", lang))
             return
         }
 
-        logger.lifecycle(PlantumlMessages.format("collect.found_data", lang, diagramFiles.size, historyFiles.size))
+        logger.lifecycle(PlantumlMessages.format("collect.found_data", lang, filteredDiagramFiles.size, historyFiles.size))
 
         val embeddingModel: EmbeddingModel = if (System.getProperty("plantuml.test.rag.mode") != null) {
             val stubClass = System.getProperty("plantuml.test.embedding.model.class")
@@ -194,13 +207,13 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         // Execute based on RAG mode
         when (ragMode) {
             RagMode.DATABASE -> {
-                executeDatabaseMode(diagramFiles, historyFiles, config, embeddingModel, documentSplitter)
+                executeDatabaseMode(filteredDiagramFiles, historyFiles, config, embeddingModel, documentSplitter)
             }
             RagMode.TESTCONTAINERS -> {
-                executeTestcontainersMode(diagramFiles, historyFiles, embeddingModel, documentSplitter)
+                executeTestcontainersMode(filteredDiagramFiles, historyFiles, embeddingModel, documentSplitter)
             }
             RagMode.SIMULATION -> {
-                simulateIndexing(diagramFiles, historyFiles, embeddingModel, documentSplitter)
+                simulateIndexing(filteredDiagramFiles, historyFiles, embeddingModel, documentSplitter)
             }
         }
     }

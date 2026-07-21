@@ -6,6 +6,7 @@ local.properties
 doc
 
 plantuml-test-context.yml
+plantuml-real-context.yml
 # Dossiers de test et scripts de dev
 dev-tools/
 test-project/

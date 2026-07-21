@@ -35,6 +35,13 @@ class IncrementalProcessor(checksumsDir: File) {
         emit(PromptProcessed(promptFile.nameWithoutExtension, iterations))
     }
 
+    fun shouldReindexPuml(pumlFile: File, promptsDir: File): Boolean {
+        val promptName = pumlFile.nameWithoutExtension
+        val promptFile = File(promptsDir, "$promptName.prompt")
+        if (!promptFile.exists()) return true
+        return checksumStore.hasPromptChanged(promptFile)
+    }
+
     fun cleanupOrphanedOutputs(promptsDir: File, diagramsDir: File, imagesDir: File) {
         val promptNames = promptsDir.listFiles { it.extension == "prompt" }
             ?.map { sanitizeFileName(it.nameWithoutExtension) }

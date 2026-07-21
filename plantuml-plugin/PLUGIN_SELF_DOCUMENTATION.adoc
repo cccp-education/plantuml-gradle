@@ -695,6 +695,128 @@ class DocsController(
 
 ***
 
+***
+
+== Domaines Transverses — i18n + Incremental Processing
+
+Depuis la publication Maven Central 0.0.1, deux nouveaux domaines DDD ont été
+ajoutés au plugin, sans modifier le pipeline Graphify existant.
+
+=== Domaine `plantuml.translation` — Translation Boundary
+
+L'i18n du plugin distingue 3 natures de texte avec 3 stratégies :
+
+[plantuml]
+....
+@startuml
+skinparam backgroundColor #FEFEFE
+skinparam componentStyle rectangle
+
+package "plantuml.translation" {
+  [TranslationCategory\n(PRESENTATION/SEMANTIC_IDENTITY/LEXICAL_FIELD)] as TC
+  [TranslationStrategy\n(TRANSLATE/BORROW/PRESERVE)] as TS
+  [TextClassifier\n(heuristiques de classification)] as Classifier
+  [IdiomaticGlossary\n(YAML configurable)] as Glossary
+  [NonTranslatableTermRegistry\n(YAML — REAC/AFNOR/FPA)] as Registry
+  [TranslationResolver\n(applique stratégie)] as Resolver
+}
+
+package "Consommateurs" {
+  [KnowledgeGraphRenderer\n(étiquettes structurelles)] as KGR
+  [DiagramProcessor\n(chaînes structurelles)] as DP
+}
+
+package "Infrastructure" {
+  [PlantumlMessages\n(ResourceBundle + MessageFormat)] as PM
+  [Messages_*.properties\n(10 langues × ~100 clés)] as Props
+  [ConfigMerger\n(4 couches: CLI > env > YAML > gradle.properties)] as CM
+}
+
+CM --> PM : language
+PM --> Props : getBundle
+KGR --> Resolver : resolve(text, language)
+DP --> Resolver : resolve(text, language)
+Resolver --> TC : classify
+Resolver --> Glossary : lookup
+Resolver --> Registry : isNonTranslatable?
+Resolver --> TS : strategy
+
+note right of Resolver
+  PRESENTATION → TRANSLATE (Messages_*.properties)
+  SEMANTIC_IDENTITY → PRESERVE (tel quel)
+  LEXICAL_FIELD → TRANSLATE ou BORROW (glossaire)
+end note
+
+@enduml
+....
+
+*Principes* :
+. Le contenant se traduit (étiquettes de présentation)
+. Le contenu se préserve (identité sémantique)
+. Le champ lexical métier se traduit avec choix idiomatique
+
+*Tests* : 12 scénarios Cucumber boundary + 1 full-pipeline end-to-end PASS.
+
+=== Domaine `plantuml.incremental` — Traitement Incrémental
+
+Évite les appels LLM redondants en traquant les checksums SHA-256 des prompts.
+Seul le delta est traité — jamais l'ensemble.
+
+[plantuml]
+....
+@startuml
+skinparam backgroundColor #FEFEFE
+
+participant "GeneratePlantumlDiagramsTask" as Task
+participant "IncrementalProcessor" as IP
+participant "ChecksumStore" as CS
+collections "build/plantuml-plugin/checksums/" as Store
+collections "prompts/" as Prompts
+collections "generated/diagrams/" as Outputs
+
+Task -> IP : process(prompts)
+loop pour chaque prompt
+  IP -> CS : getStoredChecksum(prompt)
+  CS -> Store : read
+  CS --> IP : checksum stocké
+  IP -> IP : computeCurrentChecksum(prompt)
+  alt checksum identique
+    IP -> IP : emit PromptSkipped
+    IP -> IP : skip LLM call
+  else checksum différent
+    IP -> IP : emit PromptProcessed
+    IP -> Task : process via LLM
+    IP -> CS : saveChecksum(prompt)
+    CS -> Store : write
+  end
+end
+IP -> IP : cleanupOrphans (outputs sans prompt)
+IP -> IP : emit OutputsCleaned
+@enduml
+....
+
+*Composants* :
+* `ChecksumStore` — persiste les checksums SHA-256
+* `IncrementalProcessor` — compare, skip, cleanup, émet événements
+* `IncrementalConfig` — YAML: `checksumsDir`, `auditLog`, `auditEnabled`
+* `IncrementalAuditLogger` — trace horodatée des décisions
+* Events domaine — `PromptSkipped`, `PromptProcessed`, `OutputsCleaned`
+
+*Intégration RAG* : `CollectPlantumlIndexTask` utilise
+`IncrementalProcessor.shouldReindexPuml()` pour ne réindexer que les diagrammes
+dont le prompt a changé — jamais le corpus complet.
+
+*Tests* : 35 tests unitaires, 7 scénarios Cucumber `@incremental` + `@incremental-rag` PASS.
+
+=== Impact sur le pipeline existant
+
+Les deux domaines sont *orthogonaux* au pipeline Graphify → PlantUML :
+* `plantuml.translation` s'applique au rendu (post-génération)
+* `plantuml.incremental` s'applique à l'entrée (pré-génération)
+* Aucun des deux ne modifie `GraphifyPromptAdapter`, `LlmService`, `ApiKeyPool`,
+  `DiagramProcessor` ou `PlantumlService`
+* Le pipeline `graph.json → .prompt → LLM → .puml → PNG` est inchangé
+
 == Résumé : les 4 couches du système auto-documenté
 
 [plantuml]

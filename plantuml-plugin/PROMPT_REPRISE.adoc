@@ -1,44 +1,36 @@
-= PROMPT_REPRISE — Plantuml — Session 175
-:session: 175
-:date: 2026-07-16
+= PROMPT_REPRISE — Plantuml — Session 177
+:session: 177
+:date: 2026-07-21
 
-== État — EP-1 incremental 3/4, QW-1+QW-2 terminés
+== État — QW-3 ✅, EP-2 ✅, EP-3 ✅
 
-Session 174 : QW-1 validateDiagram parsing réel (Jackson + KotlinModule +
-fallback). QW-2 api→implementation (8 deps migrées). EP-1 incremental maturity
-3/4 : events domaine (d), audit log (b), config YAML (a). RAG reindex (c)
-restant. +20 tests unitaires, 0 régression, publishToMavenLocal OK.
+Session 176 : QW-3 (README_truth.adoc + CHANGELOG.adoc + PLUGIN_SELF_DOCUMENTATION),
+EP-2 (real-llm test infrastructure : plantuml-real-context.example.yml,
+LlmService real.test toggle, RealLlmSteps.kt), EP-3 (FreemiumWeightCalculator
++ TieredRotationStrategy freemium + YAML config + 4 Cucumber @freemium PASS).
+9 tests unitaires FreemiumWeightCalculator, 4/4 Cucumber @freemium PASS.
+compileKotlin ✅, test ✅, publishToMavenLocal ✅.
 
-== Mission session 175 — EP-1 (c) RAG reindex incrémental
+== Mission session 177 — Polish (PL-1 + PL-4)
 
-**Objectif** : Intégrer le domaine `plantuml.incremental` dans
-`CollectPlantumlIndexTask` pour skip les `.puml` dont le diagramme source n'a
-pas changé (via checksum comparison).
+**Objectif** : Polish basse priorité — Configuration Cache réévaluation +
+consultation PLAN_GLOBAL.adoc.
 
-**Plan baby-step DDD/TDD/BDD** :
-1. Unit : `IncrementalProcessor` expose une méthode pour vérifier si un
-   `.puml` a changé (comparer checksum du `.prompt` source avec le `.puml`
-   généré).
-2. Functional : `CollectPlantumlIndexTask` skip les `.puml` inchangés.
-3. Cucumber : scénario `@incremental-rag` — prompt modifié → reindex, prompt
-   inchangé → skip.
-
-**Fichiers clés** :
-- `src/main/kotlin/plantuml/tasks/CollectPlantumlIndexTask.kt:132-148`
-- `src/main/kotlin/plantuml/incremental/IncrementalProcessor.kt`
-- `src/main/kotlin/plantuml/incremental/ChecksumStore.kt`
+**Plan baby-step** :
+1. PL-1 : Réévaluer `configurationCache = false` — AsciidoctorJ 3.0.1 + Java 25
+   supportent-ils le config cache ? Si oui, activer.
+2. PL-4 : Lire `PLAN_GLOBAL.adoc` (racine workspace) — identifier EPICs
+   cross-borough candidats pour plantuml-gradle.
 
 == Backlog — priorisé
 
 [cols="1,4,1"]
 |===
 | Priorité | Tâche | Est.
-| 🔴 EP-1c | RAG reindex incrémental dans CollectPlantumlIndexTask | ~1 session
-| 🟡 QW-3 | README_truth.adoc + CHANGELOG.adoc | ~1h
-| 🟡 EP-2 | Tests production-close (real-llm) | ~1 session
-| 🟡 EP-3 | Pool freemium ratio dynamique | ~1-2 sessions
 | 🟢 PL-1 | Configuration Cache réévaluation | ~30min
 | 🟢 PL-4 | Consulter PLAN_GLOBAL.adoc | ~30min
+| 🟢 PL-2 | KDoc exhaustif | ~2h
+| 🟢 PL-3 | ktlint ou detekt | dépend ABIDJAN
 |===
 
 == Méthodologie
@@ -53,7 +45,7 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 - BOM: `workspace-bom:0.0.8` ✅
 - `publishToMavenLocal` obligatoire après modif code plugin
 - Kover main: 83.26% INSTRUCTION ✅ ≥ 75%
-- Cucumber: 122 PASS, 0 FAIL, 9 SKIP
-- Domaine `plantuml.incremental` : 32 tests (ChecksumStore 7 + IncrementalProcessor 7
-  + Events 7 + AuditLogger 7 + Config 5 - 1 overlap)
-- Voir `sessions/174-quick-wins-incremental-maturity.adoc`
+- Cucumber: 128 PASS (124 + 4 @freemium), 0 FAIL, 9 SKIP
+- Domaine `plantuml.incremental` : 35 tests
+- Domaine `plantuml.apikey` : +9 tests FreemiumWeightCalculator
+- Voir `sessions/176-qw3-ep2-ep3.adoc`

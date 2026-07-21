@@ -9,26 +9,58 @@ et ce projet adhère au versionnage sémantique link:https://semver.org/spec/v2.
 
 === Ajouté
 
-* Support des fournisseurs LLM supplémentaires : Claude, HuggingFace, Groq
-* Configuration complète des fournisseurs LLM via YAML
-* Implémentation du service LlmService pour gérer les différents modèles
-* Tests d'intégration pour le plugin Gradle
-* Documentation complète dans le README.adoc
-* Fichiers de licence et de contribution
+* **i18n — 10 langues** : `PlantumlMessages` (ResourceBundle + MessageFormat),
+  10 fichiers `Messages_{code}.properties` (~100 clés chacun), résolution
+  langue via ConfigMerger 4 couches (CLI > env > YAML > gradle.properties).
+  Langues : EN, ZH, HI, ES, FR, AR, BN, PT, RU, UR.
+* **Translation Boundary (PLT-BOUNDARY)** : domaine `plantuml.translation` —
+  `TranslationCategory` (PRESENTATION/SEMANTIC_IDENTITY/LEXICAL_FIELD),
+  `TranslationStrategy` (TRANSLATE/BORROW/PRESERVE), `TextClassifier`,
+  `IdiomaticGlossary` (YAML), `NonTranslatableTermRegistry` (YAML),
+  `TranslationResolver`. Intégré dans `KnowledgeGraphRenderer` et
+  `DiagramProcessor`. 12 scénarios Cucumber boundary + 1 full-pipeline PASS.
+* **Incremental Processing** : domaine `plantuml.incremental` —
+  `ChecksumStore` (SHA-256), `IncrementalProcessor` (skip unchanged,
+  cleanup orphelins), `IncrementalConfig` (YAML), `IncrementalAuditLogger`,
+  events domaine (`PromptSkipped`/`PromptProcessed`/`OutputsCleaned`).
+  Intégré dans `GeneratePlantumlDiagramsTask` et `CollectPlantumlIndexTask`
+  (RAG reindex incrémental). 35 tests unitaires, 7 Cucumber PASS.
+* **Multi-provider API Pool (EPIC 13)** : `KeyTier` (ENTERPRISE/PRO/FREE),
+  `TieredRotationStrategy` (descente de tier si quota saturé),
+  `CrossProviderFallbackOrchestrator` (fallback inter-provider).
+  `ApiKeyPool.getNextKey()` skip quota saturé. 18/18 Cucumber feature 14 PASS.
+* **Knowledge Graph Diagram (EPIC 9)** : `KnowledgeGraphParser`,
+  `KnowledgeGraphRenderer`, `GenerateKnowledgeGraphDiagramTask` —
+  diagramme PlantUML déterministe (sans LLM) depuis `graphify-out/graph.json`.
+  380/380 tests PASS.
+* **Publication Maven Central** : `education.cccp:plantuml-plugin:0.0.1`
+  publié via nmcp (Central Portal). Kover seuil 75%.
+* **Conventions plugins (CNV-6)** : migration vers `education.cccp.build.*`
+  v0.0.1 (gradle-plugin + publishing). build.gradle.kts -46 lignes.
+* **BOM upgrade** : `workspace-bom:0.0.1` → `0.0.8`.
+* **README i18n** : 20 fichiers README (10 langues × consommateur + plugin),
+  badges Maven Central/Portal/CI/License, switcher i18n, AR/UR RTL.
 
 === Modifié
 
-* Amélioration de la tâche ProcessPlantumlPromptsTask avec intégration LangChain4j complète
-* Mise à jour de la tâche ValidatePlantumlSyntaxTask avec gestion d'erreurs
-* Amélioration de la tâche ReindexPlantumlRagTask avec support de base de données vectorielles
-* Refactorisation des services PlantumlService et DiagramProcessor
-* Mise à jour des dépendances Gradle avec support des nouveaux fournisseurs LLM
+* **ApiKeyPool** : `getNextRoundRobin()` skip quota saturé (BDD Red→Green).
+* **DiagramProcessor** : chaînes structurelles i18nisées via `TranslationResolver`.
+* **KnowledgeGraphRenderer** : étiquettes structurelles i18nisées, identifiants préservés.
+* **CollectPlantumlIndexTask** : RAG reindex incrémental (delta uniquement).
+* **GeneratePlantumlDiagramsTask** : skip unchanged prompts via checksum,
+  cleanup outputs orphelins, `--rerun-tasks` force reprocess.
+* **ConfigMerger** : ajout couche `language` + `supportedLanguages`.
+* **PlantumlConfig** : ajout `language`, `supportedLanguages`, `incremental`.
+* **PlantumlExtension** : DSL `language` + `supportedLanguages`.
 
 === Corrigé
 
-* Gestion améliorée des erreurs de validation de syntaxe PlantUML
-* Correctifs dans la configuration YAML
-* Améliorations de la robustesse des tâches Gradle
+* Bug MessageFormat quoting : `''plantuml''` → `'plantuml'` (1 ligne `I18nErrorSteps.kt`).
+* Bug KG `graphify-out graph json does not exist` : assertion alignée sur contrat i18n.
+* 5 tests unitaires régression post-i18n (mock signatures, modelName purge).
+* Kover threshold : functionalTest exclu du calcul, 83.26% PASS ≥ 75%.
+* Cucumber timeout : 10min → 15min pour feature 14 (ApiKeyPool 18 scénarios).
+* `println()` → `logger.lifecycle`/`logger.warn` avec i18n (3 classes).
 
 == [1.2026.0] - 2026-04-02
 

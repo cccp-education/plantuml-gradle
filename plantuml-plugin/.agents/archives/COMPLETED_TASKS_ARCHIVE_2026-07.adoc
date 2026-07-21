@@ -1,5 +1,50 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-07
 
+== Session 176 (2026-07-21) — QW-3 + EP-2 + EP-3
+
+=== Fait
+- QW-3 : `README_truth.adoc.txt` — version 0.0.5→0.0.1, plugin ID `com.cheroliv`→`education.cccp`, +3 sections (i18n, Translation Boundary, Incremental Processing), roadmap actualisée ✅
+- QW-3 : `CHANGELOG.adoc` — entrées pour i18n, PLT-BOUNDARY, Incremental Processing, EPIC 13, CNV-6, BOM upgrade, publication Maven Central, corrections ✅
+- QW-3 : `PLUGIN_SELF_DOCUMENTATION.adoc` — +section Domaines Transverses (architecture i18n + incremental, diagrammes PlantUML) ✅
+- EP-2 : `plantuml-real-context.example.yml` créé (template gitignored pour credentials réels) ✅
+- EP-2 : `.gitignore` — `plantuml-real-context.yml` ajouté ✅
+- EP-2 : `LlmService.createChatModel()` — support `plantuml.real.test=true` (bypass null guard) ✅
+- EP-2 : `RealLlmSteps.kt` créé (~150 lignes) — step definitions @real-llm avec ensureOllama+assumeTrue ✅
+- EP-2 : Steps renommés pour éviter collisions avec steps mock existants ✅
+- EP-3 : `FreemiumWeightCalculator.kt` créé — poids dynamique basé sur quota restant + ratio freemium ✅
+- EP-3 : `FreemiumWeightCalculatorTest.kt` (9 tests unitaires) — 9/9 PASS ✅
+- EP-3 : `TieredRotationStrategy` modifié — weight > tier quand freemium activé ✅
+- EP-3 : `ApiKeyPool` — param `freemiumRatio: Double = 0.0`, câblé dans TieredRotationStrategy ✅
+- EP-3 : `LangchainConfig.freemiumRatio: Double = 0.0` (YAML schema) ✅
+- EP-3 : `LlmService.initializeApiKeyPools()` — passe freemiumRatio à chaque ApiKeyPool ✅
+- EP-3 : `14_api_key_pool.feature` — +4 scénarios @freemium ✅
+- EP-3 : `ApiKeyPoolSteps.kt` — +5 step definitions freemium ✅
+- EP-3 : 4/4 Cucumber @freemium PASS ✅
+- `./gradlew test --tests "plantuml.apikey.*"` BUILD SUCCESSFUL ✅
+- `./gradlew publishToMavenLocal` BUILD SUCCESSFUL ✅
+
+=== Prochaine session
+- PL-1 : Configuration Cache réévaluation
+- PL-4 : Consulter PLAN_GLOBAL.adoc
+- Voir BACKLOG.adoc §"Polish"
+
+== Session 175 (2026-07-20) — EP-1(c) RAG Reindex Incrémental dans CollectPlantumlIndexTask
+
+=== Fait
+- EP-1(c) : `IncrementalProcessor.shouldReindexPuml(pumlFile, promptsDir)` — compare checksum `.prompt` source ✅
+- EP-1(c) : 3 tests unitaires (prompt changé → true, inchangé → false, pas de source → true) ✅
+- EP-1(c) : `CollectPlantumlIndexTask.reindexRag()` — partition puml via `shouldReindexPuml()` → `toReindex` / `skipped` ✅
+- EP-1(c) : Log `collect.skipped_unchanged` pour chaque puml skipé ✅
+- EP-1(c) : `filteredDiagramFiles` passe aux 3 modes (DATABASE, TESTCONTAINERS, SIMULATION) ✅
+- EP-1(c) : Clé i18n `collect.skipped_unchanged` × 11 fichiers `Messages_*.properties` (10 langues + default) ✅
+- EP-1(c) : 2 scénarios Cucumber `@incremental-rag` (prompt inchangé → skip, prompt modifié → reindex) ✅
+- EP-1(c) : 6 step definitions dans `RagPipelineSteps.kt` ✅
+- EP-1(c) : Assertions `unchangedPromptsSkipped` renforcées ✅
+- EP-1 : incremental maturity 4/4 ✅
+- `./gradlew test` BUILD SUCCESSFUL (2531 tests, 0 failure) ✅
+- `./gradlew cucumberTest -Pcucumber.tags="@incremental-rag"` 2/2 PASS ✅
+- `./gradlew publishToMavenLocal` OK ✅
+
 == Session 174 (2026-07-15) — Quick wins QW-1 + QW-2 + EP-1 incremental maturity 3/4
 
 === Fait

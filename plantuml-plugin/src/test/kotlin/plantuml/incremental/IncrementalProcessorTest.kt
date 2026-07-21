@@ -119,6 +119,58 @@ class IncrementalProcessorTest {
     }
 
     @Test
+    fun `should reindex puml when source prompt has changed`() {
+        val (projectDir, _, _) = setupProject(listOf("test.prompt" to "Create a diagram"))
+        val promptsDir = File(projectDir, "prompts")
+        val checksumsDir = File(projectDir, "build/plantuml-plugin/checksums")
+        val store = ChecksumStore(checksumsDir)
+        val promptFile = File(promptsDir, "test.prompt")
+        store.storeChecksum(promptFile)
+        promptFile.writeText("Create a different diagram")
+
+        val pumlFile = File(projectDir, "rag/test.puml").apply {
+            parentFile.mkdirs()
+            writeText("@startuml\nactor User\n@enduml")
+        }
+
+        val processor = IncrementalProcessor(checksumsDir)
+        assertThat(processor.shouldReindexPuml(pumlFile, promptsDir)).isTrue()
+    }
+
+    @Test
+    fun `should skip reindex puml when source prompt unchanged`() {
+        val (projectDir, _, _) = setupProject(listOf("test.prompt" to "Create a diagram"))
+        val promptsDir = File(projectDir, "prompts")
+        val checksumsDir = File(projectDir, "build/plantuml-plugin/checksums")
+        val store = ChecksumStore(checksumsDir)
+        val promptFile = File(promptsDir, "test.prompt")
+        store.storeChecksum(promptFile)
+
+        val pumlFile = File(projectDir, "rag/test.puml").apply {
+            parentFile.mkdirs()
+            writeText("@startuml\nactor User\n@enduml")
+        }
+
+        val processor = IncrementalProcessor(checksumsDir)
+        assertThat(processor.shouldReindexPuml(pumlFile, promptsDir)).isFalse()
+    }
+
+    @Test
+    fun `should reindex puml when no source prompt exists`() {
+        val (projectDir, _, _) = setupProject(emptyList())
+        val promptsDir = File(projectDir, "prompts")
+        val checksumsDir = File(projectDir, "build/plantuml-plugin/checksums")
+
+        val pumlFile = File(projectDir, "rag/orphan.puml").apply {
+            parentFile.mkdirs()
+            writeText("@startuml\nactor User\n@enduml")
+        }
+
+        val processor = IncrementalProcessor(checksumsDir)
+        assertThat(processor.shouldReindexPuml(pumlFile, promptsDir)).isTrue()
+    }
+
+    @Test
     fun `should sanitize file names with special characters`() {
         val projectDir = File(tempDir, "project").apply { mkdirs() }
         val promptsDir = File(projectDir, "prompts").apply { mkdirs() }

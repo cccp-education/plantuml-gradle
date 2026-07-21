@@ -1,27 +1,25 @@
 package plantuml.apikey
 
-/**
- * Tiered rotation strategy.
- *
- * Selects the next API key entry by priority tier (ENTERPRISE > PRO > FREE),
- * then by weight descending within the same tier.
- */
-class TieredRotationStrategy {
+class TieredRotationStrategy(
+    private val weightCalculator: FreemiumWeightCalculator? = null
+) {
 
-    /**
-     * Select the highest-priority entry from the given list.
-     *
-     * @param entries Candidate entries (any order)
-     * @return The selected entry (highest tier, then highest weight)
-     * @throws IllegalArgumentException if entries is empty
-     */
     fun select(entries: List<ApiKeyEntry>): ApiKeyEntry {
         require(entries.isNotEmpty()) { "entries must not be empty" }
 
         return entries.maxWithOrNull(
-            compareBy<ApiKeyEntry> { it.tier.priority() }
-                .thenBy { it.weight }
+            if (weightCalculator?.isEnabled == true) {
+                compareBy<ApiKeyEntry> { effectiveWeight(it) }
+                    .thenBy { it.tier.priority() }
+            } else {
+                compareBy<ApiKeyEntry> { it.tier.priority() }
+                    .thenBy { effectiveWeight(it) }
+            }
         ) ?: error("unreachable")
+    }
+
+    private fun effectiveWeight(entry: ApiKeyEntry): Int {
+        return weightCalculator?.calculateWeight(entry) ?: entry.weight
     }
 
     private fun KeyTier.priority(): Int = when (this) {

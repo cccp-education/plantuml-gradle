@@ -100,6 +100,7 @@ data class LangchainConfig(
     val validationPrompt: String = "Rate this diagram on clarity, completeness, and best practices. Return a JSON with 'score' (1-10) and 'feedback' (string) and 'recommendations' (array).",
     val rotationStrategy: String = "ROUND_ROBIN",
     val fallbackEnabled: Boolean = true,
+    val freemiumRatio: Double = 0.0,
     val ollama: OllamaConfig = OllamaConfig(),
     val gemini: ApiKeyConfig = ApiKeyConfig(),
     val mistral: ApiKeyConfig = ApiKeyConfig(),

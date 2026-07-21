@@ -16,13 +16,15 @@ class ApiKeyPool(
     private val rotationStrategy: RotationStrategy = RotationStrategy.ROUND_ROBIN,
     private val fallbackEnabled: Boolean = true,
     autoResetEnabled: Boolean = true,
-    auditEnabled: Boolean = true
+    auditEnabled: Boolean = true,
+    freemiumRatio: Double = 0.0
 ) {
     private var currentIndex = 0
     private val tracker: QuotaTracker = QuotaTracker()
     private val resetManager: QuotaResetManager = QuotaResetManager(tracker, autoResetEnabled)
     private val auditLogger: QuotaAuditLogger = QuotaAuditLogger(auditEnabled)
-    private val tieredStrategy: TieredRotationStrategy = TieredRotationStrategy()
+    private val weightCalculator: FreemiumWeightCalculator = FreemiumWeightCalculator(freemiumRatio, tracker)
+    private val tieredStrategy: TieredRotationStrategy = TieredRotationStrategy(weightCalculator)
 
     init {
         entries.forEach { entry ->
