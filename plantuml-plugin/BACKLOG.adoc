@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-07-20 (Session 175 — EP-1 TERMINÉ 4/4, RAG reindex incrémental)
+:last_update: 2026-07-21 (Session 179 — EP-2 + EP-3 TERMINÉS, rotation backup)
 
 '''
 == ✅ EPIC 13 : Multi-provider API Pool — Rotation par tiers + Cross-provider
@@ -89,12 +89,12 @@ Sessions 145-147. Publié via nmcp (Central Portal).
 
 '''
 
-== 📊 État des Tests (Session 175)
+== 📊 État des Tests (Session 179)
 
 |===
 | Suite | Tests | Statut
-| Unitaires | 2531 | ✅ 100% PASS (0 failure)
-| Cucumber | 124 | ✅ 124 PASS / 0 FAIL / 9 SKIP
+| Unitaires | 2537 | ✅ 100% PASS (0 failure)
+| Cucumber | 128 + 3 @realllm | ✅ 128 PASS / 0 FAIL / 9 SKIP + 3 @realllm SKIPPED (Ollama absent)
 | Kover | 83.26% | ✅ ≥ 75% seuil
 |===
 
@@ -454,7 +454,7 @@ GLOBAL_CODE_REVIEW_v7 (2026-05-13), audit code actuel S172.
   (c) GitHub Actions secret pour CI (clés API en env vars)
   Source : TODO.adoc item 2.
 | `build.gradle.kts`, `PlantumlWorld.kt`, CI
-| ~1 session
+| ✅ TERMINÉ S179
 
 | EP-3
 | **Pool freemium ratio dynamique** — EPIC 6 (ApiKeyPool) + EPIC 13
@@ -462,7 +462,7 @@ GLOBAL_CODE_REVIEW_v7 (2026-05-13), audit code actuel S172.
   poids basés sur quota réel (ratio freemium dans la config YAML du context).
   Source : TODO.adoc item 1.
 | `ApiKeyPool`, `TieredRotationStrategy`, YAML schema
-| ~1-2 sessions
+| ✅ TERMINÉ S176
 |===
 
 === 🟢 Polish (low priority)

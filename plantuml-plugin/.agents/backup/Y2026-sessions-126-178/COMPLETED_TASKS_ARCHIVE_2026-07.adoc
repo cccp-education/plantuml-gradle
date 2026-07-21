@@ -1,28 +1,5 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-07
 
-== Session 179 (2026-07-21) — EP-2 + EP-3 + Audit gouvernance + Rotation backup
-
-=== Fait
-- **EP-2 Tests production-close** ✅
-  - Workflow CI `real_llm_test.yml` créé (`.github/workflows/`) — opt-in `workflow_dispatch`, JDK 25, secret `PLANTUML_REAL_CONTEXT_YML` injecté, functionalTest + cucumberTest `@realllm`, upload rapports
-  - Feature Cucumber `22_real_llm.feature` créée (3 scénarios `@realllm` : class diagram, validate syntax, collect index)
-  - Fix bug `AmbiguousStepDefinitionsException` dans `RealLlmSteps.kt` : step `realOllamaInstanceIsRunningWithSmollmModel()` redondant supprimé (matchait le même Gherkin que `realOllamaInstanceIsRunningWithModel({word})`)
-  - Tag `@real-llm` → `@realllm` (sans trait d'union) pour fix découverte Cucumber (`cucumber.filter.tags`)
-  - Filtre default `build.gradle.kts` mis à jour : `not @wip and not @integration and not @realllm`
-- **EP-3 Pool freemium ratio dynamique** ✅ (constaté déjà terminé S176)
-  - `FreemiumWeightCalculator` + `TieredRotationStrategy` + `ApiKeyPool.freemiumRatio` + config `langchain4j.freemiumRatio`
-  - 9 tests unitaires + 4/4 Cucumber `@freemium` PASS
-- **PL-3 ktlint/detekt** ❌ BLOQUÉ ABIDJAN (conventions-gradle n'a pas de plugin lint)
-- **Audit gouvernance** ✅ — Total EAGER 820→766 lignes (AGENT 351, INDEX 226, HISTORY 75, LAZY_EAGER 73, PROMPT 41)
-- **Rotation backup** ✅ — `.agents/backup/Y2026-sessions-126-178/` créé (50 sessions + INDEX + HISTORY + COMPLETED_TASKS_ARCHIVE). `.agents/sessions/` 50→5 fichiers (174-178). `SESSIONS_HISTORY.adoc` 130→75 lignes (sessions 126-173 condensées one-liners)
-- `compileTestKotlin` ✅, `cucumberTest -Pcucumber.tags="@realllm"` 3/3 découverts SKIPPED (Ollama absent) ✅, `cucumberTest` default 19 features (feature 22 exclue) ✅, BUILD SUCCESSFUL
-- Zéro code métier modifié (test + config + gouvernance uniquement)
-
-=== Prochaine session
-- Session 180 = multiple de 10 → rotation backup obligatoire (vérifier EAGER > 500)
-- PL-3 : ktlint/detekt — dépend ABIDJAN (bloqué)
-- QW-3 : README_truth.adoc + CHANGELOG.adoc (gardé pour autre jour)
-
 == Session 178 (2026-07-21) — PL-2 KDoc Exhaustif + PL-3 ktlint/detekt
 
 === Fait

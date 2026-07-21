@@ -15,16 +15,7 @@ class RealLlmSteps(private val world: PlantumlWorld) {
         world.ensureOllama()
         assumeTrue(
             world.ollamaBaseUrl != null,
-            "Real Ollama instance not available — skipping @real-llm test"
-        )
-    }
-
-    @Given("a real Ollama instance is running with smollm:135m model")
-    fun realOllamaInstanceIsRunningWithSmollmModel() {
-        world.ensureOllama()
-        assumeTrue(
-            world.ollamaBaseUrl != null,
-            "Real Ollama instance not available — skipping @real-llm test"
+            "Real Ollama instance not available — skipping @realllm test"
         )
     }
 

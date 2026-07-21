@@ -1,0 +1,111 @@
+name: Real LLM Test
+
+# EP-2 — Tests production-close (opt-in, manual dispatch only).
+# Executes functionalTest + cucumberTest with real LLM providers
+# (tag "real-llm") using credentials injected from GitHub secrets.
+#
+# Prerequisite secrets (Settings → Secrets and variables → Actions):
+#   PLANTUML_REAL_CONTEXT_YML  — full plantuml-real-context.yml content
+#                                (copy plantuml-real-context.example.yml,
+#                                 fill in real API keys, base64-encode not needed)
+#   Optional env overrides:
+#   OLLAMA_BASE_URL           — Ollama endpoint (default http://localhost:11438)
+#   OLLAMA_MODEL              — Ollama model (default smollm:135m)
+#
+# Trigger manually from Actions tab:
+#   ./gradlew functionalTest -Ptest.tags="real-llm"
+#   ./gradlew cucumberTest   -Pcucumber.tags="@real-llm"
+
+on:
+  workflow_dispatch:
+    inputs:
+      providers:
+        description: "Comma-separated providers to exercise (ollama,openai,gemini,mistral,claude,huggingface,groq)"
+        required: false
+        default: "ollama"
+      suite:
+        description: "Test suite to run (functional, cucumber, both)"
+        required: false
+        default: "both"
+
+jobs:
+  real-llm:
+    name: Real LLM tests (@real-llm)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      PLANTUML_TEST_MODE: "true"
+      PLANTUML_REAL_TEST: "true"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+
+      - name: Cache Gradle wrapper
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/wrapper
+          key: gradle-wrapper-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: gradle-wrapper-
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/jdks
+          key: gradle-deps-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts') }}
+          restore-keys: gradle-deps-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Publish plugin to local Maven
+        run: ./gradlew -p plantuml-plugin publishToMavenLocal --no-daemon
+
+      - name: Inject real context from secret
+        run: |
+          if [ -z "${{ secrets.PLANTUML_REAL_CONTEXT_YML }}" ]; then
+            echo "::warning::Secret PLANTUML_REAL_CONTEXT_YML is not set — falling back to example (no real keys)"
+            cp plantuml-plugin/plantuml-real-context.example.yml plantuml-plugin/plantuml-real-context.yml
+          else
+            echo "::notice::Injecting plantuml-real-context.yml from secret"
+            printenv PLANTUML_REAL_CONTEXT_YML > plantuml-plugin/plantuml-real-context.yml
+          fi
+
+      - name: Run functional tests (@real-llm)
+        if: github.event.inputs.suite == 'functional' || github.event.inputs.suite == 'both'
+        run: |
+          ./gradlew -p plantuml-plugin functionalTest \
+            -Ptest.tags="real-llm" \
+            -Dplantuml.test.mode=true \
+            -Dplantuml.real.test=true \
+            --no-daemon
+
+      - name: Run Cucumber tests (@realllm)
+        if: github.event.inputs.suite == 'cucumber' || github.event.inputs.suite == 'both'
+        run: |
+          ./gradlew -p plantuml-plugin cucumberTest \
+            -Pcucumber.tags="@realllm" \
+            -Dplantuml.test.mode=true \
+            -Dplantuml.real.test=true \
+            --no-daemon
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: real-llm-test-reports
+          path: |
+            plantuml-plugin/build/reports/tests/
+            plantuml-plugin/build/reports/cucumber.*
+            plantuml-plugin/build/reports/functionalTest/

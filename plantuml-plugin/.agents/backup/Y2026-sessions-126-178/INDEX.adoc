@@ -3,8 +3,8 @@
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
 _Dernière mise a jour_ : 2026-07-21  
-_Session en cours_ : 180 — Rotation backup (multiple de 10)  
-_Session terminee_ : 179 — EP-2 tests production-close (workflow CI `real_llm_test.yml` + feature Cucumber `22_real_llm.feature` 3 scénarios `@realllm` + fix bug `AmbiguousStepDefinitionsException`). EP-3 constaté déjà terminé (S176). Rotation backup sessions 126-178 (50→5 fichiers). Audit gouvernance (EAGER 766 lignes). Tous les EPICs métier terminés, plugin en maintenance.
+_Session en cours_ : 179 — À définir (maintenance/polish)  
+_Session terminee_ : 178 — PL-2 KDoc exhaustif (43 fichiers source, 4 lots, compileKotlin ✅) + PL-3 annulé (ABIDJAN sans plugin lint). Tous les EPICs métier terminés, plugin en maintenance.
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
 '''
@@ -119,8 +119,6 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 
 |=== 
 | # | Date | Type | Sujet | Fichier | Score
-.1+^.^| 179 | 2026-07-21 | governance + BDD | EP-2 tests production-close (workflow CI `real_llm_test.yml` opt-in + feature Cucumber `22_real_llm.feature` 3 scénarios `@realllm` + fix bug `AmbiguousStepDefinitionsException` dans `RealLlmSteps.kt` — step redondant supprimé, tag `@real-llm`→`@realllm` pour fix découverte Cucumber). EP-3 constaté déjà terminé (S176 — `FreemiumWeightCalculator` + 4/4 Cucumber `@freemium` PASS). PL-3 bloqué ABIDJAN. Audit gouvernance (EAGER 820→766 lignes). Rotation backup sessions 126-178 (50→5 fichiers, HISTORY 130→75). Zéro code métier modifié | `179-ep2-ep3-audit-rotation.adoc` | 8/10
-.1+^.^| 178 | 2026-07-21 | governance + polish | PL-2 KDoc exhaustif sur 43 fichiers source (4 lots, compileKotlin ✅) + PL-3 annulé (ABIDJAN sans plugin lint). Zéro code métier modifié (KDoc uniquement) | `178-pl2-kdoc-exhaustif.adoc` | 9/10
 .1+^.^| 177 | 2026-07-21 | governance + polish | PL-1 (configurationCache = true, asciidoctor retiré, timeout 120s, compileKotlin ✅) + PL-4 (lecture PLAN_GLOBAL.adoc → 3 EPICs cross-borough) + G-03 (7 fichiers gouvernance com.cheroliv→education.cccp) + O-07 (vérifié déjà fait) + K-06 (PLAN_GLOBAL.adoc section plantuml mise à jour : 177 sessions, tous EPICs terminés, Kover 83.26%). Gouvernance pure, zéro code métier modifié | `177-pl1-pl4-epic-g03-o07-k06.adoc` | 9/10
 .1+^.^| 174 | 2026-07-15 | DDD + TDD | QW-1 validateDiagram parsing réel (Jackson + KotlinModule + fallback gracieux, clé i18n 10 langues) + QW-2 api→implementation (8 deps migrées, API surface nettoyée) + EP-1 incremental maturity 3/4 : (d) events domaine sealed class PromptSkipped/PromptProcessed/OutputsCleaned + onEvent listener, (b) IncrementalAuditLogger trace horodatée, (a) IncrementalConfig YAML checksumsDir/auditLog/auditEnabled câblé PlantumlConfig. +20 tests unitaires (32 domaine incremental), 0 régression, 122 Cucumber @incremental PASS, publishToMavenLocal OK | `174-quick-wins-incremental-maturity.adoc` | 9/10
 .1+^.^| 173 | 2026-07-15 | governance | Consolidation backlog + code review audit. Inventaire complet (BACKLOG + TODO + CODE_REVIEW 2026-04 + GLOBAL v7 + audit code). 7 pistes priorisées : QW-1 validateDiagram parsing, QW-2 api→implementation, QW-3 README+CHANGELOG, EP-1 maturité incremental, EP-2 tests real-llm, EP-3 pool freemium, PL-1..4 polish. Items déjà résolus vérifiés. BACKLOG.adoc + TODO.adoc mis à jour. Gouvernance seule | `173-consolidation-backlog-code-review.adoc` | 8/10
@@ -152,9 +150,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 == 🎯 Roadmap — État Actuel
 
 | EPIC Incremental Processing : Checksum-based skip + cleanup + force reprocess | ✅ 100% | 5/5 | ✅ TERMINÉ — Session 172 (domaine `plantuml.incremental`, 14 tests unitaires + 5 Cucumber PASS) |
-| EP-1 Maturité plantuml.incremental : events + audit log + config YAML | ✅ 100% | 4/4 | ✅ TERMINÉ — S174 (d) events, (b) audit log, (a) config YAML + S175 (c) RAG reindex |
-| EP-2 Tests production-close : workflow CI + feature @realllm | ✅ 100% | — | ✅ TERMINÉ — Session 179 (workflow `real_llm_test.yml` opt-in + feature `22_real_llm.feature` 3 scénarios + fix `AmbiguousStepDefinitionsException`) |
-| EP-3 Pool freemium ratio dynamique : FreemiumWeightCalculator | ✅ 100% | — | ✅ TERMINÉ — Session 176 (FreemiumWeightCalculator + TieredRotationStrategy + 4/4 Cucumber `@freemium` PASS) |
+| EP-1 Maturité plantuml.incremental : events + audit log + config YAML | 🟡 75% | 3/4 | (d) events ✅ S174, (b) audit log ✅ S174, (a) config YAML ✅ S174, (c) RAG reindex restant |
 | EPIC PLT-BOUNDARY : Translation Boundary (8 US, ~26 pts) | ✅ 100% | 8/8 | ✅ TERMINÉ — Session 166 (US-BND-7 Cucumber full pipeline end-to-end) |
 | EPIC rattrapage i18n : Traduction 196 lignes × 9 langues | ✅ 100% | — | ✅ TERMINÉ — 9 fichiers `Messages_*.properties` traduits, 9 tests `Messages*TranslationTest.kt` PASS |
 | Bug Feature 18 : Quoting MessageFormat `''plantuml''` vs `'plantuml'` | ✅ 100% | — | ✅ FIXÉ — Session 167 (1 ligne `I18nErrorSteps.kt`) |
@@ -188,9 +184,8 @@ _Historique_ :
 == 📁 Archives
 
 * _Sessions 1-125_ : `.agents/backup/Y2026-sessions-001-125/` (INDEX, SESSIONS_HISTORY, COMPLETED_TASKS_ARCHIVE, sessions/)
-* _Sessions 126-178_ : `.agents/backup/Y2026-sessions-126-178/` (INDEX, SESSIONS_HISTORY, COMPLETED_TASKS_ARCHIVE, sessions/)
-* _Sessions 174-179_ : Ce fichier + `.agents/sessions/`
-* _Localisation des vagues_ : `.agents/backup/Y2026-sessions-001-125/` + `.agents/backup/Y2026-sessions-126-178/`
+* _Sessions 126-147_ : Ce fichier + `.agents/sessions/`
+* _Localisation de la vague_ : `.agents/backup/Y2026-sessions-001-125/`
 
 '''
 

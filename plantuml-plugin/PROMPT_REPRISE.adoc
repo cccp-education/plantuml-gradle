@@ -1,19 +1,22 @@
-= PROMPT_REPRISE — Plantuml — Session 179
-:session: 179
-:date: 2026-07-21
+= PROMPT_REPRISE — Plantuml — Session 180
+:session: 180
+:date: 2026-07-22
 
-== État — PL-2 ✅, PL-3 ❌ (bloqué ABIDJAN)
+== État — EP-2 ✅, EP-3 ✅ (déjà fait S176), PL-3 ❌ (bloqué ABIDJAN)
 
-Session 178 : PL-2 KDoc exhaustif sur 43 fichiers source (4 lots, compileKotlin ✅).
-PL-3 annulé — conventions-gradle (ABIDJAN) n'a pas de plugin ktlint/detekt.
+Session 179 : EP-2 tests production-close livré (workflow CI `real_llm_test.yml`
+opt-in + feature Cucumber `22_real_llm.feature` 3 scénarios `@realllm` + fix bug
+`AmbiguousStepDefinitionsException` dans `RealLlmSteps.kt`). EP-3 constaté déjà
+terminé (S176). Rotation backup sessions 126-178 (50→5 fichiers, HISTORY 130→75).
+Audit gouvernance : total EAGER 766 lignes.
 
-== Mission session 179 — À définir
+== Mission session 180 — Rotation backup (multiple de 10)
 
-Tous les EPICs métier sont terminés. Le plugin est en maintenance/polish.
-Pistes restantes :
+Session 180 = multiple de 10 → rotation backup obligatoire.
+Vérifier total EAGER, archiver si > 500 lignes.
+Autres pistes restantes :
 - PL-3 : ktlint/detekt — dépend ABIDJAN (bloqué)
-- Audit gouvernance : vérifier si des fichiers EAGER dépassent 100 lignes
-- Rotation backup si N % 10 == 0 (session 180)
+- QW-3 : README_truth.adoc + CHANGELOG.adoc (gardé pour autre jour)
 
 == Backlog — priorisé
 
@@ -21,6 +24,7 @@ Pistes restantes :
 |===
 | Priorité | Tâche | Est.
 | 🟡 PL-3 | ktlint ou detekt | dépend ABIDJAN
+| 🟢 QW-3 | README_truth.adoc + CHANGELOG.adoc | ~1h
 |===
 
 == Méthodologie
@@ -35,7 +39,7 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 - BOM: `workspace-bom:0.0.8` ✅
 - `publishToMavenLocal` obligatoire après modif code plugin
 - Kover main: 83.26% INSTRUCTION ✅ ≥ 75%
-- Cucumber: 128 PASS, 0 FAIL, 9 SKIP
+- Cucumber: 128 PASS, 0 FAIL, 9 SKIP (+ 3 @realllm SKIPPED si Ollama absent)
 - Configuration Cache: activé ✅
 - Tous les EPICs métier terminés
-- Voir `sessions/178-pl2-kdoc-exhaustif.adoc`
+- Voir `sessions/179-ep2-ep3-audit-rotation.adoc`

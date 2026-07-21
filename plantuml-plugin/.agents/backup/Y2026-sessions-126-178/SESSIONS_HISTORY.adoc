@@ -1,0 +1,130 @@
+= Historique des Sessions
+
+== Session 178 (2026-07-21) — PL-2 KDoc Exhaustif + PL-3 ktlint/detekt
+
+PL-2 : KDoc exhaustif ajouté sur les 43 fichiers source du plugin (models, config, boundary, tasks, services, apikey, incremental). Baby-step : 4 lots de fichiers, compileKotlin après chaque lot. PL-3 : annulé — conventions-gradle (ABIDJAN) n'a pas de plugin ktlint/detekt. Aucun borough n'a de linting automatisé. Zéro code métier modifié (KDoc uniquement). ✅
+
+== Session 177 (2026-07-21) — PL-1 + PL-4 + EPIC G-03 + O-07 + K-06
+
+PL-1 : configurationCache = true (AsciidoctorJ 3.0.1 + Java 25), asciidoctor bundle retiré (zéro usage), timeout 60s→120s, compileKotlin ✅. PL-4 : lecture PLAN_GLOBAL.adoc → 3 EPICs cross-borough identifiés. G-03 : 7 fichiers gouvernance com.cheroliv→education.cccp migrés (ARCHITECTURE, TROUBLESHOOTING ×2, HISTORIQUE, README_truth_fr, finetuning-protocole, EPIC_CONSOLIDATION). O-07 : vérifié déjà fait (zéro engine dans INDEX.adoc). K-06 : PLAN_GLOBAL.adoc section plantuml mise à jour (177 sessions, tous EPICs terminés, Kover 83.26%, 2531 unitaires + 128 Cucumber). Gouvernance pure, zéro code métier modifié. ✅
+
+== Session 176 (2026-07-21) — QW-3 + EP-2 + EP-3
+
+Trois EPICs livrés en baby-step DDD/TDD/BDD. QW-3 : README_truth.adoc (version 0.0.5→0.0.1, plugin ID com.cheroliv→education.cccp, +3 sections i18n/Translation Boundary/Incremental), CHANGELOG.adoc (entrées EP-1, PLT-BOUNDARY, PLT-I18N, EPIC 13, CNV-6, BOM), PLUGIN_SELF_DOCUMENTATION.adoc (+Domaines Transverses). EP-2 : plantuml-real-context.example.yml (gitignored), LlmService.createChatModel() support plantuml.real.test=true, RealLlmSteps.kt (~150 lignes, steps @real-llm avec ensureOllama+assumeTrue). EP-3 : FreemiumWeightCalculator (9 tests unitaires, 9/9 PASS), TieredRotationStrategy (weight > tier quand freemium activé), ApiKeyPool + LangchainConfig.freemiumRatio + LlmService wiring, 4 Cucumber @freemium PASS. compileKotlin ✅, test ✅, publishToMavenLocal ✅. ✅
+
+== Session 175 (2026-07-20) — EP-1(c) RAG Reindex Incrémental dans CollectPlantumlIndexTask
+
+EP-1 incremental maturity 4/4 ✅. Baby-step DDD/TDD/BDD : (1) Unit — `IncrementalProcessor.shouldReindexPuml(pumlFile, promptsDir)` compare checksum du `.prompt` source avec checksum stocké. 3 tests : prompt changé → true, inchangé → false, pas de source → true. 10/10 IncrementalProcessorTest PASS. (2) Functional — `CollectPlantumlIndexTask.reindexRag()` partitionne les `.puml` via `shouldReindexPuml()` → `toReindex` / `skipped`. Log `collect.skipped_unchanged` pour chaque skip. `filteredDiagramFiles` passe aux 3 modes. Clé i18n ajoutée aux 11 fichiers `Messages_*.properties`. 6/6 CollectPlantumlIndexTaskUnitTest PASS, zéro régression. (3) Cucumber — 2 scénarios `@incremental-rag` ajoutés à `9_incremental_processing.feature` (prompt inchangé → skip, prompt modifié → reindex). 6 step definitions dans `RagPipelineSteps.kt`. Assertions `unchangedPromptsSkipped` renforcées. 2/2 PASS. compileKotlin ✅, test ✅, publishToMavenLocal ✅. ✅
+
+== Session 174 (2026-07-15) — Quick wins QW-1 + QW-2 + EP-1 incremental maturity 3/4
+
+Trois tâches en baby-step DDD/TDD/BDD. QW-1 : `validateDiagram()` parsing réel — le LLM était appelé mais la réponse jetée (score=8 hardcodé). Maintenant parsé en `ValidationFeedback` via `Jackson + KotlinModule`, fallback gracieux (score=5) si parse échoue. Clé i18n `processor.validation_parse_failed` ajoutée aux 10 langues + default. Fix régression `DiagramProcessorPrivateMethodsTest` (assertion `isValid`/`valid` avec KotlinModule). QW-2 : `api` → `implementation` — 8 dépendances migrées (jgit, commons-io, plantuml-ai, testcontainers, jackson×3, plantuml-engine). L'API publique du plugin n'expose que des `Property<String>` Gradle standard, aucune lib externe transitive. Zéro régression. EP-1 incremental maturity 3/4 : (d) events domaine sealed class `IncrementalEvent` (`PromptSkipped`, `PromptProcessed`, `OutputsCleaned`) + `onEvent()` listener pattern, (b) `IncrementalAuditLogger` trace horodatée + `IncrementalEventListener` fun interface, (a) `IncrementalConfig` (checksumsDir, auditLog, auditEnabled) câblé dans `PlantumlConfig`. +20 tests unitaires (32 domaine incremental), 0 régression, 122 Cucumber @incremental PASS, publishToMavenLocal OK. (c) RAG reindex restant. ✅
+
+== Session 173 (2026-07-15) — Consolidation backlog + code review audit
+
+Inventaire complet de ce qui reste à faire pour plantuml-gradle, croisé entre BACKLOG, TODO, CODE_REVIEW_2026-04 (v3, 8.2/10), GLOBAL_CODE_REVIEW_v7 (2026-05-13), et audit du code actuel. 7 pistes priorisées dans BACKLOG.adoc : 3 quick wins (QW-1 validateDiagram parsing réel, QW-2 api→implementation, QW-3 README+CHANGELOG), 3 EPICs substantiels (EP-1 maturité plantuml.incremental, EP-2 tests production-close, EP-3 pool freemium ratio), 4 polish (config cache, KDoc, ktlint, PLAN_GLOBAL). Items déjà résolus vérifiés dans le code : JSON Jackson, double validateDiagram, debug logs, port 5432 configurable, println résiduels zéro, commentaires français migrés, Kover 75%, RAG testcontainers. TODO.adoc reformatté avec pointeurs vers BACKLOG. Gouvernance seule, aucun code modifié. ✅
+
+== Session 172 (2026-07-15) — Incremental Processing : Domaine DDD + 5/5 Cucumber PASS
+
+Fix 5 scénarios Cucumber Incremental Processing (feature 9) en échec depuis S169. Diagnostic : crash réseau `ConnectException` vers Ollama:11438 car aucun mock LLM démarré dans `IncrementalProcessingSteps`. Démarche baby-step DDD/TDD/BDD : (1) BDD infra — injection mock LLM dans les 6 `Given` → 4 Reds significatifs. (2) DDD/TDD unit — nouveau domaine `plantuml.incremental` : `ChecksumStore` (7 tests, SHA-256) + `IncrementalProcessor` (7 tests, decideProcessing SKIP/PROCESS, markAsProcessed, cleanupOrphanedOutputs, sanitizeFileName). (3) Intégration fonctionnelle — `GeneratePlantumlDiagramsTask` : skip unchanged (checksum match) sauf `--rerun-tasks`, cleanup orphelins, store checksum avant traitement, save `{sanitized}.yml` dans `generated/diagrams`. 2 clés i18n × 11 fichiers `Messages_*.properties`. (4) Cucumber Green — 5/5 `@incremental` PASS. (5) Fix régression File Edge Cases — sanitization nom fichier (`[^a-zA-Z0-9._-]` → `_`). Résultats : 122/122 Cucumber PASS (0 FAIL), 2508 unitaires PASS, Kover 83.26% ✅, publishToMavenLocal ✅. ✅
+
+== Session 171 (2026-07-14) — ApiKeyPoolSteps.kt + timeout Cucumber
+
+ApiKeyPoolSteps.kt créé (~330 lignes, 30+ step definitions) — 18/18 scénarios feature 14 PASS. Baby-step DDD/TDD/BDD : 1 step à la fois, Red→Green→Refactor. PlantumlWorld.kt étendu +8 champs dédiés (apiKeyPool, apiKeyPoolEntries, apiKeyPoolSelectedKeys, apiKeyPoolConfig, apiKeyPoolAuditEnabled, apiKeyPoolFallbackEnabled, apiKeyPoolVersion) + cleanup. Feature 14 taggée `@api-key-pool` pour filtrage `-Pcucumber.tags`. Steps qualifiés "pool key" pour éviter collision avec TieredRotationSteps.kt (feature 19). Patterns Cucumber : `{word}` pour providers sans guillemets, steps singulier/pluriel. **Domaine modifié (BDD Red→Green)** : `ApiKeyPool.getNextRoundRobin()` skip les clés dont le quota est dépassé — scénario 6 "Select key respects quota threshold" révélait que ROUND_ROBIN ne skip pas les clés saturées. Si toutes saturées, fallback sur l'entry originale. 17/17 tests unitaires ApiKeyPoolTest PASS (zéro régression). Timeout cucumberTest 10min → 15min (`build.gradle.kts:318`). Validation : compileKotlin ✅, test ✅, publishToMavenLocal ✅, cucumberTest 108 PASS / 5 FAIL préexistantes (Incremental Processing, GradleRunner). ✅
+
+== Session 170 (2026-07-14) — Fix koverThresholdCheck + Cucumber i18n failures
+
+P1 koverThresholdCheck FIXÉ : `build.gradle.kts:475` `includedSourceSets.addAll("main", "functionalTest")` → `add("main")`. functionalTest est du code de test — l'inclure dans Kover est une erreur (0% coverage plombe l'agrégat 53.55%). `koverThresholdCheck` PASS 83.26% ≥ 75%. P2 Cucumber 21 failures investigués : feature 14 (18 `UndefinedStepException` — `ApiKeyPoolSteps.kt` jamais créé, backlog), feature 15 (3 failures — log `config.resolved_language` i18nisé `已解析语言：zh` vs test attend `Resolved language: zh`). Fix : `GeneratePlantumlDiagramsTask.kt:88` `PlantumlMessages.format(...)` → `logger.lifecycle("Resolved language: ${config.language}")` (log diagnostic anglais fixe, non localisé). 3/3 scénarios `@yaml-config`, `@gradle-properties`, `@env-var` PASS. `./gradlew test` zéro régression. publishToMavenLocal OK. ✅
+
+== Session 169 (2026-07-11) — Kover Verification + Backlog Audit
+
+Kover main source set INSTRUCTION 92.93% ✅ ≥ 75% (LINE 95.76%, BRANCH 74.20%). `koverThresholdCheck` parse tout le XML (main+functionalTest) → 53.55% < 75% → FAIL (functionalTest 0% coverage plombe l'agrégat). Cucumber 26 failures, 9 skipped, timeout 10 minutes (préexistant, non investigué). Backlog vide, tous les EPICs terminés. Prochaine session : fix koverThresholdCheck (exclure functionalTest), investiguer Cucumber, consulter PLAN_GLOBAL.adoc. ✅
+
+== Session 168 (2026-07-11) — BOM Upgrade workspace-bom:0.0.1 → 0.0.8
+
+BOM `workspace-bom:0.0.1` → `0.0.8` (1 ligne `build.gradle.kts:25`). Maven Central latest = 0.0.8, `includeBuild("../workspace-bom")` local aussi en 0.0.8. compileKotlin ✅ (24s), test ✅ (57s, 13 tasks), publishToMavenLocal ✅ (15s). Baby-step : 1 changement, 1 vérification. Maintenance pure, zéro code métier modifié. Tous les EPICs sont terminés (13, PLT-I18N, PLT-BOUNDARY, rattrapage i18n, Bug Feature 18). ✅
+
+== Session 167 (2026-07-09) — Fix Bug Feature 18 MessageFormat Quoting
+
+Bug préexistant depuis S164 : les 2 scénarios `@diagram-processor` de la feature 18 échouaient à cause d'un mismatch de quoting MessageFormat. `I18nErrorSteps.kt:136` utilisait `PlantumlMessages.get()` (raw `''plantuml''`) alors que `DiagramProcessor.kt` utilise `PlantumlMessages.format()` (MessageFormat résout `''` → `'`). Fix : 1 ligne changée (`get()` → `format(key, language, "")`). 7/7 feature 18 PASS, 122/122 Cucumber PASS, 1312+ unitaires verts, publishToMavenLocal OK. Zéro production modifié. Constat : l'EPIC rattrapage i18n (traduire 196 lignes × 9 langues) est déjà terminé — les 9 fichiers `Messages_*.properties` sont traduits, 9 tests `Messages*TranslationTest.kt` passent. ✅
+
+== Session 166 (2026-07-09) — US-BND-7 Cucumber full pipeline end-to-end
+
+US-BND-7 livrée en baby-step BDD (Red → Green). Dernière US de l'EPIC PLT-BOUNDARY. Scénario `@boundary @full-pipeline` ajouté à `21_i18n_translation_boundary.feature` — "Full pipeline end-to-end — diagram KG with FR glossary and REAC registry". Vérifie la cohérence de transmission des 4 stratégies dans un seul rendu KnowledgeGraphRenderer : "Classes" TRANSLATE (via Messages), "LlmService" PRESERVE (identité sémantique), "pipeline" BORROW (via glossary), "REAC" PRESERVE (via registry, priorité sur tout). 6 steps Cucumber ajoutés à `BoundarySteps.kt` (Given resolver full pipeline, Given KG avec nodes/communauté, When renderer rendu, Then folder label traduit, Then node identifier préservé, Then community name emprunté). `PlantumlWorld.kt` étendu +2 champs (`boundaryGraph`, `boundaryRenderedDiagram`) + cleanup. 1312 unitaires 0 failure, 12/12 Cucumber boundary PASS (111 steps), publishToMavenLocal OK. **EPIC PLT-BOUNDARY CLOTUREE 8/8 US**. ✅
+
+== Session 165 (2026-07-09) — US-BND-6 NonTranslatableTermRegistry
+
+US-BND-6 livrée en baby-step DDD/TDD/BDD (8 étapes Red→Green→Refactor, unit → cucumber). `NonTranslatableTermRegistry` (Set minimal) + `NonTranslatableTermRegistryLoader` (Jackson YAML `terms: [list]`) créés. `TranslationResolver` étendu avec param optionnel `nonTranslatableRegistry? = null` — court-circuit PRESERVE en tête de `resolve()` **avant** toute classification (priorité sur classifier + glossary). Backward-compatible (sans registry, comportement inchangé). 2 tasks Gradle câblées (`GeneratePlantumlDiagramsTask`, `GenerateKnowledgeGraphDiagramTask`) avec registry vide par défaut. 6 tests unitaires nouveaux (3 registry + 3 loader) + 3 tests TranslationResolver (registry priorité vs classifier, vs glossary BORROW, backward-compat). 2 scénarios Cucumber `@non-translatable` (REAC préservé vs classifier PRESENTATION, AFNOR préservé vs glossary BORROW). 1303 unitaires 0 failure, 11/11 Cucumber boundary PASS, publishToMavenLocal OK. EPIC PLT-BOUNDARY : 7/8 US. ✅
+
+== Session 164 (2026-07-09) — US-BND-5 DiagramProcessor structural strings i18n
+
+Reprise plantuml : état réel US-BND-0..4 déjà committés (PROMPT_REPRISE obsolète).
+US-BND-5 livrée en baby-step DDD/TDD/BDD (unit → cucumber). `DiagramProcessor.processPrompt()` étendu avec `resolver`/`language` (pattern US-BND-4). Chaînes structurelles (`title "Generated Diagram"`, `rectangle "System"`, description) routées via `TranslationResolver`, prompt LLM préservé. `applyStructuralLabels()` post-traite le code généré (préserve signature `generateSimulatedLlmResponse` testée par reflection). `GeneratePlantumlDiagramsTask` câble le resolver. Régressions fixées : `DiagramProcessorPrivateMethodsTest` (signature préservée), `PromptOrchestratorTest` (mock 5 params + `isNull()` pour resolver nullable). 1303 unitaires 0 failure, 9/9 Cucumber boundary PASS (8 originaux + 1 nouveau), publishToMavenLocal OK. Bug préexistant feature 18 `@diagram-processor` (quoting MessageFormat) identifié, hors-scope. EPIC PLT-BOUNDARY : 6/8 US. ✅
+
+== Session 163 (2026-07-08) — Bug KG trié+fixé + Cadrage EPIC PLT-BOUNDARY
+
+Deux livrables. **(1) Bug KG trié+fixé** : `KnowledgeGraphDiagramFunctionalTest.should fail when graphify-out graph json does not exist` était en échec pré-existant depuis S156 (US-I18N-4). Cause racine : le refactor i18n a remplacé le message hardcodé `"graphify-out/graph.json not found"` par la clé i18n `kgparser.file_not_found` (`"Graph file not found: {0}"`), mais le test cherchait encore l'ancien texte. Fix : assertion alignée sur contrat i18n stable `contains("Graph file not found")`, 1 fichier test modifié, 0 production touché, 15/15 KG fonctionnels PASS. **(2) Cadrage EPIC PLT-BOUNDARY** : suite au constat que EPIC PLT-I18N a traduit les logs mais pas le livrable (diagramme monolingue, 9 fichiers `Messages_*.properties` coquilles vides identiques à `Messages_en.properties`), cadrage d'un nouvel EPIC Translation Boundary. Vision validée : 3 natures (Présentation, Identité sémantique, Champ lexical métier), 3 stratégies (TRANSLATE, BORROW, PRESERVE). Rejet explicite francisation forcée + mot-à-mot aveugle. 8 US, ~26 pts, baby-step DDD/TDD/BDD. Fichier vision `.agents/I18N_BOUNDARY_VISION.adoc` créé. Gouvernance workspace (PLAN_GLOBAL.adoc, AGENTS.adoc) mise à jour. ✅
+
+== Session 162 (2026-07-06) — EPIC 13 Cross-provider Fallback (6/6 tâches, TERMINÉ)
+
+Dernière tâche EPIC 13 (LOW) : fallback inter-provider quand un pool entier est saturé. Méthode baby-step DDD/TDD/BDD (unit → functional → cucumber), 4 étapes A→B→C→D, Red→Green→Refactor, 1 test à la fois. **Étape A unit** : `ApiKeyPool.isPoolSaturated()` (3 lignes logique) + `ApiKeyPoolSaturationTest` (3/3 PASS) — brique de base. **Étape B unit** : `CrossProviderFallbackOrchestrator` (service domaine, 25 lignes) + `CrossProviderFallbackOrchestratorTest` (5/5 PASS) — itère sur l'ordre de fallback, skip pools saturés. **Étape C functional** : câblage dans `LlmService` (`initializeFallbackOrchestrator`, `selectKeyWithCrossProviderFallback`, `getApiKeyFromPool` refactorisé) + `CrossProviderFallbackFunctionalTest` (5/5 PASS) — 3 pools Gemini/Mistral/Ollama, saturation progressive. **Étape D BDD** : `20_cross_provider_fallback.feature` (5 scénarios `@cross-provider` EN only) + `CrossProviderFallbackSteps.kt` (12 steps), 5/5 PASS. Fix calibration Cucumber : `{string}` capture liste CSV entre guillemets, quota `limit=4, threshold=50` (seuil=2). Suite unitaire 1235/1235 PASS, publishToMavenLocal OK. **EPIC 13 TERMINÉ 6/6**. ✅
+
+== Session 161 (2026-07-06) — EPIC 13 TieredRotationStrategy (4 étapes A→B→C→D)
+
+EPIC 13 Multi-provider API Pool : 5/6 tâches livrées en baby-step DDD/TDD/BDD (unit → functional → cucumber), agile software craftsmanship. **Socle domaine** : `KeyTier` enum (ENTERPRISE/PRO/FREE), `ApiKeyEntry.tier`/`weight` (rétro-compatibles), `TieredRotationStrategy.select()` (tier desc + weight desc), `RotationStrategy.TIERED` + `ApiKeyPool.getNextTiered()` (descente de tier + fallback). **Étape A BDD** : `19_tiered_rotation.feature` (7 scénarios `@tiered`) + `TieredRotationSteps.kt` (11 steps), 7/7 PASS. **Étape B functional** : `TieredRotationFunctionalTest.kt` (5 tests), 5/5 PASS — bug `IllegalArgumentException` (liste vide quand tout saturé + fallbackEnabled=false) détecté et résolu. **Étape C YAML** : `tier`/`weight` sur `ApiKeyPoolEntry`, `rotationStrategy`/`fallbackEnabled` sur `LangchainConfig`, conversion `toApiKeyEntry()` + `parseTier`/`parseRotationStrategy`, 3 tests ConfigLoader, fix régression `ModelsDataClassTest` (args nommés). **Étape D fallbackEnabled** : `getNextTiered()` implémente la sémantique (true=descente, false=reuse saturated), 2 tests unitaires + 1 scénario Cucumber. Suite unitaire complète verte, publishToMavenLocal OK. Reste cross-provider (LOW, S162). ✅
+
+== Session 160 (2026-07-06) — Fix 5 tests unitaires régression + clôture EPIC PLT-I18N
+
+Fix baby-step TDD des 5 tests unitaires en régression depuis S159. 1 test à la fois (Red→Green→Refactor). 1210/1210 tests PASS, 0 failures, 0 errors, 0 skipped. publishToMavenLocal OK. **Diagnostic initial vs réalité** : le PROMPT_REPRISE pointait le fix `loadConfiguration` comme cause unique, mais sur 5 tests seul #5 (PlantumlPluginUnitTest NPE) y était lié (extension étendue `language`/`supportedLanguages` non mockée). #1 = arriéré US-I18N-2 (group i18nisé `"plantuml"`→`"info"`), #2-4 = arriérés SEC-1 (défaut `modelName` `smollm:135m`→`gpt-oss:120b-cloud` purge deepseek). 0 fichier de production modifié, 5 fichiers de test. **EPIC PLT-I18N TERMINÉ** : 28/28 pts BDD + 1210/1210 tests unitaires verts. ✅
+
+== Session 159 (2026-07-06) — US-I18N-6 Cucumber BDD (8/8 PASS) + 5 tests unitaires en régression
+
+US-I18N-6 Cucumber BDD i18n livrée : 8/8 scénarios feature 15 PASS (default, cli-override, yaml-config, gradle-properties, env-var, fallback, fallback-yaml, supported-langs). Baby-step DDD/TDD/BDD. Infrastructure Cucumber tag filter (`-Pcucumber.tags` → `cucumber.filter.tags`, suppression annotation figée runner). Log `Resolved language: {0}` ajouté à `GeneratePlantumlDiagramsTask` (clé i18n `config.resolved_language` dans 11 Messages*.properties). Fix bug `loadConfiguration` : CLI language non câblé — ajout `cliParams["language"]` passé à `Configuration.load(project, cliParams)`. Fix bug Cucumber `{word}` vs `{string}` (capture guillemets). Fix feature 17 `{list}` undefined → `{string}`. Suppression doublons steps. publishToMavenLocal 5×. **Régression** : 5 tests unitaires FAILED (GenerateDiagramDocsTaskTest, ModelsDataClassTest, PlantumlConfigFailureTest, PlantumlManagerTest, PlantumlPluginUnitTest) — cause : `loadConfiguration` cliParams modifie résolution config. Ne PAS réverter, adapter tests session 160. EPIC PLT-I18N : 28/28 pts BDD (mais 5 tests unitaires à fixer). ✅ BDD / ⚠️ Unitaires
+
+== Session 158 (2026-07-05) — Cadrage CNV-7 + report US-I18N-6
+
+Diagnostic blocage tests :t → `junit-platform-params = "6.0.3"` (inexistant) dans catalogue local plantuml. Décision : fix structurel via conventions-gradle (CNV-7). EPIC CNV-7 cadré (8 pts, 3 US : deps cucumber, deps junit, migration plantuml). US-I18N-6 en attente CNV-7. Pas de code plantuml modifié. ✅
+
+== Session 157 (2026-07-05) — US-I18N-5 println cleanup → logger i18n
+
+Migration ~15 `println`/`System.err`/`System.out.println` résiduels → `logger.lifecycle`/`warn`/`info`/`error` i18n. 3 classes (PlantumlManager 4 println → project.logger, PlantumlService 1 System.err → logger.warn + Logger SLF4J ajouté, DiagramProcessor 5 System.out/println → logger.info). compileKotlin + compileTestKotlin + publishToMavenLocal SUCCESS. Zéro println résiduel. US-I18N-5 ✅ (2/28 pts). EPIC PLT-I18N : 25/28 pts (89%). ✅
+
+== Session 156 (2026-07-05) — US-I18N-4 Logger warn/error + exceptions i18n
+
+Refactoring ~45 `logger.warn`/`error`/`throw ...Exception` hardcodés → `PlantumlMessages.get()`/`format()`. 8 classes refactorées (ApiKeyPool, KnowledgeGraphParser, GraphifyPromptAdapter, DiagramProcessor, PlantumlManager, GenerateKnowledgeGraphDiagramTask, GeneratePlantumlDiagramsTask, CollectPlantumlIndexTask). Nouvelle clé `kg.validation_issues` (10 fichiers). Feature Cucumber 18 (7 scénarios) + I18nErrorSteps (12 steps). compileKotlin + compileTestKotlin + publishToMavenLocal SUCCESS. US-I18N-4 ✅ (5/28 pts). EPIC PLT-I18N : 23/28 pts (82%). Tests :t cassés par BOM junit-bom 6.0.3 (préexistant). ✅
+
+== Session 155 (2026-07-03) — CNV-6 Migration
+
+Migration du `build.gradle.kts` vers les convention plugins `education.cccp.build.gradle-plugin` (0.0.1) + `education.cccp.build.publishing` (0.0.1), pattern bakery. build.gradle.kts 616→570 lignes (-46). compileKotlin SUCCESS. Variantes gardées : buildscript annotations force, groovy exclusions, Docker/HuggingFace tasks, kover 75%, configurationCache=false.
+
+_Session 153_ (2026-06-24) : Architecture README Plugin + Consommateur — déplacement README.plugin → plantuml-plugin/, README.consommateurs → racine, liens i18n recréés (10 langues). Aucun code Kotlin modifié. ✅
+_Session 152_ (2026-06-24) : US-I18N-7 Documentation + README i18n — 20 fichiers README créés (10 langues × 2 audiences : `README.consommateurs/` + `README.plugin/`). Badges Maven Central/Portal/CI/Coverage/License, markers version 0.0.1 + 380/380 PASS, switcher i18n 10 langues, AR/UR en script RTL. US-I18N-7 ✅ (2/28 pts). EPIC PLT-I18N : 18/28 pts (64%). ✅
+_Session 151_ (2026-06-15) : US-I18N-3 Logger Lifecycle Messages i18n — DDD+TDD+BDD. 5 task classes +champ `lang`, 66 `logger.lifecycle()` → `PlantumlMessages.format()`/`get()`. LifecycleMessagesI18nTest 760/760 PASS. 17_i18n_lifecycle_messages.feature (2 scénarios) + I18nSteps.kt step. Compile + publishToMavenLocal OK. ✅
+_Session 150_ (2026-06-15) : US-I18N-2 Task Descriptions i18n — DDD+TDD+BDD. PlantumlManager.resolveLanguage(), 5 task classes + PlantumlPlugin init blocks → PlantumlMessages.get(). TaskDescriptionsI18nTest 16/16 PASS. 16_i18n_task_descriptions.feature (2 scénarios) + I18nSteps.kt. Compile + publishToMavenLocal OK. ✅
+_Session 149_ (2026-06-15) : Fix plugin ID + US-I18N-0 BDD + US-I18N-1 Messages — 11 fichiers plugin ID fixés, 15_i18n_language_switch.feature (8 scénarios) + I18nSteps.kt, PlantumlMessages.kt (UTF-8 control) + 11 Messages*.properties (100+ clés, 10 langues) + PlantumlMessagesTest (23/23 PASS). Compile OK. ✅
+_Session 148_ (2026-06-15) : Cadrage EPIC PLT-I18N + US-0 Configuration Layer — 7 US, ~28 pts, 10 langues. PlantumlConfig.language/supportedLanguages/SUPPORTED_LANGS, PlantumlExtension DSL, ConfigMerger mergeLanguage/mergeSupportedLanguages (4 couches). 35/35 nouveaux tests PASS. Blocage plugin ID mismatch découvert (50 échecs pré-existants). ✅
+_Session 147_ (2026-06-11) : Publication Maven Central 0.0.1 — version 0.0.1 hardcodée, codebase→0.0.2, POM sans guard, Sonatype→nmcp, settings nmcp. Publié -x functionalTest ✅
+_Session 146_ (2026-06-02) : Borough-isation — plantuml-gradle devient HTOWN 🚀, 23ème borough, N2 ✅
+_Session 145_ (2026-05-19) : EPIC K-1 Renommage taxonomie — `processPlantumlPrompts`→`generatePlantumlDiagrams`, `reindexPlantumlRag`→`collectPlantumlIndex`. 18 fichiers modifiés, Build OK ✅
+_Session 144_ (2026-05-14) : CI Template test.yml deploye, build OK, EPIC F cross-boroughs ✅
+_Session 143_ (2026-05-13) : Fix testcontainer fine-tune SmolLM2 — wait strategy, API trl 1.4.0, logging Python, pip→uv, 3/3 PASS ✅
+_Session 142_ (2026-05-13) : Pipeline Fine-tuning SmolLM2-135M-Instruct — 3ème couche test (testcontainer Python), WireMock instruct-v0.2, real-llm, Dockerfile, Gradle tasks, CI workflow ⚠️
+_Session 141_ (2026-05-07) : Migration chemins foundry/ → foundry/OSS/ dans INDEX.adoc — granularisation OSS/CSS ✅
+_Session 139_ (2026-05-04) : Renommage gouvernance openclaw-codingame → quizz-benchmark-gradle (3 refs) ✅
+_Session 137_ (2026-05-01) : EPIC 12 Cloture — BACKLOG (EPIC 12 🟢 TERMINE) + INDEX (incoherence portefeuille corrigee, roadmap OK) ✅
+_Session 136_ (2026-05-01) : EPIC 12 Execution — 6/6 taches (PROCEDURES corrige, @Ignore+raison, Kover 81.19%, Gemini/Claude robuste, @Ignore→@Disabled) ✅
+_Session 135_ (2026-05-01) : EPIC 12 Definition Consolidation — Audit + 6 taches planifiees, BACKLOG + PROMPT_REPRISE a jour ✅
+_Session 134_ (2026-05-01) : EPIC 11 Tests Fonctionnels KG + Cloture — 15/15 PASSED, EPIC 11 🟢 TERMINE ✅
+_Session 133_ (2026-04-27) : EPIC 11 Article Blog Knowledge Graph — "Le KG comme outil de comprehension de codebase" (0106, 458 lignes, 10 diagrammes) ✅
+_Session 132_ (2026-04-27) : EPIC 10 Cloture + BACKLOG a jour — EPIC 9 et 10 termines, EPIC 11 a definir ✅
+_Session 131_ (2026-04-23) : EPIC 10 Diagrammes Architecture + Article Blog (0105) + message Discord + suppression README_fr.adoc obsolete ✅
+_Session 130_ (2026-04-23) : EPIC 10 Tests Unitaires Renderer — 15 tests ajoutes, cleanLabel/isMethodNode/nodeTypes/toString (40/40 PASS) ✅
+_Session 129_ (2026-04-23) : Git Commit graphify data — 2 commits, 332 fichiers (diagrammes + cache + .class) ✅
+_Session 128_ (2026-04-23) : EPIC 10 Tests Fonctionnels + Renderer ameliore + Readmes — 15 func tests, bug mavenLocal fix, 4 readmes ✅
+_Session 127_ (2026-04-22) : EPIC 10 Tests Integration Graphify — 380/380 PASS, 3 bugs fix, 40+ tests ajoutes ✅
+_Session 126_ (2026-04-22) : Article blog fg (0104) + reflexion distillation IA — 9.0/10 ✅
+_Session 125_ (2026-04-22) : EPIC 9 Knowledge Graph Diagram — GenerateKnowledgeGraphDiagramTask + Parser + Renderer (336/336 tests PASS) ✅
+_Session 124_ (2026-04-22) : Correction timeout ReindexPlantumlRagIntegrationTest — StubEmbeddingModel + mode SIMULATION OK ✅
+
+→ _Details_ : `.agents/sessions/` (sessions 124-147)
+→ _Sessions 1-123_ : `.agents/backup/Y2026-sessions-001-123/`

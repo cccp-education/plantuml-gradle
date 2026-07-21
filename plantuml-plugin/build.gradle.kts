@@ -286,9 +286,9 @@ val cucumberTest = tasks.register<Test>("cucumberTest") {
     }
     systemProperty("cucumber.junit-platform.naming-strategy", "long")
 
-    // Cucumber tag filter via -Pcucumber.tags="..." (default: exclude @wip and @integration)
+    // Cucumber tag filter via -Pcucumber.tags="..." (default: exclude @wip, @integration, @realllm)
     val cucumberTags = project.findProperty("cucumber.tags")?.toString()
-        ?: "not @wip and not @integration"
+        ?: "not @wip and not @integration and not @realllm"
     systemProperty("cucumber.filter.tags", cucumberTags)
 
     // FIX: Disable Gradle daemon for tests to avoid startup overhead and memory leaks
