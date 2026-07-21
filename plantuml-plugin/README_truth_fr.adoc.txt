@@ -22,7 +22,7 @@ image:https://img.shields.io/badge/License-Apache%202.0-blue.svg[License]
 
 == Description
 
-`com.cheroliv.plantuml` est un plugin Gradle qui génère des diagrammes PlantUML via IA (LangChain4j) à partir de fichiers `.prompt`.
+`education.cccp.plantuml` est un plugin Gradle qui génère des diagrammes PlantUML via IA (LangChain4j) à partir de fichiers `.prompt`.
 Il expose une DSL minimale au consommateur et gère en interne toute la configuration des dépôts, dépendances et tâches.
 Il intègre un pipeline RAG (Retrieval-Augmented Generation) pour la génération automatisée de diagrammes PlantUML via plusieurs fournisseurs LLM.
 
@@ -126,12 +126,12 @@ GPA --> KGJSON
 
 === ID du Plugin
 
-L'ID du plugin est `com.cheroliv.plantuml`, appliqué via :
+L'ID du plugin est `education.cccp.plantuml`, appliqué via :
 
 [source,kotlin]
 ----
 plugins {
-    id("com.cheroliv.plantuml") version "0.0.5"
+    id("education.cccp.plantuml") version "0.0.5"
 }
 ----
 
@@ -733,7 +733,7 @@ plantuml {
 plantuml = "{plugin-version}"
 
 [plugins]
-plantuml = { id = "com.cheroliv.plantuml", version.ref = "plantuml" }
+plantuml = { id = "education.cccp.plantuml", version.ref = "plantuml" }
 ----
 
 === gradle.properties (recommandé)

@@ -1,34 +1,30 @@
-= PROMPT_REPRISE — Plantuml — Session 177
-:session: 177
+= PROMPT_REPRISE — Plantuml — Session 178
+:session: 178
 :date: 2026-07-21
 
-== État — QW-3 ✅, EP-2 ✅, EP-3 ✅
+== État — PL-1 ✅, PL-4 ✅, G-03 ✅, O-07 ✅, K-06 ✅
 
-Session 176 : QW-3 (README_truth.adoc + CHANGELOG.adoc + PLUGIN_SELF_DOCUMENTATION),
-EP-2 (real-llm test infrastructure : plantuml-real-context.example.yml,
-LlmService real.test toggle, RealLlmSteps.kt), EP-3 (FreemiumWeightCalculator
-+ TieredRotationStrategy freemium + YAML config + 4 Cucumber @freemium PASS).
-9 tests unitaires FreemiumWeightCalculator, 4/4 Cucumber @freemium PASS.
-compileKotlin ✅, test ✅, publishToMavenLocal ✅.
+Session 177 : PL-1 (configurationCache = true, asciidoctor retiré, timeout 120s,
+compileKotlin ✅), PL-4 (lecture PLAN_GLOBAL.adoc → 3 EPICs cross-borough
+identifiés), G-03 (7 fichiers gouvernance com.cheroliv→education.cccp migrés),
+O-07 (vérifié déjà fait), K-06 (PLAN_GLOBAL.adoc section plantuml mise à jour :
+177 sessions, tous EPICs terminés, Kover 83.26%, 2531 unitaires + 128 Cucumber).
 
-== Mission session 177 — Polish (PL-1 + PL-4)
+== Mission session 178 — Polish (PL-2 + PL-3)
 
-**Objectif** : Polish basse priorité — Configuration Cache réévaluation +
-consultation PLAN_GLOBAL.adoc.
+**Objectif** : Polish basse priorité — KDoc exhaustif + ktlint/detekt.
 
 **Plan baby-step** :
-1. PL-1 : Réévaluer `configurationCache = false` — AsciidoctorJ 3.0.1 + Java 25
-   supportent-ils le config cache ? Si oui, activer.
-2. PL-4 : Lire `PLAN_GLOBAL.adoc` (racine workspace) — identifier EPICs
-   cross-borough candidats pour plantuml-gradle.
+1. PL-2 : KDoc exhaustif sur toutes les classes publiques (models, config,
+   boundary). ~2h.
+2. PL-3 : ktlint ou detekt — dépend ABIDJAN (conventions-gradle). Si
+   conventions-gradle a ajouté un plugin lint, le consommer.
 
 == Backlog — priorisé
 
 [cols="1,4,1"]
 |===
 | Priorité | Tâche | Est.
-| 🟢 PL-1 | Configuration Cache réévaluation | ~30min
-| 🟢 PL-4 | Consulter PLAN_GLOBAL.adoc | ~30min
 | 🟢 PL-2 | KDoc exhaustif | ~2h
 | 🟢 PL-3 | ktlint ou detekt | dépend ABIDJAN
 |===
@@ -45,7 +41,7 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 - BOM: `workspace-bom:0.0.8` ✅
 - `publishToMavenLocal` obligatoire après modif code plugin
 - Kover main: 83.26% INSTRUCTION ✅ ≥ 75%
-- Cucumber: 128 PASS (124 + 4 @freemium), 0 FAIL, 9 SKIP
-- Domaine `plantuml.incremental` : 35 tests
-- Domaine `plantuml.apikey` : +9 tests FreemiumWeightCalculator
-- Voir `sessions/176-qw3-ep2-ep3.adoc`
+- Cucumber: 128 PASS, 0 FAIL, 9 SKIP
+- Configuration Cache: activé ✅
+- Tous les EPICs métier terminés
+- Voir `sessions/177-pl1-pl4-epic-g03-o07-k06.adoc`

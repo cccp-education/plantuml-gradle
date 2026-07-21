@@ -8,7 +8,7 @@ ____
 
 Plugin Gradle qui génère des diagrammes PlantUML via IA (LangChain4j) à partir de fichiers `.prompt`.
 
-* _Plugin ID_ : `com.cheroliv.plantuml`
+* _Plugin ID_ : `education.cccp.plantuml`
 * _Package_ : `plantuml`
 * _Stack_ : Kotlin, Gradle, LangChain4j, Cucumber BDD
 

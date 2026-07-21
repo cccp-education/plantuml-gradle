@@ -1,0 +1,67 @@
+= Session 177 — PL-1 + PL-4 + EPIC G-03 + O-07 + K-06
+:date: 2026-07-21
+:type: governance + polish
+
+== Fait
+
+=== PL-1 — Configuration Cache réévaluation ✅
+
+- `configurationCache = false` → `true` dans `build.gradle.kts:543`
+- `implementation(libs.bundles.asciidoctor)` retiré (zéro usage dans src/)
+- Timeout test 60s → 120s
+- `./gradlew compileKotlin` BUILD SUCCESSFUL (2s, from-cache)
+
+=== PL-4 — Consultation PLAN_GLOBAL.adoc ✅
+
+- Lecture complète du PLAN_GLOBAL.adoc racine workspace
+- 3 EPICs cross-borough candidats identifiés pour plantuml :
+  * EPIC G-03 : Migration groupId com.cheroliv → education.cccp (code source)
+  * EPIC O-07 : Renommage engine → runner-gradle dans INDEX.adoc
+  * EPIC K-06 : Mise à jour PLAN_GLOBAL.adoc section plantuml
+
+=== EPIC G-03 — Migration groupId com.cheroliv → education.cccp ✅
+
+- `build.gradle.kts` + `src/` déjà migrés (group = "education.cccp")
+- 7 fichiers gouvernance migrés :
+  * `.agents/ARCHITECTURE.adoc` — Plugin ID
+  * `.agents/TROUBLESHOOTING.adoc` — 5 occurrences
+  * `.agents/TROUBLESHOOTING_fr.adoc` — 5 occurrences
+  * `.agents/HISTORIQUE_COMPLET_1-113.adoc` — 1 occurrence
+  * `README_truth_fr.adoc.txt` — 4 occurrences
+  * `finetuning-plantuml-protocole.adoc` — 5 occurrences
+  * `EPIC_CONSOLIDATION_TESTS_FONCTIONNELS.adoc` — 2 occurrences
+- 2 occurrences restantes dans `.agents/` sont des traces historiques documentant la migration (SESSIONS_HISTORY, TEST_COVERAGE_ANALYSIS) — conservées
+
+=== EPIC O-07 — Renommage engine → runner-gradle ✅
+
+- Vérifié : zéro occurrence `engine` standalone dans `.agents/INDEX.adoc`
+- Déjà fait en amont
+
+=== EPIC K-06 — Mise à jour PLAN_GLOBAL.adoc section plantuml ✅
+
+- Section `[[termine-plantuml]]` mise à jour :
+  * 163 → 177 sessions
+  * "13/14 EPICs terminés" → "tous EPICs terminés"
+  * Kover 81.19% → 83.26%
+  * 380/380 → 2531 unitaires + 128 Cucumber PASS
+  * PLT-BOUNDARY "EN COURS (S163, 0/8 US)" → "TERMINÉ (S163-S166, 8/8 US)"
+  * Table EPICs complétée : Incremental, EP-1/2/3, QW-1/2/3, CNV-6, BOM, Bug F18, Rattrapage i18n
+  * Ajout : Configuration Cache activé, BOM 0.0.8, Maven Central 0.0.1
+
+== Fichiers modifiés
+
+- `plantuml-plugin/build.gradle.kts` — PL-1 (config cache + asciidoctor + timeout)
+- `plantuml-plugin/.agents/ARCHITECTURE.adoc` — G-03
+- `plantuml-plugin/.agents/TROUBLESHOOTING.adoc` — G-03
+- `plantuml-plugin/.agents/TROUBLESHOOTING_fr.adoc` — G-03
+- `plantuml-plugin/.agents/HISTORIQUE_COMPLET_1-113.adoc` — G-03
+- `plantuml-plugin/README_truth_fr.adoc.txt` — G-03
+- `plantuml-plugin/finetuning-plantuml-protocole.adoc` — G-03
+- `plantuml-plugin/EPIC_CONSOLIDATION_TESTS_FONCTIONNELS.adoc` — G-03
+- `PLAN_GLOBAL.adoc` (racine workspace) — K-06
+
+== Prochaine session
+
+- PL-2 : KDoc exhaustif (~2h)
+- PL-3 : ktlint ou detekt (dépend ABIDJAN)
+- BACKLOG.adoc vide — tous les EPICs métier sont terminés

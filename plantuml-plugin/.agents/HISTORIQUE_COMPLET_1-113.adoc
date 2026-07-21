@@ -1,6 +1,6 @@
 = 📜 Historique Complet des Sessions — PlantUML Gradle Plugin
 
-_Projet_ : Plugin Gradle `com.cheroliv.plantuml`  
+_Projet_ : Plugin Gradle `education.cccp.plantuml`  
 _Période_ : Mars 2026 — 20 avril 2026  
 _Total sessions_ : 113 sessions  
 _Dernière session_ : 113 (Quota Tracker + Reset automatique)  

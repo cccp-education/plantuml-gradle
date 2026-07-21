@@ -248,7 +248,7 @@ Pour chaque test optimisé, vérifier :
 @Test
 fun `should apply plugin successfully`() {
     File(projectDir, "build.gradle.kts").writeText(
-        """plugins { id("com.cheroliv.plantuml") }"""
+        """plugins { id("education.cccp.plantuml") }"""
     )
     val result = GradleRunner.create()
         .withProjectDir(projectDir)
@@ -269,7 +269,7 @@ fun `should apply plugin successfully`() {
 @Test
 fun `should apply plugin successfully`() {
     File(projectDir, "build.gradle.kts").writeText(
-        """plugins { id("com.cheroliv.plantuml") }"""
+        """plugins { id("education.cccp.plantuml") }"""
     )
     GradleRunner.create()
         .withProjectDir(projectDir)

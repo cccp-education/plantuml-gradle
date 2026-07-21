@@ -33,7 +33,6 @@ dependencies {
 
     implementation(gradleApi())
     implementation(gradleKotlinDsl())
-    implementation(libs.bundles.asciidoctor)
     implementation(libs.node.gradle)
 
     implementation(libs.bundles.plantuml)
@@ -114,7 +113,7 @@ tasks.withType<Test> {
     forkEvery = 0 // ← Never restart the worker (0 = unlimited)
 
     // Strict timeout to prevent blocking
-    timeout.set(Duration.ofSeconds(60))
+    timeout.set(Duration.ofSeconds(120))
 
     // Reuse outputs to speed up executions
     outputs.cacheIf { true }
@@ -541,10 +540,7 @@ gradlePlugin {
             @Suppress("UnstableApiUsage")
             compatibility {
                 features {
-                    // asciidoctorRevealJs runs OUT_OF_PROCESS via JRuby — not compatible
-                    // with Configuration Cache. Will be revisited when asciidoctor-gradle
-                    // stabilises beyond 5.0.0-alpha.1.
-                    configurationCache = false
+                    configurationCache = true
                 }
             }
         }

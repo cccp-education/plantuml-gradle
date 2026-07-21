@@ -12,7 +12,7 @@
 == Contexte et périmètre
 
 Ce document décrit le protocole d'intégration d'une feature de fine-tuning d'un modèle de langage
-pour la génération de diagrammes PlantUML, dans le plugin Gradle existant `com.cheroliv.plantuml`
+pour la génération de diagrammes PlantUML, dans le plugin Gradle existant `education.cccp.plantuml`
 (repo `plantuml-gradle`).
 
 Le plugin existant intègre déjà `langchain4j` et `ollama` dans ses dépendances.
@@ -235,7 +235,7 @@ et le dataset d'entraînement versionné.
 
 === Intégration dans le plugin existant
 
-Le modèle GGUF publié sera consommable directement par le plugin `com.cheroliv.plantuml`
+Le modèle GGUF publié sera consommable directement par le plugin `education.cccp.plantuml`
 via la dépendance `langchain4j-ollama` déjà présente, sans modification de l'API du plugin.
 
 === Décisions ouvertes
@@ -510,7 +510,7 @@ ollama pull cheroliv/plantuml-e4b
 ollama pull cheroliv/plantuml-qwen3.5
 ----
 
-Consommables en remote depuis le plugin `com.cheroliv.plantuml`
+Consommables en remote depuis le plugin `education.cccp.plantuml`
 via `langchain4j-ollama` sans installation locale des poids.
 
 === Nouvelles tâches Gradle
@@ -571,7 +571,7 @@ node "ollama.com\n(Apache 2.0, public)" {
   [cheroliv/plantuml-qwen3.5]
 }
 
-node "plugin com.cheroliv.plantuml" {
+node "plugin education.cccp.plantuml" {
   [langchain4j-ollama]
 }
 
@@ -624,7 +624,7 @@ et les variables d'environnement d'exécution Colab.
 
 == Références
 
-* Plugin : https://plugins.gradle.org/plugin/com.cheroliv.plantuml
+* Plugin : https://plugins.gradle.org/plugin/education.cccp.plantuml
 * Plugin readme : https://plugins.gradle.org/plugin/com.cheroliv.readme
 * Modèle de base : https://huggingface.co/google/gemma-4-E4B-it
 * Unsloth Gemma 4 : https://unsloth.ai/docs/models/gemma-4/train

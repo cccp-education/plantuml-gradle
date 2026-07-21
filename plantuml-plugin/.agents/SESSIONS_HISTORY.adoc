@@ -1,5 +1,9 @@
 = Historique des Sessions
 
+== Session 177 (2026-07-21) — PL-1 + PL-4 + EPIC G-03 + O-07 + K-06
+
+PL-1 : configurationCache = true (AsciidoctorJ 3.0.1 + Java 25), asciidoctor bundle retiré (zéro usage), timeout 60s→120s, compileKotlin ✅. PL-4 : lecture PLAN_GLOBAL.adoc → 3 EPICs cross-borough identifiés. G-03 : 7 fichiers gouvernance com.cheroliv→education.cccp migrés (ARCHITECTURE, TROUBLESHOOTING ×2, HISTORIQUE, README_truth_fr, finetuning-protocole, EPIC_CONSOLIDATION). O-07 : vérifié déjà fait (zéro engine dans INDEX.adoc). K-06 : PLAN_GLOBAL.adoc section plantuml mise à jour (177 sessions, tous EPICs terminés, Kover 83.26%, 2531 unitaires + 128 Cucumber). Gouvernance pure, zéro code métier modifié. ✅
+
 == Session 176 (2026-07-21) — QW-3 + EP-2 + EP-3
 
 Trois EPICs livrés en baby-step DDD/TDD/BDD. QW-3 : README_truth.adoc (version 0.0.5→0.0.1, plugin ID com.cheroliv→education.cccp, +3 sections i18n/Translation Boundary/Incremental), CHANGELOG.adoc (entrées EP-1, PLT-BOUNDARY, PLT-I18N, EPIC 13, CNV-6, BOM), PLUGIN_SELF_DOCUMENTATION.adoc (+Domaines Transverses). EP-2 : plantuml-real-context.example.yml (gitignored), LlmService.createChatModel() support plantuml.real.test=true, RealLlmSteps.kt (~150 lignes, steps @real-llm avec ensureOllama+assumeTrue). EP-3 : FreemiumWeightCalculator (9 tests unitaires, 9/9 PASS), TieredRotationStrategy (weight > tier quand freemium activé), ApiKeyPool + LangchainConfig.freemiumRatio + LlmService wiring, 4 Cucumber @freemium PASS. compileKotlin ✅, test ✅, publishToMavenLocal ✅. ✅

@@ -1,5 +1,18 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-07
 
+== Session 177 (2026-07-21) — PL-1 + PL-4 + EPIC G-03 + O-07 + K-06
+
+=== Fait
+- PL-1 : `configurationCache = true` (AsciidoctorJ 3.0.1 + Java 25), asciidoctor bundle retiré (zéro usage), timeout 60s→120s, compileKotlin ✅
+- PL-4 : Lecture PLAN_GLOBAL.adoc → 3 EPICs cross-borough identifiés (G-03, O-07, K-06)
+- G-03 : 7 fichiers gouvernance `com.cheroliv.plantuml` → `education.cccp.plantuml` migrés (ARCHITECTURE, TROUBLESHOOTING ×2, HISTORIQUE, README_truth_fr, finetuning-protocole, EPIC_CONSOLIDATION)
+- O-07 : Vérifié déjà fait (zéro `engine` standalone dans INDEX.adoc)
+- K-06 : PLAN_GLOBAL.adoc section plantuml mise à jour (177 sessions, tous EPICs terminés, Kover 83.26%, 2531 unitaires + 128 Cucumber, PLT-BOUNDARY TERMINÉ, table EPICs complète)
+
+=== Prochaine session
+- PL-2 : KDoc exhaustif (~2h)
+- PL-3 : ktlint ou detekt (dépend ABIDJAN)
+
 == Session 176 (2026-07-21) — QW-3 + EP-2 + EP-3
 
 === Fait
