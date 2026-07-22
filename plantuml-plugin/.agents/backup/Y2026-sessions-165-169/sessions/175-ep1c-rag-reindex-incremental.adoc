@@ -1,0 +1,58 @@
+= Session 175 — EP-1(c) RAG Reindex Incrémental dans CollectPlantumlIndexTask
+:date: 2026-07-20
+:status: ✅ TERMINÉ
+
+== Objectif
+
+Intégrer le domaine `plantuml.incremental` dans `CollectPlantumlIndexTask` pour
+skip les `.puml` dont le diagramme source n'a pas changé (checksum comparison).
+
+== Baby-step DDD/TDD/BDD
+
+=== 1. Unit — IncrementalProcessor.shouldReindexPuml()
+
+- `IncrementalProcessor.shouldReindexPuml(pumlFile, promptsDir)` : compare le
+  checksum du `.prompt` source avec le checksum stocké.
+- 3 tests unitaires : prompt changé → true, prompt inchangé → false, pas de
+  prompt source → true (orphelin).
+- 10/10 IncrementalProcessorTest PASS (7 existants + 3 nouveaux).
+
+=== 2. Functional — CollectPlantumlIndexTask
+
+- `reindexRag()` : après chargement des `.puml`, partition via
+  `incrementalProcessor.shouldReindexPuml()` → `toReindex` / `skipped`.
+- Log `collect.skipped_unchanged` pour chaque puml skipé.
+- `filteredDiagramFiles` passe aux 3 modes (DATABASE, TESTCONTAINERS, SIMULATION).
+- Clé i18n `collect.skipped_unchanged` ajoutée aux 11 fichiers `Messages_*.properties`
+  (10 langues + default).
+- 6/6 CollectPlantumlIndexTaskUnitTest PASS, zéro régression.
+
+=== 3. Cucumber — @incremental-rag
+
+- 2 scénarios ajoutés à `9_incremental_processing.feature` :
+  - `@incremental-rag @rag-reindex` : prompt inchangé → puml skipé
+  - `@incremental-rag @rag-reindex` : prompt modifié → puml reindexé
+- 6 step definitions ajoutées à `RagPipelineSteps.kt` (Given puml in RAG dir,
+  Given checksum stored, Given prompt modified, When collectPlantumlIndex in
+  simulation mode, Then skipped/reindexed).
+- Assertions `unchangedPromptsSkipped` renforcées (cherche "Skipped"/"skipped"/
+  "unchanged").
+- 2/2 Cucumber @incremental-rag PASS.
+
+== Fichiers modifiés
+
+- `src/main/kotlin/plantuml/incremental/IncrementalProcessor.kt` — +7 lignes
+  (shouldReindexPuml)
+- `src/main/kotlin/plantuml/tasks/CollectPlantumlIndexTask.kt` — +15 lignes
+  (import IncrementalProcessor, partition puml, filteredDiagramFiles)
+- `src/test/kotlin/plantuml/incremental/IncrementalProcessorTest.kt` — +3 tests
+- `src/test/features/9_incremental_processing.feature` — +2 scénarios
+- `src/test/scenarios/plantuml/scenarios/RagPipelineSteps.kt` — +6 step defs
+- `src/main/resources/i18n/Messages*.properties` × 11 — +1 clé
+
+== Vérification
+
+- compileKotlin ✅
+- test (unitaires) ✅ — 0 régression
+- cucumberTest @incremental-rag ✅ — 2/2 PASS
+- publishToMavenLocal ✅

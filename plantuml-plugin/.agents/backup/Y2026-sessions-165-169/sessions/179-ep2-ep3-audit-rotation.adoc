@@ -1,0 +1,139 @@
+= Session 179 — EP-2 Tests production-close + EP-3 Pool freemium + Audit gouvernance + Rotation backup
+:session: 179
+:date: 2026-07-21
+:status: ✅ TERMINÉ
+
+== Objectifs
+
+1. PL-3 ktlint/detekt
+2. EP-2 Tests production-close
+3. EP-3 Pool freemium ratio dynamique
+4. Audit gouvernance (fichiers EAGER > 100 lignes)
+5. Rotation backup (N % 10 == 0 OU EAGER cumulé > 500)
+
+== Résultats
+
+=== PL-3 ktlint/detekt — ❌ BLOQUÉ ABIDJAN
+
+Confirmé : conventions-gradle (ABIDJAN) n'expose aucun plugin ktlint ni detekt
+(aucune référence dans `src/main/kotlin/` ni `build.gradle.kts`). Pour débloquer
+PL-3, il faudrait d'abord ajouter un plugin lint à ABIDJAN — hors scope plantuml.
+Skipué, gardé pour plus tard.
+
+=== EP-2 Tests production-close — ✅ TERMINÉ
+
+État initial :
+- (a) Context dédié : ✅ existait déjà (`plantuml-real-context.example.yml` +
+  `plantuml-real-context.yml` gitignoré)
+- (b) Parameter CLI : ✅ existait déjà (`-Ptest.tags="real-llm"` +
+  `plantuml.real.test=true` system property dans `LlmService.kt:180`)
+- (c) GitHub Actions workflow avec secrets : ❌ MANQUANT — seul gap
+
+Livré :
+1. **Workflow CI `real_llm_test.yml`** créé (`.github/workflows/`).
+   - Opt-in (`workflow_dispatch` uniquement), timeout 30min
+   - Inputs : `providers` (default "ollama"), `suite` (functional/cucumber/both)
+   - Secret `PLANTUML_REAL_CONTEXT_YML` injecté → `plantuml-real-context.yml`
+   - Fallback example si secret absent (warning)
+   - JDK 25, `publishToMavenLocal` avant tests
+   - functionalTest `-Ptest.tags="real-llm"` + cucumberTest `-Pcucumber.tags="@realllm"`
+   - Upload rapports (tests + cucumber + functionalTest)
+
+2. **Feature Cucumber `22_real_llm.feature`** créée (3 scénarios `@realllm`).
+   - Generate class diagram from real Ollama model
+   - Validate PlantUML syntax against real Ollama model
+   - Collect PlantUML index against real Ollama model
+   - Tous les steps matchent `RealLlmSteps.kt` (préexistant)
+
+3. **Fix bug `AmbiguousStepDefinitionsException`** dans `RealLlmSteps.kt`.
+   - Step `realOllamaInstanceIsRunningWithSmollmModel()` (redondant) supprimé.
+   - Cause : matchait le même Gherkin que `realOllamaInstanceIsRunningWithModel({word})`
+     quand `{word}` = "smollm:135m". Deux step definitions → ambiguïté Cucumber.
+   - 1 step definition supprimée (le cas spécial), le step générique reste.
+
+4. **Tag `@realllm`** (sans trait d'union) adopté pour Cucumber.
+   - `@real-llm` avec trait d'union causait un souci de découverte avec
+     `cucumber.filter.tags` (0 scénario découvert). Renommé `@realllm`.
+   - Filtre default `build.gradle.kts` mis à jour :
+     `not @wip and not @integration` → `not @wip and not @integration and not @realllm`
+   - Workflow CI mis à jour (`-Pcucumber.tags="@realllm"`).
+
+Validation :
+- `compileTestKotlin` ✅
+- `cucumberTest -Pcucumber.tags="@realllm"` → 3/3 scénarios découverts, SKIPPED
+  (Ollama non disponible localement — `assumeTrue` dans `ensureOllama()`)
+- `cucumberTest` (default) → 19 features, feature 22 exclue ✅
+- BUILD SUCCESSFUL
+- Zéro code métier modifié (test + config uniquement)
+
+=== EP-3 Pool freemium ratio dynamique — ✅ DÉJÀ TERMINÉ
+
+Constat : EP-3 était déjà implémenté lors d'une session antérieure (S176).
+`FreemiumWeightCalculator` + `TieredRotationStrategy` + `ApiKeyPool.freemiumRatio`
++ config `langchain4j.freemiumRatio` + tests unitaires (`FreemiumWeightCalculatorTest`,
+9/9 PASS) + tests BDD (feature 14, 4/4 scénarios `@freemium` PASS).
+
+Architecture :
+- `FreemiumWeightCalculator(freemiumRatio, quotaTracker)` — FREE tier reçoit
+  weight × freemiumRatio, paid tiers × (1 - freemiumRatio), scaled by remaining quota
+- `TieredRotationStrategy(weightCalculator)` — trie par tier desc + effective weight
+- `ApiKeyPool(freemiumRatio)` câblé dans `LlmService.initializeApiKeyPools()`
+- Config YAML : `langchain4j.freemiumRatio: 0.5` dans `plantuml-context.yml`
+
+Validation : 4/4 Cucumber `@freemium` PASS (default 0.0, 0.5, 1.0, usage-based).
+
+=== Audit gouvernance — ✅ TERMINÉ
+
+| Fichier EAGER | Lignes | Statut
+| `AGENT.adoc` | 351 | > 100 (règles absolues — toléré)
+| `.agents/INDEX.adoc` | 226 | > 100 (état projet — toléré)
+| `.agents/SESSIONS_HISTORY.adoc` | 130 → 75 | trimé (rotation backup)
+| `LAZY_EAGER_ESSENTIALS.adoc` | 73 | ✅ < 100
+| `PROMPT_REPRISE.adoc` | 41 | ✅ < 100
+| TOTAL EAGER | 820 → 766 | > 500 (rotation déclenchée)
+
+Constat : `AGENT.adoc` (351) et `INDEX.adoc` (226) sont les gros fichiers EAGER.
+Ce sont des exceptions tolérées (règles absolues + état projet). Pour aller sous
+500 lignes il faudrait trim ces fichiers — non actionné (contenu de référence).
+
+=== Rotation backup — ✅ TERMINÉ
+
+- Backup créé : `.agents/backup/Y2026-sessions-126-178/`
+  (50 sessions + INDEX + SESSIONS_HISTORY + COMPLETED_TASKS_ARCHIVE_2026-07)
+- `.agents/sessions/` : 50 → 5 fichiers (174-178 gardés, 126-173 archivés)
+- `SESSIONS_HISTORY.adoc` : 130 → 75 lignes (sessions 126-173 condensées one-liners)
+- Total EAGER : 820 → 766 lignes
+- Prochaine rotation : session 180 (multiple de 10)
+
+== Méthodologie
+
+Baby-step DDD/TDD/BDD (unit → functional → cucumber), Red→Green→Refactor,
+1 test à la fois. `publishToMavenLocal` obligatoire après modif code plugin
+(pas nécessaire cette session — zéro code main modifié).
+
+== Fichiers modifiés
+
+- `.github/workflows/real_llm_test.yml` (créé, 99 lignes) — workflow CI opt-in
+- `plantuml-plugin/src/test/features/22_real_llm.feature` (créé, 48 lignes) — 3 scénarios @realllm
+- `plantuml-plugin/src/test/scenarios/plantuml/scenarios/RealLlmSteps.kt` (modifié) — step redondant supprimé
+- `plantuml-plugin/build.gradle.kts` (modifié) — filtre default cucumber tags
+- `plantuml-plugin/.agents/SESSIONS_HISTORY.adoc` (réécrit) — rotation backup
+- `plantuml-plugin/.agents/sessions/126-173-*.adoc` (supprimés, 45 fichiers) — archivés
+- `plantuml-plugin/.agents/backup/Y2026-sessions-126-178/` (créé) — backup
+
+== Score
+
+8/10 — EP-2 livré avec workflow CI + feature BDD + fix bug ambiguïté. EP-3
+constaté déjà terminé (pas de nouvelle valeur). PL-3 bloqué hors-scope.
+Audit + rotation backup propres. Zéro code métier modifié (test + config + gouvernance).
+
+== Bump version (post-clôture)
+
+- `plantuml-plugin`: 0.0.1 → 0.0.2 (catalogue + BOM 0.0.11)
+- `document-gradle`: BOM 0.0.6 → 0.0.11 + plantuml-plugin 0.0.1 → 0.0.2
+- `workspace-bom`: constraint plantuml 0.0.2 déjà présente (commit dcb3274, BOM 0.0.11 sur Central ✅)
+- `publishToMavenLocal` plantuml + BOM ✅, `compileKotlin` plantuml + document ✅
+- **Publication Maven Central** : `publishAggregationToCentralPortal` ✅
+  - Bundle `92463d37-de2f-41bb-87cb-fd9fa19f4d02` uploadé (AUTOMATIC)
+  - Statut `publishing` au moment du push (propagation repo1.maven.org en cours)
+- Commits pushés : `ed472e4` (plantuml-gradle), `4546a17` (document-gradle)

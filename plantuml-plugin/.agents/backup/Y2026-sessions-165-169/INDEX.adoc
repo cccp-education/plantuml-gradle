@@ -2,9 +2,9 @@
 
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
-_Dernière mise a jour_ : 2026-07-22  
-_Session en cours_ : 182 — Maintenance (backlog vide, tous les EPICs métier terminés)  
-_Session terminee_ : 181 — QW-3 README_truth.adoc + CHANGELOG.adoc (version 0.0.2, groupId education.cccp, i18n, Translation Boundary, Incremental Processing, Multi-Provider Pool). Consommateurs corrigés. Zéro code métier modifié.
+_Dernière mise a jour_ : 2026-07-21  
+_Session en cours_ : 180 — Rotation backup (multiple de 10)  
+_Session terminee_ : 179 — EP-2 tests production-close (workflow CI `real_llm_test.yml` + feature Cucumber `22_real_llm.feature` 3 scénarios `@realllm` + fix bug `AmbiguousStepDefinitionsException`). EP-3 constaté déjà terminé (S176). Rotation backup sessions 126-178 (50→5 fichiers). Audit gouvernance (EAGER 766 lignes). Bump 0.0.1→0.0.2 + publication Maven Central (bundle 92463d37). Consommateurs mis à niveau (document-gradle BOM 0.0.11). Tous les EPICs métier terminés, plugin en maintenance.
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
 '''
@@ -119,19 +119,22 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 
 |=== 
 | # | Date | Type | Sujet | Fichier | Score
-.1+^.^| 180 | 2026-07-22 | governance | Rotation backup (multiple de 10, EAGER 3405→~800 lignes). Snapshot Y2026-sessions-165-169 (INDEX, SESSIONS_HISTORY, COMPLETED_TASKS_ARCHIVE, 6 sessions). INDEX + HISTORY tronqués → 10 sessions (171-180). PROMPT_REPRISE → S181 (QW-3). Zéro code métier modifié | `180-rotation-backup.adoc` | 9/10
-.1+^.^| 179 | 2026-07-21 | governance + BDD | EP-2 tests production-close (workflow CI `real_llm_test.yml` opt-in + feature Cucumber `22_real_llm.feature` 3 scénarios `@realllm` + fix bug `AmbiguousStepDefinitionsException`). EP-3 constaté déjà terminé (S176). Rotation backup sessions 126-178 (50→5 fichiers). Audit gouvernance (EAGER 766 lignes). Zéro code métier modifié | `179-ep2-ep3-audit-rotation.adoc` | 8/10
+.1+^.^| 179 | 2026-07-21 | governance + BDD | EP-2 tests production-close (workflow CI `real_llm_test.yml` opt-in + feature Cucumber `22_real_llm.feature` 3 scénarios `@realllm` + fix bug `AmbiguousStepDefinitionsException` dans `RealLlmSteps.kt` — step redondant supprimé, tag `@real-llm`→`@realllm` pour fix découverte Cucumber). EP-3 constaté déjà terminé (S176 — `FreemiumWeightCalculator` + 4/4 Cucumber `@freemium` PASS). PL-3 bloqué ABIDJAN. Audit gouvernance (EAGER 820→766 lignes). Rotation backup sessions 126-178 (50→5 fichiers, HISTORY 130→75). Zéro code métier modifié | `179-ep2-ep3-audit-rotation.adoc` | 8/10
 .1+^.^| 178 | 2026-07-21 | governance + polish | PL-2 KDoc exhaustif sur 43 fichiers source (4 lots, compileKotlin ✅) + PL-3 annulé (ABIDJAN sans plugin lint). Zéro code métier modifié (KDoc uniquement) | `178-pl2-kdoc-exhaustif.adoc` | 9/10
-.1+^.^| 177 | 2026-07-21 | governance + polish | PL-1 (configurationCache = true, asciidoctor retiré, timeout 120s) + PL-4 (lecture PLAN_GLOBAL.adoc → 3 EPICs cross-borough) + G-03 (7 fichiers gouvernance com.cheroliv→education.cccp) + O-07 (vérifié déjà fait) + K-06 (PLAN_GLOBAL.adoc section plantuml mise à jour). Gouvernance pure, zéro code métier modifié | `177-pl1-pl4-epic-g03-o07-k06.adoc` | 9/10
-.1+^.^| 176 | 2026-07-21 | DDD + TDD + BDD | QW-3 README_truth.adoc + CHANGELOG.adoc + PLUGIN_SELF_DOCUMENTATION.adoc. EP-2 plantuml-real-context.example.yml + LlmService.createChatModel() + RealLlmSteps.kt (~150 lignes). EP-3 FreemiumWeightCalculator (9 tests) + TieredRotationStrategy + 4 Cucumber @freemium PASS. compileKotlin ✅, test ✅, publishToMavenLocal ✅ | `176-qw3-ep2-ep3.adoc` | 9/10
-.1+^.^| 175 | 2026-07-20 | DDD + TDD + BDD | EP-1(c) RAG Reindex Incrémental dans CollectPlantumlIndexTask. shouldReindexPuml() + reindexRag() + 2 scénarios @incremental-rag. 10/10 IncrementalProcessorTest, 6/6 CollectPlantumlIndexTaskUnitTest, 2/2 Cucumber PASS. EP-1 incremental maturity 4/4 ✅ | `175-ep1c-rag-reindex-incremental.adoc` | 9/10
-.1+^.^| 174 | 2026-07-15 | DDD + TDD | QW-1 validateDiagram parsing réel (Jackson + KotlinModule + fallback gracieux, clé i18n 10 langues) + QW-2 api→implementation (8 deps migrées, API surface nettoyée) + EP-1 incremental maturity 3/4 : (d) events domaine sealed class, (b) IncrementalAuditLogger, (a) IncrementalConfig YAML. +20 tests unitaires, 0 régression, 122 Cucumber @incremental PASS | `174-quick-wins-incremental-maturity.adoc` | 9/10
-.1+^.^| 173 | 2026-07-15 | governance | Consolidation backlog + code review audit. 7 pistes priorisées (QW-1/2/3, EP-1/2/3, PL-1..4). BACKLOG.adoc + TODO.adoc mis à jour. Gouvernance seule | `173-consolidation-backlog-code-review.adoc` | 8/10
-.1+^.^| 172 | 2026-07-15 | DDD + TDD + BDD | Incremental Processing : domaine `plantuml.incremental` (ChecksumStore 7 tests + IncrementalProcessor 7 tests). Intégration GeneratePlantumlDiagramsTask (skip/cleanup/force). 5/5 @incremental PASS, 122/122 Cucumber, 2508 unitaires, Kover 83.26% | `172-incremental-processing-domain-ddd.adoc` | 9/10
-.1+^.^| 171 | 2026-07-14 | BDD | ApiKeyPoolSteps.kt créé (~330 lignes, 30+ steps) — 18/18 scénarios feature 14 PASS. getNextRoundRobin() skip quota saturé (BDD Red→Green). Timeout 15min. 108 PASS cucumber complet | `171-api-key-pool-steps-timeout.adoc` | 9/10
+.1+^.^| 177 | 2026-07-21 | governance + polish | PL-1 (configurationCache = true, asciidoctor retiré, timeout 120s, compileKotlin ✅) + PL-4 (lecture PLAN_GLOBAL.adoc → 3 EPICs cross-borough) + G-03 (7 fichiers gouvernance com.cheroliv→education.cccp) + O-07 (vérifié déjà fait) + K-06 (PLAN_GLOBAL.adoc section plantuml mise à jour : 177 sessions, tous EPICs terminés, Kover 83.26%). Gouvernance pure, zéro code métier modifié | `177-pl1-pl4-epic-g03-o07-k06.adoc` | 9/10
+.1+^.^| 174 | 2026-07-15 | DDD + TDD | QW-1 validateDiagram parsing réel (Jackson + KotlinModule + fallback gracieux, clé i18n 10 langues) + QW-2 api→implementation (8 deps migrées, API surface nettoyée) + EP-1 incremental maturity 3/4 : (d) events domaine sealed class PromptSkipped/PromptProcessed/OutputsCleaned + onEvent listener, (b) IncrementalAuditLogger trace horodatée, (a) IncrementalConfig YAML checksumsDir/auditLog/auditEnabled câblé PlantumlConfig. +20 tests unitaires (32 domaine incremental), 0 régression, 122 Cucumber @incremental PASS, publishToMavenLocal OK | `174-quick-wins-incremental-maturity.adoc` | 9/10
+.1+^.^| 173 | 2026-07-15 | governance | Consolidation backlog + code review audit. Inventaire complet (BACKLOG + TODO + CODE_REVIEW 2026-04 + GLOBAL v7 + audit code). 7 pistes priorisées : QW-1 validateDiagram parsing, QW-2 api→implementation, QW-3 README+CHANGELOG, EP-1 maturité incremental, EP-2 tests real-llm, EP-3 pool freemium, PL-1..4 polish. Items déjà résolus vérifiés. BACKLOG.adoc + TODO.adoc mis à jour. Gouvernance seule | `173-consolidation-backlog-code-review.adoc` | 8/10
+.1+^.^| 172 | 2026-07-15 | DDD + TDD + BDD | Incremental Processing : domaine `plantuml.incremental` (ChecksumStore 7 tests + IncrementalProcessor 7 tests) créé. Intégration GeneratePlantumlDiagramsTask (skip unchanged via checksum, cleanup orphelins, save `.yml` sanitizé, `--rerun-tasks` force). Mock LLM injecté dans IncrementalProcessingSteps. Fix régression File Edge Cases (sanitization nom). 5/5 `@incremental` PASS, 122/122 Cucumber (0 FAIL), 2508 unitaires, Kover 83.26%, publishToMavenLocal OK | `172-incremental-processing-domain-ddd.adoc` | 9/10
+.1+^.^| 171 | 2026-07-14 | BDD | ApiKeyPoolSteps.kt créé (~330 lignes, 30+ steps) — 18/18 scénarios feature 14 PASS. Domaine `getNextRoundRobin()` modifié pour skip quota saturé (BDD Red→Green). Timeout cucumberTest 10min → 15min. 108 PASS cucumber complet, 5 FAIL préexistantes (Incremental Processing). publishToMavenLocal OK | `171-api-key-pool-steps-timeout.adoc` | 9/10
+.1+^.^| 170 | 2026-07-14 | fix | Fix koverThresholdCheck (functionalTest exclu, 83.26% PASS) + Cucumber feature 15 i18n fixé (3 failures → 0, log diagnostic anglais fixe non i18nisé). Feature 14 (18 UndefinedStepException) reste. `./gradlew test` zéro régression, publishToMavenLocal OK | `170-fix-kover-cucumber-i18n.adoc` | 9/10
+.1+^.^| 169 | 2026-07-11 | maintenance | Kover Verification + Backlog Audit — Kover main 92.93% ✅ ≥ 75%, `koverThresholdCheck` FAIL (agrégat main+functionalTest 53.55%), Cucumber 26 failures timeout préexistant, backlog vide | `169-kover-verification.adoc` | 8/10
+.1+^.^| 168 | 2026-07-11 | maintenance | BOM Upgrade workspace-bom:0.0.1 → 0.0.8 — 1 ligne `build.gradle.kts:25`, compileKotlin ✅, test ✅, publishToMavenLocal ✅. Maintenance pure, zéro code métier modifié. Tous les EPICs terminés | `168-bom-upgrade-0.0.8.adoc` | 9/10
+.1+^.^| 167 | 2026-07-09 | fix | Bug Feature 18 MessageFormat Quoting — 1 ligne `I18nErrorSteps.kt` (`get()` → `format()`), 7/7 feature 18 PASS, 122/122 Cucumber PASS, 1312+ unitaires verts, publishToMavenLocal OK. Zéro production modifié. Constat : EPIC rattrapage i18n déjà terminé | `167-fix-feature-18-messageformat-quoting.adoc` | 9/10
+.1+^.^| 166 | 2026-07-09 | BDD | US-BND-7 Cucumber full pipeline end-to-end — scénario `@full-pipeline` vérifie les 4 stratégies coexistant dans un rendu KG (Classes TRANSLATE, LlmService PRESERVE, pipeline BORROW, REAC PRESERVE registry). 6 steps Cucumber ajoutés (Given/When/Then) + 2 champs PlantumlWorld. 1312 unitaires 0 fail, 12/12 Cucumber boundary PASS, publishToMavenLocal OK. EPIC PLT-BOUNDARY CLOTUREE 8/8 US | `166-us-bnd-7-cucumber-full-pipeline.adoc` | 9/10
+.1+^.^| 165 | 2026-07-09 | DDD + TDD + BDD | US-BND-6 NonTranslatableTermRegistry — registre configurable YAML `terms: [list]` (Set minimal), `NonTranslatableTermRegistryLoader` (Jackson YAML), `TranslationResolver` param optionnel `nonTranslatableRegistry?` court-circuit PRESERVE avant classification (priorité sur classifier + glossary), 2 tasks câblées (registry vide défaut), 6 tests unitaires + 3 TranslationResolver (priorité + backward-compat), 2 scénarios Cucumber `@non-translatable` (REAC vs classifier, AFNOR vs glossary BORROW), 1303 unitaires 0 fail, 11/11 Cucumber boundary PASS, publishToMavenLocal OK. EPIC PLT-BOUNDARY 7/8 US | `165-us-bnd-6-non-translatable-term-registry.adoc` | 9/10
 |===
 
-→ _Sessions 1-170_ : `.agents/backup/Y2026-sessions-001-125/` + `.agents/backup/Y2026-sessions-126-178/` + `.agents/backup/Y2026-sessions-165-169/`
+→ _Sessions 1-126_ : `.agents/backup/Y2026-sessions-001-126/`
 
 == 📈 Statistiques
 
@@ -184,9 +187,10 @@ _Historique_ :
 
 == 📁 Archives
 
-* _Sessions 1-170_ : `.agents/backup/Y2026-sessions-001-125/` + `.agents/backup/Y2026-sessions-126-178/` + `.agents/backup/Y2026-sessions-165-169/`
-* _Sessions 171-180_ : Ce fichier + `.agents/sessions/`
-* _Localisation des vagues_ : `.agents/backup/Y2026-sessions-001-125/` + `.agents/backup/Y2026-sessions-126-178/` + `.agents/backup/Y2026-sessions-165-169/`
+* _Sessions 1-125_ : `.agents/backup/Y2026-sessions-001-125/` (INDEX, SESSIONS_HISTORY, COMPLETED_TASKS_ARCHIVE, sessions/)
+* _Sessions 126-178_ : `.agents/backup/Y2026-sessions-126-178/` (INDEX, SESSIONS_HISTORY, COMPLETED_TASKS_ARCHIVE, sessions/)
+* _Sessions 174-179_ : Ce fichier + `.agents/sessions/`
+* _Localisation des vagues_ : `.agents/backup/Y2026-sessions-001-125/` + `.agents/backup/Y2026-sessions-126-178/`
 
 '''
 

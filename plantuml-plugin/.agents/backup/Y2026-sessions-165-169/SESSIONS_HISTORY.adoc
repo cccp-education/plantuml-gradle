@@ -1,0 +1,80 @@
+= Historique des Sessions
+
+== Session 179 (2026-07-21) — EP-2 + EP-3 + Audit gouvernance + Rotation backup
+
+EP-2 tests production-close livré : workflow CI `real_llm_test.yml` (opt-in `workflow_dispatch`, secret `PLANTUML_REAL_CONTEXT_YML`, JDK 25, functionalTest + cucumberTest `@realllm`) + feature Cucumber `22_real_llm.feature` (3 scénarios `@realllm`) + fix bug `AmbiguousStepDefinitionsException` dans `RealLlmSteps.kt` (step `realOllamaInstanceIsRunningWithSmollmModel` redondant supprimé). Tag `@real-llm` → `@realllm` (sans trait d'union, fix découverte Cucumber). Filtre default `build.gradle.kts` mis à jour (`not @realllm`). EP-3 constaté déjà terminé (S176 — `FreemiumWeightCalculator` + 4/4 Cucumber `@freemium` PASS). PL-3 bloqué ABIDJAN (pas de plugin lint). Audit gouvernance : total EAGER 820→766 lignes. Rotation backup : 50→5 fichiers sessions (126-173 archivés dans `.agents/backup/Y2026-sessions-126-178/`), `SESSIONS_HISTORY.adoc` 130→75 lignes. Zéro code métier modifié. ✅
+
+== Session 178 (2026-07-21) — PL-2 KDoc Exhaustif + PL-3 ktlint/detekt
+
+PL-2 : KDoc exhaustif ajouté sur les 43 fichiers source du plugin (models, config, boundary, tasks, services, apikey, incremental). Baby-step : 4 lots de fichiers, compileKotlin après chaque lot. PL-3 : annulé — conventions-gradle (ABIDJAN) n'a pas de plugin ktlint/detekt. Aucun borough n'a de linting automatisé. Zéro code métier modifié (KDoc uniquement). ✅
+
+== Session 177 (2026-07-21) — PL-1 + PL-4 + EPIC G-03 + O-07 + K-06
+
+PL-1 : configurationCache = true (AsciidoctorJ 3.0.1 + Java 25), asciidoctor bundle retiré (zéro usage), timeout 60s→120s, compileKotlin ✅. PL-4 : lecture PLAN_GLOBAL.adoc → 3 EPICs cross-borough identifiés. G-03 : 7 fichiers gouvernance com.cheroliv→education.cccp migrés (ARCHITECTURE, TROUBLESHOOTING ×2, HISTORIQUE, README_truth_fr, finetuning-protocole, EPIC_CONSOLIDATION). O-07 : vérifié déjà fait (zéro engine dans INDEX.adoc). K-06 : PLAN_GLOBAL.adoc section plantuml mise à jour (177 sessions, tous EPICs terminés, Kover 83.26%, 2531 unitaires + 128 Cucumber). Gouvernance pure, zéro code métier modifié. ✅
+
+== Session 176 (2026-07-21) — QW-3 + EP-2 + EP-3
+
+Trois EPICs livrés en baby-step DDD/TDD/BDD. QW-3 : README_truth.adoc (version 0.0.5→0.0.1, plugin ID com.cheroliv→education.cccp, +3 sections i18n/Translation Boundary/Incremental), CHANGELOG.adoc (entrées EP-1, PLT-BOUNDARY, PLT-I18N, EPIC 13, CNV-6, BOM), PLUGIN_SELF_DOCUMENTATION.adoc (+Domaines Transverses). EP-2 : plantuml-real-context.example.yml (gitignored), LlmService.createChatModel() support plantuml.real.test=true, RealLlmSteps.kt (~150 lignes, steps @real-llm avec ensureOllama+assumeTrue). EP-3 : FreemiumWeightCalculator (9 tests unitaires, 9/9 PASS), TieredRotationStrategy (weight > tier quand freemium activé), ApiKeyPool + LangchainConfig.freemiumRatio + LlmService wiring, 4 Cucumber @freemium PASS. compileKotlin ✅, test ✅, publishToMavenLocal ✅. ✅
+
+== Session 175 (2026-07-20) — EP-1(c) RAG Reindex Incrémental dans CollectPlantumlIndexTask
+
+EP-1 incremental maturity 4/4 ✅. Baby-step DDD/TDD/BDD : (1) Unit — `IncrementalProcessor.shouldReindexPuml(pumlFile, promptsDir)` compare checksum du `.prompt` source avec checksum stocké. 3 tests : prompt changé → true, inchangé → false, pas de source → true. 10/10 IncrementalProcessorTest PASS. (2) Functional — `CollectPlantumlIndexTask.reindexRag()` partitionne les `.puml` via `shouldReindexPuml()` → `toReindex` / `skipped`. Log `collect.skipped_unchanged` pour chaque skip. `filteredDiagramFiles` passe aux 3 modes. Clé i18n ajoutée aux 11 fichiers `Messages_*.properties`. 6/6 CollectPlantumlIndexTaskUnitTest PASS, zéro régression. (3) Cucumber — 2 scénarios `@incremental-rag` ajoutés à `9_incremental_processing.feature` (prompt inchangé → skip, prompt modifié → reindex). 6 step definitions dans `RagPipelineSteps.kt`. Assertions `unchangedPromptsSkipped` renforcées. 2/2 PASS. compileKotlin ✅, test ✅, publishToMavenLocal ✅. ✅
+
+== Session 174 (2026-07-15) — Quick wins QW-1 + QW-2 + EP-1 incremental maturity 3/4
+
+Trois tâches en baby-step DDD/TDD/BDD. QW-1 : `validateDiagram()` parsing réel — le LLM était appelé mais la réponse jetée (score=8 hardcodé). Maintenant parsé en `ValidationFeedback` via `Jackson + KotlinModule`, fallback gracieux (score=5) si parse échoue. Clé i18n `processor.validation_parse_failed` ajoutée aux 10 langues + default. Fix régression `DiagramProcessorPrivateMethodsTest` (assertion `isValid`/`valid` avec KotlinModule). QW-2 : `api` → `implementation` — 8 dépendances migrées (jgit, commons-io, plantuml-ai, testcontainers, jackson×3, plantuml-engine). L'API publique du plugin n'expose que des `Property<String>` Gradle standard, aucune lib externe transitive. Zéro régression. EP-1 incremental maturity 3/4 : (d) events domaine sealed class `IncrementalEvent` (`PromptSkipped`, `PromptProcessed`, `OutputsCleaned`) + `onEvent()` listener pattern, (b) `IncrementalAuditLogger` trace horodatée + `IncrementalEventListener` fun interface, (a) `IncrementalConfig` (checksumsDir, auditLog, auditEnabled) câblé dans `PlantumlConfig`. +20 tests unitaires (32 domaine incremental), 0 régression, 122 Cucumber @incremental PASS, publishToMavenLocal OK. (c) RAG reindex restant. ✅
+
+== Sessions 126-173 (2026-04-22 → 2026-07-15) — Condensé
+
+_Sessions 126-178_ : `.agents/backup/Y2026-sessions-126-178/`
+_Details complets_ : `.agents/sessions/` (sessions 174-179)
+
+_Session 173_ (2026-07-15) : Consolidation backlog + code review audit. 7 pistes priorisées (QW-1/2/3, EP-1/2/3, PL-1..4). BACKLOG + TODO mis à jour. Gouvernance seule. ✅
+_Session 172_ (2026-07-15) : Incremental Processing domaine DDD (ChecksumStore + IncrementalProcessor, 14 tests), intégration GeneratePlantumlDiagramsTask (skip/cleanup/force), 5/5 Cucumber @incremental PASS, 122/122 Cucumber, 2508 unitaires, Kover 83.26%. ✅
+_Session 171_ (2026-07-14) : ApiKeyPoolSteps.kt (~330 lignes, 30+ steps), 18/18 feature 14 PASS. getNextRoundRobin() skip quota saturé (BDD Red→Green). Timeout 15min. 108 PASS. ✅
+_Session 170_ (2026-07-14) : Fix koverThresholdCheck (functionalTest exclu, 83.26% PASS) + Cucumber feature 15 i18n fixé (3→0 failures). ✅
+_Session 169_ (2026-07-11) : Kover main 92.93% ✅, koverThresholdCheck FAIL (agrégat 53.55%), Cucumber 26 failures timeout. Backlog vide. ✅
+_Session 168_ (2026-07-11) : BOM 0.0.1→0.0.8 (1 ligne). compileKotlin + test + publishToMavenLocal OK. Maintenance pure. ✅
+_Session 167_ (2026-07-09) : Fix Bug Feature 18 MessageFormat Quoting (1 ligne I18nErrorSteps.kt). 7/7 feature 18 PASS, 122/122 Cucumber. EPIC rattrapage i18n déjà terminé. ✅
+_Session 166_ (2026-07-09) : US-BND-7 Cucumber full pipeline end-to-end. 6 steps + 2 champs PlantumlWorld. 1312 unitaires, 12/12 Cucumber boundary PASS. EPIC PLT-BOUNDARY CLOTUREE 8/8 US. ✅
+_Session 165_ (2026-07-09) : US-BND-6 NonTranslatableTermRegistry (YAML configurable, TranslationResolver priorité PRESERVE). 6 tests + 3 resolver + 2 Cucumber. 1303 unitaires, 11/11 boundary PASS. ✅
+_Session 164_ (2026-07-09) : US-BND-5 DiagramProcessor structural strings i18n (resolver/language, applyStructuralLabels). 1303 unitaires, 9/9 boundary PASS. ✅
+_Session 163_ (2026-07-08) : Bug KG trié+fixé (assertion i18n kgparser.file_not_found) + cadrage EPIC PLT-BOUNDARY (8 US, ~26 pts, vision I18N_BOUNDARY_VISION.adoc). ✅
+_Session 162_ (2026-07-06) : EPIC 13 cross-provider fallback (CrossProviderFallbackOrchestrator, 5/5 functional, 5/5 Cucumber). 1235 unitaires. EPIC 13 TERMINÉ 6/6. ✅
+_Session 161_ (2026-07-06) : EPIC 13 TieredRotationStrategy (KeyTier, weight, 7 Cucumber + 5 functional + YAML schema + fallbackEnabled). 5/6 tâches. ✅
+_Session 160_ (2026-07-06) : Fix 5 tests unitaires régression + clôture EPIC PLT-I18N (28/28 pts, 1210/1210 tests). ✅
+_Session 159_ (2026-07-06) : US-I18N-6 Cucumber BDD (8/8 PASS) + 5 tests unitaires en régression (loadConfiguration cliParams). ✅ BDD / ⚠️ Unitaires
+_Session 158_ (2026-07-05) : Cadrage CNV-7 + report US-I18N-6 (bug junit-platform-params 6.0.3). ✅
+_Session 157_ (2026-07-05) : US-I18N-5 println cleanup → logger i18n (3 classes, zéro println résiduel). ✅
+_Session 156_ (2026-07-05) : US-I18N-4 Logger warn/error + exceptions i18n (8 classes, clé kg.validation_issues, feature 18). ✅
+_Session 155_ (2026-07-03) : CNV-6 Migration conventions plugins (build.gradle.kts 616→570, -46 lignes). ✅
+_Session 153_ (2026-06-24) : Architecture README Plugin + Consommateur (déplacement README.plugin → plantuml-plugin/). ✅
+_Session 152_ (2026-06-24) : US-I18N-7 README i18n — 20 fichiers README (10 langues × 2 audiences). ✅
+_Session 151_ (2026-06-15) : US-I18N-3 Logger Lifecycle Messages i18n (5 tasks, 66 logger.lifecycle → PlantumlMessages). ✅
+_Session 150_ (2026-06-15) : US-I18N-2 Task Descriptions i18n (PlantumlManager.resolveLanguage, 5 tasks). ✅
+_Session 149_ (2026-06-15) : Fix plugin ID + US-I18N-0 BDD + US-I18N-1 Messages (11 Messages*.properties, 100+ clés, 10 langues). ✅
+_Session 148_ (2026-06-15) : Cadrage EPIC PLT-I18N + US-0 Configuration Layer (PlantumlConfig.language/supportedLanguages, ConfigMerger 4 couches). ✅
+_Session 147_ (2026-06-11) : Publication Maven Central 0.0.1 (nmcp). ✅
+_Session 146_ (2026-06-02) : Borough-isation HTOWN 🚀, 23ème borough. ✅
+_Session 145_ (2026-05-19) : EPIC K-1 Renommage taxonomie (processPlantumlPrompts→generatePlantumlDiagrams). ✅
+_Session 144_ (2026-05-14) : CI Template test.yml, build OK. ✅
+_Session 143_ (2026-05-13) : Fix testcontainer fine-tune SmolLM2 (wait strategy, API trl 1.4.0). ✅
+_Session 142_ (2026-05-13) : Pipeline Fine-tuning SmolLM2-135M-Instruct (3ème couche test). ⚠️
+_Session 141_ (2026-05-07) : Migration chemins foundry/ → foundry/OSS/ dans INDEX.adoc. ✅
+_Session 139_ (2026-05-04) : Renommage gouvernance openclaw-codingame → quizz-benchmark-gradle. ✅
+_Session 137_ (2026-05-01) : EPIC 12 Cloture (BACKLOG + INDEX). ✅
+_Session 136_ (2026-05-01) : EPIC 12 Execution (6/6 tâches, PROCEDURES, @Ignore+raison, Kover 81.19%). ✅
+_Session 135_ (2026-05-01) : EPIC 12 Definition Consolidation (6 tâches planifiées). ✅
+_Session 134_ (2026-05-01) : EPIC 11 Tests Fonctionnels KG (15/15 PASS). EPIC 11 TERMINE. ✅
+_Session 133_ (2026-04-27) : EPIC 11 Article Blog Knowledge Graph (0106, 458 lignes, 10 diagrammes). ✅
+_Session 132_ (2026-04-27) : EPIC 10 Cloture + BACKLOG à jour. ✅
+_Session 131_ (2026-04-23) : EPIC 10 Diagrammes Architecture + Article Blog (0105). ✅
+_Session 130_ (2026-04-23) : EPIC 10 Tests Unitaires Renderer (15 tests, 40/40 PASS). ✅
+_Session 129_ (2026-04-23) : Git Commit graphify data (2 commits, 332 fichiers). ✅
+_Session 128_ (2026-04-23) : EPIC 10 Tests Fonctionnels + Renderer ameliore + Readmes. ✅
+_Session 127_ (2026-04-22) : EPIC 10 Tests Integration Graphify (380/380 PASS, 3 bugs fix). ✅
+_Session 126_ (2026-04-22) : Article blog fg (0104) + reflexion distillation IA. ✅
+
+→ _Sessions 1-125_ : `.agents/backup/Y2026-sessions-001-125/`
+→ _Sessions 126-178_ : `.agents/backup/Y2026-sessions-126-178/`
+→ _Details sessions 174-179_ : `.agents/sessions/`

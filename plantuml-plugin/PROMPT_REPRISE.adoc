@@ -1,22 +1,17 @@
-= PROMPT_REPRISE — Plantuml — Session 180
-:session: 180
+= PROMPT_REPRISE — Plantuml — Session 182
+:session: 182
 :date: 2026-07-22
 
-== État — EP-2 ✅, EP-3 ✅ (déjà fait S176), PL-3 ❌ (bloqué ABIDJAN)
+== État — Tous les EPICs métier terminés, plugin en maintenance
 
-Session 179 : EP-2 tests production-close livré (workflow CI `real_llm_test.yml`
-opt-in + feature Cucumber `22_real_llm.feature` 3 scénarios `@realllm` + fix bug
-`AmbiguousStepDefinitionsException` dans `RealLlmSteps.kt`). EP-3 constaté déjà
-terminé (S176). Rotation backup sessions 126-178 (50→5 fichiers, HISTORY 130→75).
-Audit gouvernance : total EAGER 766 lignes.
+Session 181 : QW-3 terminé. README_truth.adoc (EN+FR) mis à jour (version 0.0.2,
+groupId education.cccp, i18n, Translation Boundary, Incremental Processing,
+Multi-Provider Pool). CHANGELOG.adoc enrichi (EP-1/2/3, 0.0.2, PL-1/2, BOM 0.0.11).
+Consommateurs (message.md, run-debug-output-real.sh) corrigés groupId + noms tâches.
 
-== Mission session 180 — Rotation backup (multiple de 10)
+== Mission session 182 — Maintenance
 
-Session 180 = multiple de 10 → rotation backup obligatoire.
-Vérifier total EAGER, archiver si > 500 lignes.
-Autres pistes restantes :
-- PL-3 : ktlint/detekt — dépend ABIDJAN (bloqué)
-- QW-3 : README_truth.adoc + CHANGELOG.adoc (gardé pour autre jour)
+Backlog vide. Tous les EPICs métier terminés. Plugin en maintenance.
 
 == Backlog — priorisé
 
@@ -24,7 +19,6 @@ Autres pistes restantes :
 |===
 | Priorité | Tâche | Est.
 | 🟡 PL-3 | ktlint ou detekt | dépend ABIDJAN
-| 🟢 QW-3 | README_truth.adoc + CHANGELOG.adoc | ~1h
 |===
 
 == Méthodologie
@@ -35,11 +29,11 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 == Rappels
 
 - GroupId: education.cccp.plantuml
-- Version publiée: 0.0.2 (Maven Central, bundle 92463d37, propagation en cours)
-- BOM: `workspace-bom:0.0.11` ✅ (constraint plantuml 0.0.2)
+- Version publiée: 0.0.2 (Maven Central, bundle 92463d37)
+- BOM: `workspace-bom:0.0.11` ✅
 - `publishToMavenLocal` obligatoire après modif code plugin
 - Kover main: 83.26% INSTRUCTION ✅ ≥ 75%
 - Cucumber: 128 PASS, 0 FAIL, 9 SKIP (+ 3 @realllm SKIPPED si Ollama absent)
 - Configuration Cache: activé ✅
 - Tous les EPICs métier terminés
-- Voir `sessions/179-ep2-ep3-audit-rotation.adoc`
+- Voir `sessions/181-qw3-readme-changelog.adoc`

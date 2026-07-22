@@ -5,7 +5,7 @@
 :icons: font
 :lang: fr
 :hardbreaks-option:
-:plugin-version: 0.0.0
+:plugin-version: 0.0.2
 
 ++++
 <p align="right">
@@ -22,9 +22,10 @@ image:https://img.shields.io/badge/Licence-Apache%202.0-blue.svg[Licence]
 
 == Description
 
-`com.cheroliv.plantuml` est un plugin Gradle qui encapsule l'intégralité du cycle de vie de génération de diagrammes *PlantUML* via des LLM.
+`education.cccp.plantuml` est un plugin Gradle qui encapsule l'intégralité du cycle de vie de génération de diagrammes *PlantUML* via des LLM.
 Il expose un DSL minimal au consommateur et gère en interne toute la configuration des dépôts, dépendances et tâches.
 Il intègre un pipeline RAG (Retrieval-Augmented Generation) pour la génération automatisée de diagrammes PlantUML via plusieurs fournisseurs LLM.
+Supporte 10 langues (EN, ZH, HI, ES, FR, AR, BN, PT, RU, UR) avec une frontière de traduction intelligente (étiquettes de présentation traduites, identité sémantique préservée, lexique métier traité idiomatiquement).
 
 == Version actuelle : {plugin-version}
 
@@ -734,7 +735,7 @@ rootProject.name = "nom-de-votre-projet"
 [source,kotlin]
 ----
 plugins { 
-    id("com.cheroliv.plantuml") version "1.2026.0"
+    id("education.cccp.plantuml") version "0.0.2"
 }
 
 plantuml {

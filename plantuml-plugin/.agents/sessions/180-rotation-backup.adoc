@@ -1,0 +1,30 @@
+= Session 180 — Rotation Backup (multiple de 10)
+:session: 180
+:date: 2026-07-22
+:type: governance
+:score: 9/10
+
+== Contexte
+
+Session 180 = multiple de 10 → rotation backup obligatoire (règle AGENT.adoc).
+EAGER total = 3405 lignes (>> 500 seuil). Déclenchement automatique.
+
+== Actions
+
+. Snapshot complet → `.agents/backup/Y2026-sessions-165-169/` (INDEX, SESSIONS_HISTORY, COMPLETED_TASKS_ARCHIVE_2026-07, 6 sessions 174-179)
+. INDEX.adoc tronqué → 10 dernières sessions (171-180)
+. SESSIONS_HISTORY.adoc tronqué → 10 dernières sessions (171-180)
+. COMPLETED_TASKS_ARCHIVE_2026-07.adoc tronqué → entrées récentes uniquement
+. PROMPT_REPRISE.adoc → Session 181 (QW-3 README_truth + CHANGELOG)
+. Localisation vagues mise à jour dans INDEX.adoc
+
+== Résultat
+
+- EAGER réduit de 3405 → ~800 lignes
+- 3 vagues de backup : Y2026-sessions-001-125, Y2026-sessions-126-178, Y2026-sessions-165-169
+- Sessions actives : 171-180 (10 sessions)
+- Zéro code métier modifié
+
+== Prochaine session
+
+Session 181 — QW-3 README_truth.adoc + CHANGELOG.adoc (mise à jour avec i18n, Translation Boundary, Incremental Processing, EP-1/2/3)

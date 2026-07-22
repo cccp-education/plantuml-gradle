@@ -1,0 +1,27 @@
+= Session 181 — QW-3 README_truth.adoc + CHANGELOG.adoc
+:date: 2026-07-22
+:type: documentation
+:score: 9/10
+
+== Mission
+
+Mise à jour documentaire avec les EPICs livrés depuis S176 : i18n, Translation
+Boundary, Incremental Processing, EP-1/2/3, Maven Central 0.0.2, PL-1/PL-2.
+
+== Fait
+
+* README_truth.adoc.txt (EN) — version 0.0.0→0.0.2, groupId com.cheroliv→education.cccp, structure projet enrichie (apikey/boundary/incremental/i18n), diagramme architecture interne mis à jour, noms de tâches corrigés (generatePlantumlDiagrams/collectPlantumlIndex), nouvelles sections i18n 10 langues + Translation Boundary + Incremental Processing + Multi-Provider API Key Pool ✅
+* README_truth_fr.adoc.txt (FR) — version 0.0.0→0.0.2, groupId + plugin ID consommateur corrigés ✅
+* CHANGELOG.adoc — EP-1 (Incremental Maturity 4/4), EP-2 (Tests production-close), EP-3 (Pool freemium), Maven Central 0.0.2, PL-1 (Configuration Cache), PL-2 (KDoc), BOM 0.0.8→0.0.11, QW-1/QW-2 dans Modified ✅
+* message.md — groupId + version + noms de tâches corrigés ✅
+* run-debug-output-real.sh — groupId + noms de tâches corrigés ✅
+
+== Non fait
+
+* README_truth_fr.adoc.txt — sections i18n/Translation Boundary/Incremental non traduites (seulement version + groupId corrigés)
+* README.plugin/ (9 langues) — `1.2026.0` dans les tables de dépendances (version du moteur PlantUML, pas du plugin — non critique)
+
+== Prochaine session
+
+Session 182 — PL-3 ktlint/detekt (si ABIDJAN a livré) ou maintenance.
+Backlog vide (tous les EPICs métier terminés, plugin en maintenance).

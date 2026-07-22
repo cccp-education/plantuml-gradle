@@ -6,7 +6,7 @@ mkdir -p test-project-real
 # Create build.gradle.kts
 cat > test-project-real/build.gradle.kts << 'EOF'
 plugins {
-    id("com.cheroliv.plantuml")
+    id("education.cccp.plantuml")
 }
 EOF
 
@@ -24,7 +24,7 @@ mkdir -p test-project-real/generated/rag
 
 # Run the task and capture output
 echo "=== Output for empty directory ==="
-./gradlew -p test-project-real reindexPlantumlRag --stacktrace
+./gradlew -p test-project-real collectPlantumlIndex --stacktrace
 echo "=================================="
 
 # Create a RAG directory with one file
@@ -34,7 +34,7 @@ class Test
 
 # Run the task and capture output
 echo "=== Output for directory with one file ==="
-./gradlew -p test-project-real reindexPlantumlRag --stacktrace
+./gradlew -p test-project-real collectPlantumlIndex --stacktrace
 echo "=========================================="
 
 # Clean up

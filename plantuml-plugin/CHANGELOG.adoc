@@ -25,6 +25,17 @@ et ce projet adhère au versionnage sémantique link:https://semver.org/spec/v2.
   events domaine (`PromptSkipped`/`PromptProcessed`/`OutputsCleaned`).
   Intégré dans `GeneratePlantumlDiagramsTask` et `CollectPlantumlIndexTask`
   (RAG reindex incrémental). 35 tests unitaires, 7 Cucumber PASS.
+* **Incremental Maturity (EP-1)** : events domaine sealed class,
+  `IncrementalAuditLogger` (traçabilité horodatée), `IncrementalConfig`
+  YAML (checksumsDir, auditLog, auditEnabled), RAG reindex incrémental
+  dans `CollectPlantumlIndexTask` (delta uniquement). 4/4 US terminés.
+* **Tests production-close (EP-2)** : workflow CI `real_llm_test.yml`
+  opt-in + feature Cucumber `22_real_llm.feature` (3 scénarios `@realllm`).
+  `plantuml-real-context.example.yml` + `LlmService.createChatModel()`
+  + `RealLlmSteps.kt`. Parameter CLI `-Pplantuml.real.test=true`.
+* **Pool freemium ratio dynamique (EP-3)** : `FreemiumWeightCalculator`
+  (poids basés sur quota réel), intégré dans `TieredRotationStrategy`.
+  9 tests unitaires, 4 Cucumber `@freemium` PASS.
 * **Multi-provider API Pool (EPIC 13)** : `KeyTier` (ENTERPRISE/PRO/FREE),
   `TieredRotationStrategy` (descente de tier si quota saturé),
   `CrossProviderFallbackOrchestrator` (fallback inter-provider).
@@ -33,11 +44,15 @@ et ce projet adhère au versionnage sémantique link:https://semver.org/spec/v2.
   `KnowledgeGraphRenderer`, `GenerateKnowledgeGraphDiagramTask` —
   diagramme PlantUML déterministe (sans LLM) depuis `graphify-out/graph.json`.
   380/380 tests PASS.
-* **Publication Maven Central** : `education.cccp:plantuml-plugin:0.0.1`
+* **Publication Maven Central 0.0.2** : `education.cccp:plantuml-plugin:0.0.2`
+  publié via nmcp (Central Portal, bundle 92463d37). Kover seuil 75%.
+* **Publication Maven Central 0.0.1** : `education.cccp:plantuml-plugin:0.0.1`
   publié via nmcp (Central Portal). Kover seuil 75%.
 * **Conventions plugins (CNV-6)** : migration vers `education.cccp.build.*`
   v0.0.1 (gradle-plugin + publishing). build.gradle.kts -46 lignes.
-* **BOM upgrade** : `workspace-bom:0.0.1` → `0.0.8`.
+* **BOM upgrade** : `workspace-bom:0.0.1` → `0.0.11`.
+* **Configuration Cache** : `configurationCache = true` (PL-1), asciidoctor retiré.
+* **KDoc exhaustif** : 43 fichiers source documentés (PL-2).
 * **README i18n** : 20 fichiers README (10 langues × consommateur + plugin),
   badges Maven Central/Portal/CI/License, switcher i18n, AR/UR RTL.
 
@@ -45,6 +60,7 @@ et ce projet adhère au versionnage sémantique link:https://semver.org/spec/v2.
 
 * **ApiKeyPool** : `getNextRoundRobin()` skip quota saturé (BDD Red→Green).
 * **DiagramProcessor** : chaînes structurelles i18nisées via `TranslationResolver`.
+  `validateDiagram()` parsing réel (Jackson + KotlinModule + fallback gracieux).
 * **KnowledgeGraphRenderer** : étiquettes structurelles i18nisées, identifiants préservés.
 * **CollectPlantumlIndexTask** : RAG reindex incrémental (delta uniquement).
 * **GeneratePlantumlDiagramsTask** : skip unchanged prompts via checksum,
@@ -52,6 +68,7 @@ et ce projet adhère au versionnage sémantique link:https://semver.org/spec/v2.
 * **ConfigMerger** : ajout couche `language` + `supportedLanguages`.
 * **PlantumlConfig** : ajout `language`, `supportedLanguages`, `incremental`.
 * **PlantumlExtension** : DSL `language` + `supportedLanguages`.
+* **build.gradle.kts** : `api` → `implementation` (8 dépendances migrées, API surface nettoyée).
 
 === Corrigé
 

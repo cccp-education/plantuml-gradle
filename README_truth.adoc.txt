@@ -5,7 +5,7 @@
 :icons: font
 :lang: en
 :hardbreaks-option:
-:plugin-version: 0.0.0
+:plugin-version: 0.0.2
 
 ++++
 <p align="right">
@@ -22,9 +22,10 @@ image:https://img.shields.io/badge/License-Apache%202.0-blue.svg[License]
 
 == Description
 
-`com.cheroliv.plantuml` is a Gradle plugin that encapsulates the full lifecycle of *PlantUML* diagram generation via LLMs.
+`education.cccp.plantuml` is a Gradle plugin that encapsulates the full lifecycle of *PlantUML* diagram generation via LLMs.
 It exposes a minimal DSL to the consumer and handles all repository, dependency, and task configuration internally.
 It integrates a RAG (Retrieval-Augmented Generation) pipeline for automated PlantUML diagram generation via multiple LLM providers.
+Supports 10 languages (EN, ZH, HI, ES, FR, AR, BN, PT, RU, UR) with intelligent translation boundary (presentation labels translated, semantic identity preserved, domain lexicon handled idiomatically).
 
 == Current version: {plugin-version}
 
@@ -47,15 +48,23 @@ plantuml-gradle/
 │   │   │   ├── PlantumlExtension.kt      # Plugin extension for configuration
 │   │   │   ├── PlantumlConfig.kt         # Configuration data classes
 │   │   │   ├── models.kt                 # Data models (PromptContext, DiagramConfiguration, Git…)
+│   │   │   ├── kgmodels.kt               # Knowledge Graph data models
 │   │   │   ├── PlantumlManager.kt        # All plugin logic — nested objects
-│   │   │   └── tasks/
-│   │   │       ├── ProcessPlantumlPromptsTask.kt  # Main task for processing prompts
+│   │   │   ├── PlantumlMessages.kt       # i18n message bundle (ResourceBundle + MessageFormat)
+│   │   │   ├── ConfigLoader.kt           # YAML configuration loader
+│   │   │   ├── ConfigMerger.kt           # 4-layer config merge (CLI > env > YAML > gradle.properties)
+│   │   │   ├── apikey/                   # API key pool with rotation, tiers, cross-provider fallback
+│   │   │   ├── boundary/                 # Translation boundary domain (3 natures, 3 strategies)
+│   │   │   ├── incremental/              # Incremental processing (checksum-based skip, audit log)
+│   │   │   ├── service/                  # Core services (LLM, PlantUML, RAG, KG, Graphify)
+│   │   │   └── tasks/                    # Gradle tasks
+│   │   │       ├── GeneratePlantumlDiagramsTask.kt  # Main task for processing prompts
 │   │   │       ├── ValidatePlantumlSyntaxTask.kt   # Syntax validation task
-│   │   │       └── ReindexPlantumlRagTask.kt       # RAG reindexing task
-│   │   ├── main/kotlin/plantuml/service/
-│   │   │   ├── PlantumlService.kt        # PlantUML processing and validation service
-│   │   │   └── DiagramProcessor.kt       # Core processor for LLM interaction and diagram refinement
-│   │   ├── test/kotlin/                  # Unit + Cucumber tests
+│   │   │       ├── CollectPlantumlIndexTask.kt     # RAG reindexing task
+│   │   │       ├── GenerateKnowledgeGraphDiagramTask.kt  # KG diagram (deterministic, no LLM)
+│   │   │       └── GenerateDiagramDocsTask.kt      # Dogfooding documentation diagrams
+│   │   ├── main/resources/i18n/          # 10 language message bundles
+│   │   ├── test/kotlin/                  # Unit + Cucumber tests (2537 unit, 128 Cucumber)
 │   │   └── functionalTest/kotlin/        # GradleTestKit functional tests
 │   └── build.gradle.kts                  # Plugin build script
 ├── gradle/
@@ -78,9 +87,9 @@ package "PlantUML Plugin" {
   [PlantumlManager] as manager
 
   package "Tasks" {
-    [ProcessPlantumlPromptsTask] as processTask
+    [GeneratePlantumlDiagramsTask] as processTask
     [ValidatePlantumlSyntaxTask] as validateTask
-    [ReindexPlantumlRagTask] as reindexTask
+    [CollectPlantumlIndexTask] as reindexTask
     [GenerateKnowledgeGraphDiagramTask] as kgTask
     [GenerateDiagramDocsTask] as docsTask
   }
@@ -95,6 +104,26 @@ package "PlantUML Plugin" {
     [GraphifyPromptAdapter] as gpa
   }
 
+  package "API Key Pool" {
+    [ApiKeyPool] as pool
+    [TieredRotationStrategy] as tiered
+    [CrossProviderFallbackOrchestrator] as cross
+    [FreemiumWeightCalculator] as freemium
+  }
+
+  package "Translation Boundary" {
+    [TranslationResolver] as resolver
+    [TextClassifier] as classifier
+    [IdiomaticGlossary] as glossary
+    [NonTranslatableTermRegistry] as registry
+  }
+
+  package "Incremental Processing" {
+    [IncrementalProcessor] as inc
+    [ChecksumStore] as checksum
+    [IncrementalAuditLogger] as audit
+  }
+
   plugin --> manager : delegates logic
   manager --> processTask : registers
   manager --> validateTask : registers
@@ -102,14 +131,22 @@ package "PlantUML Plugin" {
   manager --> kgTask : registers
   manager --> docsTask : registers
   processTask --> processor : uses
+  processTask --> inc : skip unchanged
   processor --> llm : uses
   processor --> service : uses
+  processor --> resolver : i18n structural strings
   validateTask --> service : uses
   reindexTask --> rag : uses
+  reindexTask --> inc : delta reindex
   kgTask --> kgParser : uses
   kgTask --> kgRenderer : uses
   kgTask --> service : uses
+  kgRenderer --> resolver : i18n labels
   docsTask --> gpa : uses
+  llm --> pool : uses
+  pool --> tiered : uses
+  pool --> cross : uses
+  pool --> freemium : uses
 }
 
 collections "graphify-out/graph.json" as kgJson
@@ -124,6 +161,11 @@ end note
 note right of kgTask
   Deterministic pipeline —
   no LLM required
+end note
+
+note right of inc
+  SHA-256 checksum-based
+  skip + cleanup + audit
 end note
 
 @enduml
@@ -277,17 +319,17 @@ plantuml {
 |===
 | Task | Group | Description
 
-| `processPlantumlPrompts`
+| `generatePlantumlDiagrams`
 | plantuml
-| Processes PlantUML prompts and generates diagrams
+| Processes PlantUML prompts and generates diagrams (incremental: skip unchanged via SHA-256 checksum)
 
 | `validatePlantumlSyntax`
 | plantuml
 | Validates PlantUML syntax for debugging
 
-| `reindexPlantumlRag`
+| `collectPlantumlIndex`
 | plantuml
-| Rebuilds the RAG index with collected PlantUML diagrams
+| Rebuilds the RAG index with collected PlantUML diagrams (delta reindex via incremental processor)
 
 | `generateKnowledgeGraphDiagram`
 | plantuml
@@ -692,7 +734,7 @@ rootProject.name = "your-project-name"
 [source,kotlin]
 ----
 plugins { 
-    id("com.cheroliv.plantuml") version "1.2026.0"
+    id("education.cccp.plantuml") version "0.0.2"
 }
 
 plantuml {
@@ -764,6 +806,83 @@ Declaring `configurationCache = false` ensures compatibility and honest reportin
 * Configuration Cache support
 * Web UI for viewing and managing generated diagrams
 * Advanced RAG features for better diagram suggestions
+
+== Internationalization (i18n) — 10 Languages
+
+The plugin supports 10 languages via `PlantumlMessages` (ResourceBundle + MessageFormat).
+Language is resolved through the 4-layer ConfigMerger cascade: CLI > env vars > YAML > gradle.properties.
+
+[cols="1,2"]
+|===
+| Language | Code
+| English | `en`
+| Chinese Mandarin | `zh`
+| Hindi | `hi`
+| Spanish | `es`
+| French | `fr`
+| Arabic Standard | `ar`
+| Bengali | `bn`
+| Portuguese | `pt`
+| Russian | `ru`
+| Urdu | `ur`
+|===
+
+[source,bash]
+----
+# Override language via CLI
+./gradlew generatePlantumlDiagrams -Pplantuml.language=fr
+
+# Override via environment variable
+export PLANTUML_LANGUAGE=zh
+./gradlew generatePlantumlDiagrams
+----
+
+=== Translation Boundary
+
+The plugin distinguishes 3 text natures with 3 strategies:
+
+[cols="1,3,2"]
+|===
+| Nature | Examples | Strategy
+| Presentation | `"Classes"`, `"Files"`, `"Empty Knowledge Graph"` | TRANSLATE (via Messages_*.properties)
+| Semantic Identity | `LlmService`, `community_0`, formulas | PRESERVE (as-is)
+| Domain Lexicon | `pipeline`, `rollback`, `dependency injection` | TRANSLATE or BORROW (idiomatic glossary)
+|===
+
+Configurable via YAML: `idiomatic-glossary.yml` and `non-translatable-terms.yml`.
+
+== Incremental Processing
+
+The plugin avoids redundant LLM calls by tracking SHA-256 checksums of prompts.
+Only the delta is processed — never the entire set.
+
+[source,bash]
+----
+# Force reprocess all prompts (bypass checksum)
+./gradlew generatePlantumlDiagrams --rerun-tasks
+----
+
+Components:
+* `ChecksumStore` — persists SHA-256 checksums
+* `IncrementalProcessor` — compare, skip, cleanup, emit domain events
+* `IncrementalConfig` — YAML: `checksumsDir`, `auditLog`, `auditEnabled`
+* `IncrementalAuditLogger` — timestamped decision trace
+* Domain events — `PromptSkipped`, `PromptProcessed`, `OutputsCleaned`
+
+RAG reindex is also incremental: `collectPlantumlIndex` only reindexes diagrams whose prompt changed.
+
+== Multi-Provider API Key Pool
+
+The plugin manages API keys with tiered rotation and cross-provider fallback:
+
+* **KeyTier** — ENTERPRISE (3), PRO (2), FREE (1)
+* **TieredRotationStrategy** — Enterprise > Pro > Free, intra-tier by weight
+* **CrossProviderFallbackOrchestrator** — Gemini Pro → Mistral Free → Ollama
+* **FreemiumWeightCalculator** — dynamic weights based on real quota ratios
+* **QuotaTracker** + **QuotaResetManager** — per-key quota tracking with auto-reset
+* **QuotaAuditLogger** — rotation audit trail
+
+7 providers supported: Ollama, OpenAI, Gemini, Mistral AI, Claude, HuggingFace, Groq.
 
 == License
 This project is licensed under the Apache 2.0 License – see the `LICENSE` file.

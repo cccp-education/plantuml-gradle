@@ -1,0 +1,73 @@
+= Session 176 — QW-3 + EP-2 + EP-3
+:session: 176
+:date: 2026-07-21
+:score: 9/10
+
+== Résumé
+
+Trois EPICs livrés en baby-step DDD/TDD/BDD, agile software craftsmanship.
+QW-3 (documentation), EP-2 (tests production-close real-llm), EP-3 (pool
+freemium ratio dynamique). 9 tests unitaires + 4 Cucumber @freemium PASS.
+compileKotlin ✅, test ✅, publishToMavenLocal ✅.
+
+== QW-3 — README_truth.adoc + CHANGELOG.adoc + PLUGIN_SELF_DOCUMENTATION.adoc
+
+=== Fait
+- `README_truth.adoc.txt` : version 0.0.5→0.0.1, plugin ID `com.cheroliv`→`education.cccp` ✅
+- `README_truth.adoc.txt` : +3 sections (i18n 10 langues, Translation Boundary, Incremental Processing) ✅
+- `README_truth.adoc.txt` : roadmap actualisée (✅ i18n, ✅ Translation Boundary, ✅ Incremental, ✅ EPIC 13, ✅ Maven Central) ✅
+- `CHANGELOG.adoc` : entrées pour i18n, PLT-BOUNDARY, Incremental Processing, EPIC 13, CNV-6, BOM upgrade, publication Maven Central, corrections ✅
+- `PLUGIN_SELF_DOCUMENTATION.adoc` : +section Domaines Transverses (architecture i18n + incremental, diagrammes PlantUML, impact pipeline) ✅
+
+== EP-2 — Tests production-close (real-llm)
+
+=== Fait
+- `plantuml-real-context.example.yml` créé (template gitignored pour credentials réels) ✅
+- `.gitignore` : `plantuml-real-context.yml` ajouté ✅
+- `LlmService.createChatModel()` : support `plantuml.real.test=true` — bypass null guard en test mode ✅
+- `RealLlmSteps.kt` créé (~150 lignes) : step definitions pour `@real-llm` Cucumber scenarios ✅
+  - `ensureOllama()` + `assumeTrue()` pour skip si Ollama indisponible
+  - Steps : real Ollama instance, prompt file multiline, generatePlantumlDiagrams/validatePlantumlSyntax/collectPlantumlIndex avec real LLM
+  - Assertions : valid diagram, PNG, embeddings, prompt deleted, BUILD SUCCESSFUL
+- Steps renommés pour éviter collisions avec steps mock existants (LlmProvidersSteps, RagPipelineSteps, PlantUmlProcessingSteps, DiagramTypesSteps) ✅
+
+== EP-3 — Pool freemium ratio dynamique
+
+=== Fait
+- `FreemiumWeightCalculator.kt` créé (domaine DDD) — calcule poids dynamique basé sur quota restant + ratio freemium ✅
+  - `freemiumRatio ∈ [0.0, 1.0]` : 0.0 = désactivé, 1.0 = 100% FREE
+  - FREE keys : `weight × remainingRatio × freemiumRatio`
+  - ENTERPRISE/PRO keys : `weight × remainingRatio × (1 - freemiumRatio)`
+  - Floor à 0 quand quota épuisé
+- `FreemiumWeightCalculatorTest.kt` (9 tests unitaires) — 9/9 PASS ✅
+- `TieredRotationStrategy` modifié : quand freemium activé, weight > tier (comparateur primaire) ✅
+- `ApiKeyPool` : param `freemiumRatio: Double = 0.0`, câblé dans `TieredRotationStrategy` ✅
+- `LangchainConfig.freemiumRatio: Double = 0.0` (YAML schema) ✅
+- `LlmService.initializeApiKeyPools()` : passe `freemiumRatio` à chaque `ApiKeyPool` ✅
+- `14_api_key_pool.feature` : +4 scénarios `@freemium` ✅
+- `ApiKeyPoolSteps.kt` : +5 step definitions freemium (poolWithFreeKeysAndEnterpriseKey, poolWithFreeKeys, freemiumRatioIs, thePoolIsInitializedWithTieredStrategy, theEnterpriseKeyShouldBeSelected, aFreeKeyShouldBeSelected) ✅
+- 4/4 Cucumber @freemium PASS ✅
+- Suite unitaire apikey complète verte (zéro régression) ✅
+
+== Fichiers modifiés
+
+- `README_truth.adoc.txt` — version, plugin ID, +3 sections, roadmap
+- `CHANGELOG.adoc` — entrées complètes
+- `PLUGIN_SELF_DOCUMENTATION.adoc` — +Domaines Transverses
+- `plantuml-real-context.example.yml` — nouveau
+- `.gitignore` — +plantuml-real-context.yml
+- `src/main/kotlin/plantuml/service/LlmService.kt` — real.test + freemiumRatio
+- `src/main/kotlin/plantuml/apikey/FreemiumWeightCalculator.kt` — nouveau
+- `src/main/kotlin/plantuml/apikey/TieredRotationStrategy.kt` — weightCalculator
+- `src/main/kotlin/plantuml/apikey/ApiKeyPool.kt` — freemiumRatio
+- `src/main/kotlin/plantuml/models.kt` — LangchainConfig.freemiumRatio
+- `src/test/kotlin/plantuml/apikey/FreemiumWeightCalculatorTest.kt` — nouveau (9 tests)
+- `src/test/scenarios/plantuml/scenarios/RealLlmSteps.kt` — nouveau (~150 lignes)
+- `src/test/scenarios/plantuml/scenarios/ApiKeyPoolSteps.kt` — +freemium steps
+- `src/test/features/14_api_key_pool.feature` — +4 scénarios @freemium
+
+== Prochaine session
+
+- PL-1 : Configuration Cache réévaluation
+- PL-4 : Consulter PLAN_GLOBAL.adoc
+- Voir BACKLOG.adoc §"Polish"
