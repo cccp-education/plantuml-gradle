@@ -2,21 +2,13 @@ package plantuml.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import plantuml.PlantumlMessages
+import plantuml.rag.DocKnowledgeBase
 import java.io.File
 
-/**
- * Generates PlantUML prompt files from a graphify knowledge graph JSON.
- *
- * Reads `graph.json` produced by graphify-gradle and creates `.prompt` files
- * for each community (subgraph), enabling automated diagram generation via
- * [GeneratePlantumlDiagramsTask].
- *
- * @param graphFile Path to the graphify `graph.json` output
- * @param promptsDir Directory where generated `.prompt` files are written
- */
 class GraphifyPromptAdapter(
     private val graphFile: File,
-    private val promptsDir: File
+    private val promptsDir: File,
+    private val docKnowledgeBase: DocKnowledgeBase = DocKnowledgeBase.forPlantUML(),
 ) {
 
     private val mapper = ObjectMapper()
@@ -90,8 +82,16 @@ class GraphifyPromptAdapter(
         nodes: List<String>,
         edges: List<String>
     ): String {
-        return """
-Generate a PlantUML class diagram for the "$communityName" module of the plantuml-gradle plugin.
+        val queryText = "class diagram component $communityName ${nodes.joinToString(" ")}"
+        val docContext = docKnowledgeBase.queryContext(queryText)
+        val docSection = if (docContext.isNotBlank()) {
+            """PlantUML syntax reference (use ONLY valid PlantUML syntax):
+$docContext
+
+"""
+        } else ""
+
+        return """${docSection}Generate a PlantUML class diagram for the "$communityName" module of the plantuml-gradle plugin.
 
 Classes and their relationships:
 

@@ -1,0 +1,362 @@
+= PlantUML Language Reference Guide
+
+== Diagram Types
+
+PlantUML supports multiple diagram types:
+
+* Sequence diagrams (`@startuml` / `@enduml`)
+* Class diagrams
+* Component diagrams
+* Activity diagrams
+* Use case diagrams
+* State diagrams
+* Object diagrams
+* Deployment diagrams
+* Timing diagrams
+* Mind maps (`@startmindmap` / `@endmindmap`)
+* Gantt charts
+* Work Breakdown Structure (WBS)
+* Network diagrams (nwdiag)
+* Wireframe diagrams (salt)
+* JSON/YAML data visualization
+
+== Basic Syntax
+
+Every diagram starts with `@startuml` and ends with `@enduml`:
+
+```
+@startuml
+' diagram content here
+@enduml
+```
+
+== Sequence Diagrams
+
+```
+@startuml
+actor User
+participant "Web Server" as WS
+database "Database" as DB
+
+User -> WS : Request
+WS -> DB : Query
+DB --> WS : Result
+WS --> User : Response
+
+alt success
+  WS -> User : 200 OK
+else failure
+  WS -> User : 500 Error
+end
+
+group Authentication
+  User -> WS : Login
+  WS -> User : Token
+end
+
+note right of WS: Server processes request
+note over User, DB: End-to-end flow
+@enduml
+```
+
+Arrow types:
+* `->` — solid arrow
+* `-->` — dashed arrow
+* `->>` — solid arrow with open head
+* `-->>` — dashed arrow with open head
+* `-x` — solid arrow with X head
+* `--x` — dashed arrow with X head
+* `-o` — solid arrow with circle head
+* `--o` — dashed arrow with circle head
+
+== Component Diagrams
+
+```
+@startuml
+skinparam componentStyle rectangle
+
+package "Frontend" {
+  component "Web App" as web
+  component "Mobile App" as mobile
+}
+
+package "Backend" {
+  component "API Gateway" as gateway
+  component "Auth Service" as auth
+  database "PostgreSQL" as db
+}
+
+web --> gateway : REST
+mobile --> gateway : REST
+gateway --> auth : JWT
+gateway --> db : SQL
+@enduml
+```
+
+== Activity Diagrams
+
+```
+@startuml
+start
+:Initialize;
+if (Valid?) then (yes)
+  :Process;
+  :Complete;
+else (no)
+  :Error;
+  stop
+endif
+:Continue;
+stop
+@enduml
+```
+
+Activity keywords:
+* `start` / `stop` — begin/end
+* `:Activity;` — activity node
+* `if (condition?) then (yes)` / `else (no)` / `endif` — branching
+* `repeat` / `repeat while (condition?)` — loops
+* `partition "Name" { ... }` — swimlanes
+* `note right` / `note left` — annotations
+
+== Class Diagrams
+
+```
+@startuml
+class User {
+  +String name
+  +String email
+  +login()
+  +logout()
+}
+
+class Order {
+  +UUID id
+  +Date created
+  +submit()
+}
+
+User "1" -- "*" Order : places
+@enduml
+
+Relations:
+* `--` — association (solid)
+* `..` — dependency (dashed)
+* `--|>` — inheritance
+* `..|>` — realization
+* `*--` — composition
+* `o--` — aggregation
+
+Visibility:
+* `+` public
+* `-` private
+* `#` protected
+* `~` package-private
+```
+
+== State Diagrams
+
+```
+@startuml
+[*] --> Draft
+Draft --> Review : submit
+Review --> Published : approve
+Review --> Draft : reject
+Published --> [*]
+@enduml
+```
+
+== Use Case Diagrams
+
+```
+@startuml
+actor User
+actor Admin
+
+usecase "Login" as UC1
+usecase "Manage Users" as UC2
+
+User --> UC1
+Admin --> UC2
+Admin --> UC1
+@enduml
+```
+
+== Mind Maps
+
+```
+@startmindmap
+* Root
+** Branch 1
+*** Leaf 1.1
+*** Leaf 1.2
+** Branch 2
+*** Leaf 2.1
+@endmindmap
+
+left side / right side for positioning:
+@startmindmap
+* Center
+left side
+** Left Item
+right side
+** Right Item
+@endmindmap
+```
+
+== Styling
+
+Skinparam (global style):
+```
+@startuml
+skinparam backgroundColor #FEFEFE
+skinparam componentStyle rectangle
+skinparam ActivityBackgroundColor #E8F4FD
+skinparam ActivityBorderColor #2C3E50
+@enduml
+```
+
+Individual styling:
+```
+@startuml
+component "My Component" as comp #LightBlue
+database "My DB" as db #LightGray
+actor User #LightGreen
+@enduml
+```
+
+Colors: `#HEXCODE`, `#RGB`, or named colors (LightBlue, Coral, SkyBlue, LightGreen, LightCoral, LightYellow, LightGray, etc.)
+
+== Notes
+
+```
+note right of Component: Description text
+note left of Actor: Another note
+note over Node1, Node2: Spanning note
+note bottom: Bottom note
+
+note right
+  Multi-line
+  note content
+end note
+```
+
+== Packages and Grouping
+
+```
+@startuml
+package "Module A" {
+  component A1
+  component A2
+}
+
+package "Module B" #LightGreen {
+  component B1
+  component B2
+}
+
+rectangle "Group" #Coral {
+  component C1
+  component C2
+}
+
+card "Card" {
+  component D1
+}
+
+cloud "External" {
+  [Service 1]
+  [Service 2]
+}
+@enduml
+```
+
+== Collections
+
+```
+@startuml
+collections "Output Files" as Output
+Output : file1.txt
+Output : file2.txt
+@enduml
+```
+
+== Autonumber
+
+```
+@startuml
+autonumber
+Alice -> Bob : Hello
+Bob -> Alice : Hi
+@enduml
+```
+
+== Comments
+
+```
+@startuml
+' Single line comment
+/' Multi-line
+   comment '/
+@enduml
+```
+
+== Common Patterns
+
+=== Pipeline/Flow Pattern
+```
+@startuml
+participant A
+participant B
+participant C
+
+A -> B : step 1
+B -> C : step 2
+C --> B : result
+B --> A : final
+@enduml
+```
+
+=== Architecture Overview Pattern
+```
+@startuml
+skinparam componentStyle rectangle
+
+actor User
+package "Frontend" { component UI }
+package "Backend" { component API }
+database DB
+
+User --> UI
+UI --> API : HTTP
+API --> DB : SQL
+@enduml
+```
+
+=== Decision Tree Pattern
+```
+@startuml
+start
+if (Condition A?) then (yes)
+  :Action A;
+else (no)
+  if (Condition B?) then (yes)
+    :Action B;
+  else (no)
+    :Action C;
+  endif
+endif
+stop
+@enduml
+```
+
+=== Phase Evolution Pattern
+```
+@startuml
+rectangle "Phase 1" #LightGreen { component A }
+rectangle "Phase 2" #LightYellow { component B }
+rectangle "Phase 3" #LightCoral { component C }
+A -down-> B : Evolution
+B -down-> C : Growth
+@enduml
+```

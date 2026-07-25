@@ -2,9 +2,9 @@
 
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
-_Dernière mise a jour_ : 2026-07-22  
-_Session en cours_ : 182 — Maintenance (backlog vide, tous les EPICs métier terminés)  
-_Session terminee_ : 181 — QW-3 README_truth.adoc + CHANGELOG.adoc (version 0.0.2, groupId education.cccp, i18n, Translation Boundary, Incremental Processing, Multi-Provider Pool). Consommateurs corrigés. Zéro code métier modifié.
+_Dernière mise a jour_ : 2026-07-25  
+_Session en cours_ : 183 — DocKnowledgeBase PlantUML câblé dans GraphifyPromptAdapter  
+_Session terminee_ : 182 — Maintenance (backlog vide, tous les EPICs métier terminés)
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
 '''

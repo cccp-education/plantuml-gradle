@@ -1,5 +1,13 @@
 = Historique des Sessions
 
+== Session 183 (2026-07-25) — RAG DocKnowledgeBase PlantUML
+
+DocKnowledgeBase PlantUML câblé dans GraphifyPromptAdapter. DocKnowledgeBase.kt keyword matching in-memory sur doc officielle PlantUML. resources/docs/plantuml-reference.adoc (diagram types, syntax, styling, patterns). GraphifyPromptAdapter.buildPrompt() injecte doc avant génération. compileKotlin ✅. ✅
+
+== Session 182 (2026-07-25) — Maintenance
+
+Backlog vide, tous les EPICs métier terminés. ✅
+
 == Session 181 (2026-07-22) — QW-3 README_truth.adoc + CHANGELOG.adoc
 
 Mise à jour documentaire : README_truth.adoc (EN+FR) version 0.0.0→0.0.2, groupId com.cheroliv→education.cccp, structure projet enrichie, architecture interne, i18n 10 langues, Translation Boundary, Incremental Processing, Multi-Provider Pool. CHANGELOG.adoc enrichi (EP-1/2/3, Maven Central 0.0.2, PL-1/2, BOM 0.0.11). Consommateurs (message.md, run-debug-output-real.sh) corrigés groupId + noms tâches. Zéro code métier modifié. ✅

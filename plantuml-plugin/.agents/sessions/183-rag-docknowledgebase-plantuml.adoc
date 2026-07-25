@@ -1,0 +1,41 @@
+= Session 183 — RAG DocKnowledgeBase PlantUML
+:date: 2026-07-25
+:type: feat
+:score: 9/10
+
+== Objectif
+
+Câbler la réalité augmentée (doc officielle PlantUML) dans le pipeline de génération de prompts plantuml-gradle.
+
+== Contexte
+
+Le `GraphifyPromptAdapter` génère des prompts LLM pour créer des diagrammes PlantUML. Injecter la doc officielle PlantUML dans le prompt permet au LLM de produire une syntaxe PlantUML valide (types de diagrammes, flèches, styles, packages, etc.).
+
+== Travail réalisé
+
+=== 1. DocKnowledgeBase (plantuml.rag)
+
+- `DocKnowledgeBase.kt` — keyword matching in-memory sur la doc officielle PlantUML
+- `resources/docs/plantuml-reference.adoc` — diagram types, sequence/component/activity/class/state/use case/mindmap syntax, styling, notes, packages, collections, autonumber, common patterns
+- Factory `DocKnowledgeBase.forPlantUML()` charge la doc depuis les resources
+
+=== 2. Câblage GraphifyPromptAdapter
+
+- `buildPrompt()` injecte les sections pertinentes de la doc PlantUML avant le prompt de génération
+- Le LLM reçoit "PlantUML syntax reference (use ONLY valid PlantUML syntax):" suivi des règles pertinentes
+- Paramètre `docKnowledgeBase` avec défaut `DocKnowledgeBase.forPlantUML()`
+
+== Fichiers modifiés
+
+*plantuml-gradle* :
+- `src/main/kotlin/plantuml/rag/DocKnowledgeBase.kt` — nouveau
+- `src/main/resources/docs/plantuml-reference.adoc` — nouveau
+- `src/main/kotlin/plantuml/service/GraphifyPromptAdapter.kt` — modifié (injection DocKnowledgeBase)
+
+== Compilation
+
+`./gradlew -p plantuml-plugin compileKotlin` → BUILD SUCCESSFUL
+
+== Prochaine session
+
+184 — Maintenance (backlog vide, tous les EPICs métier terminés)
