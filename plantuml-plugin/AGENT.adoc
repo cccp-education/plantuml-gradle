@@ -159,6 +159,22 @@ plantuml-gradle/                   # RACINE GIT (ne contient que le repo + boots
 * **ValidatePlantumlSyntaxTask** : Tache Gradle de validation syntaxique
 * **GenerateDiagramDocsTask** : Tache Gradle pour le dogfooding
 
+=== Conventions Plugins (ABIDJAN N0)
+
+PlantUML consomme les convention plugins centralises `education.cccp.build` v0.0.3 :
+
+[cols="2,5"]
+|===
+| Plugin ID | Role
+| `education.cccp.build.gradle-plugin` | java-gradle-plugin + kotlin-jvm + test JUnit + withSourcesJar/JavadocJar + mavenLocal + deps junit test
+| `education.cccp.build.publishing` | POM Maven Central + signing conditionnel + relocation + publicationType
+| `education.cccp.build.cucumber` | Source set features/scenarios + cucumberTest task + exclusion jupiter + CucumberTaskSpec
+| `education.cccp.build.functional-test` | Source set functionalTest + GradleTestKit + task + check.dependsOn
+|===
+
+Ces 4 plugins remplacent ~46 lignes de build redondantes (POM, signing, toolchain, testLogging, cucumber setup, functionalTest setup).
+Les deps junit/cucumber sont gerees par les conventions (CNV-7), eliminant le bug `junit-platform-params = "6.0.3"` du catalogue local.
+
 === Commandes Utiles
 
 [source,bash]
