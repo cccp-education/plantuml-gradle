@@ -40,6 +40,9 @@ dependencies {
     implementation(libs.commons.io)
     implementation(libs.bundles.plantuml.ai)
 
+    // N0 contracts — i18n (cross-borough translation alliance)
+    implementation("education.cccp:i18n-contracts:0.0.2")
+
     // Testcontainers for RAG integration (CollectPlantumlIndexTask uses PostgreSQLContainer)
     implementation(libs.testcontainers.pg)
 

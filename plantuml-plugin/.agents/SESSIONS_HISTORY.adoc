@@ -1,5 +1,9 @@
 = Historique des Sessions
 
+== Session 184 (2026-07-31) — Alliance i18n : PlantumlTranslationServiceAdapter
+
+PlantumlTranslationServiceAdapter wrappant TranslationResolver + dépendance i18n-contracts:0.0.2 dans build.gradle.kts. compileKotlin ✅. Fait partie de l'alliance i18n cross-borough (bakery + slider + plantuml + document). ✅
+
 == Session 183 (2026-07-25) — RAG DocKnowledgeBase PlantUML
 
 DocKnowledgeBase PlantUML câblé dans GraphifyPromptAdapter. DocKnowledgeBase.kt keyword matching in-memory sur doc officielle PlantUML. resources/docs/plantuml-reference.adoc (diagram types, syntax, styling, patterns). GraphifyPromptAdapter.buildPrompt() injecte doc avant génération. compileKotlin ✅. ✅

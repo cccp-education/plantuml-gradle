@@ -1,17 +1,16 @@
-= PROMPT_REPRISE — Plantuml — Session 182
-:session: 182
-:date: 2026-07-22
+= PROMPT_REPRISE — Plantuml — Session 185
+:session: 185
+:date: 2026-07-31
 
-== État — Tous les EPICs métier terminés, plugin en maintenance
+== État — Alliance i18n cross-borough
 
-Session 181 : QW-3 terminé. README_truth.adoc (EN+FR) mis à jour (version 0.0.2,
-groupId education.cccp, i18n, Translation Boundary, Incremental Processing,
-Multi-Provider Pool). CHANGELOG.adoc enrichi (EP-1/2/3, 0.0.2, PL-1/2, BOM 0.0.11).
-Consommateurs (message.md, run-debug-output-real.sh) corrigés groupId + noms tâches.
+Session 184 : PlantumlTranslationServiceAdapter créé + dépendance i18n-contracts:0.0.2.
+PlantUML expose maintenant un `TranslationService` consommable par l'alliance
+(bakery + slider + plantuml + document). compileKotlin ✅.
 
-== Mission session 182 — Maintenance
+== Mission session 185 — Rattrapage i18n
 
-Backlog vide. Tous les EPICs métier terminés. Plugin en maintenance.
+Rattrapage i18n : 196 lignes × 9 langues Messages_*.properties à traduire.
 
 == Backlog — priorisé
 
@@ -36,4 +35,4 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 - Cucumber: 128 PASS, 0 FAIL, 9 SKIP (+ 3 @realllm SKIPPED si Ollama absent)
 - Configuration Cache: activé ✅
 - Tous les EPICs métier terminés
-- Voir `sessions/181-qw3-readme-changelog.adoc`
+- Voir `sessions/184-alliance-i18n-translation-service-adapter.adoc`

@@ -1,0 +1,35 @@
+= Session 184 — Alliance i18n : PlantumlTranslationServiceAdapter
+:date: 2026-07-31
+:type: feat
+:score: 9/10
+
+== Contexte
+
+PlantUML n'avait aucune dépendance vers `i18n-contracts`. Son système i18n
+était complètement indépendant (ResourceBundle + TranslationResolver +
+classification/stratégie). Aucun pont vers le contrat N0 `TranslationService`.
+
+== Actions
+
+. Ajout dépendance `implementation("education.cccp:i18n-contracts:0.0.2")`
+  dans `build.gradle.kts`
+
+. Création de `PlantumlTranslationServiceAdapter.kt` dans `plantuml.boundary` :
+  - Implémente `contracts.i18n.TranslationService`
+  - Wrappe `TranslationResolver` (orchestrateur existant)
+  - Délégue `translate()` → `resolver.resolve(sourceText, targetLanguage)`
+  - Mapping : `ResolvedText` → `TranslationResult.Success` / `TranslationResult.Failure`
+  - PRESERVE sans traduction = Failure (pas d'erreur, juste pas de trad dispo)
+
+. Vérification : `./gradlew compileKotlin` BUILD SUCCESSFUL
+
+== Impact
+
+- +1 fichier source, +1 ligne build.gradle.kts
+- PlantUML expose maintenant un `TranslationService` consommable par l'alliance
+- Le `TranslationResolver` (classification/stratégie/glossaire) reste intact
+- Fait partie de l'alliance i18n cross-borough (bakery + slider + plantuml + document)
+
+== Prochaine session
+
+S185 — Rattrapage i18n : 196 lignes × 9 langues Messages_*.properties
