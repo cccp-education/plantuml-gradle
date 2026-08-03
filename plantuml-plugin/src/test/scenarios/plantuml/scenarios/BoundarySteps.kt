@@ -18,6 +18,7 @@ import plantuml.boundary.TranslationStrategy
 import plantuml.service.DiagramProcessor
 import plantuml.service.KnowledgeGraphRenderer
 import plantuml.service.PlantumlService
+import plantuml.validation.SyntaxValidationResult
 
 class BoundarySteps(private val world: PlantumlWorld) {
 
@@ -74,7 +75,7 @@ class BoundarySteps(private val world: PlantumlWorld) {
     fun aDiagramProcessorInTestModeWithFrResolver() {
         val plantumlService = org.mockito.Mockito.mock(PlantumlService::class.java)
         org.mockito.Mockito.`when`(plantumlService.validateSyntax(org.mockito.Mockito.anyString()))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Valid)
+            .thenReturn(SyntaxValidationResult.Valid)
         world.boundaryResolver = TranslationResolver(
             classifier = TextClassifier(),
             glossary = IdiomaticGlossary(),
@@ -88,7 +89,7 @@ class BoundarySteps(private val world: PlantumlWorld) {
     fun theDiagramProcessorProcessesPrompt(prompt: String, language: String) {
         val plantumlService = org.mockito.Mockito.mock(PlantumlService::class.java)
         org.mockito.Mockito.`when`(plantumlService.validateSyntax(org.mockito.Mockito.anyString()))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Valid)
+            .thenReturn(SyntaxValidationResult.Valid)
         val processor = DiagramProcessor(plantumlService, null, null)
         world.boundaryDiagram = processor.processPrompt(
             prompt = prompt,

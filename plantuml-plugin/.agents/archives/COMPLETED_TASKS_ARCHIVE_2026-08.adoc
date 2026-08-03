@@ -1,0 +1,16 @@
+= COMPLETED_TASKS_ARCHIVE — 2026-08
+
+== Session 185 (2026-08-03) — EPIC PLT-VALIDATION-CONTRACT : Extraction SyntaxValidationResult standalone
+
+=== Fait
+- PLT-VAL-0 : SyntaxValidationResult extrait → standalone sealed class dans plantuml.validation ✅
+- PLT-VAL-1 : PlantumlService.validateSyntax() retourne le type standalone ✅
+- PLT-VAL-2 : KDoc sur l'API publique de validation ✅
+- PLT-VAL-3 : Cucumber BDD non-régression (3/3 syntax_validation) ✅
+- 13 fichiers modifiés (1 nouveau + 12 imports mis à jour) ✅
+- compileKotlin ✅, test ✅, publishToMavenLocal ✅
+- Zéro régression (2537 unitaires + 128 Cucumber) ✅
+- document-gradle débloqué pour EPIC DOC-PLANTUML-VALIDATE ✅
+
+=== Prochaine session
+- Session 186 — Clôture gouvernance + identification prochain EPIC cross-borough

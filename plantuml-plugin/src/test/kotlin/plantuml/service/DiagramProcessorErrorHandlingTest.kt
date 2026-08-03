@@ -6,6 +6,7 @@ import org.mockito.Mockito.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import plantuml.PlantumlConfig
+import plantuml.validation.SyntaxValidationResult
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -37,9 +38,9 @@ class DiagramProcessorErrorHandlingTest {
 
         // Setup validation: first invalid, then valid
         `when`(mockPlantumlService.validateSyntax("@startuml\nInvalid syntax"))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Invalid("Syntax error", "stack"))
+            .thenReturn(SyntaxValidationResult.Invalid("Syntax error", "stack"))
         `when`(mockPlantumlService.validateSyntax("@startuml\nFixed\n@enduml"))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Valid)
+            .thenReturn(SyntaxValidationResult.Valid)
 
         // Setup config
         `when`(mockConfig.langchain4j).thenReturn(mockLangchainConfig)
@@ -72,11 +73,11 @@ class DiagramProcessorErrorHandlingTest {
             .thenReturn("@startuml\nValid\n@enduml")
 
         `when`(mockPlantumlService.validateSyntax("@startuml\nInvalid 1"))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Invalid("Error 1", "stack1"))
+            .thenReturn(SyntaxValidationResult.Invalid("Error 1", "stack1"))
         `when`(mockPlantumlService.validateSyntax("@startuml\nInvalid 2"))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Invalid("Error 2", "stack2"))
+            .thenReturn(SyntaxValidationResult.Invalid("Error 2", "stack2"))
         `when`(mockPlantumlService.validateSyntax("@startuml\nValid\n@enduml"))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Valid)
+            .thenReturn(SyntaxValidationResult.Valid)
 
         `when`(mockConfig.langchain4j).thenReturn(mockLangchainConfig)
         `when`(mockLangchainConfig.validationPrompt).thenReturn("Validate this")
@@ -106,7 +107,7 @@ class DiagramProcessorErrorHandlingTest {
             .thenReturn("@startuml\nAlways invalid")
 
         `when`(mockPlantumlService.validateSyntax(anyString()))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Invalid("Always error", "stack"))
+            .thenReturn(SyntaxValidationResult.Invalid("Always error", "stack"))
 
         `when`(mockConfig.langchain4j).thenReturn(mockLangchainConfig)
         `when`(mockLangchainConfig.validationPrompt).thenReturn("Validate this")
@@ -137,11 +138,11 @@ class DiagramProcessorErrorHandlingTest {
             .thenReturn("@startuml\nThird attempt\n@enduml")
 
         `when`(mockPlantumlService.validateSyntax("@startuml\nFirst attempt"))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Invalid("Error 1", "stack1"))
+            .thenReturn(SyntaxValidationResult.Invalid("Error 1", "stack1"))
         `when`(mockPlantumlService.validateSyntax("@startuml\nSecond attempt"))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Invalid("Error 2", "stack2"))
+            .thenReturn(SyntaxValidationResult.Invalid("Error 2", "stack2"))
         `when`(mockPlantumlService.validateSyntax("@startuml\nThird attempt\n@enduml"))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Valid)
+            .thenReturn(SyntaxValidationResult.Valid)
 
         `when`(mockConfig.langchain4j).thenReturn(mockLangchainConfig)
         `when`(mockLangchainConfig.validationPrompt).thenReturn("Validate this")
@@ -172,9 +173,9 @@ class DiagramProcessorErrorHandlingTest {
             .thenReturn("@startuml\nCorrected\n@enduml")
 
         `when`(mockPlantumlService.validateSyntax("@startuml\nInitial invalid"))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Invalid("Initial error", "stack"))
+            .thenReturn(SyntaxValidationResult.Invalid("Initial error", "stack"))
         `when`(mockPlantumlService.validateSyntax("@startuml\nCorrected\n@enduml"))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Valid)
+            .thenReturn(SyntaxValidationResult.Valid)
 
         `when`(mockConfig.langchain4j).thenReturn(mockLangchainConfig)
         `when`(mockLangchainConfig.validationPrompt).thenReturn("Validate this")

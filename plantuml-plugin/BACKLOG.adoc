@@ -397,6 +397,98 @@ EPIC PLT-I18N a livré l'infrastructure i18n (`PlantumlMessages`, `ResourceBundl
 
 '''
 
+== 🔴 EPIC PLT-VALIDATION-CONTRACT : Contrat N0 de validation syntaxique PlantUML
+
+*Statut* : ✅ TERMINÉ — Session 185 (4/4 US)
+*Priorité* : 🔴 HAUTE — débloque l'EPIC DOC-PLANTUML-VALIDATE de document-gradle
+*Charge* : ~6 pts (1 session)
+*Dépend de* : néant (refacto interne plantuml-gradle)
+
+=== Contexte
+
+document-gradle a un EPIC DOC-PLANTUML-VALIDATE (5 US, ~21 pts) BLOQUÉ sur
+plantuml-gradle. Le `PlantUmlTranslationAdapter` de document traduit les labels
+dans les blocs `[plantuml]` mais rien ne vérifie la syntaxe après traduction.
+
+**DRY** : plantuml-gradle expose déjà `PlantumlService.validateSyntax()` qui
+utilise `net.sourceforge.plantuml.SourceStringReader` (le vrai parser PlantUML).
+Disponible via `education.cccp:plantuml-plugin:0.0.2` sur Maven Central.
+
+**Blocker** : `SyntaxValidationResult` est une sealed class **imbriquée** dans
+`PlantumlService` — pas une API publique stable. Document a besoin d'un type
+standalone consommable sans couplage à `PlantumlService`.
+
+=== Stratégie
+
+. Extraire `SyntaxValidationResult` de `PlantumlService` → type standalone
+  dans `plantuml.validation` (package dédié)
+. `PlantumlService.validateSyntax()` retourne le type standalone
+. KDoc sur l'API publique
+. Cucumber BDD non-régression (3 scénarios existants)
+. `publishToMavenLocal` + `compileKotlin` ✅
+
+=== User Stories
+
+[cols="1,4,2,2"]
+|===
+| US | Description | Pts | Priorité
+
+| PLT-VAL-0
+| **Extraire SyntaxValidationResult** — Créer `plantuml.validation.SyntaxValidationResult`
+  sealed class standalone (Valid object + Invalid data class avec errorMessage, stackTrace).
+  Supprimer la nested class dans `PlantumlService`. Mettre à jour tous les imports
+  (PlantumlService, ValidatePlantumlSyntaxTask, DiagramProcessor, tests).
+  Baby-step : 1 fichier + compileKotlin.
+| 2
+| 🔴 P0 ✅ S185
+
+| PLT-VAL-1
+| **PlantumlService.validateSyntax()** — retourne le type standalone.
+  Vérifier que `ValidatePlantumlSyntaxTask` et `DiagramProcessor` utilisent
+  le nouveau type sans changement de comportement.
+| 1
+| 🔴 P0 ✅ S185
+
+| PLT-VAL-2
+| **KDoc** — Documenter `SyntaxValidationResult`, `Valid`, `Invalid` avec
+  KDoc public. Documenter `PlantumlService.validateSyntax()` comme API
+  publique stable consommable par d'autres boroughs.
+| 1
+| 🟡 P1 ✅ S185
+
+| PLT-VAL-3
+| **Cucumber BDD non-régression** — Vérifier que les 3 scénarios
+  `3_syntax_validation.feature` passent avec le type standalone.
+  Zéro changement de comportement attendu.
+| 2
+| 🟡 P1 ✅ S185
+|===
+
+=== Critères d'Acceptation
+
+* [x] `SyntaxValidationResult` est une sealed class standalone dans `plantuml.validation`
+* [x] `PlantumlService.validateSyntax()` retourne le type standalone
+* [x] Tous les imports mis à jour (PlantumlService, ValidatePlantumlSyntaxTask, DiagramProcessor, tests)
+* [x] KDoc sur l'API publique de validation
+* [x] 3/3 Cucumber `3_syntax_validation.feature` PASS (0 FAIL, 0 régression)
+* [x] `./gradlew compileKotlin` OK + `test` OK
+* [x] `publishToMavenLocal` OK
+* [x] Zéro régression (2537 unitaires + 128 Cucumber)
+
+=== Note — Extraction future en contrat N0 BOM
+
+Aujourd'hui le type standalone vit dans `plantuml-plugin`. Si d'autres boroughs
+(codex, slider, bakery) ont besoin de valider du PlantUML sans dépendre du
+plugin complet, un contrat N0 `plantuml-validation-contracts` pourra être extrait
+dans le BOM avec :
+- `SyntaxValidationResult` sealed class
+- `PlantUmlSyntaxValidator` interface
+
+Le type standalone dans `plantuml.validation` est conçu pour cette extraction
+future : il ne dépend que de Kotlin stdlib, zéro dépendance Gradle ou PlantUML.
+
+'''
+
 == Prochains EPICs — pistes consolidées
 
 _Sources_ : BACKLOG S172, TODO.adoc, CODE_REVIEW_2026-04.adoc (v3, 8.2/10),

@@ -1,5 +1,9 @@
 = Historique des Sessions
 
+== Session 185 (2026-08-03) — EPIC PLT-VALIDATION-CONTRACT : Extraction SyntaxValidationResult standalone
+
+SyntaxValidationResult extrait de PlantumlService → standalone dans plantuml.validation. KDoc public. 4/4 US terminées (PLT-VAL-0→3). 13 fichiers modifiés (1 nouveau + 12 imports mis à jour). compileKotlin ✅, test ✅, publishToMavenLocal ✅. Zéro régression. document-gradle débloqué pour EPIC DOC-PLANTUML-VALIDATE. ✅
+
 == Session 184 (2026-07-31) — Alliance i18n : PlantumlTranslationServiceAdapter
 
 PlantumlTranslationServiceAdapter wrappant TranslationResolver + dépendance i18n-contracts:0.0.2 dans build.gradle.kts. compileKotlin ✅. Fait partie de l'alliance i18n cross-borough (bakery + slider + plantuml + document). ✅

@@ -18,6 +18,7 @@ import plantuml.incremental.ProcessingDecision
 import plantuml.service.DiagramProcessor
 import plantuml.service.LlmService
 import plantuml.service.PlantumlService
+import plantuml.validation.SyntaxValidationResult
 import java.io.File
 
 /**
@@ -272,7 +273,7 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
             logger.lifecycle(PlantumlMessages.get("generate.validating", lang))
             val validationResult = diagramProcessor.plantumlService.validateSyntax(diagram.plantuml.code)
 
-            if (validationResult is PlantumlService.SyntaxValidationResult.Invalid) {
+            if (validationResult is SyntaxValidationResult.Invalid) {
                 logger.lifecycle(PlantumlMessages.get("generate.validation_errors", lang))
                 logger.lifecycle(PlantumlMessages.format("generate.validation_error", lang, validationResult.errorMessage))
                 logger.lifecycle(PlantumlMessages.format("generate.validation_stack", lang, validationResult.stackTrace))

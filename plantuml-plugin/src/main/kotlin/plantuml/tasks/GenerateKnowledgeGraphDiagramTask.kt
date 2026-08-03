@@ -14,6 +14,7 @@ import plantuml.boundary.TranslationResolver
 import plantuml.service.KnowledgeGraphParser
 import plantuml.service.KnowledgeGraphRenderer
 import plantuml.service.PlantumlService
+import plantuml.validation.SyntaxValidationResult
 import java.io.File
 
 /**
@@ -123,7 +124,7 @@ abstract class GenerateKnowledgeGraphDiagramTask : DefaultTask() {
 
         val plantumlService = PlantumlService()
         val validationResult = plantumlService.validateSyntax(plantumlCode)
-        if (validationResult is PlantumlService.SyntaxValidationResult.Invalid) {
+        if (validationResult is SyntaxValidationResult.Invalid) {
             logger.warn(PlantumlMessages.format("kg.validation_issues", lang, validationResult.errorMessage))
             logger.lifecycle(PlantumlMessages.format("kg.saved_despite_issues", lang, pumlFile.absolutePath))
         } else {

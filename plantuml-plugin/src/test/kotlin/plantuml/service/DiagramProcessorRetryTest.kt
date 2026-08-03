@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import org.mockito.Mockito.*
 import org.slf4j.Logger
+import plantuml.validation.SyntaxValidationResult
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -19,9 +20,9 @@ class DiagramProcessorRetryTest {
     fun `processPrompt should handle multiple retry iterations before success`() {
         val mockPlantumlService = mock(PlantumlService::class.java)
         `when`(mockPlantumlService.validateSyntax(anyString()))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Invalid("Error 1", "stack1"))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Invalid("Error 2", "stack2"))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Valid)
+            .thenReturn(SyntaxValidationResult.Invalid("Error 1", "stack1"))
+            .thenReturn(SyntaxValidationResult.Invalid("Error 2", "stack2"))
+            .thenReturn(SyntaxValidationResult.Valid)
 
         val processor = DiagramProcessor(mockPlantumlService, null, null)
         val result = processor.processPrompt("Test prompt with retries", logger = logger)
@@ -34,7 +35,7 @@ class DiagramProcessorRetryTest {
     fun `processPrompt should return null after max iterations exceeded`() {
         val mockPlantumlService = mock(PlantumlService::class.java)
         `when`(mockPlantumlService.validateSyntax(anyString()))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Invalid("Always invalid", "stack"))
+            .thenReturn(SyntaxValidationResult.Invalid("Always invalid", "stack"))
 
         val processor = DiagramProcessor(mockPlantumlService, null, null)
         val result = processor.processPrompt("Test prompt that always fails", maxIterations = 3, logger = logger)
@@ -46,7 +47,7 @@ class DiagramProcessorRetryTest {
     fun `processPrompt should succeed on first try without retries`() {
         val mockPlantumlService = mock(PlantumlService::class.java)
         `when`(mockPlantumlService.validateSyntax(anyString()))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Valid)
+            .thenReturn(SyntaxValidationResult.Valid)
 
         val processor = DiagramProcessor(mockPlantumlService, null, null)
         val result = processor.processPrompt("Test prompt with immediate success", logger = logger)
@@ -59,8 +60,8 @@ class DiagramProcessorRetryTest {
     fun `processPrompt should include error messages in attempt history on failure`() {
         val mockPlantumlService = mock(PlantumlService::class.java)
         `when`(mockPlantumlService.validateSyntax(anyString()))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Invalid("Error: Missing @enduml", "stack"))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Valid)
+            .thenReturn(SyntaxValidationResult.Invalid("Error: Missing @enduml", "stack"))
+            .thenReturn(SyntaxValidationResult.Valid)
 
         val processor = DiagramProcessor(mockPlantumlService, null, null)
         val result = processor.processPrompt("Test with error tracking", logger = logger)
@@ -73,8 +74,8 @@ class DiagramProcessorRetryTest {
     fun `processPrompt should archive attempt history when multiple iterations`() {
         val mockPlantumlService = mock(PlantumlService::class.java)
         `when`(mockPlantumlService.validateSyntax(anyString()))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Invalid("First error", "stack1"))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Valid)
+            .thenReturn(SyntaxValidationResult.Invalid("First error", "stack1"))
+            .thenReturn(SyntaxValidationResult.Valid)
 
         val processor = DiagramProcessor(mockPlantumlService, null, null)
         val result = processor.processPrompt("Test with multiple attempts", logger = logger)
@@ -87,8 +88,8 @@ class DiagramProcessorRetryTest {
     fun `processPrompt should handle fixCommonPlantUmlIssues in retry loop`() {
         val mockPlantumlService = mock(PlantumlService::class.java)
         `when`(mockPlantumlService.validateSyntax(anyString()))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Invalid("Missing tags", "stack"))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Valid)
+            .thenReturn(SyntaxValidationResult.Invalid("Missing tags", "stack"))
+            .thenReturn(SyntaxValidationResult.Valid)
 
         val processor = DiagramProcessor(mockPlantumlService, null, null)
         val result = processor.processPrompt(

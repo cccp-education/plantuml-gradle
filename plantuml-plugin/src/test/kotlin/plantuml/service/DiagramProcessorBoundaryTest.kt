@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory
 import plantuml.boundary.IdiomaticGlossary
 import plantuml.boundary.TextClassifier
 import plantuml.boundary.TranslationResolver
+import plantuml.validation.SyntaxValidationResult
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
@@ -20,7 +21,7 @@ class DiagramProcessorBoundaryTest {
     fun setUp() {
         plantumlService = Mockito.mock(PlantumlService::class.java)
         Mockito.`when`(plantumlService.validateSyntax(Mockito.anyString()))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Valid)
+            .thenReturn(SyntaxValidationResult.Valid)
         processor = DiagramProcessor(plantumlService, null, null)
     }
 

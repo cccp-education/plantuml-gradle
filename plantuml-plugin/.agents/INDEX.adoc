@@ -2,9 +2,9 @@
 
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
-_Dernière mise a jour_ : 2026-07-31 — Session 184 Alliance i18n : PlantumlTranslationServiceAdapter + dépendance i18n-contracts  
-_Session en cours_ : 184 terminée — Alliance i18n cross-borough ✅  
-_Session terminee_ : 183 — DocKnowledgeBase PlantUML câblé dans GraphifyPromptAdapter
+_Dernière mise a jour_ : 2026-08-03 — Session 185 EPIC PLT-VALIDATION-CONTRACT : Extraction SyntaxValidationResult standalone  
+_Session en cours_ : 185 — EPIC PLT-VALIDATION-CONTRACT (débloque DOC-PLANTUML-VALIDATE de document-gradle)  
+_Session terminee_ : 184 — Alliance i18n : PlantumlTranslationServiceAdapter + dépendance i18n-contracts
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
 '''
@@ -151,6 +151,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 
 == 🎯 Roadmap — État Actuel
 
+| EPIC PLT-VALIDATION-CONTRACT : Extraction SyntaxValidationResult standalone → débloque DOC-PLANTUML-VALIDATE (document-gradle) | ✅ 100% | 4/4 | ✅ TERMINÉ — Session 185 (SyntaxValidationResult standalone + KDoc + Cucumber non-régression) |
 | EPIC Incremental Processing : Checksum-based skip + cleanup + force reprocess | ✅ 100% | 5/5 | ✅ TERMINÉ — Session 172 (domaine `plantuml.incremental`, 14 tests unitaires + 5 Cucumber PASS) |
 | EP-1 Maturité plantuml.incremental : events + audit log + config YAML | ✅ 100% | 4/4 | ✅ TERMINÉ — S174 (d) events, (b) audit log, (a) config YAML + S175 (c) RAG reindex |
 | EP-2 Tests production-close : workflow CI + feature @realllm | ✅ 100% | — | ✅ TERMINÉ — Session 179 (workflow `real_llm_test.yml` opt-in + feature `22_real_llm.feature` 3 scénarios + fix `AmbiguousStepDefinitionsException`) |

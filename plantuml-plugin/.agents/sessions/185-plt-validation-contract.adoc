@@ -1,0 +1,75 @@
+= Session 185 — EPIC PLT-VALIDATION-CONTRACT : Extraction SyntaxValidationResult standalone
+:date: 2026-08-03
+:type: DDD + refacto
+:score: 9/10
+
+== Contexte
+
+document-gradle a un EPIC DOC-PLANTUML-VALIDATE (5 US, ~21 pts) BLOQUÉ sur
+plantuml-gradle. Le `PlantUmlTranslationAdapter` de document traduit les labels
+dans les blocs `[plantuml]` mais rien ne vérifie la syntaxe après traduction.
+
+**Blocker** : `SyntaxValidationResult` était une sealed class **imbriquée** dans
+`PlantumlService` — pas une API publique stable. Document a besoin d'un type
+standalone consommable sans couplage à `PlantumlService`.
+
+== US réalisées
+
+=== PLT-VAL-0 — Extraire SyntaxValidationResult (2 pts) ✅
+
+Création de `plantuml/validation/SyntaxValidationResult.kt` — sealed class
+standalone avec `Valid` object + `Invalid` data class (errorMessage, stackTrace).
+Suppression de la nested class dans `PlantumlService`.
+
+=== PLT-VAL-1 — PlantumlService.validateSyntax() (1 pt) ✅
+
+`PlantumlService.validateSyntax()` retourne le type standalone.
+Mise à jour de tous les imports dans les 3 tâches (ValidatePlantumlSyntaxTask,
+GeneratePlantumlDiagramsTask, GenerateKnowledgeGraphDiagramTask) et
+DiagramProcessor.
+
+=== PLT-VAL-2 — KDoc (1 pt) ✅
+
+KDoc public sur `SyntaxValidationResult`, `Valid`, `Invalid` et
+`PlantumlService.validateSyntax()`. Documenté comme API publique stable
+consommable par d'autres boroughs.
+
+=== PLT-VAL-3 — Cucumber BDD non-régression (2 pts) ✅
+
+3/3 scénarios `3_syntax_validation.feature` — zéro régression.
+compileKotlin ✅, test ✅ (BUILD SUCCESSFUL), publishToMavenLocal ✅.
+
+== Fichiers modifiés
+
+[cols="2,3"]
+|===
+| Fichier | Action
+| `src/main/kotlin/plantuml/validation/SyntaxValidationResult.kt` | NOUVEAU — sealed class standalone + KDoc
+| `src/main/kotlin/plantuml/service/PlantumlService.kt` | Nested class supprimée, import standalone, KDoc
+| `src/main/kotlin/plantuml/service/DiagramProcessor.kt` | Import mis à jour
+| `src/main/kotlin/plantuml/tasks/ValidatePlantumlSyntaxTask.kt` | Import + refs mis à jour
+| `src/main/kotlin/plantuml/tasks/GeneratePlantumlDiagramsTask.kt` | Import + refs mis à jour
+| `src/main/kotlin/plantuml/tasks/GenerateKnowledgeGraphDiagramTask.kt` | Import + refs mis à jour
+| `src/test/kotlin/plantuml/service/PlantumlServiceTest.kt` | Import + refs mis à jour
+| `src/test/kotlin/plantuml/service/DiagramProcessorRetryTest.kt` | Import + refs mis à jour
+| `src/test/kotlin/plantuml/service/DiagramProcessorErrorHandlingTest.kt` | Import + refs mis à jour
+| `src/test/kotlin/plantuml/service/DiagramProcessorTest.kt` | Import + refs mis à jour
+| `src/test/kotlin/plantuml/service/DiagramProcessorBoundaryTest.kt` | Import + refs mis à jour
+| `src/test/kotlin/plantuml/service/GraphifyIntegrationTest.kt` | Import + refs mis à jour
+| `src/test/scenarios/plantuml/scenarios/BoundarySteps.kt` | Import + refs mis à jour
+| `PROMPT_REPRISE.adoc` | S185→S186
+| `BACKLOG.adoc` | EPIC PLT-VALIDATION-CONTRACT ajouté + 4/4 ✅
+| `.agents/INDEX.adoc` | Session 185 enregistrée, roadmap mise à jour
+|===
+
+== Résultat
+
+- `SyntaxValidationResult` est maintenant un type standalone dans `plantuml.validation`
+- Zéro référence résiduelle à `PlantumlService.SyntaxValidationResult` (grep confirmé)
+- compileKotlin ✅, test ✅, publishToMavenLocal ✅
+- Zéro régression (2537 unitaires + 128 Cucumber)
+- **document-gradle est débloqué** : l'EPIC DOC-PLANTUML-VALIDATE peut commencer
+
+== Prochaine session
+
+Session 186 — Clôture gouvernance + identification prochain EPIC cross-borough.

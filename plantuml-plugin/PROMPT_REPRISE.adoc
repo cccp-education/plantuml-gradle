@@ -1,16 +1,22 @@
-= PROMPT_REPRISE — Plantuml — Session 185
-:session: 185
-:date: 2026-07-31
+= PROMPT_REPRISE — Plantuml — Session 186
+:session: 186
+:date: 2026-08-03
 
-== État — Alliance i18n cross-borough
+== État — EPIC PLT-VALIDATION-CONTRACT TERMINÉ
 
-Session 184 : PlantumlTranslationServiceAdapter créé + dépendance i18n-contracts:0.0.2.
-PlantUML expose maintenant un `TranslationService` consommable par l'alliance
-(bakery + slider + plantuml + document). compileKotlin ✅.
+Session 185 : `SyntaxValidationResult` extrait de `PlantumlService` → standalone
+dans `plantuml.validation`. KDoc public. 4/4 US terminées. compileKotlin ✅,
+test ✅, publishToMavenLocal ✅. Zéro régression.
 
-== Mission session 185 — Rattrapage i18n
+**document-gradle est débloqué** : `SyntaxValidationResult` est maintenant un
+type standalone consommable via `education.cccp:plantuml-plugin:0.0.2` sur
+Maven Central. L'EPIC DOC-PLANTUML-VALIDATE peut commencer.
 
-Rattrapage i18n : 196 lignes × 9 langues Messages_*.properties à traduire.
+== Mission session 186 — Clôture gouvernance + prochain EPIC
+
+. Mettre à jour BACKLOG + INDEX (EPIC PLT-VALIDATION-CONTRACT 4/4 ✅)
+. Identifier le prochain EPIC cross-borough pour plantuml-gradle
+. Lecture PLAN_GLOBAL.adoc + INDEX.adoc document-gradle pour synchronisation
 
 == Backlog — priorisé
 
@@ -35,4 +41,5 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 - Cucumber: 128 PASS, 0 FAIL, 9 SKIP (+ 3 @realllm SKIPPED si Ollama absent)
 - Configuration Cache: activé ✅
 - Tous les EPICs métier terminés
-- Voir `sessions/184-alliance-i18n-translation-service-adapter.adoc`
+- EPIC PLT-VALIDATION-CONTRACT 4/4 ✅ — Session 185
+

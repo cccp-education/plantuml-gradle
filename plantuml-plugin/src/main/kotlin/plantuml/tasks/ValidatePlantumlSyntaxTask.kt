@@ -10,6 +10,7 @@ import org.gradle.work.DisableCachingByDefault
 import plantuml.PlantumlManager
 import plantuml.PlantumlMessages
 import plantuml.service.PlantumlService
+import plantuml.validation.SyntaxValidationResult
 
 /**
  * Gradle task: `validatePlantumlSyntax`
@@ -78,11 +79,11 @@ abstract class ValidatePlantumlSyntaxTask : DefaultTask() {
         val validationResult = plantumlService.validateSyntax(plantumlCode)
 
         when (validationResult) {
-            is PlantumlService.SyntaxValidationResult.Valid -> {
+            is SyntaxValidationResult.Valid -> {
                 logger.lifecycle(PlantumlMessages.get("validate.valid", lang))
             }
 
-            is PlantumlService.SyntaxValidationResult.Invalid -> {
+            is SyntaxValidationResult.Invalid -> {
                 logger.lifecycle(PlantumlMessages.get("validate.invalid", lang))
                 logger.lifecycle(PlantumlMessages.format("validate.error_line", lang, validationResult.errorMessage))
                 if (validationResult.stackTrace.isNotEmpty()) {

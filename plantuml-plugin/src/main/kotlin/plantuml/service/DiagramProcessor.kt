@@ -12,7 +12,7 @@ import plantuml.PlantumlDiagram
 import plantuml.PlantumlMessages
 import plantuml.ValidationFeedback
 import plantuml.boundary.TranslationResolver
-import plantuml.service.PlantumlService.SyntaxValidationResult
+import plantuml.validation.SyntaxValidationResult
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

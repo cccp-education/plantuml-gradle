@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import plantuml.validation.SyntaxValidationResult
 import java.io.File
 import kotlin.test.assertTrue
 
@@ -37,7 +38,7 @@ class PlantumlServiceTest {
         val result = plantumlService.validateSyntax(validPlantuml)
 
         // Then
-        assertTrue(result is PlantumlService.SyntaxValidationResult.Valid)
+        assertTrue(result is SyntaxValidationResult.Valid)
     }
 
     private fun testInvalidSyntax() {
@@ -48,7 +49,7 @@ class PlantumlServiceTest {
         val result = plantumlService.validateSyntax(invalidPlantuml)
 
         // Then
-        assertTrue(result is PlantumlService.SyntaxValidationResult.Invalid)
+        assertTrue(result is SyntaxValidationResult.Invalid)
     }
 
     @Test

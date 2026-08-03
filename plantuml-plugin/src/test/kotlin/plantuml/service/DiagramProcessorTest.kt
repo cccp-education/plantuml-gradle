@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory
 import plantuml.PlantumlCode
 import plantuml.PlantumlDiagram
 import plantuml.ValidationFeedback
+import plantuml.validation.SyntaxValidationResult
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -130,17 +131,17 @@ class DiagramProcessorTest {
     // Utility methods for mock configuration
     private fun setupValidSyntaxMock() {
         `when`(mockPlantumlService.validateSyntax(anyString()))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Valid)
+            .thenReturn(SyntaxValidationResult.Valid)
     }
 
     private fun setupInvalidSyntaxMock() {
         `when`(mockPlantumlService.validateSyntax(anyString()))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Invalid("Test error", "Stack trace"))
+            .thenReturn(SyntaxValidationResult.Invalid("Test error", "Stack trace"))
     }
 
     private fun setupInvalidThenValidSyntaxMock() {
         `when`(mockPlantumlService.validateSyntax(anyString()))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Invalid("Test error", "Stack trace"))
-            .thenReturn(PlantumlService.SyntaxValidationResult.Valid)
+            .thenReturn(SyntaxValidationResult.Invalid("Test error", "Stack trace"))
+            .thenReturn(SyntaxValidationResult.Valid)
     }
 }
