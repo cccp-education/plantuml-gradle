@@ -1,5 +1,33 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-08
 
+== Session 187 (2026-08-04) — Maintenance cross-borough : BOM + conventions upgrades
+
+=== Fait
+- Audit cross-borough : BOM 0.0.11→0.0.13 (-2), conventions 0.0.2→0.0.3 (-1), i18n-contracts aligné, Kotlin 2.4.10 aligné, Gradle 9.6.1 aligné ✅
+- build.gradle.kts:25 : BOM 0.0.11 → 0.0.13 ✅
+- build.gradle.kts:16-17 : conventions 0.0.2 → 0.0.3 ✅
+- compileKotlin ✅ (BUILD SUCCESSFUL in 54s)
+- publishToMavenLocal ✅
+- Effets transitifs : langchain4j 1.14.1→1.16.3, jackson 2.21.1→2.21.2, wiremock 3.9.1→3.9.2
+- Zéro régression
+
+=== Prochaine session
+- Session 188 — Maintenance ou cross-borough. Si aucun nouveau besoin n'émerge, audit gouvernance ou rotation backup.
+
+== Session 186 (2026-08-04) — Clôture gouvernance + synchronisation cross-borough
+
+=== Fait
+- BACKLOG.adoc : last_update 2026-08-04, EPIC PLT-VALIDATION-CONTRACT + Alliance i18n + RAG DocKnowledgeBase ajoutés dans "EPICs Terminées", QW-3 marqué ✅ S181, note "Tous les EPICs métier TERMINÉS" ✅
+- INDEX.adoc : session en cours 186, roadmap enrichie (3 nouveaux EPICs), sessions récentes +S186 ✅
+- PROMPT_REPRISE.adoc : session 186→187, état "Plugin DORMANT" ✅
+- Synchronisation cross-borough : document-gradle DOC-PLANTUML-VALIDATE ✅ terminé S040 (5/5 US) ✅
+- compileKotlin ✅ (BUILD SUCCESSFUL in 46s)
+- git status : clean (zéro code métier modifié)
+- Tous les EPICs métier plantuml TERMINÉS, plugin dormant
+
+=== Prochaine session
+- Session 187 — Maintenance ou cross-borough. Si aucun nouveau besoin n'émerge, audit gouvernance ou rotation backup.
+
 == Session 185 (2026-08-03) — EPIC PLT-VALIDATION-CONTRACT : Extraction SyntaxValidationResult standalone
 
 === Fait

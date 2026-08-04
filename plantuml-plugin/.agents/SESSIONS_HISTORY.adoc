@@ -1,5 +1,13 @@
 = Historique des Sessions
 
+== Session 187 (2026-08-04) — Maintenance cross-borough : BOM + conventions upgrades
+
+BOM 0.0.11→0.0.13 (1 ligne build.gradle.kts:25) + conventions plugins 0.0.2→0.0.3 (2 lignes build.gradle.kts:16-17). compileKotlin ✅ (BUILD SUCCESSFUL in 54s), publishToMavenLocal ✅. Zéro régression. ✅
+
+== Session 186 (2026-08-04) — Clôture gouvernance + synchronisation cross-borough
+
+BACKLOG + INDEX mis à jour (PLT-VALIDATION-CONTRACT ✅, tous EPICs TERMINÉS). Synchronisation cross-borough document-gradle (DOC-PLANTUML-VALIDATE ✅ S040). Plugin dormant. Zéro code métier modifié. ✅
+
 == Session 185 (2026-08-03) — EPIC PLT-VALIDATION-CONTRACT : Extraction SyntaxValidationResult standalone
 
 SyntaxValidationResult extrait de PlantumlService → standalone dans plantuml.validation. KDoc public. 4/4 US terminées (PLT-VAL-0→3). 13 fichiers modifiés (1 nouveau + 12 imports mis à jour). compileKotlin ✅, test ✅, publishToMavenLocal ✅. Zéro régression. document-gradle débloqué pour EPIC DOC-PLANTUML-VALIDATE. ✅

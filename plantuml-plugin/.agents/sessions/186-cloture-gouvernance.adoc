@@ -1,0 +1,59 @@
+= Session 186 — Clôture gouvernance + synchronisation cross-borough
+:session: 186
+:date: 2026-08-04
+:type: governance
+:score: 9/10
+
+== Contexte
+
+Session 185 a livré EPIC PLT-VALIDATION-CONTRACT (4/4 US) : extraction
+`SyntaxValidationResult` standalone dans `plantuml.validation`. document-gradle
+est débloqué pour EPIC DOC-PLANTUML-VALIDATE.
+
+== Objectif
+
+. Mettre à jour BACKLOG + INDEX (PLT-VALIDATION-CONTRACT 4/4 ✅)
+. Identifier le prochain EPIC cross-borough
+. Lecture PLAN_GLOBAL.adoc + INDEX.adoc document-gradle pour synchronisation
+
+== Réalisations
+
+=== BACKLOG.adoc
+
+- `last_update` : 2026-07-21 → 2026-08-04
+- Ajout EPIC PLT-VALIDATION-CONTRACT dans "EPICs Terminées"
+- Ajout EPIC Alliance i18n (S184) dans "EPICs Terminées"
+- Ajout EPIC RAG DocKnowledgeBase (S183) dans "EPICs Terminées"
+- QW-3 marqué ✅ S181
+- Section "Prochains EPICs" : note "Tous les EPICs métier sont TERMINÉS"
+
+=== INDEX.adoc
+
+- Session en cours : 185 → 186
+- Roadmap : ajout EPIC PLT-VALIDATION-CONTRACT, Alliance i18n, RAG DocKnowledgeBase
+- Sessions récentes : ajout session 186
+
+=== PROMPT_REPRISE.adoc
+
+- Session 186 → 187
+- État : Plugin DORMANT, tous les EPICs métier TERMINÉS
+- Mission S187 : maintenance ou cross-borough
+
+=== Synchronisation cross-borough
+
+- document-gradle DOC-PLANTUML-VALIDATE ✅ terminé S040 (5/5 US)
+- document-gradle INDEX.adoc confirme : EPIC DOC-PLANTUML-VALIDATE CLÔTURÉ
+- Aucun nouveau besoin cross-borough identifié pour plantuml-gradle
+
+== Constats
+
+- Tous les EPICs métier plantuml sont TERMINÉS
+- Seul PL-3 (ktlint/detekt) reste — BLOQUÉ ABIDJAN
+- Plugin en mode maintenance/dormant
+- compileKotlin ✅ (BUILD SUCCESSFUL in 46s)
+- git status : clean (aucune modification de code)
+
+== Prochaine session
+
+Session 187 — Maintenance ou cross-borough. Si aucun nouveau besoin n'émerge,
+audit gouvernance ou rotation backup (session multiple de 10 → 190).

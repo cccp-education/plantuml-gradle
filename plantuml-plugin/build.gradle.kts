@@ -13,8 +13,8 @@ import java.time.Duration
 
 plugins {
     `java-library`
-    id("education.cccp.build.gradle-plugin") version "0.0.2"
-    id("education.cccp.build.publishing") version "0.0.2"
+    id("education.cccp.build.gradle-plugin") version "0.0.3"
+    id("education.cccp.build.publishing") version "0.0.3"
     alias(libs.plugins.publish)
     alias(libs.plugins.kover)
     alias(libs.plugins.codebase)
@@ -22,7 +22,7 @@ plugins {
 
 // Apply the BOM
 dependencies {
-    implementation(platform("education.cccp:workspace-bom:0.0.11"))
+    implementation(platform("education.cccp:workspace-bom:0.0.13"))
 }
 
 group = "education.cccp"

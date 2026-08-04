@@ -2,9 +2,9 @@
 
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
-_Dernière mise a jour_ : 2026-08-03 — Session 185 EPIC PLT-VALIDATION-CONTRACT : Extraction SyntaxValidationResult standalone  
-_Session en cours_ : 185 — EPIC PLT-VALIDATION-CONTRACT (débloque DOC-PLANTUML-VALIDATE de document-gradle)  
-_Session terminee_ : 184 — Alliance i18n : PlantumlTranslationServiceAdapter + dépendance i18n-contracts
+_Dernière mise a jour_ : 2026-08-04 — Session 187 Maintenance cross-borough : BOM 0.0.11→0.0.13 + conventions 0.0.2→0.0.3  
+_Session en cours_ : 187 — Maintenance cross-borough (BOM + conventions upgrades)  
+_Session terminee_ : 186 — Clôture gouvernance + synchronisation cross-borough (document-gradle DOC-PLANTUML-VALIDATE ✅)
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
 '''
@@ -119,6 +119,9 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 
 |=== 
 | # | Date | Type | Sujet | Fichier | Score
+.1+^.^| 187 | 2026-08-04 | maintenance | BOM 0.0.11→0.0.13 + conventions 0.0.2→0.0.3. compileKotlin ✅, publishToMavenLocal ✅. Zéro régression. | `187-maintenance-cross-borough.adoc` | 9/10
+.1+^.^| 186 | 2026-08-04 | governance | Clôture gouvernance — BACKLOG + INDEX mis à jour (PLT-VALIDATION-CONTRACT ✅, tous EPICs TERMINÉS). Synchronisation cross-borough document-gradle (DOC-PLANTUML-VALIDATE ✅ S040). Plugin dormant. | `186-cloture-gouvernance.adoc` | 9/10
+.1+^.^| 185 | 2026-08-03 | feat | EPIC PLT-VALIDATION-CONTRACT : Extraction SyntaxValidationResult standalone dans plantuml.validation. 4/4 US. compileKotlin ✅, test ✅, publishToMavenLocal ✅. document-gradle débloqué. | `185-plt-validation-contract.adoc` | 9/10
 .1+^.^| 184 | 2026-07-31 | feat | Alliance i18n — PlantumlTranslationServiceAdapter wrappant TranslationResolver + dépendance i18n-contracts:0.0.2. compileKotlin ✅ | `184-alliance-i18n-translation-service-adapter.adoc` | 9/10
 .1+^.^| 183 | 2026-07-25 | feat | DocKnowledgeBase PlantUML câblé dans GraphifyPromptAdapter | `183-docknowledgebase-plantuml.adoc` | 9/10
 .1+^.^| 182 | 2026-07-25 | maintenance | Backlog vide, tous les EPICs métier terminés | `182-maintenance.adoc` | 9/10
@@ -151,7 +154,9 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 
 == 🎯 Roadmap — État Actuel
 
-| EPIC PLT-VALIDATION-CONTRACT : Extraction SyntaxValidationResult standalone → débloque DOC-PLANTUML-VALIDATE (document-gradle) | ✅ 100% | 4/4 | ✅ TERMINÉ — Session 185 (SyntaxValidationResult standalone + KDoc + Cucumber non-régression) |
+| EPIC PLT-VALIDATION-CONTRACT : Extraction SyntaxValidationResult standalone → débloque DOC-PLANTUML-VALIDATE (document-gradle) | ✅ 100% | 4/4 | ✅ TERMINÉ — Session 185 (SyntaxValidationResult standalone + KDoc + Cucumber non-régression). document-gradle DOC-PLANTUML-VALIDATE ✅ terminé S040 (5/5 US). |
+| EPIC Alliance i18n : PlantumlTranslationServiceAdapter wrappant TranslationResolver | ✅ 100% | — | ✅ TERMINÉ — Session 184 (dépendance i18n-contracts:0.0.2, compileKotlin ✅) |
+| EPIC RAG DocKnowledgeBase : PlantUML câblé dans GraphifyPromptAdapter | ✅ 100% | — | ✅ TERMINÉ — Session 183 (keyword matching in-memory, doc officielle PlantUML) |
 | EPIC Incremental Processing : Checksum-based skip + cleanup + force reprocess | ✅ 100% | 5/5 | ✅ TERMINÉ — Session 172 (domaine `plantuml.incremental`, 14 tests unitaires + 5 Cucumber PASS) |
 | EP-1 Maturité plantuml.incremental : events + audit log + config YAML | ✅ 100% | 4/4 | ✅ TERMINÉ — S174 (d) events, (b) audit log, (a) config YAML + S175 (c) RAG reindex |
 | EP-2 Tests production-close : workflow CI + feature @realllm | ✅ 100% | — | ✅ TERMINÉ — Session 179 (workflow `real_llm_test.yml` opt-in + feature `22_real_llm.feature` 3 scénarios + fix `AmbiguousStepDefinitionsException`) |

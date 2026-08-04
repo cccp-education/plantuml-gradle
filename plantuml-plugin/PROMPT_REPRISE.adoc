@@ -1,29 +1,26 @@
-= PROMPT_REPRISE — Plantuml — Session 186
-:session: 186
-:date: 2026-08-03
+= PROMPT_REPRISE — Plantuml — Session 188
+:session: 188
+:date: 2026-08-04
 
-== État — EPIC PLT-VALIDATION-CONTRACT TERMINÉ
+== État — Maintenance cross-borough terminée
 
-Session 185 : `SyntaxValidationResult` extrait de `PlantumlService` → standalone
-dans `plantuml.validation`. KDoc public. 4/4 US terminées. compileKotlin ✅,
-test ✅, publishToMavenLocal ✅. Zéro régression.
+Session 187 : BOM 0.0.11→0.0.13 + conventions 0.0.2→0.0.3.
+compileKotlin ✅, publishToMavenLocal ✅. Zéro régression.
 
-**document-gradle est débloqué** : `SyntaxValidationResult` est maintenant un
-type standalone consommable via `education.cccp:plantuml-plugin:0.0.2` sur
-Maven Central. L'EPIC DOC-PLANTUML-VALIDATE peut commencer.
+== Mission session 188 — Maintenance ou cross-borough
 
-== Mission session 186 — Clôture gouvernance + prochain EPIC
-
-. Mettre à jour BACKLOG + INDEX (EPIC PLT-VALIDATION-CONTRACT 4/4 ✅)
-. Identifier le prochain EPIC cross-borough pour plantuml-gradle
-. Lecture PLAN_GLOBAL.adoc + INDEX.adoc document-gradle pour synchronisation
+. Si un nouveau besoin cross-borough émerge (document, bakery, slider,
+  codex) → implémenter en baby-step DDD/TDD/BDD
+. Sinon → maintenance (audit gouvernance, rotation backup si session
+  multiple de 10)
+. Lecture PROMPT_REPRISE.adoc + BACKLOG.adoc + INDEX.adoc pour contexte
 
 == Backlog — priorisé
 
 [cols="1,4,1"]
 |===
 | Priorité | Tâche | Est.
-| 🟡 PL-3 | ktlint ou detekt | dépend ABIDJAN
+| 🟡 PL-3 | ktlint ou detekt | BLOQUÉ ABIDJAN
 |===
 
 == Méthodologie
@@ -35,11 +32,11 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 
 - GroupId: education.cccp.plantuml
 - Version publiée: 0.0.2 (Maven Central, bundle 92463d37)
-- BOM: `workspace-bom:0.0.11` ✅
+- BOM: `workspace-bom:0.0.13` ✅ (upgradé S187)
+- Conventions: `education.cccp.build.*:0.0.3` ✅ (upgradé S187)
 - `publishToMavenLocal` obligatoire après modif code plugin
 - Kover main: 83.26% INSTRUCTION ✅ ≥ 75%
 - Cucumber: 128 PASS, 0 FAIL, 9 SKIP (+ 3 @realllm SKIPPED si Ollama absent)
 - Configuration Cache: activé ✅
 - Tous les EPICs métier terminés
-- EPIC PLT-VALIDATION-CONTRACT 4/4 ✅ — Session 185
-
+- Plugin dormant — maintenance uniquement
