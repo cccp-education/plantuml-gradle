@@ -664,3 +664,26 @@ PASS, 122/122 Cucumber PASS.
 | Dernière màj | 2026-06-24 (Session 152 — US-I18N-7 README i18n)
 | Anciennes versions | Archivées dans `.agents/backup/`
 |===
+
+'''
+== 🟡 EPIC PLT-CR3 — Revue CR-GLOBALE-003 : Création de Contenu Solide
+
+_Source_ : `GLOBAL_CODE_REVIEW.adoc` (workspace root) — session CR-GLOBALE-003 (2026-08-04).
+_Focus_ : robustesse des providers LLM pour la génération de diagrammes.
+
+[cols="1,3,2", options="header"]
+|===
+| EPIC | Description | Priorité
+
+| PLT-CR3-1
+| **Rendre configurables les modèles hardcodés HuggingFace/Groq** — `LlmService.createHuggingFaceModel`
+hardcode `modelName("gpt2")` ; `createGroqModel` hardcode `llama3-8b-8192`. Exposer via la config
+`langchain4j.huggingface.modelName` / `langchain4j.groq.modelName` comme les autres providers.
+| 🟡 P2
+
+| PLT-CR3-2
+| **Probe de sortie diagramme** — Aucun garde-fou vérifiant qu'un diagramme PlantUML généré est
+syntaxiquement valide *après* rendu LLM (au-delà de `validatePlantumlSyntax`). Ajouter un check
+de non-régression : image PNG non vide + syntaxe PlantUML re-parsable.
+| 🟡 P2
+|===
