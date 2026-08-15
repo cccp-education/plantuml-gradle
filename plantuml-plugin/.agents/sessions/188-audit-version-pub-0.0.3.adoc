@@ -1,0 +1,105 @@
+= Session 188 — Audit version + EPIC PUB publish 0.0.3 (gouvernance pure)
+:session: 188
+:date: 2026-08-15
+:epic: PUB (plantuml-plugin 0.0.3 publish backlog)
+:status: ✅ TERMINÉ
+:score: 9/10
+
+== Résumé
+
+Session pure gouvernance (zéro code de production modifié, zéro test
+modifié, pattern S-199 bakery / S-181 codebase / S-068 slider). Audit de
+la version plantuml-plugin et ajout au backlog d'un EPIC PUB dédié pour
+publier 0.0.3 sur Maven Central.
+
+== Audit version
+
+* **Version locale** : `plantuml-plugin/gradle/libs.versions.toml:2` →
+  `plantuml = "0.0.3"`. Le bump 0.0.2 → 0.0.3 a déjà été committé le
+  2026-08-03 (commit `60a76b4` « chore: bump plantuml version 0.0.2 →
+  0.0.3 »).
+* **Maven Central** : seuls `0.0.1` et `0.0.2` sont publiés
+  (maven-metadata.xml). La version 0.0.3 du code n'est **pas** publiée.
+* **Delta** : publier 0.0.3 (le bump de version est déjà fait — pas de
+  bump supplémentaire requis).
+
+== Décisions
+
+* **EPIC PUB dédié au backlog** — 3 US :
+  * PUB-0.0.3-1 : vérifier les prérequis de publication (POM
+    `withType<MavenPublication>`, signing GPG, release deps, nmcp
+    settings 1.5.0).
+  * PUB-0.0.3-2 : `./gradlew check` VERT + publication
+    `publishAggregationToCentralPortal --no-daemon` (méthode nmcp).
+  * PUB-0.0.3-3 : vérification repo1.maven.org (POM plantuml-plugin
+    0.0.3 HTTP 200) + mise à jour BOM/consommateurs si nécessaire.
+* **Backlog uniquement** — aucune publication dans cette session. Le
+  publish 0.0.3 est recadré EPIC PUB (pattern S-199 bakery).
+
+== Tests
+
+* Aucun test modifié (gouvernance pure).
+* Baseline préservée : 2537 unitaires + 128 Cucumber (0 FAIL, 9 SKIP)
+  + 3 @realllm (SKIPPED si Ollama absent). Kover 83.26% ≥ 75%.
+
+== Fichiers Modifiés
+
+[cols="2,3,1"]
+|===
+| Fichier | Rôle | Delta
+
+| `BACKLOG.adoc`
+| Section Session 188 + EPIC PUB 0.0.3 (3 US) + `:last_update:`
+| Mise à jour
+
+| `PROMPT_REPRISE.adoc`
+| Pointage session 189
+| Réécriture
+
+| `slider-plugin/.agents/INDEX.adoc` (plantuml-plugin/.agents/)
+| Header + table Sessions (entrée 188)
+| Mise à jour
+
+| `plantuml-plugin/.agents/SESSIONS_HISTORY.adoc`
+| Entrée 188
+| Mise à jour
+
+| `plantuml-plugin/.agents/TEST_COVERAGE_ANALYSIS.adoc`
+| Mention S188 gouvernance pure
+| Mise à jour
+
+| `plantuml-plugin/.agents/archives/COMPLETED_TASKS_ARCHIVE_2026-08.adoc`
+| Entrée 188
+| Mise à jour
+
+| `plantuml-plugin/.agents/sessions/188-audit-version-pub-0.0.3.adoc`
+| Rapport de session
+| Création
+|===
+
+*Total* : 6 fichiers gouvernance modifiés + 1 rapport créé. Zéro code de
+production modifié. Zéro test modifié.
+
+== Vérifications fin de session
+
+* `git status` : fichiers gouvernance à committer.
+* Secret-scan : zéro secret dans les fichiers modifiés (gouvernance).
+* Backlog synchronisé : EPIC PUB 0.0.3 marqué `🟡 À FAIRE` (à exécuter
+  à la prochaine session de publication), sections détaillées alignées.
+
+== Prochaine session
+
+* Exécuter l'EPIC PUB 0.0.3 (publish Maven Central) — accord pilote
+  requis pour publish et commit.
+* Plugin dormant — maintenance uniquement. Prochaine rotation backup au
+  multiple de 10 (session 190).
+
+== Rappels
+
+* GroupId : `education.cccp`, Plugin ID : `education.cccp.plantuml`
+* Version publiée Central : 0.0.1, 0.0.2. Version code : 0.0.3 (à publier)
+* BOM : `workspace-bom:0.0.13`, Conventions : `education.cccp.build.*:0.0.3`
+* Kover main : 83.26% INSTRUCTION ≥ 75%
+* Cucumber : 128 PASS, 0 FAIL, 9 SKIP (+ 3 @realllm)
+* Configuration Cache : activé
+* Tous les EPICs métier terminés — plugin dormant, maintenance uniquement

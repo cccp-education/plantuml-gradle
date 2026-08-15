@@ -1,18 +1,24 @@
-= PROMPT_REPRISE — Plantuml — Session 188
-:session: 188
-:date: 2026-08-04
+= PROMPT_REPRISE — Plantuml — Session 189
+:session: 189
+:date: 2026-08-15
 
-== État — Maintenance cross-borough terminée
+== État — Audit version + EPIC PUB publish 0.0.3 terminé
 
-Session 187 : BOM 0.0.11→0.0.13 + conventions 0.0.2→0.0.3.
-compileKotlin ✅, publishToMavenLocal ✅. Zéro régression.
+Session 188 : audit version gouvernance pure. plantuml-plugin
+`libs.versions.toml:2` = 0.0.3 (déjà bumpé S-187) mais Central ne publie
+que 0.0.1/0.0.2 → EPIC PUB publish 0.0.3 ajouté au BACKLOG (3 US,
+`🟡 À FAIRE`). Zéro code modifié. Commit + push (clôture pilote).
 
-== Mission session 188 — Maintenance ou cross-borough
+== Mission session 189 — Publish 0.0.3 ou maintenance
 
+. **EPIC PUB 0.0.3 au backlog** (`🟡 À FAIRE`) : à exécuter à la prochaine
+  session de publication — vérifier prérequis nmcp + `./gradlew check`
+  VERT + `publishAggregationToCentralPortal --no-daemon` + vérification
+  repo1.maven.org. Accord pilote requis pour publish et commit.
 . Si un nouveau besoin cross-borough émerge (document, bakery, slider,
   codex) → implémenter en baby-step DDD/TDD/BDD
 . Sinon → maintenance (audit gouvernance, rotation backup si session
-  multiple de 10)
+  multiple de 10 — prochaine rotation S190)
 . Lecture PROMPT_REPRISE.adoc + BACKLOG.adoc + INDEX.adoc pour contexte
 
 == Backlog — priorisé
@@ -20,6 +26,7 @@ compileKotlin ✅, publishToMavenLocal ✅. Zéro régression.
 [cols="1,4,1"]
 |===
 | Priorité | Tâche | Est.
+| 🟡 PUB 0.0.3 | Publication Maven Central plantuml-plugin 0.0.3 (3 US) | ~1 session
 | 🟡 PL-3 | ktlint ou detekt | BLOQUÉ ABIDJAN
 |===
 
@@ -31,7 +38,7 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 == Rappels
 
 - GroupId: education.cccp.plantuml
-- Version publiée: 0.0.2 (Maven Central, bundle 92463d37)
+- Version publiée: 0.0.1, 0.0.2 (Maven Central). Version code: 0.0.3 (à publier)
 - BOM: `workspace-bom:0.0.13` ✅ (upgradé S187)
 - Conventions: `education.cccp.build.*:0.0.3` ✅ (upgradé S187)
 - `publishToMavenLocal` obligatoire après modif code plugin

@@ -2,9 +2,9 @@
 
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
-_Dernière mise a jour_ : 2026-08-04 — Session 187 Maintenance cross-borough : BOM 0.0.11→0.0.13 + conventions 0.0.2→0.0.3  
-_Session en cours_ : 187 — Maintenance cross-borough (BOM + conventions upgrades)  
-_Session terminee_ : 186 — Clôture gouvernance + synchronisation cross-borough (document-gradle DOC-PLANTUML-VALIDATE ✅)
+_Dernière mise a jour_ : 2026-08-15 — Session 188 Audit version + EPIC PUB publish 0.0.3 (gouvernance pure)  
+_Session en cours_ : 188 — Audit version + EPIC PUB publish 0.0.3 (gouvernance pure)  
+_Session terminee_ : 187 — Maintenance cross-borough (BOM 0.0.11→0.0.13 + conventions 0.0.2→0.0.3)  
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
 '''
@@ -119,6 +119,7 @@ _Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` 
 
 |=== 
 | # | Date | Type | Sujet | Fichier | Score
+.1+^.^| 188 | 2026-08-15 | governance + ops | Audit version + EPIC PUB publish 0.0.3 (gouvernance pure, pattern S-199 bakery / S-068 slider). plantuml-plugin `libs.versions.toml:2` = 0.0.3 (déjà bumpé S-187, commit `60a76b4`) mais Central ne publie que 0.0.1/0.0.2 → **publish 0.0.3**. EPIC PUB ajouté au BACKLOG (3 US PUB-0.0.3-1/2/3, `🟡 À FAIRE`). Zéro code modifié. Commit + push (clôture pilote). | `188-audit-version-pub-0.0.3.adoc` | 9/10
 .1+^.^| 187 | 2026-08-04 | maintenance | BOM 0.0.11→0.0.13 + conventions 0.0.2→0.0.3. compileKotlin ✅, publishToMavenLocal ✅. Zéro régression. | `187-maintenance-cross-borough.adoc` | 9/10
 .1+^.^| 186 | 2026-08-04 | governance | Clôture gouvernance — BACKLOG + INDEX mis à jour (PLT-VALIDATION-CONTRACT ✅, tous EPICs TERMINÉS). Synchronisation cross-borough document-gradle (DOC-PLANTUML-VALIDATE ✅ S040). Plugin dormant. | `186-cloture-gouvernance.adoc` | 9/10
 .1+^.^| 185 | 2026-08-03 | feat | EPIC PLT-VALIDATION-CONTRACT : Extraction SyntaxValidationResult standalone dans plantuml.validation. 4/4 US. compileKotlin ✅, test ✅, publishToMavenLocal ✅. document-gradle débloqué. | `185-plt-validation-contract.adoc` | 9/10

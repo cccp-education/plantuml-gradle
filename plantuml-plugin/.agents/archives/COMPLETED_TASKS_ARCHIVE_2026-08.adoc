@@ -1,5 +1,23 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-08
 
+== Session 188 (2026-08-15) — Audit version + EPIC PUB publish 0.0.3 ✅
+
+=== Fait
+- Audit version gouvernance pure (pattern S-199 bakery / S-068 slider) : plantuml-plugin `libs.versions.toml:2` = 0.0.3 (déjà bumpé S-187, commit `60a76b4`) mais Central ne publie que 0.0.1/0.0.2 (maven-metadata.xml) → delta **publish 0.0.3** ✅
+- EPIC PUB publish 0.0.3 ajouté au BACKLOG (3 US PUB-0.0.3-1/2/3, `🟡 À FAIRE`) — publish au backlog uniquement, pas d'exécution ✅
+- BACKLOG.adoc : Section Session 188 + EPIC PUB 0.0.3 + `:last_update:` → Session 188 ✅
+- PROMPT_REPRISE.adoc : pointage session 189 (mission PUB 0.0.3 ou maintenance) ✅
+- INDEX.adoc : header (session 188, prochaine 189) + table Sessions +S188 ✅
+- SESSIONS_HISTORY.adoc : entrée 188 ✅
+- TEST_COVERAGE_ANALYSIS.adoc : mention S188 gouvernance pure ✅
+- COMPLETED_TASKS_ARCHIVE_2026-08.adoc : entrée 188 ✅
+- Rapport 188 créé : `.agents/sessions/188-audit-version-pub-0.0.3.adoc` ✅
+- Zéro code de production modifié, zéro test modifié
+- Commit + push (clôture pilote)
+
+=== Prochaine session
+- Session 189 — Publier 0.0.3 (EPIC PUB au backlog) ou maintenance. Prochaine rotation backup au multiple de 10 (session 190).
+
 == Session 187 (2026-08-04) — Maintenance cross-borough : BOM + conventions upgrades
 
 === Fait

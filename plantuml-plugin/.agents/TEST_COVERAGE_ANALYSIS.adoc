@@ -1,6 +1,13 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 179 (21 juillet 2026) — pub 0.0.2 Maven Central
+_Dernière mise à jour_ : Session 188 (15 août 2026) — Audit version + EPIC PUB publish 0.0.3 (gouvernance pure)
+
+=== Session 188 — Gouvernance pure
+
+Session 188 (2026-08-15) : audit version + EPIC PUB publish 0.0.3 ajouté
+au backlog. Zéro code de production modifié, zéro test modifié. Baseline
+préservée : 2537 unitaires + 128 Cucumber (0 FAIL, 9 SKIP) + 3 @realllm
+(SKIPPED si Ollama absent). Kover 83.26% ≥ 75%. Zéro régression.
 
 === Résumé Global
 

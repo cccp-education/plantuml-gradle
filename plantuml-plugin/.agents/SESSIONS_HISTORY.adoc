@@ -1,5 +1,20 @@
 = Historique des Sessions
 
+== Session 188 (2026-08-15) — Audit version + EPIC PUB publish 0.0.3
+
+Session de gouvernance pure (pattern S-199 bakery / S-068 slider) — zéro
+code de production modifié, zéro test modifié. Audit des deltas versions
+Maven Central vs code local : plantuml-plugin `libs.versions.toml:2` =
+0.0.3 (déjà bumpé S-187, commit `60a76b4`) mais Central ne publie que
+0.0.1/0.0.2 (maven-metadata.xml) → **publish 0.0.3** (le bump est déjà
+fait — pas de bump supplémentaire requis). EPIC PUB publish 0.0.3 ajouté
+au BACKLOG (3 US PUB-0.0.3-1/2/3, `🟡 À FAIRE`). Mise à jour gouvernance
+: BACKLOG.adoc (Section Session 188 + EPIC PUB 0.0.3 + `:last_update:`),
+PROMPT_REPRISE.adoc (pointage 189), INDEX.adoc (header + table Sessions),
+SESSIONS_HISTORY.adoc, TEST_COVERAGE_ANALYSIS.adoc,
+COMPLETED_TASKS_ARCHIVE_2026-08.adoc. Rapport 188 créé. Commit + push
+(clôture pilote). ✅
+
 == Session 187 (2026-08-04) — Maintenance cross-borough : BOM + conventions upgrades
 
 BOM 0.0.11→0.0.13 (1 ligne build.gradle.kts:25) + conventions plugins 0.0.2→0.0.3 (2 lignes build.gradle.kts:16-17). compileKotlin ✅ (BUILD SUCCESSFUL in 54s), publishToMavenLocal ✅. Zéro régression. ✅
