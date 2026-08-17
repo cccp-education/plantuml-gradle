@@ -4,7 +4,13 @@
 // annotations:26.0.2-1. Codebase-plugin exclut koog-agents mais les sous-modules
 // koog transitifs contournent l'exclusion. Solution : forcer annotations:26.0.2-1.
 buildscript {
-    configurations.all { resolutionStrategy { force("org.jetbrains:annotations:26.0.2-1") } }
+    configurations.all {
+        resolutionStrategy {
+            force("org.jetbrains:annotations:26.0.2-1")
+            force("org.jetbrains.kotlin:kotlin-stdlib:2.3.21")
+            force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.21")
+        }
+    }
 }
 
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
@@ -20,13 +26,13 @@ plugins {
     alias(libs.plugins.codebase)
 }
 
-// Apply the BOM
-dependencies {
-    implementation(platform("education.cccp:workspace-bom:0.0.13"))
-}
+    // Apply the BOM
+    dependencies {
+        implementation(platform("education.cccp:workspace-bom:0.0.19"))
+    }
 
 group = "education.cccp"
-version = libs.plugins.plantuml.get().version
+version = "0.0.4"
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
