@@ -19,8 +19,8 @@ import java.time.Duration
 
 plugins {
     `java-library`
-    id("education.cccp.build.gradle-plugin") version "0.0.3"
-    id("education.cccp.build.publishing") version "0.0.3"
+    id("education.cccp.build.gradle-plugin") version "0.0.4"
+    id("education.cccp.build.publishing") version "0.0.4"
     alias(libs.plugins.publish)
     alias(libs.plugins.kover)
     alias(libs.plugins.codebase)
