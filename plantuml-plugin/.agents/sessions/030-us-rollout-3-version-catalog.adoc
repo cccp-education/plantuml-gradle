@@ -1,0 +1,47 @@
+= Session 030 — US-ROLLOUT-3 : adoption version catalog ws 0.0.30 (EPIC MEM-CAT-ROLLOUT 3/6)
+
+_Date_ : 2026-09-02
+_Type_ : cross-borough MEMPHIS (mission pilote S-028)
+_Mission_ : plantuml-gradle = ordre 3 du référentiel MEM-CAT-ROLLOUT (BACKLOG
+workspace-bom). 1 pin settings + version dérivée + platform 0.0.30.
+
+== Baby-step TDD strict (RED → GREEN)
+
+*RED* — Garde `PlantumlPluginPublicationTest` créée (pattern
+`DocumentPluginPublicationTest` S-244), 3 tests :
+1. version dérivée ws — FAILED (hardcode `version = "0.0.4"`)
+2. pin platform — FAILED (0.0.21 ≠ 0.0.30)
+3. group/id — PASSED (id `education.cccp.plantuml` déclaré dans le toml)
+
+*GREEN* — 4 baby-steps :
+. settings : `create("ws") { from("education.cccp:workspace-catalog:0.0.30") }` (D4)
+. build : `version = ws.versions.plantuml.plugin.get()` (D3)
+. build : platform 0.0.21 → 0.0.30
+. toml local : `plantuml = "0.0.3"` → `"0.0.4"` (split-brain local — voir ci-dessous)
+
+Résultat : 3/3 PASSED.
+
+== Split-brain local découvert (comme document ROLLOUT-1)
+
+Toml local `plantuml = "0.0.3"` vs build hardcode `0.0.4` (= Central, correct).
+La garde l'a attrapé au RED. Le borough accumulait le tri-split banni :
+toml 0.0.3 / build 0.0.4 / Central 0.0.4. Après fix : toml = ws = Central.
+
+== Gates (baseline exacte préservée)
+
+- `test` : 2531 tests, 0 failure (baseline S-166 1312 unit + growth postérieure, 0 régression)
+- `functionalTest` : 85/1 — le 1 FAIL (`PlantumlFunctionalSuite$FilePermission`)
+  est **préexistant** : prouvé par `git stash` (1/85 avant = après les mods).
+  Dette hors scope MEM-CAT-ROLLOUT (EPIC plantuml dédié si souhaité).
+- `publishToMavenLocal` : VERT — POM `plantuml-plugin-0.0.4.pom` vérifié :
+  version `0.0.4` (dérivée ws) + platform `workspace-bom:0.0.30`
+
+== Économie d'encre
+
+Pas de publication Central — version publiée (0.0.4) inchangée. Le POM diff
+est limité à la platform import (0.0.21 → 0.0.30).
+
+== Prochaine étape
+
+ROLLOUT-4 hyperframes-gradle (ordre 4, même pattern — US inscrite BACKLOG
+hyperframes).

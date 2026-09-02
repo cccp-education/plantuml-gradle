@@ -28,11 +28,12 @@ plugins {
 
     // Apply the BOM
     dependencies {
-        implementation(platform("education.cccp:workspace-bom:0.0.21"))
+        implementation(platform("education.cccp:workspace-bom:0.0.30"))
     }
 
 group = "education.cccp"
-version = "0.0.4"
+// MEM-CAT-ROLLOUT-3 (D3) — self version derived from the published workspace catalog.
+version = ws.versions.plantuml.plugin.get()
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
