@@ -2,8 +2,9 @@
 
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
-_Dernière mise a jour_ : 2026-08-15 — Session 188 Audit version + EPIC PUB publish 0.0.3 (gouvernance pure)  
-_Session en cours_ : 188 — Audit version + EPIC PUB publish 0.0.3 (gouvernance pure)  
+_Dernière mise a jour_ : 2026-09-07 — Session 215 (globale) — Cadrage EPIC RENAME (US-5 plantuml, FPA→content/CDA→coding, transverse 7 boroughs) : `"FPA"`/`"CDA"` sortent du registre non-traductible (marques du pilote, pas des acronymes génériques) + 2 tests. Zéro code modifié. Doc `.agents/CADRAGE_EPIC_RENAME.adoc`.  
+_Session en cours_ : 215 (globale) — Cadrage RENAME (gouvernance pure).  
+_Prochaine session_ : RENAME-5 (1 pt, 5e baby-step) OU maintenance DORMANT au besoin.  
 _Session terminee_ : 187 — Maintenance cross-borough (BOM 0.0.11→0.0.13 + conventions 0.0.2→0.0.3)  
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
 
