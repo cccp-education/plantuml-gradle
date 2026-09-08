@@ -1,32 +1,37 @@
-= PROMPT_REPRISE — Plantuml — Session 189
-:session: 189
-:date: 2026-08-15
+= PROMPT_REPRISE — Plantuml — Session 217
+:session: 217
+:date: 2026-09-08
 
-== État — Audit version + EPIC PUB publish 0.0.3 terminé
+== État — RENAME-5 terminé (S-216)
 
-Session 188 : audit version gouvernance pure. plantuml-plugin
-`libs.versions.toml:2` = 0.0.3 (déjà bumpé S-187) mais Central ne publie
-que 0.0.1/0.0.2 → EPIC PUB publish 0.0.3 ajouté au BACKLOG (3 US,
-`🟡 À FAIRE`). Zéro code modifié. Commit + push (clôture pilote).
+Session 216 : RENAME-5 exécuté (baby-step TDD) — `"FPA"` sorti du registre
+non-traductible `plantuml.boundary` (décision D6 du cadrage EPIC RENAME
+S-215). Remplacé par `QUALIOPI` (référence publique française). 3 fichiers
+(KDoc loader + 2 fixtures tests). Gate : grep `fpa|cda` = zéro réel (1 faux
+positif `ofPattern` prévu), unit boundary 13/13, `check` baseline exacte
+(3 FAIL cucumber + 1 FAIL functional **préexistants**, stash-confirmés),
+`publishToMavenLocal` VERT. Commit + push clôture.
 
-== Mission session 189 — Publish 0.0.3 ou maintenance
+== Mission session 217 — Maintenance DORMANT ou échecs baseline
 
-. **EPIC PUB 0.0.3 au backlog** (`🟡 À FAIRE`) : à exécuter à la prochaine
-  session de publication — vérifier prérequis nmcp + `./gradlew check`
-  VERT + `publishAggregationToCentralPortal --no-daemon` + vérification
-  repo1.maven.org. Accord pilote requis pour publish et commit.
-. Si un nouveau besoin cross-borough émerge (document, bakery, slider,
-  codex) → implémenter en baby-step DDD/TDD/BDD
-. Sinon → maintenance (audit gouvernance, rotation backup si session
-  multiple de 10 — prochaine rotation S190)
-. Lecture PROMPT_REPRISE.adoc + BACKLOG.adoc + INDEX.adoc pour contexte
+. **Échecs baseline préexistants** (découverts S-216, stash-confirmés à
+   HEAD) — optionnels, sur demande pilote :
+   - `cucumberTest` : Attempt History Tracking (2 FAIL) + RAG Pipeline
+     (1 FAIL) — diagnostic en session dédiée baby-step TDD/BDD
+   - `functionalTest` : `PlantumlFunctionalSuite$FilePermission`
+     (préexistant connu S-030)
+. Si un besoin cross-borough émerge (document, bakery, slider, codex) →
+   baby-step DDD/TDD/BDD
+. Sinon → maintenance (audit gouvernance, rotation backup si multiple de
+   10 — prochaine S-220)
 
 == Backlog — priorisé
 
 [cols="1,4,1"]
 |===
 | Priorité | Tâche | Est.
-| 🟡 PUB 0.0.3 | Publication Maven Central plantuml-plugin 0.0.3 (3 US) | ~1 session
+| 🟡 PUB 0.0.3 | Publication Maven Central plantuml-plugin (3 US) — version actuelle dérivée ws catalog 0.0.4 | ~1 session
+| 🟡 FIX-BASELINE | Diagnostic échecs cucumber préexistants (Attempt History + RAG Pipeline) | ~1 session
 | 🟡 PL-3 | ktlint ou detekt | BLOQUÉ ABIDJAN
 |===
 
@@ -37,13 +42,14 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 
 == Rappels
 
-- GroupId: education.cccp.plantuml
-- Version publiée: 0.0.1, 0.0.2 (Maven Central). Version code: 0.0.3 (à publier)
-- BOM: `workspace-bom:0.0.13` ✅ (upgradé S187)
-- Conventions: `education.cccp.build.*:0.0.3` ✅ (upgradé S187)
+- GroupId: education.cccp.plantuml — version dérivée `ws.versions.plantuml.plugin` (catalog 0.0.30 = 0.0.4)
+- Central: 0.0.1, 0.0.2 publiés. Version code: 0.0.4 (à publier)
+- BOM: `workspace-bom` platform 0.0.30 ✅ (MEM-CAT-ROLLOUT S-030)
+- Conventions: `education.cccp.build.*:0.0.4` ✅
 - `publishToMavenLocal` obligatoire après modif code plugin
 - Kover main: 83.26% INSTRUCTION ✅ ≥ 75%
-- Cucumber: 128 PASS, 0 FAIL, 9 SKIP (+ 3 @realllm SKIPPED si Ollama absent)
+- Cucumber: 131 tests — 3 FAIL préexistants (Attempt History ×2, RAG Pipeline ×1), 12 SKIP
+- Functional: 1 FAIL préexistant `FilePermission` (connu S-030)
 - Configuration Cache: activé ✅
-- Tous les EPICs métier terminés
+- Tous les EPICs métier terminés — RENAME-5 ✅ (S-216)
 - Plugin dormant — maintenance uniquement

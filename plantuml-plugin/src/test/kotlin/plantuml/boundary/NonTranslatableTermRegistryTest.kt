@@ -24,10 +24,10 @@ class NonTranslatableTermRegistryTest {
     @Test
     fun `should support bulk registration`() {
         val registry = NonTranslatableTermRegistry()
-        registry.registerAll(listOf("REAC", "AFNOR", "FPA"))
+        registry.registerAll(listOf("REAC", "AFNOR", "QUALIOPI"))
 
         assertTrue(registry.contains("REAC"))
         assertTrue(registry.contains("AFNOR"))
-        assertTrue(registry.contains("FPA"))
+        assertTrue(registry.contains("QUALIOPI"))
     }
 }

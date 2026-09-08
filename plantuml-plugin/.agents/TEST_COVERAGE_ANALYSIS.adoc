@@ -1,6 +1,17 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 188 (15 août 2026) — Audit version + EPIC PUB publish 0.0.3 (gouvernance pure)
+_Dernière mise à jour_ : Session 216 (8 septembre 2026) — RENAME-5 registre non-traductible (baby-step TDD)
+
+=== Session 216 — RENAME-5 (fixtures + KDoc)
+
+Session 216 (2026-09-08) : RENAME-5 exécuté — `"FPA"` → `"QUALIOPI"` dans
+2 fixtures tests (`NonTranslatableTermRegistryTest`, `NonTranslatableTermRegistryLoaderTest`)
++ KDoc loader. Zéro code de production sémantique modifié (KDoc seul).
+Unit boundary ciblés : 13/13 PASSED. Baseline : `check` — `test` VERT,
+`functionalTest` baseline exacte (1 FAIL `PlantumlFunctionalSuite$FilePermission`
+préexistant connu S-030), `cucumberTest` 131 tests / 3 FAIL **préexistants**
+(Attempt History Tracking ×2, RAG Pipeline ×1 — stash-confirmés à HEAD)
+/ 12 SKIP. Kover 83.26% ≥ 75%. `publishToMavenLocal` VERT. Zéro régression.
 
 === Session 188 — Gouvernance pure
 

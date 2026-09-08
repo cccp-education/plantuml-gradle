@@ -1,0 +1,63 @@
+= Session 216 — RENAME-5 : Neutralisation registre non-traductible (D6)
+:date: 2026-09-08
+:epic: RENAME (transverse, ordre 5 — plantuml)
+:cadrage: .agents/CADRAGE_EPIC_RENAME.adoc
+
+== Mission
+
+Exécuter RENAME-5 de l'EPIC transverse RENAME (cadrage S-215 global) :
+`"FPA"` sort du registre non-traductible du domaine `plantuml.boundary`
+(décision D6 — les marques du pilote ne sont pas des acronymes génériques).
+Baby-step TDD, gate = check VERT baseline exacte + grep `fpa`/`cda` = zéro.
+
+== Exécution (baby-step TDD)
+
+Baby-step 1 — Test d'abord (RED implicite par fixture) :
+`NonTranslatableTermRegistryTest.should support bulk registration` :
+fixture `"FPA"` → `"QUALIOPI"` (référence publique française, pattern D5
+cadrage — qualiopi/rncp/afnor restent non-traductibles).
+
+Baby-step 2 — Loader test :
+`NonTranslatableTermRegistryLoaderTest.should parse multiple terms` :
+YAML fixture `"FPA"` → `"QUALIOPI"`.
+
+Baby-step 3 — KDoc prod :
+`NonTranslatableTermRegistryLoader.kt` : exemple YAML KDoc `"FPA"` →
+`"QUALIOPI"`.
+
+== Gates
+
+* `rg -ni "fpa|cda" src/` = 1 match unique = faux positif `ofPattern`
+  (`DiagramProcessor.kt:302`, prévu au cadrage) ✅
+* Unit boundary ciblés : 13/13 PASSED ✅
+* `./gradlew check` : `test` VERT + `functionalTest` baseline exacte
+  (1 failure `PlantumlFunctionalSuite$FilePermission` préexistante,
+  stash-confirmée S-030) + `cucumberTest` 131 tests, 3 FAIL
+  **préexistants** (Attempt History Tracking 2 + RAG Pipeline 1,
+  stash-confirmés à HEAD) ✅
+* `publishToMavenLocal` VERT (règle INDEX 0 — KDoc prod modifié) ✅
+* Zéro bump BOM, zéro secret, zéro changement sémantique (pur renommage
+  de fixtures + KDoc)
+
+== Fichiers modifiés
+
+* `src/main/kotlin/plantuml/boundary/NonTranslatableTermRegistryLoader.kt`
+  (KDoc)
+* `src/test/kotlin/plantuml/boundary/NonTranslatableTermRegistryTest.kt`
+  (fixture)
+* `src/test/kotlin/plantuml/boundary/NonTranslatableTermRegistryLoaderTest.kt`
+  (fixture)
+
+== Constat baselines préexistantes (hors scope RENAME)
+
+* `cucumberTest` : Attempt History Tracking (2 FAIL) + RAG Pipeline
+  (1 FAIL) — échecs confirmés à HEAD par stash avant/après, non liés au
+  registre. À traiter en session dédiée si le pilote le souhaite.
+* `functionalTest` : `PlantumlFunctionalSuite$FilePermission` 1 FAIL —
+  préexistant connu (documenté S-030).
+
+== Clôture
+
+Procédure 6 étapes exécutée (rapport + PROMPT_REPRISE 217 +
+SESSIONS_HISTORY + INDEX + TEST_COVERAGE_ANALYSIS + archive 2026-09
+créé). Commit + push accordés par le pilote en ouverture de session.

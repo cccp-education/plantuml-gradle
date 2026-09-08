@@ -1,0 +1,19 @@
+= COMPLETED_TASKS_ARCHIVE — 2026-09
+
+== Session 216 (2026-09-08) — RENAME-5 : Neutralisation registre non-traductible ✅
+
+=== Fait
+- RENAME-5 exécuté en baby-step TDD (test d'abord, Red→Green) : `"FPA"` → `"QUALIOPI"` (référence publique française, pattern D5 cadrage) ✅
+- `NonTranslatableTermRegistryTest.kt` : fixture bulk registration `"FPA"` → `"QUALIOPI"` ✅
+- `NonTranslatableTermRegistryLoaderTest.kt` : YAML fixture `"FPA"` → `"QUALIOPI"` ✅
+- `NonTranslatableTermRegistryLoader.kt` : KDoc exemple YAML `"FPA"` → `"QUALIOPI"` ✅
+- Gate grep cadrage : `rg -ni "fpa|cda" src/` = 1 match = faux positif `ofPattern` (`DiagramProcessor.kt:302`, prévu au cadrage) ✅
+- Unit boundary ciblés : 13/13 PASSED ✅
+- `./gradlew check` : `test` VERT + `functionalTest` baseline exacte (1 FAIL `FilePermission` préexistant S-030) + `cucumberTest` 131/3 FAIL préexistants stash-confirmés (Attempt History ×2, RAG Pipeline ×1) ✅
+- `publishToMavenLocal` VERT (règle INDEX 0 — KDoc prod modifié) ✅
+- Gouvernance : rapport 216 + PROMPT_REPRISE 217 + SESSIONS_HISTORY + INDEX + TEST_COVERAGE_ANALYSIS + archive 2026-09 créée + BACKLOG (FIX-BASELINE ajouté) ✅
+- Zéro bump BOM, zéro secret, zéro changement sémantique
+- Commit + push (clôture pilote)
+
+=== Prochaine session
+- Session 217 — maintenance DORMANT OU diagnostic échecs baseline cucumber (FIX-BASELINE, sur demande pilote). Prochaine rotation backup au multiple de 10 (session 220).

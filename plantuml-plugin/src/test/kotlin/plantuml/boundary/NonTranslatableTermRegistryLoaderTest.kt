@@ -23,14 +23,14 @@ class NonTranslatableTermRegistryLoaderTest {
             terms:
               - REAC
               - AFNOR
-              - FPA
+              - QUALIOPI
         """.trimIndent() + "\n"
 
         val registry = loader.load(yaml)
 
         assertTrue(registry.contains("REAC"))
         assertTrue(registry.contains("AFNOR"))
-        assertTrue(registry.contains("FPA"))
+        assertTrue(registry.contains("QUALIOPI"))
     }
 
     @Test

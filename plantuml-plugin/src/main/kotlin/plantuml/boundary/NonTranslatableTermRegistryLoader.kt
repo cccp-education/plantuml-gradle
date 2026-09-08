@@ -12,7 +12,7 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
  * terms:
  *   - REAC
  *   - AFNOR
- *   - FPA
+ *   - QUALIOPI
  * ```
  */
 class NonTranslatableTermRegistryLoader {

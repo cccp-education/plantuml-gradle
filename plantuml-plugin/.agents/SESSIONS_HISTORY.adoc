@@ -1,5 +1,14 @@
 = Historique des Sessions
 
+== Session 216 (2026-09-08) — RENAME-5 : Neutralisation registre non-traductible
+
+Baby-step TDD — `"FPA"` sorti du registre non-traductible `plantuml.boundary`
+(décision D6, cadrage EPIC RENAME S-215) : 2 fixtures tests + KDoc loader
+remplacés par `QUALIOPI`. Gate : grep `fpa|cda` = zéro réel (faux positif
+`ofPattern` prévu), unit boundary 13/13, `check` baseline exacte (3 FAIL
+cucumber + 1 FAIL functional préexistants, stash-confirmés à HEAD),
+`publishToMavenLocal` VERT. ✅
+
 == Session 188 (2026-08-15) — Audit version + EPIC PUB publish 0.0.3
 
 Session de gouvernance pure (pattern S-199 bakery / S-068 slider) — zéro
