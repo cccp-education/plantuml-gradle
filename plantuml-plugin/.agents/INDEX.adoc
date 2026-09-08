@@ -2,8 +2,9 @@
 
 _Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
 
-_Dernière mise a jour_ : 2026-09-08 — Session 216 (plantuml) — RENAME-5 TERMINÉ (baby-step TDD) : `"FPA"` sort du registre non-traductible `plantuml.boundary` (D6 cadrage S-215) → `QUALIOPI`. 3 fichiers (KDoc + 2 fixtures). Gate : grep zéro réel + unit 13/13 + check baseline exacte (3 FAIL cucumber + 1 FAIL functional préexistants stash-confirmés) + publishToMavenLocal VERT.  
+_Dernière mise a jour_ : 2026-09-08 — Session 216 (plantuml) — RENAME-5 TERMINÉ (baby-step TDD) : `"FPA"` sort du registre non-traductible `plantuml.boundary` (D6 cadrage S-215) → `QUALIOPI`. 3 fichiers (KDoc + 2 fixtures). Gate : grep zéro réel + unit 13/13 + check baseline exacte (3 FAIL cucumber + 1 FAIL functional préexistants stash-confirmés) + publishToMavenLocal VERT. + S-215 : cadrage RENAME Vague 3 (RENAME-11 : KDoc loader exemple YAML cite encore REAC/AFNOR — remplacer par QUALIOPI, 0.5 pt).  
 _Session en cours_ : 216 (plantuml) — RENAME-5 exécuté.  
+_Prochaine session_ : RENAME-11 (0.5 pt, KDoc loader) OU maintenance DORMANT au besoin.  
 _Prochaine session_ : 217 — maintenance DORMANT OU diagnostic échecs baseline cucumber (Attempt History ×2, RAG Pipeline ×1) sur demande pilote.  
 _Session terminee_ : 215 (globale) — Cadrage RENAME (gouvernance pure).  
 _Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
