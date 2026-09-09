@@ -113,7 +113,7 @@ _Lecon Session 033 (magic-stick)_ : L'agent a tente de modifier `/home/cheroliv/
 . Delta diagrammes : ne générer que les diagrammes dont le prompt source a changé (hash comparison).
 . `DisableCachingByDefault` ne dispense pas de l'idempotence applicative — Gradle ne sait pas ce qu'est un "diagramme déjà valide", seul le domaine le sait.
 
-*RÉFÉRENCE* : Source canonique — `bakery-gradle/bakery-plugin/AGENT.adoc` section "Non-Répétition des Opérations Coûteuses — Loi de l'Économie d'Encre" (Session 153). Portée transverse : 10 boroughs LLM metered (bakery i18n, codex RAG, training SPG/SPD, capsule TTS, plantuml diagrammes, readme, document, agile, ticket, review). Potentiel 50-80% d'économie LLM sur le pipeline MVP0 complet.
+*RÉFÉRENCE* : Source canonique — `bakery-gradle/bakery-plugin/AGENT.adoc` section "Non-Répétition des Opérations Coûteuses — Loi de l'Économie d'Encre" (Session 153). Portée transverse : 10 boroughs LLM metered (bakery i18n, codex RAG, training scénarios pédagogiques, capsule TTS, plantuml diagrammes, readme, document, agile, ticket, review). Potentiel 50-80% d'économie LLM sur le pipeline MVP0 complet.
 
 == Architecture
 

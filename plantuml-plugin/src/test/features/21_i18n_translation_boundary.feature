@@ -73,25 +73,25 @@ Feature: I18N Translation Boundary — Diagram labels translated, identifiers pr
     And the generated diagram should contain the translated rectangle label "System"
 
   @boundary @non-translatable
-  Scenario: Non-translatable term "REAC" is preserved even when classifier says presentation
-    Given a translation resolver with a FR glossary and non-translatable term "REAC"
-    When the resolver resolves "REAC" in language "fr"
-    Then the translated text should be "REAC"
+  Scenario: Non-translatable term "QUALIOPI" is preserved even when classifier says presentation
+    Given a translation resolver with a FR glossary and non-translatable term "QUALIOPI"
+    When the resolver resolves "QUALIOPI" in language "fr"
+    Then the translated text should be "QUALIOPI"
     And the strategy should be PRESERVE
 
   @boundary @non-translatable
-  Scenario: Non-translatable term "AFNOR" is preserved even when glossary would borrow
-    Given a translation resolver with a FR glossary registering "AFNOR" as BORROW and non-translatable term "AFNOR"
-    When the resolver resolves "AFNOR" in language "fr"
-    Then the translated text should be "AFNOR"
+  Scenario: Non-translatable term "ISO" is preserved even when glossary would borrow
+    Given a translation resolver with a FR glossary registering "ISO" as BORROW and non-translatable term "ISO"
+    When the resolver resolves "ISO" in language "fr"
+    Then the translated text should be "ISO"
     And the strategy should be PRESERVE
 
   @boundary @full-pipeline
-  Scenario: Full pipeline end-to-end — diagram KG with FR glossary and REAC registry
-    Given a full pipeline translation resolver with a FR glossary and a non-translatable registry containing "REAC"
-    And a knowledge graph with nodes "LlmService", "REAC" and a community "pipeline"
+  Scenario: Full pipeline end-to-end — diagram KG with FR glossary and QUALIOPI registry
+    Given a full pipeline translation resolver with a FR glossary and a non-translatable registry containing "QUALIOPI"
+    And a knowledge graph with nodes "LlmService", "QUALIOPI" and a community "pipeline"
     When the knowledge graph renderer renders the graph in language "fr"
     Then the rendered diagram should translate the "Classes" folder label via messages
     And the rendered diagram should preserve the "LlmService" node identifier
-    And the rendered diagram should preserve the "REAC" node identifier
+    And the rendered diagram should preserve the "QUALIOPI" node identifier
     And the rendered diagram should borrow the "pipeline" community name

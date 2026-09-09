@@ -9,25 +9,25 @@ class NonTranslatableTermRegistryTest {
     @Test
     fun `should register and detect a term`() {
         val registry = NonTranslatableTermRegistry()
-        registry.register("REAC")
+        registry.register("QUALIOPI")
 
-        assertTrue(registry.contains("REAC"))
+        assertTrue(registry.contains("QUALIOPI"))
     }
 
     @Test
     fun `should not detect unregistered term`() {
         val registry = NonTranslatableTermRegistry()
 
-        assertFalse(registry.contains("REAC"))
+        assertFalse(registry.contains("QUALIOPI"))
     }
 
     @Test
     fun `should support bulk registration`() {
         val registry = NonTranslatableTermRegistry()
-        registry.registerAll(listOf("REAC", "AFNOR", "QUALIOPI"))
+        registry.registerAll(listOf("QUALIOPI", "ISO", "NFP"))
 
-        assertTrue(registry.contains("REAC"))
-        assertTrue(registry.contains("AFNOR"))
+        assertTrue(registry.contains("QUALIOPI"))
+        assertTrue(registry.contains("ISO"))
         assertTrue(registry.contains("QUALIOPI"))
     }
 }
