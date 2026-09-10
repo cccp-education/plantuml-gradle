@@ -34,21 +34,31 @@ Le périmètre cucumber est résolu (les 3 FAIL de `cucumberTest`) :
    toujours ouvert (hors cucumber).
 
 '''
-== 🟡 EPIC PUB — Publication Maven Central plantuml-plugin (Session 188 — bump backlog)
+== ✅ EPIC PUB — Publication Maven Central plantuml-plugin (Session 188 — bump backlog)
 
-Audit version (gouvernance pure, zéro code modifié) — Session 188 (2026-08-15) :
+Mise à jour réaliste (2026-09-10, post FIX-BASELINE S-217) :
 
-* `plantuml-plugin/gradle/libs.versions.toml:2` → `plantuml = "0.0.3"` (code local — déjà bumpé S-187)
-* Central 0.0.1 + 0.0.2 publiés (maven-metadata.xml) — 0.0.3 **non publié**
-* Décision : **publish 0.0.3** au backlog uniquement (pas d'exécution dans
-  cette tâche — gouvernance pure, pattern bakery S199 / slider S068)
-* BOM : workspace-bom 0.0.13 ✅ (upgradé S187) ; Conventions
-  `education.cccp.build.*:0.0.3` ✅
+* Central maven-metadata.xml : **0.0.4 publié** (0.0.1, 0.0.2, 0.0.4 —
+  `lastUpdated 2026-08-17`, donc **0.0.4 déjà sur Central**)
+* Code local : version dérivée catalogue ws `ws.versions.plantuml.plugin`
+  = **0.0.4** (`libs.versions.toml:2`) — alignée sur Central ✅
+* Consommateur `document-plugin` : catalogue aligné `0.0.3` → `0.0.4`
+  (commit `0d0a71b`, la résolution effective était déjà 0.0.4 via BOM
+  0.0.37 — compileKotlin UP-TO-DATE) ✅
+* Consommateur `workspace-bom` : catalogue `plantuml-plugin = "0.0.4"`
+  + BOM contraint 0.0.4 — RAS ✅
+* BOM : workspace-bom 0.0.37 ✅ ; Conventions
+  `education.cccp.build.*:0.0.4` ✅
+* Contenu 0.0.4 : code livré jusqu'à PLT-BOUNDARY // RENAME (KDoc) —
+  FIX-BASELINE S-217 est TEST-only (zéro impact binaire, pas de réédition)
 
 US (~3) :
-. PUB-0.0.3-1 — Vérifier POM (`withType<MavenPublication>`) + signing GPG + release deps (pattern nmcp)
-. PUB-0.0.3-2 — `./gradlew check` VERT + Exécuter `./gradlew publishAggregationToCentralPortal --no-daemon` (méthode nmcp)
-. PUB-0.0.3-3 — Vérifier repo1.maven.org (POM plantuml-plugin 0.0.3 HTTP 200) + MàJ BOM/consommateurs si nécessaire
+. PUB-0.0.3-1 — Vérifier POM (`withType<MavenPublication>`) + signing GPG + release deps (pattern nmcp) ✅ (fait S-179 pour 0.0.2, POM inchangé)
+. PUB-0.0.3-2 — `./gradlew check` VERT + Exécuter `./gradlew publishAggregationToCentralPortal --no-daemon` (méthode nmcp) ✅ (0.0.4 déjà sur Central depuis 2026-08-17)
+. PUB-0.0.3-3 — Vérifier repo1.maven.org (POM plantuml-plugin HTTP 200) + MàJ BOM/consommateurs si nécessaire ✅ (repo1 0.0.4 vérifié ; document-plugin aligné 0.0.4 — commit `0d0a71b`)
+
+**RESULTAT** : 0.0.3 jamais publié (sauté), 0.0.4 = version réelle alignée
+code ↔ Central ↔ catalogue ws ↔ consommateur.
 
 '''
 == ✅ EPIC 13 : Multi-provider API Pool — Rotation par tiers + Cross-provider
