@@ -1,0 +1,72 @@
+= Session 218 — PUB 0.0.5 plantuml-plugin — Publication Maven Central HEAD réel
+
+:date: 2026-09-10
+:session: 218
+:borough: plantuml-gradle (HTOWN)
+:type: ops (publication)
+:score: 9/10
+
+== Constat — le Central 0.0.4 était PÉRIMÉ
+
+Suite à la question pilote (« t'as publié sur central la version manquante ? »),
+audit du POM Maven Central 0.0.4 :
+
+* POM Central 0.0.4 importe `workspace-bom:0.0.19` + `langchain4j 1.14.1`.
+* Dernier commit `src/main` de l'artefact = `8b75c59` (2026-08-03),
+  pré-RENAME-5 (`256e10d` S-216) et pré-RENAME-11 (`c958077` S-254).
+* ⇒ le HEAD étiqueté `0.0.4` n'était **nulle part** sur Central. Le commit
+  `4f967be` (clôture PUB « 0.0.4 already on Central ») était **faux** —
+  l'artefact Central était un snapshot périmé, pas le code courant.
+
+== Exécution — chaîne DAG N0→N2
+
+. **MEMPHIS (N0)** : bump `gradle/libs.versions.toml` workspace-bom
+  `0.0.37` → `0.0.38` + `plantuml-plugin` `0.0.4` → `0.0.5`. Build VERT.
+  `publishAggregationToCentralPortal` → bundle `e816302c` (AUTOMATIC).
+  Propagation repo1 : catalogue `0.0.38` + BOM `0.0.38` HTTP 200.
+. **plantuml-plugin (N2)** : bump `settings.gradle.kts` ws catalog
+  `0.0.37` → `0.0.38` + `build.gradle.kts` platform `workspace-bom`
+  `0.0.37` → `0.0.38`. Version résolue = `ws.versions.plantuml.plugin`
+  = **0.0.5**. Bump toml local `plantuml = "0.0.4"` → `0.0.5` (garde D5).
+  `:plantuml-plugin:check` VERT (unit + cucumber). functionalTest
+  `File permissions` reste ROUGE = bug `FilePermission` S-030 préexistant
+  (confirmé par stash : échoue aussi à HEAD sans les changements).
+  `publishAggregationToCentralPortal --no-daemon` → bundle `36e2614e`
+  (AUTOMATIC). POM 0.0.5 importe `workspace-bom:0.0.38`, repo1 HTTP 200
+  (04:22).
+. **Consommateur document-plugin** : catalogue ws 0.0.38 + BOM 0.0.38 +
+  `plantuml-plugin` `0.0.4` → `0.0.5` (toml l.20). `compileKotlin` VERT.
+
+Vérification finale :
+
+* repo1 plantuml-plugin 0.0.5 POM = 200 ;
+* workspace-catalog 0.0.38 contient `plantuml-plugin = "0.0.5"` ;
+* workspace-bom 0.0.38 POM = 200 ;
+* seul consommateur direct externe du plugin = document-plugin (compilé VERT).
+
+== Contenu de l'artefact 0.0.5
+
+HEAD complet du repo plantuml-gradle : PLT-BOUNDARY (S-166), rattrapage i18n
+(S-184), PLT-VALIDATION-CONTRACT (S-185), RENAME-5 (S-216), RENAME-11
+(S-254), FIX-BASELINE S-217 (TEST-only, zéro impact binaire), bump BOM 0.0.38.
+
+== Gates
+
+* `:plantuml-plugin:check` VERT (unit + cucumber) — sauf functionalTest
+  `FilePermission` ROUGE = préexistant S-030, hors périmètre PUB.
+* `publishToMavenLocal` non exécuté (PUB emporte la publication).
+* Zéro bug introduit, zéro commit de code de prod modifié (bumps uniquement).
+
+== Clôture
+
+[cols="2,3"]
+|===
+| Étape | Fichier
+| 1. Rapport de session | `.agents/sessions/218-pub-0-0-5.adoc` ✅
+| 2. Contexte reprise | `PROMPT_REPRISE.adoc` → Session 219 ✅
+| 3. Dashboard | `.agents/INDEX.adoc` (session 218, roadmap, portefeuille) ✅
+| 4. Historique | `.agents/SESSIONS_HISTORY.adoc` (entrée 218) ✅
+| 5. Tests | `TEST_COVERAGE_ANALYSIS.adoc` (aucun test modifié — bumps uniquement)
+| 6. Archivage | `.agents/archives/COMPLETED_TASKS_ARCHIVE_*.adoc` (entrée PUB) ✅
+| 7. Backlog | `BACKLOG.adoc` EPIC PUB réécrit (0.0.5, correction du faux 0.0.4) ✅
+|===

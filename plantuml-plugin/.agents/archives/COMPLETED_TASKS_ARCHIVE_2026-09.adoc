@@ -1,5 +1,17 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-09
 
+== Session 218 (2026-09-10) — PUB 0.0.5 : publication Maven Central HEAD réel ✅
+
+=== Fait
+- Audit POM Central 0.0.4 : périmé (workspace-bom 0.0.19, code 8b75c59 pré-RENAME) → HEAD nulle part sur Central ✅
+- MEMPHIS workspace-bom/workspace-catalog 0.0.38 publiés (bundle e816302c, AUTOMATIC), plantuml-plugin=0.0.5 ✅
+- plantuml-plugin 0.0.5 publié (bundle 36e2614e, AUTOMATIC), POM workspace-bom 0.0.38, repo1 200 ✅
+- plantuml-plugin : settings catalog 0.0.38 + BOM 0.0.38 + toml local version 0.0.5 (garde D5) ✅
+- Consommateur document-plugin : catalogue ws 0.0.38 + BOM 0.0.38 + plantuml-plugin 0.0.5, compileKotlin VERT ✅
+- BACKLOG EPIC PUB réécrit (correction du faux « 0.0.4 already on Central ») ✅
+- Gate : :plantuml-plugin:check VERT ; functionalTest FilePermission ROUGE = S-030 préexistant hors périmètre ✅
+- Zéro bug introduit (bumps uniquement) ✅
+
 == Session 216 (2026-09-08) — RENAME-5 : Neutralisation registre non-traductible ✅
 
 === Fait

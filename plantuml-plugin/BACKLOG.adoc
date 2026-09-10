@@ -34,31 +34,39 @@ Le périmètre cucumber est résolu (les 3 FAIL de `cucumberTest`) :
    toujours ouvert (hors cucumber).
 
 '''
-== ✅ EPIC PUB — Publication Maven Central plantuml-plugin (Session 188 — bump backlog)
+== ✅ EPIC PUB — Publication Maven Central plantuml-plugin 0.0.5 (Session 218)
 
-Mise à jour réaliste (2026-09-10, post FIX-BASELINE S-217) :
+Réalité actée (2026-09-10, S-218 — publication complète) :
 
-* Central maven-metadata.xml : **0.0.4 publié** (0.0.1, 0.0.2, 0.0.4 —
-  `lastUpdated 2026-08-17`, donc **0.0.4 déjà sur Central**)
-* Code local : version dérivée catalogue ws `ws.versions.plantuml.plugin`
-  = **0.0.4** (`libs.versions.toml:2`) — alignée sur Central ✅
-* Consommateur `document-plugin` : catalogue aligné `0.0.3` → `0.0.4`
-  (commit `0d0a71b`, la résolution effective était déjà 0.0.4 via BOM
-  0.0.37 — compileKotlin UP-TO-DATE) ✅
-* Consommateur `workspace-bom` : catalogue `plantuml-plugin = "0.0.4"`
-  + BOM contraint 0.0.4 — RAS ✅
-* BOM : workspace-bom 0.0.37 ✅ ; Conventions
-  `education.cccp.build.*:0.0.4` ✅
-* Contenu 0.0.4 : code livré jusqu'à PLT-BOUNDARY // RENAME (KDoc) —
-  FIX-BASELINE S-217 est TEST-only (zéro impact binaire, pas de réédition)
+* **Le Central 0.0.4 était PÉRIMÉ** : POM Central 0.0.4 importe
+  `workspace-bom:0.0.19` + `langchain4j 1.14.1`, dernier code `8b75c59`
+  (2026-08-03, pré-RENAME-5/RENAME-11). HEAD étiqueté `0.0.4` n'était
+  **nulle part** sur Central → la vraie version manquante.
+* Publication **0.0.5** exécutée (S-218) :
+  . MEMPHIS workspace-bom `0.0.38` (catalogue `plantuml-plugin = "0.0.5"`)
+    publié Central (bundle `e816302c`, AUTOMATIC) — prérequis N0.
+  . plantuml-plugin `0.0.5` publié Central (bundle `36e2614e`, AUTOMATIC),
+    POM importe `workspace-bom:0.0.38`, repo1 HTTP 200 (04:22).
+  . Contenu 0.0.5 : HEAD complet = PLT-BOUNDARY + i18n rattrapage +
+    RENAME-5 (`256e10d`) + RENAME-11 (`c958077`) + FIX-BASELINE S-217
+    (TEST-only) + bump BOM 0.0.38.
+* Consommateur `document-plugin` : catalogue ws 0.0.38 + BOM 0.0.38 +
+  `plantuml-plugin = "0.0.5"` — compileKotlin VERT (resolue 0.0.5).
+* Version dérivée : `ws.versions.plantuml.plugin` = **0.0.5**
+  (`gradle/libs.versions.toml:2` aligné, garde D5 satisfait).
+* Gate : `:plantuml-plugin:check` VERT (unit + cucumber) ; functionalTest
+  `File permissions` reste ROUGE — bug `FilePermission` S-030 préexistant
+  documenté **hors périmètre PUB** (confirmé stash VERT nommage, le test
+  échoue à HEAD aussi).
 
 US (~3) :
 . PUB-0.0.3-1 — Vérifier POM (`withType<MavenPublication>`) + signing GPG + release deps (pattern nmcp) ✅ (fait S-179 pour 0.0.2, POM inchangé)
-. PUB-0.0.3-2 — `./gradlew check` VERT + Exécuter `./gradlew publishAggregationToCentralPortal --no-daemon` (méthode nmcp) ✅ (0.0.4 déjà sur Central depuis 2026-08-17)
-. PUB-0.0.3-3 — Vérifier repo1.maven.org (POM plantuml-plugin HTTP 200) + MàJ BOM/consommateurs si nécessaire ✅ (repo1 0.0.4 vérifié ; document-plugin aligné 0.0.4 — commit `0d0a71b`)
+. PUB-0.0.3-2 — `./gradlew check` VERT + Exécuter `./gradlew publishAggregationToCentralPortal --no-daemon` (méthode nmcp) ✅ (0.0.5 publié S-218, bundle `36e2614e`)
+. PUB-0.0.3-3 — Vérifier repo1.maven.org (POM plantuml-plugin HTTP 200) + MàJ BOM/consommateurs si nécessaire ✅ (repo1 0.0.5 HTTP 200 ; workspace-bom fixé 0.0.38 ; document-plugin aligné 0.0.5)
 
-**RESULTAT** : 0.0.3 jamais publié (sauté), 0.0.4 = version réelle alignée
-code ↔ Central ↔ catalogue ws ↔ consommateur.
+**RESULTAT** : 0.0.3 jamais publié (sauté), 0.0.4 Central périmé (8b75c59),
+0.0.5 = version réelle du HEAD PUBLIÉE — code ↔ Central ↔ catalogue ws
+0.0.38 ↔ consommateur aligné.
 
 '''
 == ✅ EPIC 13 : Multi-provider API Pool — Rotation par tiers + Cross-provider

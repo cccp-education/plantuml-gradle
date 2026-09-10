@@ -1,5 +1,24 @@
 = Historique des Sessions
 
+== Session 218 (2026-09-10) — PUB 0.0.5 : publication Maven Central du HEAD réel ✅
+
+Le Central 0.0.4 était **périmé** (POM `workspace-bom:0.0.19`, dernier code
+`8b75c59` 2026-08-03, pré-RENAME-5/RENAME-11) — le HEAD étiqueté 0.0.4 était
+nulle part sur Central. Publication chaînée DAG N0→N2 :
+
+* MEMPHIS `workspace-bom`/`workspace-catalog` **0.0.38** publiés Central
+  (bundle `e816302c`, AUTOMATIC) avec `plantuml-plugin = "0.0.5"`.
+* plantuml-plugin **0.0.5** publié Central (bundle `36e2614e`, AUTOMATIC),
+  POM importe `workspace-bom:0.0.38`, repo1 HTTP 200.
+* Contenu 0.0.5 : HEAD complet (PLT-BOUNDARY, i18n rattrapage, RENAME-5,
+  RENAME-11, FIX-BASELINE S-217 TEST-only) + bump BOM 0.0.38.
+* Consommateur `document-plugin` : catalogue ws 0.0.38 + BOM 0.0.38 +
+  `plantuml-plugin = "0.0.5"` — compileKotlin VERT.
+* Version dérivée `ws.versions.plantuml.plugin` = 0.0.5 (toml l.2 aligné,
+  garde D5 satisfait). Gate `:plantuml-plugin:check` VERT ; functionalTest
+  `FilePermission` ROUGE = bug S-030 préexistant hors périmètre PUB.
+* Correction du faux commit `4f967be` (clôture « 0.0.4 already on Central »).
+
 == Session 216 (2026-09-08) — RENAME-5 : Neutralisation registre non-traductible
 
 Baby-step TDD — `"FPA"` sorti du registre non-traductible `plantuml.boundary`

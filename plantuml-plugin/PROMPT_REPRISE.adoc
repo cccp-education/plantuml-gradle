@@ -1,33 +1,31 @@
-= PROMPT_REPRISE — Plantuml — Session 218
-:session: 218
+= PROMPT_REPRISE — Plantuml — Session 219
+:session: 219
 :date: 2026-09-10
 
-== État — FIX-BASELINE terminé (S-217)
+== État — PUB 0.0.5 terminé (S-218)
 
-Session 217 : les 3 échecs cucumber **préexistants** de HEAD sont résolus —
-la baseline cucumber est désormais **VERTE**.
+Session 218 : publication Maven Central du HEAD réel. Le Central 0.0.4
+était **périmé** (POM `workspace-bom:0.0.19`, dernier code `8b75c59`
+2026-08-03, pré-RENAME-5/RENAME-11) — le HEAD était nulle part sur Central.
 
-* Attempt History Tracking (2 FAIL) : cause racine = regex `"valid"`
-  minuscule vs champ réel `"isValid"` (V majuscule, case-sensitive) →
-  `"(?:is)?Valid"` × 4 dans `AttemptHistorySteps.kt`. Suite 3/3 VERT.
-* RAG Pipeline (1 FAIL) : fixture écrivait `generated/rag` (relatif) alors
-  que `CollectPlantumlIndexTask` lit `build/plantuml-plugin/generated/rag`
-  → "No RAG directory found". Dir corrigé + nouveaux steps dédiés
-  (`startPgvectorContainerWithEmbeddings` + `...WithUnchangedPromptDiagram`
-  avec seed checksum). `@rag` 4/4 PASSED (log `Skipped rag-test.puml`
-  confirmé).
-* Correctifs **TEST-only** (zéro fichier production, zéro bump BOM) →
-  `publishToMavenLocal` non requis.
-* Gates : `@rag` BUILD SUCCESSFUL 6m44s ; `@plantuml` BUILD SUCCESSFUL
-  (XML Attempt History tests=3 failures=0, +3ème ré-exécution verte après
-  crash infra d'1 test-worker).
-* Commit + push clôture (permission pilote).
+* MEMPHIS : `workspace-bom` 0.0.38 + `workspace-catalog` 0.0.38 publiés
+  (bundle `e816302c`, AUTOMATIC) avec `plantuml-plugin = "0.0.5"`.
+* plantuml-plugin **0.0.5** publié (bundle `36e2614e`, AUTOMATIC), POM
+  importe `workspace-bom:0.0.38`, repo1 HTTP 200.
+* Contenu 0.0.5 : HEAD complet (PLT-BOUNDARY, i18n rattrapage, RENAME-5
+  `256e10d`, RENAME-11 `c958077`, FIX-BASELINE S-217 TEST-only).
+* Consommateur `document-plugin` : catalogue ws 0.0.38 + BOM 0.0.38 +
+  `plantuml-plugin = "0.0.5"` — compileKotlin VERT.
+* Version dérivée : `ws.versions.plantuml.plugin` = 0.0.5 (toml l.2 aligné,
+  garde D5 `PlantumlPluginPublicationTest` satisfait).
+* Gate : `:plantuml-plugin:check` VERT (unit + cucumber). functionalTest
+  `File permissions` ROUGE restant = bug `FilePermission` S-030 préexistant
+  (vérifié par stash) — **hors périmètre PUB**.
+* Clôture : BACKLOG EPIC PUB réécrit (0.0.5), synchronisation gouvernance
+  en cours.
 
-== Mission session 218 — Maintenance DORMANT
+== Mission session 219 — Maintenance DORMANT
 
-. **PUB 0.0.3** — Publication Maven Central plantuml-plugin (3 US
-   PUB-0.0.3-1/2/3). Version code = 0.0.4 (dérivée `ws.versions.plantuml.plugin`),
-   Central = 0.0.1/0.0.2. ~1 session. Sur demande pilote.
 . **PL-3** — ktlint ou detekt (BLOQUÉ ABIDJAN).
 . Reste `functionalTest` : `PlantumlFunctionalSuite$FilePermission`
    (1 FAIL, préexistant connu S-030) — hors cucumber, périmètre FIX-BASELINE
@@ -42,8 +40,7 @@ la baseline cucumber est désormais **VERTE**.
 [cols="1,4,1"]
 |===
 | Priorité | Tâche | Est.
-| ▢ FIX-BASELINE | ✅ TERMINÉ (S-217) — échecs cucumber préexistants résolus | ~1 session
-| 🟡 PUB 0.0.3 | Publication Maven Central plantuml-plugin (3 US) — version actuelle dérivée ws catalog 0.0.4 | ~1 session
+| ✅ PUB 0.0.5 | ✅ TERMINÉ (S-218) — publication HEAD réel, consommateur aligné, BOM 0.0.38 | ~1 session
 | 🟡 PL-3 | ktlint ou detekt | BLOQUÉ ABIDJAN
 |===
 
@@ -54,14 +51,14 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 
 == Rappels
 
-- GroupId: education.cccp.plantuml — version dérivée `ws.versions.plantuml.plugin` (catalog 0.0.30 = 0.0.4)
-- Central: 0.0.1, 0.0.2 publiés. Version code: 0.0.4 (à publier)
-- BOM: `workspace-bom` platform 0.0.30 ✅ (MEM-CAT-ROLLOUT S-030)
+- GroupId: education.cccp.plantuml — version dérivée `ws.versions.plantuml.plugin` (catalog 0.0.38 = 0.0.5)
+- Central: 0.0.1, 0.0.2, 0.0.4 (périmé), 0.0.4→ **0.0.5 publié S-218** (HEAD réel)
+- BOM: `workspace-bom` platform 0.0.38 ✅ (S-218)
 - Conventions: `education.cccp.build.*:0.0.4` ✅
 - `publishToMavenLocal` obligatoire après modif code plugin
 - Kover main: 83.26% INSTRUCTION ✅ ≥ 75%
-- Cucumber: baseline désormais **VERTE** (FIX-BASELINE S-217 résoud les 3 FAIL préexistants)
+- Cucumber: baseline **VERTE** (FIX-BASELINE S-217)
 - Functional: 1 FAIL préexistant `FilePermission` (connu S-030)
 - Configuration Cache: activé ✅
-- Tous les EPICs métier terminés — RENAME-5 ✅ (S-216), FIX-BASELINE ✅ (S-217)
+- Tous les EPICs métier terminés — RENAME-5 ✅ (S-216), FIX-BASELINE ✅ (S-217), PUB 0.0.5 ✅ (S-218)
 - Plugin dormant — maintenance uniquement
