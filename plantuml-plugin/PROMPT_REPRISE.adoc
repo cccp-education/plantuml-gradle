@@ -1,37 +1,49 @@
-= PROMPT_REPRISE — Plantuml — Session 217
-:session: 217
-:date: 2026-09-08
+= PROMPT_REPRISE — Plantuml — Session 218
+:session: 218
+:date: 2026-09-10
 
-== État — RENAME-5 terminé (S-216)
+== État — FIX-BASELINE terminé (S-217)
 
-Session 216 : RENAME-5 exécuté (baby-step TDD) — le terme métier sorti du registre
-non-traductible `plantuml.boundary` (décision D6 du cadrage EPIC RENAME
-S-215). Remplacé par `QUALIOPI` (référence publique française). 3 fichiers
-(KDoc loader + 2 fixtures tests). Gate : grep `fpa|cda` = zéro réel (1 faux
-positif `ofPattern` prévu), unit boundary 13/13, `check` baseline exacte
-(3 FAIL cucumber + 1 FAIL functional **préexistants**, stash-confirmés),
-`publishToMavenLocal` VERT. Commit + push clôture.
+Session 217 : les 3 échecs cucumber **préexistants** de HEAD sont résolus —
+la baseline cucumber est désormais **VERTE**.
 
-== Mission session 217 — Maintenance DORMANT ou échecs baseline
+* Attempt History Tracking (2 FAIL) : cause racine = regex `"valid"`
+  minuscule vs champ réel `"isValid"` (V majuscule, case-sensitive) →
+  `"(?:is)?Valid"` × 4 dans `AttemptHistorySteps.kt`. Suite 3/3 VERT.
+* RAG Pipeline (1 FAIL) : fixture écrivait `generated/rag` (relatif) alors
+  que `CollectPlantumlIndexTask` lit `build/plantuml-plugin/generated/rag`
+  → "No RAG directory found". Dir corrigé + nouveaux steps dédiés
+  (`startPgvectorContainerWithEmbeddings` + `...WithUnchangedPromptDiagram`
+  avec seed checksum). `@rag` 4/4 PASSED (log `Skipped rag-test.puml`
+  confirmé).
+* Correctifs **TEST-only** (zéro fichier production, zéro bump BOM) →
+  `publishToMavenLocal` non requis.
+* Gates : `@rag` BUILD SUCCESSFUL 6m44s ; `@plantuml` BUILD SUCCESSFUL
+  (XML Attempt History tests=3 failures=0, +3ème ré-exécution verte après
+  crash infra d'1 test-worker).
+* Commit + push clôture (permission pilote).
 
-. **Échecs baseline préexistants** (découverts S-216, stash-confirmés à
-   HEAD) — optionnels, sur demande pilote :
-   - `cucumberTest` : Attempt History Tracking (2 FAIL) + RAG Pipeline
-     (1 FAIL) — diagnostic en session dédiée baby-step TDD/BDD
-   - `functionalTest` : `PlantumlFunctionalSuite$FilePermission`
-     (préexistant connu S-030)
-. Si un besoin cross-borough émerge (document, bakery, slider, codex) →
-   baby-step DDD/TDD/BDD
+== Mission session 218 — Maintenance DORMANT
+
+. **PUB 0.0.3** — Publication Maven Central plantuml-plugin (3 US
+   PUB-0.0.3-1/2/3). Version code = 0.0.4 (dérivée `ws.versions.plantuml.plugin`),
+   Central = 0.0.1/0.0.2. ~1 session. Sur demande pilote.
+. **PL-3** — ktlint ou detekt (BLOQUÉ ABIDJAN).
+. Reste `functionalTest` : `PlantumlFunctionalSuite$FilePermission`
+   (1 FAIL, préexistant connu S-030) — hors cucumber, périmètre FIX-BASELINE
+   n'ayant pas été étendu à functionalTest.
+. Si besoin cross-borough (document, bakery, slider, codex) → baby-step
+   DDD/TDD/BDD.
 . Sinon → maintenance (audit gouvernance, rotation backup si multiple de
-   10 — prochaine S-220)
+   10 — prochaine S-220).
 
 == Backlog — priorisé
 
 [cols="1,4,1"]
 |===
 | Priorité | Tâche | Est.
+| ▢ FIX-BASELINE | ✅ TERMINÉ (S-217) — échecs cucumber préexistants résolus | ~1 session
 | 🟡 PUB 0.0.3 | Publication Maven Central plantuml-plugin (3 US) — version actuelle dérivée ws catalog 0.0.4 | ~1 session
-| 🟡 FIX-BASELINE | Diagnostic échecs cucumber préexistants (Attempt History + RAG Pipeline) | ~1 session
 | 🟡 PL-3 | ktlint ou detekt | BLOQUÉ ABIDJAN
 |===
 
@@ -48,8 +60,8 @@ craftsmanship. Red→Green→Refactor, 1 test à la fois.
 - Conventions: `education.cccp.build.*:0.0.4` ✅
 - `publishToMavenLocal` obligatoire après modif code plugin
 - Kover main: 83.26% INSTRUCTION ✅ ≥ 75%
-- Cucumber: 131 tests — 3 FAIL préexistants (Attempt History ×2, RAG Pipeline ×1), 12 SKIP
+- Cucumber: baseline désormais **VERTE** (FIX-BASELINE S-217 résoud les 3 FAIL préexistants)
 - Functional: 1 FAIL préexistant `FilePermission` (connu S-030)
 - Configuration Cache: activé ✅
-- Tous les EPICs métier terminés — RENAME-5 ✅ (S-216)
+- Tous les EPICs métier terminés — RENAME-5 ✅ (S-216), FIX-BASELINE ✅ (S-217)
 - Plugin dormant — maintenance uniquement

@@ -94,3 +94,8 @@ ApiKeyPoolSteps.kt créé (~330 lignes, 30+ steps) — 18/18 scénarios feature 
 
 → _Sessions 1-170_ : `.agents/backup/Y2026-sessions-001-125/` + `.agents/backup/Y2026-sessions-126-178/` + `.agents/backup/Y2026-sessions-165-169/`
 → _Détails sessions 171-180_ : `.agents/sessions/`
+
+== Session 217 (2026-09-10) — FIX-BASELINE : échecs cucumber préexistants résolus ✅
+
+Diagnostic + correction 3 échecs cucumber préexistants de HEAD (stash-confirmés S-216).
+1) Attempt History (2 FAIL) : regex `"valid"` minuscule vs champ réel `"isValid"` (V majuscule, case-sensitive) → `"(?:is)?Valid"` × 4 (`AttemptHistorySteps.kt`). 2) RAG scénario 3 (1 FAIL) : fixture sur `generated/rag` réparée → `build/plantuml-plugin/generated/rag`, nouveau step dédié avec seed checksum (`build/plantuml-plugin/checksums/rag-test.sha256`). Séparation fixtures (scénario 2 sans checksum, scénario 3 dédié) pour éviter la régression "prompt skip". Gates : `@rag` 4/4 PASSED (log `Skipped rag-test.puml` confirmé), `@plantuml` 3/3 (XML tests=3 failures=0). Baseline cucumber VERTE. Zéro fichier production, zéro bump BOM. Les 3 échecs préexistants de `cucumberTest` sont résolus. ✅

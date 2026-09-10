@@ -1,0 +1,115 @@
+= Session 217 — FIX-BASELINE : échecs cucumber préexistants résolus
+:date: 2026-09-10
+:epic: FIX-BASELINE
+:mission: PROMPT_REPRISE.adoc session 217
+
+== Mission
+
+Résoudre les 3 échecs cucumber **préexistants** de HEAD (stash-confirmés
+S-216) : Attempt History Tracking (2 FAIL) + RAG Pipeline (1 FAIL), en
+baby-steps depuis `plantuml-plugin/`. Gates : `cucumberTest
+-Pcucumber.tags="@plantuml"` et `@rag` VERTS.
+
+== Diagnostic
+
+=== Attempt History Tracking (2 FAIL) — cause racine
+
+Les steps inspectent les fichiers d'historique JSON via le regex
+`Regex("\"valid\"\\s*:\\s*(true|false)")` — **minuscule `valid`**. Or le
+champ réellement émis par le plugin est `"isValid"` (avec un **V
+majuscule**). La regex Java/Kotlin étant case-sensitive, elle ne matchait
+jamais → collections vides → "Should have at least 1/3 entries".
+
+Vérifié : `/"((?:is)?Valid)"\s*:\s*(true|false)/` → `OK: isValid=false`.
+
+=== RAG Pipeline (1 FAIL) — cause racine
+
+`PlantumlWorld.executeGradle`/`executeGradleAsync` ajoutent toujours
+`-Pplantuml.output.rag=<projectDir>/build/plantuml-plugin/generated/rag`
+(PlantumlWorld.kt:376). `CollectPlantumlIndexTask` lit
+`File(config.output.rag)` = ce chemin `build`. Or le fixture du scénario 3
+écrivait dans `<projectDir>/generated/rag` (relatif) → RAG dir introuvable
+→ création + early return, jamais le skip attendu.
+
+Mécanique du skip : `shouldReindexPuml(rag-test.puml, promptsDir)` renvoie
+false si le prompt `prompts/rag-test.prompt` existe ET que
+`ChecksumStore.hasPromptChanged` est false (checksum stocké == courant,
+SHA-256 hex minuscule via `%02x`, fichier `<name>.sha256` sur
+`build/plantuml-plugin/checksums`).
+
+== Exécution (baby-step corrigeant uniquement les fixtures, zéro prod)
+
+=== Attempt History
+
+. `AttemptHistorySteps.kt` : regex `"(?:is)?Valid"` (4 sites) — replaceAll.
+
+Suites Attempt History PASSED → VERT (3/3).
+
+=== RAG
+
+RESTRUCTURATION : le scénario 3 partageait avec le scénario 2 le fixture
+"a running pgvector container with existing embeddings". Mon fixture
+corrigé y avait ajouté le seed checksum destiné au scénario 3 → il faisait
+**skip** le prompt `rag-test.prompt` dans le scénario 2 de
+`generatePlantumlDiagrams` (régression). Correction en 2 temps :
+
+. `startPgvectorContainerWithEmbeddings()` (scénario 2) : répertoire
+  corrigé `generated/rag` → `build/plantuml-plugin/generated/rag`, zéro
+  checksum (le skip (checksum) n'a pas lieu d'être ici).
+. Nouveau step dédié `@"a pgvector container with an unchanged prompt
+  diagram"` (scénario 3) : même dir corrigé + seed
+  `build/plantuml-plugin/checksums/rag-test.sha256` =
+  `calculateChecksum(prompts/rag-test.prompt)` (même format SHA-256 hex
+  que `ChecksumStore`), avec `rag-test.puml` présent.
+
+`5_rag_pipeline.feature` : le scénario 3 utilise le nouveau Given ;
+la step no-op "the prompt file has not been modified" est retirée du
+scénario (c'était un résidu du fixture `incremental-test.prompt`
+inexistant). `startPgvectorContainerWithUnchangedPromptDiagram` n'insère
+ni `existing-diagram.puml` ni `attempt-history-*.json` (éviter le vrai
+embedding `AllMiniLmL6V2` ONNX — les tests intégration utilisent
+délibérément `StubEmbeddingModel` + `plantuml.test.rag.mode=simulation`).
+
+Comportement attendu scénario 3 : `rag-test.puml` skipped + log
+`Skipped rag-test.puml (source prompt unchanged)` ; `filteredDiagramFiles`
+ET `historyFiles` vides → early return `collect.no_data` → BUILD
+SUCCESSFUL rapide sans embedding réel.
+
+== Gates
+
+=== RAG (`@rag`)
+
+`./gradlew cucumberTest -Pcucumber.tags="@rag"` → **BUILD SUCCESSFUL in
+6m44s**, EXIT=0. 4/4 scénarios PASSED :
+* Reindex RAG creates embeddings in pgvector ✅
+* RAG context is injected in LLM prompts ✅
+* Incremental reindex skips unchanged prompts ✅ (log confirmé :
+  `→ Skipped rag-test.puml (source prompt unchanged)`)
+* RAG cleanup removes deleted prompt embeddings ✅
+
+=== Attempt History (`@plantuml`)
+
+`./gradlew cucumberTest -Pcucumber.tags="@plantuml"` → **BUILD SUCCESSFUL
+in 3m19s**, EXIT=0. Au cours du run, l'un des test-workers s'est crashé
+(infra, non-deterministe) → la feature 4 a été ré-exécutée. XML autoritatif
+`TEST-feature_file_...-4_attempt_history-CMLHT2IFHO5MM.feature.xml` :
+**tests="3" failures="0"**. Suite (3/3) VERTE, le 3ème run confirmant.
+`@rag` run2 : 4/4 PASSED (log).
+
+* FIX-BASELINE TERMINÉ — les 3 échecs cucumber préexistants sont
+  résolus, la baseline cucumber est désormais VERTE.
+
+== Fichiers modifiés (TEST-only, zéro fichier production)
+
+* `src/test/features/5_rag_pipeline.feature` (3 lignes — Given dédié
+  scénario 3, gain 1 ligne)
+* `src/test/scenarios/plantuml/scenarios/AttemptHistorySteps.kt`
+  (Regex `"(?:is)?Valid"` × 4)
+* `src/test/scenarios/plantuml/scenarios/RagPipelineSteps.kt`
+  (dir corrigé + nouveau step dédié + `calculateChecksum` existant)
+
+== Clôture
+
+Procédure 6 étapes exécutée (rapport + PROMPT_REPRISE 218 +
+SESSIONS_HISTORY + INDEX + archive 2026-09 + sync BACKLOG). Commit +
+push accordés par le pilote en ouverture de session.

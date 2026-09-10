@@ -78,8 +78,7 @@ class RagPipelineSteps(private val world: PlantumlWorld) {
     @Given("a running pgvector container with existing embeddings")
     fun startPgvectorContainerWithEmbeddings() {
         startPgvectorContainer()
-        val ragDir = File(world.projectDir, "generated/rag")
-        ragDir.mkdirs()
+        val ragDir = File(world.projectDir, "build/plantuml-plugin/generated/rag").apply { mkdirs() }
         File(ragDir, "existing-diagram.puml").writeText(
             """
             @startuml
@@ -99,6 +98,24 @@ class RagPipelineSteps(private val world: PlantumlWorld) {
             }
             """.trimIndent()
         )
+    }
+
+    @Given("a pgvector container with an unchanged prompt diagram")
+    fun startPgvectorContainerWithUnchangedPromptDiagram() {
+        startPgvectorContainer()
+        val ragDir = File(world.projectDir, "build/plantuml-plugin/generated/rag").apply { mkdirs() }
+        File(ragDir, "rag-test.puml").writeText(
+            """
+            @startuml
+            class ExistingClass {
+              +field: String
+            }
+            @enduml
+            """.trimIndent()
+        )
+        val promptFile = File(File(world.projectDir, "prompts"), "rag-test.prompt")
+        val checksumsDir = File(world.projectDir, "build/plantuml-plugin/checksums").apply { mkdirs() }
+        File(checksumsDir, "rag-test.sha256").writeText(calculateChecksum(promptFile))
     }
 
     @Given("a running pgvector container with embeddings for {int} prompts")

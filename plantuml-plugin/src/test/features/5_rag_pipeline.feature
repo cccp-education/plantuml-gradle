@@ -22,8 +22,7 @@ Feature: RAG Pipeline
 
   @rag
   Scenario: Incremental reindex skips unchanged prompts
-    Given a running pgvector container with existing embeddings
-    And the prompt file has not been modified
+    Given a pgvector container with an unchanged prompt diagram
     When I run collectPlantumlIndex task
     Then unchanged prompts should be skipped
     And only new or modified prompts should be indexed

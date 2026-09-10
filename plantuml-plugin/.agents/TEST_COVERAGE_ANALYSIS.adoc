@@ -1,6 +1,34 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 216 (8 septembre 2026) — RENAME-5 registre non-traductible (baby-step TDD)
+_Dernière mise à jour_ : Session 217 (10 septembre 2026) — FIX-BASELINE test coverage cucumber (fixtures + regex)
+
+=== Session 217 — FIX-BASELINE (fixtures cucumber, TEST-only)
+
+Session 217 (2026-09-10) : les 3 échecs cucumber **préexistants** de HEAD
+sont corrigés — baseline cucumber désormais VERTE. Correctifs **TEST-only**
+(3 fichiers test, zéro fichier production) :
+
+* `src/test/features/5_rag_pipeline.feature` : scenario 3 utilise un
+  nouveau Given dédié (step no-op "the prompt file has not been modified"
+  retiré).
+* `AttemptHistorySteps.kt` : regex `"(?:is)?Valid"` ×4 (corrige les 2 FAIL
+  "Should have at least 1/3 entries").
+* `RagPipelineSteps.kt` : fixture `startPgvectorContainerWithEmbeddings`
+  corrigée (`generated/rag` → `build/plantuml-plugin/generated/rag`, sans
+  checksum pour le scénario RAG context) + nouveau step
+  `startPgvectorContainerWithUnchangedPromptDiagram` (seed checksum
+  `build/plantuml-plugin/checksums/rag-test.sha256`).
+
+Gates session 217 :
+* `@rag` : BUILD SUCCESSFUL 6m44s — 4/4 scénarios PASSED (log
+  `Skipped rag-test.puml (source prompt unchanged)` confirmé) ✅
+* `@plantuml` : BUILD SUCCESSFUL 3m19s — XML `4_attempt_history`
+  tests="3" failures="0" (une 1ère exécution de feature a crashé un
+  test-worker infra → feature ré-exécutée verte) ✅
+
+Couverture non impactée : Kover 83.26% (aucun code production modifié).
+Le FAIL functional préexistant `PlantumlFunctionalSuite$FilePermission`
+(S-030) reste hors périmètre FIX-BASELINE (hors cucumber).
 
 === Session 216 — RENAME-5 (fixtures + KDoc)
 

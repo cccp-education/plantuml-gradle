@@ -17,3 +17,17 @@
 
 === Prochaine session
 - Session 217 — maintenance DORMANT OU diagnostic échecs baseline cucumber (FIX-BASELINE, sur demande pilote). Prochaine rotation backup au multiple de 10 (session 220).
+== Session 217 (2026-09-10) — FIX-BASELINE : échecs cucumber préexistants résolus ✅
+
+=== Fait
+- Attempt History Tracking (2 FAIL) — cause racine : regex `Regex("\"valid\"...")` minuscule vs champ réel `"isValid"` (V majuscule, case-sensitive) → jamais matché. Fix : regex `"(?:is)?Valid"` × 4 dans `AttemptHistorySteps.kt` ✅
+- RAG Pipeline scénario 3 (1 FAIL) — cause racine : fixture écrivait dans `generated/rag` (relatif) alors que `CollectPlantumlIndexTask` lit `build/plantuml-plugin/generated/rag` → "No RAG directory found" → early return, jamais de skip. Fix : dir corrigé + nouveau step dédié "a pgvector container with an unchanged prompt diagram" (seed checksum `build/plantuml-plugin/checksums/rag-test.sha256` = SHA-256 de `prompts/rag-test.prompt`, même format `ChecksumStore`) ✅
+- Séparation fixtures RAG : scénario 2 ("existing embeddings") reçoit le dir corrigé SANS checksum (évite la régression "prompt skip" de `generatePlantumlDiagrams` découverte en cours de session) ; scénario 3 a son propre Given avec checksum ✅
+- Gate `@rag` : BUILD SUCCESSFUL in 6m44s, 4/4 PASSED, log `→ Skipped rag-test.puml (source prompt unchanged)` confirmé ✅
+- Gate `@plantuml` : BUILD SUCCESSFUL in 3m19s, XML Attempt History tests="3" failures="0" (1er run a crashé un test-worker infra → feature ré-exécutée, X run vert) ✅
+- Baseline cucumber désormais VERTE (FIX-BASELINE TERMINÉ). zéro fichier production modifié, zéro bump BOM, zéro secret. Correctifs TEST-only → `publishToMavenLocal` non requis ✅
+- Gouvernance : rapport 217 + PROMPT_REPRISE 218 + SESSIONS_HISTORY + INDEX + archive 2026-09 + sync BACKLOG ✅
+- Commit + push (clôture pilote)
+
+=== Prochaine session
+- Session 218 — maintenance DORMANT OU PUB 0.0.3 (publication Maven Central plantuml-plugin, version actuelle dérivée ws catalog 0.0.4) OU PL-3 (ktlint/detekt, BLOQUÉ ABIDJAN). Prochaine rotation backup au multiple de 10 (session 220).

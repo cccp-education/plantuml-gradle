@@ -34,7 +34,7 @@ class AttemptHistorySteps(private val world: PlantumlWorld) {
         val firstFile = historyFiles?.firstOrNull()
         if (firstFile != null) {
             val content = firstFile.readText()
-            val validPattern = Regex("\"valid\"\\s*:\\s*(true|false)")
+            val validPattern = Regex("\"(?:is)?Valid\"\\s*:\\s*(true|false)")
             val validMatches = validPattern.findAll(content).map { it.groupValues[1] }.toList()
 
             assertThat(validMatches).`as`("Should have at least 1 entry").isNotEmpty()
@@ -56,7 +56,7 @@ class AttemptHistorySteps(private val world: PlantumlWorld) {
         if (latestFile != null) {
             val content = latestFile.readText()
 
-            val validPattern = Regex("\"valid\"\\s*:\\s*(true|false)")
+            val validPattern = Regex("\"(?:is)?Valid\"\\s*:\\s*(true|false)")
             val validMatches = validPattern.findAll(content).map { it.groupValues[1] }.toList()
 
             assertThat(validMatches.size).`as`("Should have at least 2 entries").isGreaterThanOrEqualTo(2)
@@ -104,7 +104,7 @@ class AttemptHistorySteps(private val world: PlantumlWorld) {
         if (latestFile != null) {
             val content = latestFile.readText()
 
-            val validPattern = Regex("\"valid\"\\s*:\\s*(true|false)")
+            val validPattern = Regex("\"(?:is)?Valid\"\\s*:\\s*(true|false)")
             val validMatches = validPattern.findAll(content).map { it.groupValues[1] }.toList()
 
             assertThat(validMatches.size).`as`("Should have at least 3 entries").isGreaterThanOrEqualTo(3)
@@ -131,7 +131,7 @@ class AttemptHistorySteps(private val world: PlantumlWorld) {
         if (latestFile != null) {
             val content = latestFile.readText()
 
-            val validPattern = Regex("\"valid\"\\s*:\\s*(true|false)")
+            val validPattern = Regex("\"(?:is)?Valid\"\\s*:\\s*(true|false)")
             val validMatches = validPattern.findAll(content).map { it.groupValues[1] }.toList()
 
             assertThat(validMatches.size).`as`("Should have at least 4 entries").isGreaterThanOrEqualTo(4)

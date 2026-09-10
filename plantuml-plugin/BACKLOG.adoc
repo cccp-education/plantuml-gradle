@@ -1,31 +1,37 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-09-08 (Session 216 — RENAME-5 registre non-traductible)
+:last_update: 2026-09-10 (Session 217 — FIX-BASELINE échecs cucumber)
 
 '''
-== Session 216 (2026-09-08) — RENAME-5 ✅ TERMINÉ
+== Session 217 (2026-09-10) — FIX-BASELINE ✅ TERMINÉ
 
-Baby-step TDD (test d'abord) — décision D6 du cadrage EPIC RENAME
-(S-215 global) exécutée : le terme métier sort du registre non-traductible
-`plantuml.boundary` → `QUALIOPI` (référence publique française). 3
-fichiers modifiés (2 fixtures tests + KDoc loader). Gate : grep
-`fpa|cda` = zéro réel (faux positif `ofPattern` prévu), unit boundary
-13/13, `check` baseline exacte, `publishToMavenLocal` VERT. EPIC RENAME
-côté plantuml = ✅ TERMINÉ (ordre 5/6 — reste graphify/codex gouvernance).
+Solutions apportées aux 3 échecs cucumber **préexistants** de HEAD
+(stash-confirmés S-216) — la baseline cucumber est désormais VERTE.
+Correctifs **TEST-only** (aucun fichier production, zéro bump BOM).
+Gates : `@rag` 4/4 PASSED (log `Skipped rag-test.puml` confirmé),
+`@plantuml` 3/3 (XML Attempt History tests=3 failures=0). Voir rapport
+`.agents/sessions/217-fix-baseline.adoc`.
 
 '''
-== 🟡 FIX-BASELINE — Diagnostic échecs préexistants (découverts S-216)
+== ✅ FIX-BASELINE — échecs cucumber préexistants (TERMINÉ en S-217)
 
-Échecs stash-confirmés à HEAD (hors scope RENAME, non liés au registre) :
+Le périmètre cucumber est résolu (les 3 FAIL de `cucumberTest`) :
 
-* `cucumberTest` — Attempt History Tracking : 2/3 FAIL (assertions
-  "Should have at least 1/3 entries" — collections vides)
-* `cucumberTest` — RAG Pipeline : 1/4 FAIL (sortie de build Gradle
-  inattendue dans assertion)
-* `functionalTest` — `PlantumlFunctionalSuite$FilePermission` : 1 FAIL
-  (préexistant connu, documenté S-030)
+* `cucumberTest` — Attempt History Tracking : **2/3 FAIL résolus (S-217)**
+  — cause racine : regex `"valid"` minuscule vs champ réel `"isValid"`
+  (V majuscule, case-sensitive) → `"(?:is)?Valid"` ×4 dans
+  `AttemptHistorySteps.kt`. Suite 3/3 VERT. ✅
+* `cucumberTest` — RAG Pipeline : **1/4 FAIL résolu (S-217)** — fixture
+  `generated/rag` → `build/plantuml-plugin/generated/rag` + nouveau step
+  dédié avec seed checksum (`build/plantuml-plugin/checksums/rag-test.sha256`,
+  même format `ChecksumStore`). `@rag` 4/4 PASSED. ✅
+* `functionalTest` — `PlantumlFunctionalSuite$FilePermission` : **HORS
+  périmètre FIX-BASELINE** (1 FAIL préexistant connu, documenté S-030) —
+  à traiter en session dédiée si le pilote le souhaite. Peut être marqué
+  CADUQUE si le pilote actualise un niveau de risque fonctionnel.
 
-Diagnostic en session dédiée baby-step TDD/BDD, sur demande pilote.
+→ Échecs cucumber : statut ✅ (résolus). Functional `FilePermission` :
+   toujours ouvert (hors cucumber).
 
 '''
 == 🟡 EPIC PUB — Publication Maven Central plantuml-plugin (Session 188 — bump backlog)
