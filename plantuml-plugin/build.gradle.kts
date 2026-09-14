@@ -28,7 +28,7 @@ plugins {
 
     // Apply the BOM
     dependencies {
-        implementation(platform("education.cccp:workspace-bom:0.0.38"))
+        implementation(platform("education.cccp:workspace-bom:0.0.41"))
     }
 
 group = "education.cccp"
@@ -48,7 +48,7 @@ dependencies {
     implementation(libs.bundles.plantuml.ai)
 
     // N0 contracts — i18n (cross-borough translation alliance)
-    implementation("education.cccp:i18n-contracts:0.0.2")
+    implementation("education.cccp:i18n-contracts:0.0.3")
 
     // Testcontainers for RAG integration (CollectPlantumlIndexTask uses PostgreSQLContainer)
     implementation(libs.testcontainers.pg)
