@@ -259,7 +259,7 @@ _Séparation EAGER/LAZY_ :
 
 === Règles Absolues
 
-. ❌ _Jamais de commit sans permission explicite_
+. ✅ _Git autorisé (décision pilote 2026-09-17) — zéro secret commité_
 . ❌ _Jamais de tests en fin de session sans demande_
 . ✅ _Archive systématique_ en fin de session
 . ✅ _1 session = 1 objectif_ (15-30 minutes)

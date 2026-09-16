@@ -44,8 +44,8 @@ Fournir un **cadre de travail structuré** pour collaborer efficacement avec Ope
 |**Archive systématique**
 |Chaque session terminée est archivée avec résumé et prochaines étapes. Rien ne se perd, tout se retrouve.
 
-|**Git manuel**
-|L'agent NE JAMAIS committer sans permission explicite. C'est l'utilisateur qui gère Git.
+|**Git**
+|Commit/push/merge autorisés (décision pilote 2026-09-17). Ne JAMAIS commiter de secret.
 
 |**Tests sur demande**
 |L'agent NE JAMAIS lancer de tests en fin de session sans demande. Les tests prennent 1-3 minutes.
@@ -78,9 +78,10 @@ Fournir un **cadre de travail structuré** pour collaborer efficacement avec Ope
 
 == ⚠️ PARTIE 2 — RÈGLES ABSOLUES
 
-=== 2.1 Commits/Git — INTERDICTION FORMELLE
+=== 2.1 Commits/Git — AUTORISÉ (décision pilote 2026-09-17)
 
-**L'agent NE DOIT JAMAIS** exécuter de commit, push, merge, ou toute commande git modifiant l'historique **SANS permission explicite de l'utilisateur**.
+**Commit/push/merge autorisés** (décision pilote 2026-09-17 — suppression de
+l'interdiction formelle). Ne JAMAIS commiter de secret.
 
 [cols="1,4", options="header"]
 |===
@@ -546,7 +547,7 @@ jwt:
 
 ## Règles
 
-- ❌ Jamais de commit sans permission
+- ✅ Git autorisé (décision pilote 2026-09-17) — zéro secret commité
 - ❌ Jamais de tests en fin de session sans demande
 - ✅ Toujours archiver + mettre à jour ce fichier
 

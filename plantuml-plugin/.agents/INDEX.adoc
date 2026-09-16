@@ -27,7 +27,7 @@ _Raison_ : Le projet parent (`plantuml-gradle/`) consomme le plugin via `mavenLo
 
 === 1. COMMITS/GIT
 
-_L'agent NE DOIT JAMAIS_ exécuter de commit, push, merge, ou toute commande git modifiant l'historique _SANS permission explicite de l'utilisateur_.
+* Commit/push/merge autorisés (décision pilote 2026-09-17). Ne JAMAIS commiter de secret.
 
 * ✅ _Autorisé_ : `git status`, `git diff`, `git log`, `git show` (lecture seule)
 * ❌ _Interdit_ : `git add`, `git commit`, `git push`, `git merge`, `git rebase` (sauf ordre explicite)

@@ -63,7 +63,7 @@ _Détails complets_ : `.agents/API_KEY_POOL_REFERENCE.adoc` (LAZY)
 * ✅ 1 fichier à la fois (models.kt → Provider.kt)
 * ✅ Compiler après chaque fichier (`./gradlew compileKotlin`)
 * ❌ PAS de tests (Session 116)
-* ❌ PAS de commit sans permission
+* ✅ Git autorisé (décision pilote 2026-09-17) — zéro secret commité
 
 '''
 

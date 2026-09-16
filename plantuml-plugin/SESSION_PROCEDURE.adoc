@@ -183,7 +183,6 @@ L'agent **NE DOIT JAMAIS** :
 
 == ⚠️ Git — INTERDICTION ABSOLUE
 
-* ❌ Pas de `git add`, `git commit`, `git push`, `git restore`, `git checkout`
 * ✅ C'est l'utilisateur qui gère Git manuellement
 
 '''
