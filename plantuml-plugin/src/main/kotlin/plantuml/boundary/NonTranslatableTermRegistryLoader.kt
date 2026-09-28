@@ -10,9 +10,9 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
  * Expected YAML structure:
  * ```
  * terms:
- *   - QUALIOPI
  *   - ISO
- *   - RNCP
+ *   - IEEE
+ *   - RFC
  * ```
  */
 class NonTranslatableTermRegistryLoader {

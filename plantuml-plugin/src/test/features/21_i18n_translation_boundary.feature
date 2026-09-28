@@ -73,10 +73,10 @@ Feature: I18N Translation Boundary — Diagram labels translated, identifiers pr
     And the generated diagram should contain the translated rectangle label "System"
 
   @boundary @non-translatable
-  Scenario: Non-translatable term "QUALIOPI" is preserved even when classifier says presentation
-    Given a translation resolver with a FR glossary and non-translatable term "QUALIOPI"
-    When the resolver resolves "QUALIOPI" in language "fr"
-    Then the translated text should be "QUALIOPI"
+  Scenario: Non-translatable term "RFC" is preserved even when classifier says presentation
+    Given a translation resolver with a FR glossary and non-translatable term "RFC"
+    When the resolver resolves "RFC" in language "fr"
+    Then the translated text should be "RFC"
     And the strategy should be PRESERVE
 
   @boundary @non-translatable
@@ -87,11 +87,11 @@ Feature: I18N Translation Boundary — Diagram labels translated, identifiers pr
     And the strategy should be PRESERVE
 
   @boundary @full-pipeline
-  Scenario: Full pipeline end-to-end — diagram KG with FR glossary and QUALIOPI registry
-    Given a full pipeline translation resolver with a FR glossary and a non-translatable registry containing "QUALIOPI"
-    And a knowledge graph with nodes "LlmService", "QUALIOPI" and a community "pipeline"
+  Scenario: Full pipeline end-to-end — diagram KG with FR glossary and RFC registry
+    Given a full pipeline translation resolver with a FR glossary and a non-translatable registry containing "RFC"
+    And a knowledge graph with nodes "LlmService", "RFC" and a community "pipeline"
     When the knowledge graph renderer renders the graph in language "fr"
     Then the rendered diagram should translate the "Classes" folder label via messages
     And the rendered diagram should preserve the "LlmService" node identifier
-    And the rendered diagram should preserve the "QUALIOPI" node identifier
+    And the rendered diagram should preserve the "RFC" node identifier
     And the rendered diagram should borrow the "pipeline" community name

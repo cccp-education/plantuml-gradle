@@ -10,27 +10,27 @@ class NonTranslatableTermRegistryLoaderTest {
 
     @Test
     fun `should parse single term`() {
-        val yaml = "terms:\n  - QUALIOPI\n"
+        val yaml = "terms:\n  - RFC\n"
 
         val registry = loader.load(yaml)
 
-        assertTrue(registry.contains("QUALIOPI"))
+        assertTrue(registry.contains("RFC"))
     }
 
     @Test
     fun `should parse multiple terms`() {
         val yaml = """
             terms:
-              - QUALIOPI
+              - RFC
               - ISO
-              - QUALIOPI
+              - RFC
         """.trimIndent() + "\n"
 
         val registry = loader.load(yaml)
 
-        assertTrue(registry.contains("QUALIOPI"))
+        assertTrue(registry.contains("RFC"))
         assertTrue(registry.contains("ISO"))
-        assertTrue(registry.contains("QUALIOPI"))
+        assertTrue(registry.contains("RFC"))
     }
 
     @Test
@@ -39,6 +39,6 @@ class NonTranslatableTermRegistryLoaderTest {
 
         val registry = loader.load(yaml)
 
-        assertFalse(registry.contains("QUALIOPI"))
+        assertFalse(registry.contains("RFC"))
     }
 }

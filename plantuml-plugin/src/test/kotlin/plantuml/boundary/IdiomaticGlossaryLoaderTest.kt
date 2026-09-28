@@ -86,16 +86,16 @@ class IdiomaticGlossaryLoaderTest {
     @Test
     fun `should parse preserve strategy`() {
         val yaml = """
-            QUALIOPI:
+            RFC:
               fr:
-                translation: QUALIOPI
+                translation: RFC
                 strategy: PRESERVE
         """.trimIndent()
 
         val glossary = loader.load(yaml)
 
-        val entry = glossary.lookup("QUALIOPI", "fr")!!
-        assertEquals("QUALIOPI", entry.translation)
+        val entry = glossary.lookup("RFC", "fr")!!
+        assertEquals("RFC", entry.translation)
         assertEquals(TranslationStrategy.PRESERVE, entry.strategy)
     }
 

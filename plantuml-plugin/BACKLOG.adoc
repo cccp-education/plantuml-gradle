@@ -414,7 +414,7 @@ EPIC PLT-I18N a livré l'infrastructure i18n (`PlantumlMessages`, `ResourceBundl
 * `ClassifiedText` — résultat de classification
 * `TextClassifier` — classifie un texte dans une `TranslationCategory`
 * `IdiomaticGlossary` — registry terme → {langue → traduction + stratégie}
-* `NonTranslatableTermRegistry` — termes métier client (configurables — ex. QUALIOPI, ISO, NFP)
+* `NonTranslatableTermRegistry` — termes client non-traduisibles (configurables — ex. RFC, ISO, NFP)
 * `TranslationResolver` — applique la bonne stratégie selon catégorie + glossaire
 
 === User Stories
@@ -454,12 +454,12 @@ EPIC PLT-I18N a livré l'infrastructure i18n (`PlantumlMessages`, `ResourceBundl
 | 🟠 P1 ✅ S164
 
 | US-BND-6
-| **NonTranslatableTermRegistry** — registre configurable YAML (`non-translatable-terms.yml`) des termes métier client (configurables — ex. QUALIOPI, ISO, NFP). Le `TranslationResolver` consulte ce registre avant toute traduction. Baby-step : 1 terme + 1 test.
+| **NonTranslatableTermRegistry** — registre configurable YAML (`non-translatable-terms.yml`) des termes client non-traduisibles (configurables — ex. RFC, ISO, NFP). Le `TranslationResolver` consulte ce registre avant toute traduction. Baby-step : 1 terme + 1 test.
 | 3
 | 🟡 P2 ✅ S165
 
 | US-BND-7
-| **Cucumber full pipeline** — Scénario end-to-end : `language=fr` + glossaire FR → diagramme KG avec "Classes" traduit (TRANSLATE), "LlmService" préservé (PRESERVE), "pipeline" emprunté (BORROW), "QUALIOPI" préservé (registry). Vérifie la cohérence de transmission.
+| **Cucumber full pipeline** — Scénario end-to-end : `language=fr` + glossaire FR → diagramme KG avec "Classes" traduit (TRANSLATE), "LlmService" préservé (PRESERVE), "pipeline" emprunté (BORROW), "RFC" préservé (registry). Vérifie la cohérence de transmission.
 | 3
 | 🟡 P2 ✅ S166
 |===

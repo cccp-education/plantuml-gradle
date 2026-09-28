@@ -125,17 +125,17 @@ class TranslationResolverTest {
     fun `should preserve non-translatable term even when classifier says presentation`() {
         val classifier = TextClassifier()
         val glossary = IdiomaticGlossary()
-        val registry = NonTranslatableTermRegistry().apply { register("QUALIOPI") }
+        val registry = NonTranslatableTermRegistry().apply { register("RFC") }
         val resolver = TranslationResolver(
             classifier = classifier,
             glossary = glossary,
-            messageResolver = { _, _ -> "QUALIOPI-translated" },
+            messageResolver = { _, _ -> "RFC-translated" },
             nonTranslatableRegistry = registry
         )
 
-        val result = resolver.resolve("QUALIOPI", "fr")
+        val result = resolver.resolve("RFC", "fr")
 
-        assertEquals("QUALIOPI", result.translated)
+        assertEquals("RFC", result.translated)
         assertEquals(TranslationStrategy.PRESERVE, result.strategy)
     }
 
@@ -143,9 +143,9 @@ class TranslationResolverTest {
     fun `should preserve non-translatable term even when glossary would borrow`() {
         val classifier = TextClassifier()
         val glossary = IdiomaticGlossary().apply {
-            register("QUALIOPI", "fr", GlossaryEntry("QUALIOPI-emprunt", TranslationStrategy.BORROW))
+            register("RFC", "fr", GlossaryEntry("RFC-emprunt", TranslationStrategy.BORROW))
         }
-        val registry = NonTranslatableTermRegistry().apply { register("QUALIOPI") }
+        val registry = NonTranslatableTermRegistry().apply { register("RFC") }
         val resolver = TranslationResolver(
             classifier = classifier,
             glossary = glossary,
@@ -153,9 +153,9 @@ class TranslationResolverTest {
             nonTranslatableRegistry = registry
         )
 
-        val result = resolver.resolve("QUALIOPI", "fr")
+        val result = resolver.resolve("RFC", "fr")
 
-        assertEquals("QUALIOPI", result.translated)
+        assertEquals("RFC", result.translated)
         assertEquals(TranslationStrategy.PRESERVE, result.strategy)
     }
 
