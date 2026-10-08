@@ -1,0 +1,52 @@
+= Session 221 — US-3 PLT-DIAGRAM-OWNERSHIP : round-trip validation (un bloc cassé n'est jamais publié)
+
+_Date_ : 2026-10-08
+_Borough_ : plantuml-gradle (HTOWN)
+_Type_ : feature / DDD-TDD-BDD
+
+== Mission d'ouverture
+
+Suite de l'EPIC **PLT-DIAGRAM-OWNERSHIP** (US-1 contrat N0 S-280, US-2 port S-220) :
+**US-3** — round-trip validation obligatoire. Après traduction, un bloc qui ne
+parse plus doit être **rejeté** (repli sur la source), jamais publié (D5).
+
+== Livré (baby-step TDD/BDD)
+
+=== Domaine (D5)
+
+* `PlantumlTranslationPortAdapter` reçoit un **`validator: PlantUmlSyntaxValidator?`
+  optionnel** (contrat N0). Quand présent, une traduction qui produit un bloc
+  **invalide** (re-parse PlantUML échoue) est **rejetée** →
+  `PlantUmlTranslationOutcome.Preserved("translation breaks PlantUML syntax —
+  source block preserved")`. Un bloc `PRESERVE` court-circuite **avant** toute
+  validation (aucun changement → rien à valider).
+
+=== Tests
+
+* **10 unit** `PlantumlTranslationPortAdapterTest` (dont 3 round-trip :
+  traduction cassée → Preserved, traduction valide → Translated, PRESERVE jamais
+  validé) — 0 FAIL.
+* **BDD `@plantuml-roundtrip`** (`23_plantuml_roundtrip.feature`, 3 scénarios) +
+  `RoundTripSteps` (glue partagée `plantuml.scenarios`, préfixes uniques S-088) +
+  état `PlantumlWorld.roundTripOutcome`. Runner global `CucumberTestRunner`
+  (aucun runner dédié — le plugin utilise un runner unique). **3/3 PASSED**.
+
+== Preuve
+
+* `./gradlew test --tests "plantuml.boundary.PlantumlTranslationPortAdapterTest"`
+  → 10/10 PASS.
+* `./gradlew cucumberTest -Pcucumber.tags="@plantuml-roundtrip"` → 3/3 scénarios
+  PASSED (bloc cassé rejeté, traduction valide publiée, `\n` échappé).
+
+== Reste (PLT-DIAGRAM-OWNERSHIP US-4→US-7)
+
+* **US-4** : document délègue au contrat (cross-borough document+bakery ; question
+  d'injection du port à cadrer).
+* **US-5** : version toolchain gouvernée (résout D1 CHE-DIAGRAM).
+* **US-6/7** : chaîne E2E + dogfooding.
+
+== Notes
+
+* Pas de publication cette session (code non distribué) : le round-trip est un
+  garde-fou interne au port, consommé par document en US-4.
+* Zéro secret, zéro Python.

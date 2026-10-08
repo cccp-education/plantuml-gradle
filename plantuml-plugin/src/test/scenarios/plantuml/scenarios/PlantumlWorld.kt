@@ -44,6 +44,8 @@ class PlantumlWorld {
     var boundaryGraph: plantuml.KnowledgeGraph? = null
     var boundaryRenderedDiagram: String? = null
 
+    var roundTripOutcome: contracts.plantuml.PlantUmlTranslationOutcome? = null
+
     var apiKeyPool: plantuml.apikey.ApiKeyPool? = null
     var apiKeyPoolEntries: MutableList<plantuml.apikey.ApiKeyEntry> = mutableListOf()
     var apiKeyPoolSelectedKeys: MutableList<plantuml.apikey.ApiKeyEntry> = mutableListOf()
@@ -563,6 +565,7 @@ class PlantumlWorld {
         boundaryDiagram = null
         boundaryGraph = null
         boundaryRenderedDiagram = null
+        roundTripOutcome = null
         apiKeyPool = null
         apiKeyPoolEntries.clear()
         apiKeyPoolSelectedKeys.clear()

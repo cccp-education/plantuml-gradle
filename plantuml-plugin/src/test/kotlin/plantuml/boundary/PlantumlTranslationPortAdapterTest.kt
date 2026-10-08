@@ -79,4 +79,59 @@ class PlantumlTranslationPortAdapterTest {
             contracts.plantuml.PlantUmlStrategy.entries.toList(),
         )
     }
+
+    // ── US-3 — round-trip validation (D5) ────────────────────────────────────
+
+    private fun validator(valid: Boolean) =
+        object : contracts.plantuml.PlantUmlSyntaxValidator {
+            override fun validate(plantumlCode: String): contracts.plantuml.SyntaxValidationResult =
+                if (valid) {
+                    contracts.plantuml.SyntaxValidationResult.Valid
+                } else {
+                    contracts.plantuml.SyntaxValidationResult.Invalid("broken", "")
+                }
+        }
+
+    @Test
+    fun `a translation that breaks syntax is rejected - source block preserved`() {
+        // A provider that returns a raw newline is escaped (valid); but a provider
+        // that injects an unbalanced quote must be caught by the round-trip gate.
+        val adapter =
+            PlantumlTranslationPortAdapter(
+                translator(mapOf("Utilisateur" to "User\" broken")),
+                validator = validator(valid = false),
+            )
+        val block = PlantUmlBlock("@startuml\nclass \"Utilisateur\"\n@enduml")
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+        assertTrue(
+            outcome is PlantUmlTranslationOutcome.Preserved,
+            "a translation breaking PlantUML syntax must fall back to the source block",
+        )
+        assertTrue((outcome as PlantUmlTranslationOutcome.Preserved).reason.contains("syntax"))
+    }
+
+    @Test
+    fun `a valid translation passes the round-trip gate`() {
+        val adapter =
+            PlantumlTranslationPortAdapter(
+                translator(mapOf("Utilisateur" to "User")),
+                validator = validator(valid = true),
+            )
+        val block = PlantUmlBlock("@startuml\nclass \"Utilisateur\"\n@enduml")
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+        assertTrue(outcome is PlantUmlTranslationOutcome.Translated)
+    }
+
+    @Test
+    fun `an already valid source block is never validated when preserved`() {
+        // PRESERVE short-circuits before any validation: no label change.
+        val adapter =
+            PlantumlTranslationPortAdapter(
+                translator(emptyMap()),
+                validator = validator(valid = false),
+            )
+        val block = PlantUmlBlock("@startuml\nU --> Foo.Bar\n@enduml")
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+        assertTrue(outcome is PlantUmlTranslationOutcome.Preserved)
+    }
 }

@@ -1,5 +1,17 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-10
 
+== Session 221 (2026-10-08) — US-3 PLT-DIAGRAM-OWNERSHIP (round-trip) ✅
+
+=== Fait
+- `PlantumlTranslationPortAdapter` : `validator: PlantUmlSyntaxValidator?` N0 optionnel — une traduction cassant la syntaxe est rejetée (repli source, D5) ✅
+- `PRESERVE` court-circuite avant validation (aucun changement à valider) ✅
+- 10 unit (3 round-trip) 0 FAIL ; BDD `@plantuml-roundtrip` 3/3 PASSED (`23_plantuml_roundtrip.feature` + `RoundTripSteps`) ✅
+- Pas de publication (code non distribué) ✅
+
+=== Prochaine session (222)
+- **US-4** : document délègue au contrat (question d'injection du port) — résout D2 CHE-DIAGRAM
+- **Fichier à lire en priorité** : `.agents/CADRAGE_EPIC_PLT_DIAGRAM_OWNERSHIP.adoc`
+
 == Session 220 (2026-10-08) — US-2 PLT-DIAGRAM-OWNERSHIP ✅
 
 === Fait

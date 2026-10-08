@@ -1,5 +1,17 @@
 = Historique des Sessions
 
+== Session 221 (2026-10-08) — US-3 PLT-DIAGRAM-OWNERSHIP : round-trip validation ✅
+
+Suite de l'EPIC (US-1 contrat N0 S-280, US-2 port S-220). **US-3** — après
+traduction, un bloc qui ne parse plus n'est **jamais publié** (D5) :
+`PlantumlTranslationPortAdapter` reçoit un `validator: PlantUmlSyntaxValidator?`
+N0 optionnel ; une traduction qui produit un bloc invalide → `Preserved("translation
+breaks PlantUML syntax — source block preserved")` ; un `PRESERVE` court-circuite
+avant validation. Tests : **10 unit** `PlantumlTranslationPortAdapterTest` (3
+round-trip) 0 FAIL ; **BDD `@plantuml-roundtrip`** (`23_plantuml_roundtrip.feature`,
+3 scénarios + `RoundTripSteps` + `PlantumlWorld.roundTripOutcome`) **3/3 PASSED**
+(runner global unique). Pas de publication (code non distribué). Zéro secret.
+
 == Session 220 (2026-10-08) — US-2 PLT-DIAGRAM-OWNERSHIP : plantuml implémente le port du contrat N0 ✅
 
 Suite du cadrage S-219 et de l'US-1 contrat N0 (`plantuml-contracts:0.0.1`,

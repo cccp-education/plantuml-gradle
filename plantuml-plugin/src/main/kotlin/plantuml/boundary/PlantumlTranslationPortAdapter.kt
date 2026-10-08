@@ -6,9 +6,11 @@ import contracts.i18n.TranslationService
 import contracts.plantuml.PlantUmlBlock
 import contracts.plantuml.PlantUmlClassifier
 import contracts.plantuml.PlantUmlStrategy
+import contracts.plantuml.PlantUmlSyntaxValidator
 import contracts.plantuml.PlantUmlTranslationOutcome
 import contracts.plantuml.PlantUmlTranslationPort
 import contracts.plantuml.PlantUmlTranslationRequest
+import contracts.plantuml.SyntaxValidationResult
 
 /**
  * Implementation of the N0 [PlantUmlTranslationPort] (EPIC PLT-DIAGRAM-OWNERSHIP
@@ -30,10 +32,14 @@ import contracts.plantuml.PlantUmlTranslationRequest
  *
  * @param translator the N0 translation provider for label text
  * @param classifier the shared N0 block classifier
+ * @param validator optional N0 syntax validator — when present, a translated
+ *   block that no longer parses is **rejected** (the source block is preserved,
+ *   D5/US-3): a translation must never produce an unrenderable diagram
  */
 class PlantumlTranslationPortAdapter(
     private val translator: TranslationService,
     private val classifier: PlantUmlClassifier = PlantUmlClassifier(),
+    private val validator: PlantUmlSyntaxValidator? = null,
 ) : PlantUmlTranslationPort {
 
     override fun translate(request: PlantUmlTranslationRequest): PlantUmlTranslationOutcome {
@@ -71,7 +77,14 @@ class PlantumlTranslationPortAdapter(
             changed = changed || quotedChanged || directiveChanged
         }
         return if (changed) {
-            PlantUmlTranslationOutcome.Translated(block.copy(raw = raw))
+            val translated = block.copy(raw = raw)
+            // US-3 — round-trip gate (D5): a translated block that no longer
+            // parses must NOT be published. The source block is preserved.
+            if (validator != null && validator.validate(translated.raw) is SyntaxValidationResult.Invalid) {
+                PlantUmlTranslationOutcome.Preserved("translation breaks PlantUML syntax — source block preserved")
+            } else {
+                PlantUmlTranslationOutcome.Translated(translated)
+            }
         } else {
             PlantUmlTranslationOutcome.Preserved("no label changed (PRESERVE / provider failure)")
         }

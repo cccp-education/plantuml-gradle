@@ -3,9 +3,9 @@
 :last_update: 2026-10-08 (Session 220 — US-2 PLT-DIAGRAM-OWNERSHIP)
 
 '''
-== 🟡 EPIC PLT-DIAGRAM-OWNERSHIP — Le borough plantuml possède le bloc diagramme (CADRÉ S-219, US-1/US-2 ✅)
+== 🟡 EPIC PLT-DIAGRAM-OWNERSHIP — Le borough plantuml possède le bloc diagramme (CADRÉ S-219, US-1→US-3 ✅)
 
-*Statut* : 🟡 EN COURS — US-1 ✅ (S-280 MEMPHIS), US-2 ✅ (S-220), 0/7 restantes → cf. US-3→US-7
+*Statut* : 🟡 EN COURS — US-1 ✅ (S-280 MEMPHIS), US-2 ✅ (S-220), US-3 ✅ (S-221), reste US-4→US-7
 *Cadrage* : `.agents/CADRAGE_EPIC_PLT_DIAGRAM_OWNERSHIP.adoc`
 *Priorité* : 🟠 HAUTE — cause racine cross-borough de CHE-DIAGRAM (diagrammes blancs)
 *Charge* : ~22 pts (8 US, ~6 sessions)
@@ -19,7 +19,7 @@
 | US-0 | Cadrage (audit 5 constats, 10 décisions, 3 options écartées) | 1 | ✅ S-219
 | US-1 | Contrat N0 `plantuml-contracts` (MEMPHIS) — `PlantUmlBlock`, `PlantUmlStrategy`, `PlantUmlClassifier`, `SyntaxValidationResult`, `PlantUmlSyntaxValidator`, `PlantUmlTranslationPort` | 3 | ✅ S-280
 | US-2 | plantuml implémente le port (adapters validation+traduction, type migré vers N0, pin DAG) | 3 | ✅ S-220
-| US-3 | Correction/garantie de syntaxe — round-trip obligatoire, bloc cassé jamais publié + BDD `@plantuml-roundtrip` | 3 | 🟡 À FAIRE
+| US-3 | Correction/garantie de syntaxe — round-trip obligatoire, bloc cassé jamais publié + BDD `@plantuml-roundtrip` | 3 | ✅ S-221
 | US-4 | document délègue au contrat — suppression `PlantUmlClassifier`/`PlantUmlStrategy`/`PlantUmlTranslationAdapter` privés | 4 | 🟡 À FAIRE
 | US-5 | Version toolchain gouvernée — plantuml expose la version, bakery s'aligne, garde anti-drift | 3 | 🟡 À FAIRE
 | US-6 | Chaîne de transmission E2E (bakery→document→port→plantuml, rendu non blanc) | 3 | 🟡 À FAIRE
