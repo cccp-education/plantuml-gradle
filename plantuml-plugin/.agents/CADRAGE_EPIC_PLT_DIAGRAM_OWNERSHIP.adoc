@@ -170,6 +170,25 @@ classpath de bakery **via `document-plugin → plantuml-plugin`** — il cohabit
 le PlantUML **bundlé** dans `asciidoctorj-diagram-plantuml`. C'est la collision de
 classes à arbitrer en US-5 (ordre de classpath / exclusion / source unique).
 
+**Faits empiriques (S-221/US-5, mesurés)** :
+
+. Le SVG **déployé** porte `<?plantuml 1.2026.0?>` — exactement la version du JAR
+  **standalone** tiré par `plantuml-plugin`, **pas** le bundlé `1.2026.2` attendu.
+. Le bake **local** (images régénérées) porte `<?plantuml 1.2026.2?>` et est
+  **correct** (pas de `xmlns=''`).
+. Reproduction CLI : ni `1.2026.0` ni `1.2026.2` en ligne de commande PlantUML
+  pure ne produisent `xmlns=''` (`xmlns_empty=0` pour les deux). Le défaut est donc
+  produit par l'**invocation asciidoctor-diagram** (options / encodage de sortie
+  Saxon), pas par PlantUML seul.
+. Le bake tient son classpath de `libs.bundles.jbake` (`bake`/`JBakeTask`), tandis
+  que `serve` utilise `jbakeRuntime` (liste **hardcodée** `SiteManager`). Deux
+  classpaths coexistent → deux résolutions possibles.
+
+**Conséquence** : US-5 ne peut pas être corrigé « à l'aveugle » — il faut une
+**reproduction CI** de l'invocation asciidoctor-diagram (ou un run `bake` local
+avec le même classpath que la CI) pour identifier lequel des deux classpaths la
+CI emprunte, puis **prouver** l'effet du `xmlns=''`. Session dédiée.
+
 
 === Synthèse — un bloc, cinq propriétaires de fait, zéro propriétaire de droit
 
