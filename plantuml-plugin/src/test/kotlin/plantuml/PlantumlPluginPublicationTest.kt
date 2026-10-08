@@ -17,10 +17,6 @@ import kotlin.text.Charsets.UTF_8
 class PlantumlPluginPublicationTest {
     private val pluginDir = File(System.getProperty("user.dir")).absoluteFile
 
-    private val rootDir =
-        pluginDir.parentFile
-            ?: throw IllegalStateException("Cannot resolve repo root from plugin dir")
-
     @Test
     fun `plugin version matches root consumer catalog version`() {
         val buildScript = pluginDir.resolve("build.gradle.kts").readText(UTF_8)
@@ -37,7 +33,7 @@ class PlantumlPluginPublicationTest {
         // Hygiene (D5): local toml self version must match the ws catalog version —
         // the ws catalog (workspace-bom repo) is the cross-borough source of truth.
         val pluginCatalogVersion = plantumlVersionFrom(pluginDir.resolve("gradle/libs.versions.toml").readText(UTF_8))
-        val wsCatalogVersion = plantumlVersionFrom(wsCatalogToml())
+        val wsCatalogVersion = publishedCatalogPlantumlVersion()
 
         assertThat(pluginCatalogVersion)
             .withFailMessage("plugin catalog plantuml-plugin version ($pluginCatalogVersion) must match ws catalog plantuml-plugin version ($wsCatalogVersion)")
@@ -47,7 +43,7 @@ class PlantumlPluginPublicationTest {
     @Test
     fun `workspace bom platform pin matches ws catalog bom version`() {
         val buildScript = pluginDir.resolve("build.gradle.kts").readText(UTF_8)
-        val wsBomVersion = bomVersionFrom(wsCatalogToml())
+        val wsBomVersion = publishedCatalogBomVersion()
 
         assertThat(buildScript)
             .withFailMessage("workspace-bom platform pin must use the ws catalog BOM version ($wsBomVersion)")
@@ -55,30 +51,28 @@ class PlantumlPluginPublicationTest {
     }
 
     /**
-     * Reads the `ws` catalog toml resolved by Gradle (module cache) and extracts the
-     * `plantuml-plugin` version. Fallback: parse the local MEMPHIS repo toml (same
-     * source file as the published catalog).
+     * The `ws` catalog `plantuml-plugin` version, **injected by Gradle** at test
+     * launch (`systemProperty("plantuml.publishedCatalog.plantumlVersion", …)`).
+     *
+     * D5-RACE (S-222, mirror graphify S-029 / document): never read the sibling repo
+     * working tree — racy between parallel sessions and absent in CI (this repo is
+     * checked out alone). The injected value is the true published-catalog source of
+     * truth, resolved by Gradle.
      */
-    private fun wsCatalogToml(): String {
-        val wsRepoToml = rootDir.parentFile
-            ?.resolve("workspace-bom/gradle/libs.versions.toml")
-        if (wsRepoToml != null && wsRepoToml.exists()) return wsRepoToml.readText(UTF_8)
-        error("ws catalog toml introuvable — résolution ws impossible pour l'hygiène")
-    }
+    private fun publishedCatalogPlantumlVersion(): String =
+        System.getProperty("plantuml.publishedCatalog.plantumlVersion")
+            ?: error("plantuml.publishedCatalog.plantumlVersion non injecté par Gradle (D5-RACE)")
+
+    /** The `ws` catalog BOM version, injected by Gradle (see above). */
+    private fun publishedCatalogBomVersion(): String =
+        System.getProperty("plantuml.publishedCatalog.bomVersion")
+            ?: error("plantuml.publishedCatalog.bomVersion non injecté par Gradle (D5-RACE)")
 
     private fun plantumlVersionFrom(content: String): String =
         content
             .lineSequence()
             .map { it.substringBefore('#').trim() }
             .first { it.startsWith("plantuml-plugin =") || it.startsWith("plantuml =") }
-            .substringAfter("\"")
-            .substringBefore("\"")
-
-    private fun bomVersionFrom(content: String): String =
-        content
-            .lineSequence()
-            .map { it.substringBefore('#').trim() }
-            .first { it.startsWith("workspace-bom =") }
             .substringAfter("\"")
             .substringBefore("\"")
 

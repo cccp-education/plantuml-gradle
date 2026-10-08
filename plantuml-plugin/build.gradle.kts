@@ -265,6 +265,13 @@ tasks.named<Test>("test") {
 
     // Add required system properties
     systemProperty("gradle.plugin.repository", project.rootDir.resolve("build/libs").absolutePath)
+
+    // D5-RACE (S-222, mirror graphify S-029/document): the `ws` catalog versions are
+    // INJECTED by Gradle. `PlantumlPluginPublicationTest` must never read the sibling
+    // repo working tree (racy between parallel sessions, absent in CI where this repo
+    // is checked out alone).
+    systemProperty("plantuml.publishedCatalog.plantumlVersion", ws.versions.plantuml.plugin.get())
+    systemProperty("plantuml.publishedCatalog.bomVersion", ws.versions.workspace.bom.get())
 }
 
 configurations {
