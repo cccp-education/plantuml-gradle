@@ -1,5 +1,19 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-10
 
+== Session 222 (2026-10-09) — US-5 PLT-DIAGRAM-OWNERSHIP + publication 0.0.8 ✅
+
+=== Fait
+- Domaine pur `plantuml.toolchain` : `PlantUmlToolchainReference` (value object, 3 versions, invariants `isNotBlank`) + `PlantUmlToolchain.reference` — source unique de version (D6) ✅
+- Garde anti-drift BDD `@toolchain` : `24_toolchain_governance.feature` (2 scénarios) + `ToolchainSteps` ; unit `PlantUmlToolchainTest` (3 tests) ✅
+- Baby-step DDD/TDD/BDD strict : RED prouvé (8 `Unresolved reference`) → GREEN → REFACTOR ✅
+- Publication `0.0.8` (porte US-3 round-trip, non publié en 0.0.7) : DAG MEMPHIS `0.0.70→0.0.71` (bundle `d524d0ae`) → plantuml `0.0.7→0.0.8` (bundle `2c316a14`), POM importe workspace-bom 0.0.71, repo1 HTTP 200 ✅
+- Gates Local = Build : compileKotlin/compileTestKotlin VERT, publishToMavenLocal VERT ×2 ✅
+- Zéro secret, zéro Python
+
+=== Prochaine session (223)
+- **US-4** : document délègue au contrat (**ARBITRAGE pilote** injection A/B/C) — résout D2 CHE-DIAGRAM ; sinon **US-7** dogfooding
+- **Fichier à lire en priorité** : `.agents/CADRAGE_EPIC_PLT_DIAGRAM_OWNERSHIP.adoc`
+
 == Session 221 (2026-10-08) — US-3 PLT-DIAGRAM-OWNERSHIP (round-trip) ✅
 
 === Fait

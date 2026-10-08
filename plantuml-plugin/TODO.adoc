@@ -14,7 +14,9 @@ MEMPHIS/plantuml/document/bakery/runner.
 
 → **PLT-DIAGRAM-OWNERSHIP** dans BACKLOG.adoc +
 `.agents/CADRAGE_EPIC_PLT_DIAGRAM_OWNERSHIP.adoc`.
-Prochaine session (220) : US-1 contrat N0 `plantuml-contracts`.
+US-1 contrat N0 ✅ S-280, US-2 ✅ S-220, US-3 ✅ S-221, US-5 (toolchain) ✅ S-222
+(publication plantuml `0.0.8`). Prochaine session (223) : US-4 (document délègue,
+**arbitrage pilote injection A/B/C**) ou US-7 (dogfooding).
 
 == Pool de clés freemium rotatif
 

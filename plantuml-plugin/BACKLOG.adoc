@@ -1,12 +1,12 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-10-08 (Session 220 — US-2 PLT-DIAGRAM-OWNERSHIP)
+:last_update: 2026-10-09 (Session 222 — US-5 toolchain gouvernée + publication 0.0.8)
 
 '''
-== 🟡 EPIC PLT-DIAGRAM-OWNERSHIP — Le borough plantuml possède le bloc diagramme (CADRÉ S-219, US-1→US-3 ✅)
+== 🟡 EPIC PLT-DIAGRAM-OWNERSHIP — Le borough plantuml possède le bloc diagramme (CADRÉ S-219, US-1→US-3 + US-5 ✅)
 
 *GBL* : EPIC transverse **GBL-007** (BACKLOG racine workspace) — propriété du pipeline PlantUML.
-*Statut* : 🟡 EN COURS — US-1 ✅ (S-280 MEMPHIS), US-2 ✅ (S-220), US-3 ✅ (S-221), reste US-4→US-7 (D2/D3 côté cheroliv)
+*Statut* : 🟡 EN COURS — US-1 ✅ (S-280 MEMPHIS), US-2 ✅ (S-220), US-3 ✅ (S-221), US-5 ✅ (S-222, partie toolchain), reste US-4/US-6/US-7 (D2/D3 côté cheroliv)
 *Cadrage* : `.agents/CADRAGE_EPIC_PLT_DIAGRAM_OWNERSHIP.adoc`
 *Priorité* : 🟠 HAUTE — cause racine cross-borough de CHE-DIAGRAM (diagrammes blancs)
 *Charge* : ~22 pts (8 US, ~6 sessions)
@@ -22,7 +22,7 @@
 | US-2 | plantuml implémente le port (adapters validation+traduction, type migré vers N0, pin DAG) | 3 | ✅ S-220
 | US-3 | Correction/garantie de syntaxe — round-trip obligatoire, bloc cassé jamais publié + BDD `@plantuml-roundtrip` | 3 | ✅ S-221
 | US-4 | document délègue au contrat — suppression `PlantUmlClassifier`/`PlantUmlStrategy`/`PlantUmlTranslationAdapter` privés | 4 | 🟡 À FAIRE (question d'injection du port à trancher ; US-4 partiel S-282 : type migré + `escapeNewlines`)
-| US-5 | Version toolchain gouvernée — plantuml expose la version, bakery s'aligne, garde anti-drift | 3 | 🟡 PARTIEL (S-221/S-250 : D1 fixé via runner+bakery ; reste la garde anti-drift source unique)
+| US-5 | Version toolchain gouvernée — plantuml expose la version, bakery s'aligne, garde anti-drift | 3 | ✅ S-222 (partie plantuml : domaine `plantuml.toolchain` = source unique D6 + garde anti-drift `@toolchain` ; D1 fixé via runner+bakery S-250 ; reste garde côté bakery/runner)
 | US-6 | Chaîne de transmission E2E (bakery→document→port→plantuml, rendu non blanc) | 3 | 🟡 À FAIRE
 | US-7 | Dogfooding + non-régression (re-bake cheroliv.com, contrat VERT) | 2 | 🟡 À FAIRE
 |===

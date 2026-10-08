@@ -1,45 +1,41 @@
-= PROMPT_REPRISE — Plantuml — Session 222
-:session: 222
-:date: 2026-10-08
+= PROMPT_REPRISE — Plantuml — Session 223
+:session: 223
+:date: 2026-10-09
 
-== État — US-3 PLT-DIAGRAM-OWNERSHIP terminée (S-221)
+== État — US-5 (toolchain gouvernée) + publication 0.0.8 (S-222)
 
-Le port N0 (`plantuml-contracts:0.0.1`) est implémenté par ce borough (US-2,
-S-220) et gardé par le **round-trip** (US-3, S-221).
+L'EPIC **PLT-DIAGRAM-OWNERSHIP** est à **5/8 US** (US-0→3 ✅, US-5 partie
+plantuml ✅).
 
 * **US-1** ✅ (S-280 MEMPHIS) : contrat N0 `plantuml-contracts:0.0.1` Central.
-* **US-2** ✅ (S-220) : `PlantumlSyntaxValidatorAdapter` +
-  `PlantumlTranslationPortAdapter` (provider-agnostique, `TranslationService` N0) ;
-  `SyntaxValidationResult`/`TranslationStrategy` migrés vers le N0 ; `plantuml 0.0.7`
-  publié (design corrigé).
-* **US-3** ✅ (S-221) : round-trip — un bloc traduit qui ne parse plus est **rejeté**
-  (repli source, D5) ; `validator: PlantUmlSyntaxValidator?` N0 optionnel ; 10 unit
-  + BDD `@plantuml-roundtrip` 3/3 PASSED.
+* **US-2** ✅ (S-220) : adapters validation+traduction, port provider-agnostique.
+* **US-3** ✅ (S-221) : round-trip — un bloc traduit invalide est rejeté (D5).
+* **US-5** ✅ (S-222, partie toolchain) : domaine pur `plantuml.toolchain`
+  (`PlantUmlToolchain.reference`) — source unique de version (D6) + garde
+  anti-drift `@toolchain` (2 scenarios).
+* **Publication `0.0.8`** ✅ (S-222) : porte US-3 ; DAG MEMPHIS `0.0.71`
+  (bundle `d524d0ae`) → plantuml `0.0.8` (bundle `2c316a14`) ; repo1 HTTP 200.
 
-== Mission session 222 — US-4 / US-5 (au choix pilote)
+== Mission session 223 — au choix pilote
 
-* **US-4** — document délègue au contrat. **Question d'architecture à trancher** :
-  le port est N0 (document ne dépend que de `plantuml-contracts`), mais
-  l'implémentation (`PlantumlTranslationPortAdapter`) vit dans ce plugin (N2). Qui
-  l'injecte dans document ?
-  * Option A : document ne connaît que le port ; **bakery** (orchestrateur)
-    construit l'adaptateur et l'injecte → bakery dépend de plantuml-plugin.
-  * Option B : document porte une fabrique par réflexion/service-loader (N0).
-  * Option C : l'adaptateur article vit dans `plantuml-contracts`… impossible (il
-    dépend de l'i18n et du classifier — pourtant N0 acceptable si sans LLM).
-  **C'est US-4 qui résout le défaut D2 de CHE-DIAGRAM** (les variantes ne rendent
-  pas les diagrammes).
-* **US-5** — version toolchain gouvernée (asciidoctor-diagram/plantuml),
-  fin du drift local↔CI (**résout D1 CHE-DIAGRAM** : SVG blancs). Cross-borough
-  bakery (`SiteManager.createJBakeRuntimeConfiguration`).
+* **US-4** — document délègue au contrat. **Bloquée sur arbitrage pilote** :
+  qui injecte le port dans document ? Option A (bakery construit l'adaptateur,
+  dépend de plantuml-plugin) / Option B (fabrique par réflexion/service-loader
+  N0) / Option C (adaptateur article dans `plantuml-contracts`). Document a déjà
+  fait **US-4 partiel** (S-282 : type validation migré + `escapeNewlines` D2) —
+  reste la délégation complète (suppression `PlantUmlClassifier`/`PlantUmlStrategy`/
+  `PlantUmlTranslationAdapter` privés).
+* **US-7** — dogfooding + non-régression (re-bake cheroliv.com, contrat VERT).
+  **Non bloquée** — candidat par défaut si aucun arbitrage.
+* **US-6** — chaîne E2E bakery→document→port→plantuml (dépend US-4).
 
-== Backlog — priorisé
+== Reste EPIC
 
 [cols="1,4,1"]
 |===
 | Priorité | Tâche | Est.
-| 🟡 US-4 | document délègue au contrat (cross-borough, question injection) | ~1 session
-| 🟡 US-5 | version toolchain gouvernée (cross-borough bakery) | ~1 session
+| 🟡 US-4 | document délègue au contrat (ARBITRAGE A/B/C) | ~1 session
+| 🟡 US-5b | garde anti-drift côté bakery/runner (partie toolchain plantuml ✅) | ~0.5 session
 | 🟡 US-6 | chaîne E2E bakery→document→port→plantuml | ~1 session
 | 🟡 US-7 | dogfooding + non-régression (re-bake cheroliv.com) | ~1 session
 | 🟡 PL-3 | ktlint ou detekt | BLOQUÉ ABIDJAN
@@ -48,15 +44,15 @@ S-220) et gardé par le **round-trip** (US-3, S-221).
 == Méthodologie
 
 Baby-step DDD/TDD/BDD (unit → functional → cucumber). Red→Green→Refactor.
-Local = Build, Tests = CI (règle EAGER).
+Local = Build, Tests = CI (règle EAGER). **Pas de test/check en local.**
 
 == Rappels
 
-- GroupId: education.cccp.plantuml — version `plantuml = "0.0.7"` (catalog ws 0.0.68)
-- Central: 0.0.1, 0.0.2, 0.0.4 (périmé), 0.0.5, 0.0.6, **0.0.7 publié S-220**
-- BOM: `workspace-bom` platform **0.0.68** ; contrat N0 `plantuml-contracts:0.0.1` Central
+- GroupId: education.cccp — version `plantuml = "0.0.8"` (catalog ws 0.0.71)
+- Central: 0.0.1, 0.0.2, 0.0.4 (périmé), 0.0.5, 0.0.6, 0.0.7, **0.0.8 publié S-222**
+- BOM: `workspace-bom` platform **0.0.71** ; contrat N0 `plantuml-contracts:0.0.1`
 - Conventions: `education.cccp.build.*:0.0.7` ✅
 - `publishToMavenLocal` obligatoire après modif code plugin
 - Cucumber : runner **global unique** (`CucumberTestRunner`, glue `plantuml.scenarios`,
-  features `src/test/features/`) — pas de runner dédié par feature dans ce plugin
-- EPIC en cours : **PLT-DIAGRAM-OWNERSHIP** (US-1 ✅, US-2 ✅, US-3 ✅, reste US-4→7)
+  features `src/test/features/`) — pas de runner dédié par feature
+- EPIC en cours : **PLT-DIAGRAM-OWNERSHIP** (US-0→3 ✅, US-5 ✅, reste US-4/6/7)

@@ -266,3 +266,18 @@ Les 15 tests fonctionnels GradleRunner couvrent les user journeys critiques :
 
 * ~~**Tests unitaires renderer** : `cleanLabel()`, `nodeTypes` filter, `isMethodNode()` non couverts~~ ✅ **COMBLÉS Session 130** — 15 tests ajoutés
 * **Test de régression mavenLocal** : Aucun test ne vérifie que le JAR publié correspond au code source — c'est un problème de processus, pas de code
+
+=== Session 222 — US-5 toolchain gouvernée (3 unit + 2 BDD)
+
+Nouveau domaine `plantuml.toolchain` : garde anti-drift de la version
+asciidoctor-diagram/plantuml de référence (D6).
+
+|===
+| Couche | Tests | État
+| Unit `PlantUmlToolchainTest` | 3 (non-blanc, anti-drift toml, rejet version blanche) | ✅ compile VERT (CI)
+| BDD `@toolchain` (feature 24) | 2 scénarios + `ToolchainSteps` | ✅ compile VERT (CI)
+|===
+
+Couverture : +1 fichier production (`PlantUmlToolchain.kt`, objet pur + value
+object), +1 fichier test unit, +1 feature, +1 steps. Tags non filtrés →
+feature exécuté (contrôle anti « test fantôme », leçon Queens S-269).

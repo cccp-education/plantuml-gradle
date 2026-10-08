@@ -1,0 +1,112 @@
+= Session 222 — US-5 PLT-DIAGRAM-OWNERSHIP : version toolchain gouvernée (source unique + garde anti-drift) + publication 0.0.8
+:session: 222
+:date: 2026-10-09
+:type: feat (DDD/TDD/BDD)
+:statut: ✅ TERMINÉ
+
+== Mission
+
+Reprise de l'EPIC **PLT-DIAGRAM-OWNERSHIP** (GBL-007). Deux missions
+non-bloquées par un arbitrage pilote :
+
+. **US-5** (partie plantuml) — exposer la version de référence du toolchain
+   (D6) + **garde anti-drift** local↔référence. D1 (SVG blancs) était **déjà
+   résolu** côté bakery/runner (S-250, cause = `Saxon-HE:11.4`) ; ce qui restait
+   = la **source unique de version** que D6 assigne explicitement à plantuml.
+. **Publication `0.0.8`** — porter le code **US-3 (round-trip)** de HEAD, qui
+   n'était **pas publié** (Central `0.0.7` = US-2 seulement).
+
+US-4 (délégation complète document, injection A/B) reste **hors scope** :
+décision pilote à trancher.
+
+== Livrable 1 — US-5 : domaine `plantuml.toolchain`
+
+Baby-step **DDD/TDD/BDD** strict (RED → GREEN → REFACTOR). Local = Build,
+Tests = CI (règle EAGER) — seules les compilations ont été lancées.
+
+=== RED (prouvé)
+
+`PlantUmlToolchainTest` écrit **avant** le code → `compileTestKotlin` échoue avec
+**8 `Unresolved reference`** (`PlantUmlToolchain`, `PlantUmlToolchainReference`,
+`isNotBlank` sur type inconnu).
+
+=== GREEN
+
+. `src/main/kotlin/plantuml/toolchain/PlantUmlToolchain.kt` :
+   * `PlantUmlToolchainReference` — value object immuable à 3 versions de
+     référence (`engineVersion`, `diagramVersion`, `diagramPlantumlVersion`) avec
+     invariants `isNotBlank` (rejet d'une version blanche → `IllegalArgumentException`).
+   * `PlantUmlToolchain` — object exposant `reference` (D6 — la valeur que le
+     borough plantuml **expose** au reste de l'écosystème).
+. `src/test/kotlin/plantuml/toolchain/PlantUmlToolchainTest.kt` — 3 tests :
+   non-blanc, **anti-drift** (le toml local == la référence), rejet d'une version blanche.
+
+=== BDD `@toolchain`
+
+`src/test/features/24_toolchain_governance.feature` — 2 scénarios (`@reference`,
+`@anti-drift`) + `ToolchainSteps` (steps préfixés sans collision, glue partagée
+`plantuml.scenarios`, règle S-088). Découverte : ni le runner global ni le filtre
+par défaut (`not @wip and not @integration and not @realllm`) n'excluent ce tag →
+le feature est bien exécuté (contrôle anti « test fantôme », leçon Queens S-269).
+
+Un 3e scénario (tautologique, assertion sur une constante) a été **retiré** —
+théâtre, contraire au craft.
+
+=== Valeur
+
+La classe de bug qui a produit **D1** (trois sources divergentes pour la version
+de la chaîne PlantUML : hardcode bakery / toml local / BOM MEMPHIS) est
+désormais **punissable** : une garde prouve que le catalogue local ne peut pas
+dériver de la référence exposée.
+
+== Livrable 2 — Publication `0.0.8` (porte US-3)
+
+Ordre **DAG N0→N2** strict. Bumps :
+
+. **MEMPHIS** `workspace-bom`/`workspace-catalog` `0.0.70 → 0.0.71`
+   (toml : `plantuml-plugin = 0.0.7 → 0.0.8`) — publié Central, bundle
+   **`d524d0ae-61c7-4f9c-8b86-188ae4089b2e`** (AUTOMATIC), propagation repo1
+   HTTP 200.
+. **plantuml-plugin** `0.0.7 → 0.0.8` :
+   * toml local `plantuml = "0.0.7" → "0.0.8"` (version dérivée `ws.versions.plantuml.plugin`)
+   * pins `settings.gradle.kts` catalogue + `build.gradle.kts` platform
+     `0.0.68 → 0.0.71`
+   * `publishToMavenLocal` VERT (6 artefacts signés)
+   * publié Central, bundle **`2c316a14-6f82-4421-9197-83d12a6f2829`** (AUTOMATIC),
+     POM importe `workspace-bom:0.0.71`, propagation repo1 HTTP 200.
+
+Contenu `0.0.8` depuis `0.0.7` : **US-3 round-trip** (`PlantumlTranslationPortAdapter`
+rejette un bloc traduit invalide, repli source D5).
+
+== Gates (Local = Build, Tests = CI)
+
+* `compileKotlin` / `compileTestKotlin` **VERTS** (contre catalog/BOM `0.0.71`).
+* `publishToMavenLocal` **VERT** (MEMPHIS `0.0.71` + plantuml `0.0.8`).
+* BDD statique : binding feature↔steps vérifié (4 steps ↔ 4 steps), tag non filtré.
+* Propagation Central vérifiée (repo1 HTTP 200).
+* Zéro secret. Zéro Python.
+
+Les `test`/`functionalTest`/`cucumberTest`/`check` s'exécutent en **CI** (règle EAGER).
+
+== Fichiers
+
+[cols="1,3"]
+|===
+| Type | Fichier
+
+| prod (nouveau) | `src/main/kotlin/plantuml/toolchain/PlantUmlToolchain.kt`
+| test (nouveau) | `src/test/kotlin/plantuml/toolchain/PlantUmlToolchainTest.kt`
+| test (nouveau) | `src/test/features/24_toolchain_governance.feature`
+| test (nouveau) | `src/test/scenarios/plantuml/scenarios/ToolchainSteps.kt`
+| build | `gradle/libs.versions.toml` (0.0.7→0.0.8)
+| build | `settings.gradle.kts` (catalog 0.0.68→0.0.71)
+| build | `build.gradle.kts` (platform 0.0.68→0.0.71)
+|===
+
+Cross-borough : `workspace-bom/gradle/libs.versions.toml`
+(`workspace-bom` 0.0.70→0.0.71, `plantuml-plugin` 0.0.7→0.0.8).
+
+== Reste EPIC
+
+US-4 (délégation document, injection A/B — arbitrage pilote), US-5 (garde
+côté bakery/runner — partie toolchain plantuml ✅), US-6 (E2E), US-7 (dogfooding).

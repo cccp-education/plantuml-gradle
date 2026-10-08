@@ -1,5 +1,23 @@
 = Historique des Sessions
 
+== Session 222 (2026-10-09) — US-5 PLT-DIAGRAM-OWNERSHIP : version toolchain gouvernée + publication 0.0.8 ✅
+
+Deux missions non bloquées. **US-5 (D6)** — le borough plantuml **expose** la
+version de référence de la chaîne (asciidoctor-diagram/plantuml) : domaine pur
+`plantuml.toolchain` (`PlantUmlToolchainReference` value object à invariants
+`isNotBlank` + `PlantUmlToolchain.reference`) ; **garde anti-drift** prouvant que
+le catalogue local ne dérive pas de la référence (la classe de bug de D1 : 3
+sources divergentes hardcode bakery / toml local / BOM). Baby-step DDD/TDD/BDD
+strict : RED prouvé (`compileTestKotlin` 8 `Unresolved reference`) → GREEN
+(`PlantUmlToolchain.kt`) → `@toolchain` (`24_toolchain_governance.feature`, 2
+scénarios + `ToolchainSteps`). Découverte : tag non filtré → feature exécuté
+(contrôle anti « test fantôme » S-269). **Publication `0.0.8`** — porte le code
+**US-3 (round-trip)** non publié (Central `0.0.7` = US-2) : DAG MEMPHIS
+`0.0.70→0.0.71` (bundle `d524d0ae`) puis plantuml `0.0.7→0.0.8` (bundle
+`2c316a14`), POM importe workspace-bom 0.0.71, repo1 HTTP 200. Gates (Local =
+Build) : compileKotlin/compileTestKotlin VERT, publishToMavenLocal VERT ×2, zéro
+secret. US-4 (document délègue, injection A/B) reste bloquée sur arbitrage pilote.
+
 == Session 221 (2026-10-08) — US-3 PLT-DIAGRAM-OWNERSHIP : round-trip validation ✅
 
 Suite de l'EPIC (US-1 contrat N0 S-280, US-2 port S-220). **US-3** — après
