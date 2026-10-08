@@ -207,6 +207,36 @@ pressenti** : supprimer le dual-JAR (aligner `plantuml-engine` sur le bundlé, o
 l'exclure du classpath de bake). **À prouver en CI** avant tout changement du
 chemin de déploiement.
 
+**Correction honnête (S-221)** : la « preuve » que le bake local produit
+`1.2026.2` **ne vaut rien** — le SVG produit dans `build/bake/…` porte le
+**timestamp de la source (juin)** : le bake a **réutilisé les images en cache**
+(`.asciidoctor/diagram/*.cache`, gitignoré) sans régénérer (`Ink Economy`). La CI,
+sans cache, **régénère** et échoue. Il faut donc une **reproduction fraîche** :
+supprimer `.asciidoctor/` + `images/` du corpus, puis baker (local CI-équivalent)
+pour observer la version réellement produite. **Aucune conclusion ne doit être
+tirée d'un bake à cache chaud.**
+
+**CAUSE RACINE TROUVÉE (S-221, reproduction fraîche)** — ce n'est **ni** PlantUML
+**ni** le dual-JAR, mais le **sérialiseur XML Saxon** :
+
+. Le bake **frais** (cache supprimé) produit `xmlns=''` ×3 → **SVG blanc reproduit
+  localement** (σ=0 en navigateur).
+. Différentiel sain/cassé : le SVG **sain** porte des entités **décimales**
+  (`&#232;`) et **pas** de `xmlns=''` ; le SVG **cassé** porte des entités **hex**
+  (`&#xe8;`) **et** `xmlns=''` → deux sérialiseurs XML différents.
+. **Saxon 11.4** (tiré par `document-plugin → epubcheck:5.2.1`) est fautif ;
+  **Saxon 9.9.1-7** produit du SVG correct.
+. **Fix prouvé** : forcer `net.sf.saxon:Saxon-HE:9.9.1-7` → `xmlns=''` ×0 sur les
+  5 diagrammes de 0125, **rendu navigateur σ=8697 (visible)**.
+
+**Leçon** : « forcer la version PlantUML » (dual-JAR) était une fausse piste — le
+`xmlns=''` disparaît avec la version PlantUML changée **et** reste présent, car le
+sérialiseur est la vraie variable. **Toujours vider le cache `.asciidoctor/` avant
+de conclure.**
+
+Implémentation : forcer Saxon 9.9.1-7 dans **bakery** (le bake) — pas seulement le
+runner — + garde anti-drift.
+
 
 === Synthèse — un bloc, cinq propriétaires de fait, zéro propriétaire de droit
 
