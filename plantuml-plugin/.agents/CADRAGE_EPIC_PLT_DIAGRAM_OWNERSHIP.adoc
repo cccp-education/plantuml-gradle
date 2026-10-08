@@ -189,6 +189,24 @@ classes à arbitrer en US-5 (ordre de classpath / exclusion / source unique).
 avec le même classpath que la CI) pour identifier lequel des deux classpaths la
 CI emprunte, puis **prouver** l'effet du `xmlns=''`. Session dédiée.
 
+**Preuve décisive — dual-JAR (S-221)** : les deux artefacts portent **les mêmes
+classes** `net/sourceforge/plantuml/*` :
+
+[cols="2,2,1"]
+|===
+| Artefact | Source | Classes `net/sourceforge/plantuml/*`
+| `net.sourceforge.plantuml:plantuml:1.2026.0` (standalone) | tiré par `plantuml-plugin` (`plantuml-engine`) | **4891**
+| `plantuml-lgpl-1.2026.2.jar` (bundlé) | dans `asciidoctorj-diagram-plantuml` | **4898**
+|===
+
+C'est un **shadowing de classpath** : selon l'ordre des JARs, la version PlantUML
+effective change. Local (bake via runner, reproduit S-221) → `1.2026.2` (bundlé,
+correct) ; CI → `1.2026.0` (standalone, cassé). Le déterminisme de l'ordre
+local↔CI **n'est pas garanti** (mavenLocal, ordre de résolution). **Remède
+pressenti** : supprimer le dual-JAR (aligner `plantuml-engine` sur le bundlé, ou
+l'exclure du classpath de bake). **À prouver en CI** avant tout changement du
+chemin de déploiement.
+
 
 === Synthèse — un bloc, cinq propriétaires de fait, zéro propriétaire de droit
 
