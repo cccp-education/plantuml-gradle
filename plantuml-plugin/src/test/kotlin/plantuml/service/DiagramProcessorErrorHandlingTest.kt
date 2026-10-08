@@ -6,7 +6,7 @@ import org.mockito.Mockito.*
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import plantuml.PlantumlConfig
-import plantuml.validation.SyntaxValidationResult
+import contracts.plantuml.SyntaxValidationResult
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull

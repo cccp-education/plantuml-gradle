@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
-import plantuml.validation.SyntaxValidationResult
+import contracts.plantuml.SyntaxValidationResult
 import java.io.File
 import kotlin.test.assertTrue
 

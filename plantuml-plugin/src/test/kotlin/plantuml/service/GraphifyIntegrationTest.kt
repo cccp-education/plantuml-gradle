@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import plantuml.EdgeType
 import plantuml.KnowledgeGraph
-import plantuml.validation.SyntaxValidationResult
+import contracts.plantuml.SyntaxValidationResult
 import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

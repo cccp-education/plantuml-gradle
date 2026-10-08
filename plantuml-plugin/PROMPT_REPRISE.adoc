@@ -1,44 +1,45 @@
-= PROMPT_REPRISE — Plantuml — Session 220
-:session: 220
+= PROMPT_REPRISE — Plantuml — Session 221
+:session: 221
 :date: 2026-10-08
 
-== État — Cadrage EPIC PLT-DIAGRAM-OWNERSHIP terminé (S-219)
+== État — US-2 PLT-DIAGRAM-OWNERSHIP terminée (S-220)
 
-Session 219 : **cadrage** (gouvernance pure, zéro code) de l'EPIC
-**PLT-DIAGRAM-OWNERSHIP** — le borough plantuml doit posséder le bloc diagramme
-de bout en bout (modèle, traduction, validation, version toolchain).
+Session 220 : le borough plantuml **implémente le port du contrat N0**
+(`plantuml-contracts:0.0.1`, MEMPHIS S-280) et son domaine `boundary` riche
+devient vivant.
 
-Déclencheur : CHE-DIAGRAM (cheroliv.com S-068) — les diagrammes PlantUML rendent
-**blanc** au déploiement ; cause racine **architecturale**.
+* **Câblage DAG** : catalogue `0.0.41→0.0.67`, platform `0.0.41→0.0.67`,
+  `plantuml 0.0.5→0.0.6`, dépendance `plantuml-contracts:0.0.1`.
+* **`PlantumlSyntaxValidatorAdapter`** — `contracts.plantuml.PlantUmlSyntaxValidator`
+  (wrappe le parser natif ; fin du couplage N2→N2).
+* **`PlantumlTranslationPortAdapter`** — `contracts.plantuml.PlantUmlTranslationPort`
+  (domaine boundary délégué ; D5 retour-ligne → `\n`).
+* **`SyntaxValidationResult`** migré vers le N0 (fichier local supprimé).
+* **D4** : `boundary.TranslationStrategy` = typealias vers le N0.
+* **Tests** : 9 unit nouveaux ; boundary+garde **84 PASSED 0 FAILED**.
+* **Publication** : contrat `0.0.1` → BOM/catalog `0.0.66` → `0.0.67`
+  (plantuml 0.0.6) → plantuml-plugin `0.0.6` Central (tous AUTOMATIC).
 
-* **Audit 5 constats** (voir `.agents/CADRAGE_EPIC_PLT_DIAGRAM_OWNERSHIP.adoc`) :
-  C-1 split-brain (`plantuml.boundary` riche non consommé par document),
-  C-2 traduction casse `\n` → `Syntax Error?` (D2 CHE-DIAGRAM),
-  C-3 pas de contrat N0 (couplage N2→N2), C-4 version toolchain non gouvernée
-  (drift CI 1.2026.0 ≠ local 1.2026.2, D1 CHE-DIAGRAM), C-5 deux vocabulaires.
-* **Livrable** : `CADRAGE_EPIC_PLT_DIAGRAM_OWNERSHIP.adoc` (5 constats, 10
-  décisions, 3 options écartées, **8 US US-0→US-7 ~22 pts**).
-* Gouvernance synchronisée (BACKLOG, INDEX, SESSIONS_HISTORY, PROMPT_REPRISE,
-  archive). Zéro code, zéro secret, zéro Python.
+== Mission session 221 — US-3 / US-4 / US-5 (au choix pilote)
 
-== Mission session 220 — US-1 contrat N0 `plantuml-contracts`
-
-. `plantuml-contracts` (MEMPHIS, N0) = nouvel artefact standalone :
-  `PlantUmlBlock`, `SyntaxValidationResult`, `PlantUmlSyntaxValidator` (interface),
-  `PlantUmlTranslationPort` (port). Package dédié, zéro dépendance Gradle/PlantUML.
-- Baby-step DDD/TDD/BDD strict (unit → functional → cucumber).
-- Ordre DAG N0→N2 : publier le contrat **avant** que plantuml/document/bakery
-  le consomment (pattern `ocr-contracts`/`runtime-contracts`).
-- Si besoin : US-2 (port implémenté par le boundary plantuml) ensuite.
-
-Alternative si demande pilote : PL-3 (ktlint/detekt) toujours **BLOQUÉ ABIDJAN**.
+* **US-3** — round-trip validation obligatoire : après traduction, re-parse
+  PlantUML ; un bloc invalide n'est jamais publié (correction ou PRESERVE) ;
+  BDD `@plantuml-roundtrip`. Le `\n` est déjà préservé (US-2) ; il reste la garde.
+* **US-4** — document délègue : suppression de `PlantUmlClassifier` /
+  `PlantUmlStrategy` / `PlantUmlTranslationAdapter` privés côté document-gradle,
+  délégation à `PlantUmlTranslationPort` du contrat. **C'est US-4 qui résout le
+  défaut D2 de CHE-DIAGRAM.**
+* **US-5** — version toolchain gouvernée (asciidoctor-diagram/plantuml),
+  fin du drift local↔CI (défaut D1 CHE-DIAGRAM).
 
 == Backlog — priorisé
 
 [cols="1,4,1"]
 |===
 | Priorité | Tâche | Est.
-| 🟡 PLT-DIAGRAM-OWNERSHIP | ✅ CADRÉ S-219 — 8 US ~22 pts, cross-borough MEMPHIS/plantuml/document/bakery/runner | ~6 sessions
+| 🟡 US-3 | round-trip validation + BDD `@plantuml-roundtrip` | ~1 session
+| 🟡 US-4 | document délègue au contrat (cross-borough) | ~1 session
+| 🟡 US-5 | version toolchain gouvernée (cross-borough bakery) | ~1 session
 | 🟡 PL-3 | ktlint ou detekt | BLOQUÉ ABIDJAN
 |===
 
@@ -50,11 +51,10 @@ Tests = CI (règle EAGER).
 
 == Rappels
 
-- GroupId: education.cccp.plantuml — version dérivée `ws.versions.plantuml.plugin` (catalog 0.0.38 = 0.0.5)
-- Central: 0.0.1, 0.0.2, 0.0.4 (périmé), **0.0.5 publié S-218** (HEAD réel)
-- BOM: `workspace-bom` platform 0.0.38 ✅ (S-218) — le contrat N0 à venir = nouvel artefact
-- Conventions: `education.cccp.build.*:0.0.4` ✅
+- GroupId: education.cccp.plantuml — version `plantuml = "0.0.6"` (catalog ws 0.0.67)
+- Central: 0.0.1, 0.0.2, 0.0.4 (périmé), 0.0.5, **0.0.6 publié S-220**
+- BOM: `workspace-bom` platform **0.0.67** ; contrat N0 `plantuml-contracts:0.0.1` Central
+- Conventions: `education.cccp.build.*:0.0.7` ✅
 - `publishToMavenLocal` obligatoire après modif code plugin
-- Cucumber: baseline **VERTE** (FIX-BASELINE S-217) ; functional 1 FAIL préexistant `FilePermission` (S-030)
-- Tous les EPICs métier terminés — le prochain cap est **PLT-DIAGRAM-OWNERSHIP**
-- Plugin jusqu'ici dormant — cette EPIC le réactive sur le critical path CHE-DIAGRAM
+- Cucumber baseline VERTE (S-217) ; functional 1 FAIL préexistant `FilePermission` (S-030)
+- EPIC en cours : **PLT-DIAGRAM-OWNERSHIP** (US-1 ✅ S-280 MEMPHIS, US-2 ✅ S-220)

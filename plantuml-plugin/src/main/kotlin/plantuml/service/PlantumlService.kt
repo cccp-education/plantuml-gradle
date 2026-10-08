@@ -4,7 +4,7 @@ import net.sourceforge.plantuml.SourceStringReader
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import plantuml.PlantumlMessages
-import plantuml.validation.SyntaxValidationResult
+import contracts.plantuml.SyntaxValidationResult
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -14,7 +14,7 @@ import java.io.File
  * Public API consumable by other boroughs (document-gradle, codex, slider, bakery)
  * via `education.cccp:plantuml-plugin` on Maven Central.
  *
- * @see plantuml.validation.SyntaxValidationResult
+ * @see contracts.plantuml.SyntaxValidationResult
  */
 class PlantumlService {
 

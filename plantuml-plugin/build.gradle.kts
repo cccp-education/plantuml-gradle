@@ -28,7 +28,7 @@ plugins {
 
     // Apply the BOM
     dependencies {
-        implementation(platform("education.cccp:workspace-bom:0.0.41"))
+        implementation(platform("education.cccp:workspace-bom:0.0.67"))
     }
 
 group = "education.cccp"
@@ -49,6 +49,11 @@ dependencies {
 
     // N0 contracts — i18n (cross-borough translation alliance)
     implementation("education.cccp:i18n-contracts:0.0.3")
+
+    // N0 contracts — PlantUML diagram block (EPIC PLT-DIAGRAM-OWNERSHIP US-2).
+    // The port + model + validation types live in the contract; this borough
+    // provides the implementation (D1/D2/D3).
+    implementation("education.cccp:plantuml-contracts:0.0.1")
 
     // Testcontainers for RAG integration (CollectPlantumlIndexTask uses PostgreSQLContainer)
     implementation(libs.testcontainers.pg)

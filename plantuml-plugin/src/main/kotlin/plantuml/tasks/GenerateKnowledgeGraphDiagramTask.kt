@@ -14,7 +14,7 @@ import plantuml.boundary.TranslationResolver
 import plantuml.service.KnowledgeGraphParser
 import plantuml.service.KnowledgeGraphRenderer
 import plantuml.service.PlantumlService
-import plantuml.validation.SyntaxValidationResult
+import contracts.plantuml.SyntaxValidationResult
 import java.io.File
 
 /**

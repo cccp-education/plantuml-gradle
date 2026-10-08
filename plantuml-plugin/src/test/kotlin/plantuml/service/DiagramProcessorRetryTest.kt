@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test
 import org.slf4j.LoggerFactory
 import org.mockito.Mockito.*
 import org.slf4j.Logger
-import plantuml.validation.SyntaxValidationResult
+import contracts.plantuml.SyntaxValidationResult
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue

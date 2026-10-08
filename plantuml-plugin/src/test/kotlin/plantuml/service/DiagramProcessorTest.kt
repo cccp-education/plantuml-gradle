@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory
 import plantuml.PlantumlCode
 import plantuml.PlantumlDiagram
 import plantuml.ValidationFeedback
-import plantuml.validation.SyntaxValidationResult
+import contracts.plantuml.SyntaxValidationResult
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull

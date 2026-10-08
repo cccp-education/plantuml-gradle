@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory
 import plantuml.boundary.IdiomaticGlossary
 import plantuml.boundary.TextClassifier
 import plantuml.boundary.TranslationResolver
-import plantuml.validation.SyntaxValidationResult
+import contracts.plantuml.SyntaxValidationResult
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 

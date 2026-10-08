@@ -1,14 +1,14 @@
+@file:JvmName("TranslationStrategyAlias")
 package plantuml.boundary
 
 /**
- * Strategy for translating a classified text.
+ * Backward-compat typealias — the translation strategy vocabulary is unified
+ * with the N0 contract `contracts.plantuml.PlantUmlStrategy` (D4, EPIC
+ * PLT-DIAGRAM-OWNERSHIP US-2).
  *
- * - [TRANSLATE]: Word-for-word translation via Messages_*.properties
- * - [BORROW]: Keep the source term as-is (loanword)
- * - [PRESERVE]: Never translate (identifiers, formulas, client-specific terms)
+ * There is now ONE enum type (`TRANSLATE` / `BORROW` / `PRESERVE`) shared by
+ * plantuml, document and the contract — never a second, divergent enum.
+ * Existing `plantuml.boundary.TranslationStrategy.*` references resolve
+ * transparently through the alias.
  */
-enum class TranslationStrategy {
-    TRANSLATE,
-    BORROW,
-    PRESERVE
-}
+typealias TranslationStrategy = contracts.plantuml.PlantUmlStrategy

@@ -1,0 +1,71 @@
+= Session 220 — US-2 PLT-DIAGRAM-OWNERSHIP : plantuml implémente le port du contrat N0
+
+_Date_ : 2026-10-08
+_Borough_ : plantuml-gradle (HTOWN)
+_Type_ : feature / DDD-TDD-BDD + publication DAG
+
+== Mission d'ouverture
+
+Suite du cadrage **PLT-DIAGRAM-OWNERSHIP** (S-219) et de l'US-1 contrat N0
+(`plantuml-contracts:0.0.1`, MEMPHIS S-280) : **US-2** — le borough plantuml
+implémente le port du contrat, son domaine `boundary` riche devient vivant, et
+`SyntaxValidationResult` migre vers le N0.
+
+Pilote : commit/push + publication locale et Central autorisés.
+
+== Livré (baby-step DDD/TDD/BDD)
+
+=== Câblage DAG
+
+* Pin catalogue `workspace-catalog:0.0.41 → 0.0.67` (settings) ;
+  platform `workspace-bom:0.0.41 → 0.0.67`.
+* Dépendance N0 : `implementation("education.cccp:plantuml-contracts:0.0.1")`.
+* Version propre `gradle/libs.versions.toml` : `plantuml = "0.0.5" → "0.0.6"`
+  (dérivée `ws.versions.plantuml.plugin`).
+
+=== Migration du type de validation (D2)
+
+* `plantuml/validation/SyntaxValidationResult.kt` **supprimé** → 12 fichiers
+  migrés vers `import contracts.plantuml.SyntaxValidationResult` (le type N0).
+  Un typealias ne suffit pas (Kotlin interdit l'accès aux classes imbriquées via
+  alias) → import direct = zéro type local, remède propre.
+
+=== Implémentations du contrat (D1/D3)
+
+* `PlantumlSyntaxValidatorAdapter` — implémente
+  `contracts.plantuml.PlantUmlSyntaxValidator`, wrappe le parser natif
+  (`PlantumlService.validateSyntax`). Document/consommateurs valident via le
+  contrat, sans dépendre du plugin (fin du N2→N2).
+* `PlantumlTranslationPortAdapter` — implémente
+  `contracts.plantuml.PlantUmlTranslationPort` : le domaine `boundary` riche
+  (`TranslationResolver` + `TextClassifier` + glossaire + registre) devient le
+  moteur unique délégué par document (US-4 à venir). **D5** : un retour-ligne réel
+  produit par le traducteur est re-échappé en `\n` (la cause du `Syntax Error?`
+  de CHE-DIAGRAM).
+
+=== Unification du vocabulaire (D4)
+
+* `plantuml/boundary/TranslationStrategy.kt` devient un **typealias** vers
+  `contracts.plantuml.PlantUmlStrategy` (TRANSLATE/BORROW/PRESERVE) — un seul
+  vocabulaire, plus de divergence.
+
+== Tests
+
+**9 tests unitaires** : `PlantumlTranslationPortAdapterTest` (6) +
+`PlantumlSyntaxValidatorAdapterTest` (3). Non-régression `plantuml.boundary.*` +
+garde `PlantumlPluginPublicationTest` : **84 PASSED, 0 FAILED**.
+
+== Publication DAG (pilote autorisé)
+
+* MEMPHIS `plantuml-contracts:0.0.1` Central (bundle `c9a687d3`).
+* MEMPHIS BOM/catalog `0.0.66` (bundle `c0201db7`, constraint contrat).
+* MEMPHIS BOM/catalog `0.0.67` (bundle `c2ce2252`, plantuml-plugin 0.0.6).
+* plantuml `publishToMavenLocal` `0.0.6` VERT ; `plantuml-plugin:0.0.6` Central
+  (bundle `c1033b48`, AUTOMATIC).
+
+== Reste (PLT-DIAGRAM-OWNERSHIP US-3→US-7)
+
+* **US-3** : round-trip validation obligatoire (bloc cassé jamais publié).
+* **US-4** : document délègue au contrat (suppression du domaine privé).
+* **US-5** : version toolchain gouvernée.
+* **US-6/7** : chaîne E2E + dogfooding.

@@ -10,7 +10,7 @@ import org.gradle.work.DisableCachingByDefault
 import plantuml.PlantumlManager
 import plantuml.PlantumlMessages
 import plantuml.service.PlantumlService
-import plantuml.validation.SyntaxValidationResult
+import contracts.plantuml.SyntaxValidationResult
 
 /**
  * Gradle task: `validatePlantumlSyntax`

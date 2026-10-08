@@ -1,5 +1,20 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-10
 
+== Session 220 (2026-10-08) — US-2 PLT-DIAGRAM-OWNERSHIP ✅
+
+=== Fait
+- Câblage DAG : pin catalogue 0.0.41→0.0.67 + platform 0.0.41→0.0.67 + plantuml 0.0.5→0.0.6 + dépendance plantuml-contracts:0.0.1 ✅
+- `PlantumlSyntaxValidatorAdapter` — implémente `contracts.plantuml.PlantUmlSyntaxValidator` (wrappe le parser natif ; fin du N2→N2) ✅
+- `PlantumlTranslationPortAdapter` — implémente `PlantUmlTranslationPort` ; domaine boundary riche délégué ; D5 retour-ligne → `\n` ✅
+- `SyntaxValidationResult` migré vers le N0 (fichier local supprimé, 12 imports) ✅
+- `boundary.TranslationStrategy` = typealias vers `contracts.plantuml.PlantUmlStrategy` (D4 vocabulaire unique) ✅
+- 9 tests unit (port + validator) ; non-régression boundary+garde 84 PASSED 0 FAILED ✅
+- Publication DAG : contrat 0.0.1 (`c9a687d3`) → BOM/catalog 0.0.66 (`c0201db7`) → BOM/catalog 0.0.67 (`c2ce2252`) → plantuml-plugin 0.0.6 (`c1033b48`) ✅
+
+=== Prochaine session (221)
+- **US-3** : round-trip validation obligatoire (bloc cassé jamais publié)
+- **Fichier à lire en priorité** : `.agents/CADRAGE_EPIC_PLT_DIAGRAM_OWNERSHIP.adoc`
+
 == Session 219 (2026-10-08) — Cadrage EPIC PLT-DIAGRAM-OWNERSHIP ✅
 
 === Fait

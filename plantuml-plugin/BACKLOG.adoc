@@ -1,14 +1,34 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-10-08 (Session 219 — Cadrage EPIC PLT-DIAGRAM-OWNERSHIP)
+:last_update: 2026-10-08 (Session 220 — US-2 PLT-DIAGRAM-OWNERSHIP)
 
 '''
-== 🟡 EPIC PLT-DIAGRAM-OWNERSHIP — Le borough plantuml possède le bloc diagramme (CADRÉ S-219)
+== 🟡 EPIC PLT-DIAGRAM-OWNERSHIP — Le borough plantuml possède le bloc diagramme (CADRÉ S-219, US-1/US-2 ✅)
 
-*Statut* : 🟡 CADRÉ (S-219) — 0/7 US, implémentation à planifier
+*Statut* : 🟡 EN COURS — US-1 ✅ (S-280 MEMPHIS), US-2 ✅ (S-220), 0/7 restantes → cf. US-3→US-7
 *Cadrage* : `.agents/CADRAGE_EPIC_PLT_DIAGRAM_OWNERSHIP.adoc`
 *Priorité* : 🟠 HAUTE — cause racine cross-borough de CHE-DIAGRAM (diagrammes blancs)
 *Charge* : ~22 pts (8 US, ~6 sessions)
+
+=== User Stories
+
+[cols="1,5,1,2"]
+|===
+| US | Description | Pts | Statut
+
+| US-0 | Cadrage (audit 5 constats, 10 décisions, 3 options écartées) | 1 | ✅ S-219
+| US-1 | Contrat N0 `plantuml-contracts` (MEMPHIS) — `PlantUmlBlock`, `PlantUmlStrategy`, `PlantUmlClassifier`, `SyntaxValidationResult`, `PlantUmlSyntaxValidator`, `PlantUmlTranslationPort` | 3 | ✅ S-280
+| US-2 | plantuml implémente le port (adapters validation+traduction, type migré vers N0, pin DAG) | 3 | ✅ S-220
+| US-3 | Correction/garantie de syntaxe — round-trip obligatoire, bloc cassé jamais publié + BDD `@plantuml-roundtrip` | 3 | 🟡 À FAIRE
+| US-4 | document délègue au contrat — suppression `PlantUmlClassifier`/`PlantUmlStrategy`/`PlantUmlTranslationAdapter` privés | 4 | 🟡 À FAIRE
+| US-5 | Version toolchain gouvernée — plantuml expose la version, bakery s'aligne, garde anti-drift | 3 | 🟡 À FAIRE
+| US-6 | Chaîne de transmission E2E (bakery→document→port→plantuml, rendu non blanc) | 3 | 🟡 À FAIRE
+| US-7 | Dogfooding + non-régression (re-bake cheroliv.com, contrat VERT) | 2 | 🟡 À FAIRE
+|===
+
+'''
+== 🟡 EPIC PLT-DIAGRAM-OWNERSHIP — historique (CADRÉ S-219)
+
 *Déclencheur* : CHE-DIAGRAM (cheroliv.com S-068) — les diagrammes PlantUML
 rendent **blanc** au déploiement ; la cause est architecturale (pas de
 propriétaire unique du bloc PlantUML).
@@ -28,22 +48,6 @@ Il faut que la chaîne bakery → article → document délègue à plantuml
 * **C-3** — pas de contrat N0 : couplage N2→N2 `implementation(libs.plantuml.plugin)`.
 * **C-4** — version toolchain non gouvernée : drift CI 1.2026.0 ≠ local 1.2026.2 (= D1 CHE-DIAGRAM).
 * **C-5** — deux vocabulaires de stratégie (`PlantUmlStrategy` vs `TranslationStrategy`).
-
-=== User Stories
-
-[cols="1,5,1,2"]
-|===
-| US | Description | Pts | Statut
-
-| US-0 | Cadrage (audit 5 constats, 10 décisions, 3 options écartées) | 1 | ✅ S-219
-| US-1 | Contrat N0 `plantuml-contracts` (MEMPHIS) — `PlantUmlBlock`, `SyntaxValidationResult`, `PlantUmlSyntaxValidator`, `PlantUmlTranslationPort` | 3 | 🟡 À FAIRE
-| US-2 | plantuml implémente le port (boundary riche + validation, type déplacé vers N0) | 3 | 🟡 À FAIRE
-| US-3 | Correction/garantie de syntaxe — `\n` préservé, round-trip obligatoire, bloc cassé jamais publié + BDD `@plantuml-roundtrip` | 3 | 🟡 À FAIRE
-| US-4 | document délègue au contrat — suppression `PlantUmlClassifier`/`PlantUmlStrategy`/`PlantUmlTranslationAdapter` privés | 4 | 🟡 À FAIRE
-| US-5 | Version toolchain gouvernée — plantuml expose la version, bakery s'aligne, garde anti-drift | 3 | 🟡 À FAIRE
-| US-6 | Chaîne de transmission E2E (bakery→document→port→plantuml, rendu non blanc) | 3 | 🟡 À FAIRE
-| US-7 | Dogfooding + non-régression (re-bake cheroliv.com, contrat VERT) | 2 | 🟡 À FAIRE
-|===
 
 '''
 

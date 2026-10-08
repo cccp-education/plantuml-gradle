@@ -1,5 +1,26 @@
 = Historique des Sessions
 
+== Session 220 (2026-10-08) — US-2 PLT-DIAGRAM-OWNERSHIP : plantuml implémente le port du contrat N0 ✅
+
+Suite du cadrage S-219 et de l'US-1 contrat N0 (`plantuml-contracts:0.0.1`,
+MEMPHIS S-280). Le borough plantuml **implémente le port** et son domaine
+`boundary` riche devient vivant. **Câblage DAG** : pin catalogue
+`workspace-catalog:0.0.41→0.0.67` + platform `workspace-bom:0.0.41→0.0.67` +
+`plantuml 0.0.5→0.0.6` ; dépendance `implementation(education.cccp:plantuml-contracts:0.0.1)`.
+**Migration du type** : `plantuml/validation/SyntaxValidationResult.kt` supprimé →
+12 imports basculés vers `contracts.plantuml.SyntaxValidationResult` (le type N0 ;
+un typealias ne permet pas l'accès aux classes imbriquées). **Implémentations** :
+`PlantumlSyntaxValidatorAdapter` (wrappe `PlantumlService.validateSyntax` derrière
+`contracts.plantuml.PlantUmlSyntaxValidator` — fin du N2→N2) +
+`PlantumlTranslationPortAdapter` (le domaine `TranslationResolver`+`TextClassifier`+
+glossaire devient le moteur unique délégué ; **D5** un retour-ligne réel est
+re-échappé en `\n`, cause du `Syntax Error?` CHE-DIAGRAM). **Unification D4** :
+`boundary.TranslationStrategy` = typealias vers `contracts.plantuml.PlantUmlStrategy`.
+**Tests** : 9 unit (port 6 + validator 3) ; non-régression boundary+garde **84
+PASSED 0 FAILED**. **Publication DAG (pilote autorisé)** : contrat 0.0.1
+(`c9a687d3`) → BOM/catalog 0.0.66 (`c0201db7`) → BOM/catalog 0.0.67 (`c2ce2252`)
+→ plantuml-plugin 0.0.6 Central (`c1033b48`, AUTOMATIC). Suivant : US-3, US-4, US-5.
+
 == Session 219 (2026-10-08) — Cadrage EPIC PLT-DIAGRAM-OWNERSHIP : le borough plantuml possède le bloc diagramme ✅
 
 Demande pilote : « cadrer les epic pour le borough plantuml car son support au

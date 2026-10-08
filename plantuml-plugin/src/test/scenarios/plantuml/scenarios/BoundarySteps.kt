@@ -18,7 +18,7 @@ import plantuml.boundary.TranslationStrategy
 import plantuml.service.DiagramProcessor
 import plantuml.service.KnowledgeGraphRenderer
 import plantuml.service.PlantumlService
-import plantuml.validation.SyntaxValidationResult
+import contracts.plantuml.SyntaxValidationResult
 
 class BoundarySteps(private val world: PlantumlWorld) {
 

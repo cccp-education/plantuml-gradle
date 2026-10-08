@@ -18,7 +18,7 @@ import plantuml.incremental.ProcessingDecision
 import plantuml.service.DiagramProcessor
 import plantuml.service.LlmService
 import plantuml.service.PlantumlService
-import plantuml.validation.SyntaxValidationResult
+import contracts.plantuml.SyntaxValidationResult
 import java.io.File
 
 /**
