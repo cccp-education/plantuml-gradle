@@ -63,6 +63,24 @@ garde `PlantumlPluginPublicationTest` : **84 PASSED, 0 FAILED**.
 * plantuml `publishToMavenLocal` `0.0.6` VERT ; `plantuml-plugin:0.0.6` Central
   (bundle `c1033b48`, AUTOMATIC).
 
+=== Correction de design (S-220) + republication 0.0.7
+
+En préparant **US-4**, un défaut de design a été découvert : le premier
+`PlantumlTranslationPortAdapter` résolvait les labels via le glossaire **borné**
+(`TranslationResolver`) — il **ne traduit pas** les labels arbitraires des
+articles (`Utilisateur` → PRESERVE), ce qui **régressionnerait** la traduction des
+articles. Le port est rendu **provider-agnostique** : il prend un
+`TranslationService` N0. Les deux usages se branchent sur le **même** port :
+
+* diagrammes **générés** → `PlantumlTranslationServiceAdapter` (glossaire boundary) ;
+* blocs d'**articles** → le `TranslationService` LLM de l'article
+  (`PooledOllamaTranslationAdapter`).
+
+Le design corrigé invalide le `0.0.6` publié (piège #1 : version publiée ≠ code) →
+**`plantuml 0.0.7` republié** (bundle `18cf74bc`, AUTOMATIC) + BOM/catalog `0.0.68`
+(bundle `b9ea6d21`). Tests port : **10/10** (dont directive non quotée + escaping).
+
+
 == Reste (PLT-DIAGRAM-OWNERSHIP US-3→US-7)
 
 * **US-3** : round-trip validation obligatoire (bloc cassé jamais publié).

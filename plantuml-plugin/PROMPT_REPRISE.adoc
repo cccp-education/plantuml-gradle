@@ -51,8 +51,8 @@ Tests = CI (règle EAGER).
 
 == Rappels
 
-- GroupId: education.cccp.plantuml — version `plantuml = "0.0.6"` (catalog ws 0.0.67)
-- Central: 0.0.1, 0.0.2, 0.0.4 (périmé), 0.0.5, **0.0.6 publié S-220**
+- GroupId: education.cccp.plantuml — version `plantuml = "0.0.7"` (catalog ws 0.0.68)
+- Central: 0.0.1, 0.0.2, 0.0.4 (périmé), 0.0.5, 0.0.6, **0.0.7 publié S-220**
 - BOM: `workspace-bom` platform **0.0.67** ; contrat N0 `plantuml-contracts:0.0.1` Central
 - Conventions: `education.cccp.build.*:0.0.7` ✅
 - `publishToMavenLocal` obligatoire après modif code plugin

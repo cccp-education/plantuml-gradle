@@ -1,5 +1,8 @@
 package plantuml.boundary
 
+import contracts.i18n.TranslationRequest
+import contracts.i18n.TranslationResult
+import contracts.i18n.TranslationService
 import contracts.plantuml.PlantUmlBlock
 import contracts.plantuml.PlantUmlStrategy
 import contracts.plantuml.PlantUmlTranslationOutcome
@@ -10,77 +13,67 @@ import org.junit.jupiter.api.Test
 
 class PlantumlTranslationPortAdapterTest {
 
-    private fun resolverWith(messages: Map<String, String>, glossary: IdiomaticGlossary = IdiomaticGlossary()) =
-        TranslationResolver(
-            classifier = TextClassifier(),
-            glossary = glossary,
-            messageResolver = { key, _ -> messages[key] },
-        )
+    private fun translator(map: Map<String, String>) = object : TranslationService {
+        override fun translate(request: TranslationRequest): TranslationResult =
+            map[request.sourceText]?.let { TranslationResult.Success(it) }
+                ?: TranslationResult.Failure("no entry")
+    }
 
-    private fun port(resolver: TranslationResolver) = PlantumlTranslationPortAdapter(resolver)
+    private fun port(map: Map<String, String>) = PlantumlTranslationPortAdapter(translator(map))
 
     @Test
     fun `preserves a block with only semantic identity`() {
-        val adapter = port(resolverWith(emptyMap()))
+        val adapter = port(emptyMap())
         val block = PlantUmlBlock("@startuml\nU --> Foo.Bar\n@enduml")
-        val outcome =
-            adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
         assertTrue(outcome is PlantUmlTranslationOutcome.Preserved)
     }
 
     @Test
-    fun `translates a quoted label via the boundary resolver`() {
-        val resolver = resolverWith(mapOf("label.classes" to "Klassen"))
-        val adapter = port(resolver)
-        val block = PlantUmlBlock("@startuml\nclass \"Classes\"\n@enduml")
-        val outcome =
-            adapter.translate(PlantUmlTranslationRequest(block, "en", "de"))
+    fun `translates a quoted label via the provider`() {
+        val adapter = port(mapOf("Utilisateur" to "User"))
+        val block = PlantUmlBlock("@startuml\nclass \"Utilisateur\"\n@enduml")
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
         assertTrue(outcome is PlantUmlTranslationOutcome.Translated)
-        assertTrue((outcome as PlantUmlTranslationOutcome.Translated).block.raw.contains("\"Klassen\""))
+        assertTrue((outcome as PlantUmlTranslationOutcome.Translated).block.raw.contains("\"User\""))
     }
 
     @Test
-    fun `converts a raw newline returned by the translator back to the plantuml escape`() {
-        // The LLM may return a real line break where the source had `\n`.
-        val resolver = resolverWith(mapOf("label.classes" to "Cla\nsses"))
-        val adapter = port(resolver)
-        val block = PlantUmlBlock("@startuml\nclass \"Classes\"\n@enduml")
-        val outcome =
-            adapter.translate(PlantUmlTranslationRequest(block, "en", "de"))
+    fun `translates an unquoted directive value`() {
+        val adapter = port(mapOf("Évolution Mensuelle" to "Monthly Evolution"))
+        val block = PlantUmlBlock("@startuml\ntitle Évolution Mensuelle\n@enduml")
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+        assertTrue((outcome as PlantUmlTranslationOutcome.Translated).block.raw.contains("title Monthly Evolution"))
+    }
+
+    @Test
+    fun `converts a raw newline returned by the provider back to the plantuml escape`() {
+        val adapter = port(mapOf("CLI de vibe coding" to "vibe coding CLI\nOpen source, free"))
+        val block = PlantUmlBlock("@startuml\nrectangle \"CLI de vibe coding\" as CLI\n@enduml")
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
         val raw = (outcome as PlantUmlTranslationOutcome.Translated).block.raw
         assertTrue(raw.contains("\\n"), "newline must be escaped: $raw")
-        assertTrue(!raw.contains("Cla\nsses"), "raw line break must not survive")
-    }
-
-    @Test
-    fun `preserves borrowed vocabulary blocks`() {
-        val glossary =
-            IdiomaticGlossary().apply {
-                register("pipeline", "fr", GlossaryEntry("pipeline", TranslationStrategy.BORROW))
-            }
-        val adapter = port(resolverWith(emptyMap(), glossary))
-        val block =
-            PlantUmlBlock(
-                raw = "@startuml\nrectangle \"pipeline\"\n@enduml",
-                borrowedVocabulary = setOf("pipeline"),
-            )
-        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "en", "fr"))
-        // BORROW keeps the term; the block is unchanged → Preserved.
-        assertTrue(outcome is PlantUmlTranslationOutcome.Preserved)
+        assertTrue(!raw.contains("vibe coding CLI\nOpen"), "raw line break must not survive")
     }
 
     @Test
     fun `empty block is preserved`() {
-        val adapter = port(resolverWith(emptyMap()))
-        val outcome =
-            adapter.translate(PlantUmlTranslationRequest(PlantUmlBlock(""), "fr", "en"))
+        val adapter = port(emptyMap())
+        val outcome = adapter.translate(PlantUmlTranslationRequest(PlantUmlBlock(""), "fr", "en"))
+        assertTrue(outcome is PlantUmlTranslationOutcome.Preserved)
+    }
+
+    @Test
+    fun `provider failure preserves the block`() {
+        val adapter = port(emptyMap())
+        val block = PlantUmlBlock("@startuml\nclass \"Utilisateur\"\n@enduml")
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
         assertTrue(outcome is PlantUmlTranslationOutcome.Preserved)
     }
 
     @Test
     fun `unified strategy alias points to the N0 contract enum`() {
         // D4 — one vocabulary: the boundary alias resolves to the contract enum.
-        assertEquals(PlantUmlStrategy.TRANSLATE, contracts.plantuml.PlantUmlStrategy.TRANSLATE)
         assertEquals(
             listOf(PlantUmlStrategy.TRANSLATE, PlantUmlStrategy.BORROW, PlantUmlStrategy.PRESERVE),
             contracts.plantuml.PlantUmlStrategy.entries.toList(),
