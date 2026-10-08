@@ -20,8 +20,8 @@
 | US-1 | Contrat N0 `plantuml-contracts` (MEMPHIS) — `PlantUmlBlock`, `PlantUmlStrategy`, `PlantUmlClassifier`, `SyntaxValidationResult`, `PlantUmlSyntaxValidator`, `PlantUmlTranslationPort` | 3 | ✅ S-280
 | US-2 | plantuml implémente le port (adapters validation+traduction, type migré vers N0, pin DAG) | 3 | ✅ S-220
 | US-3 | Correction/garantie de syntaxe — round-trip obligatoire, bloc cassé jamais publié + BDD `@plantuml-roundtrip` | 3 | ✅ S-221
-| US-4 | document délègue au contrat — suppression `PlantUmlClassifier`/`PlantUmlStrategy`/`PlantUmlTranslationAdapter` privés | 4 | 🟡 À FAIRE
-| US-5 | Version toolchain gouvernée — plantuml expose la version, bakery s'aligne, garde anti-drift | 3 | 🟡 À FAIRE
+| US-4 | document délègue au contrat — suppression `PlantUmlClassifier`/`PlantUmlStrategy`/`PlantUmlTranslationAdapter` privés | 4 | 🟡 À FAIRE (question d'injection du port à trancher)
+| US-5 | Version toolchain gouvernée — plantuml expose la version, bakery s'aligne, garde anti-drift | 3 | 🟡 CADRÉ (S-221 — triple split-brain diagnostiqué, impl. à planifier)
 | US-6 | Chaîne de transmission E2E (bakery→document→port→plantuml, rendu non blanc) | 3 | 🟡 À FAIRE
 | US-7 | Dogfooding + non-régression (re-bake cheroliv.com, contrat VERT) | 2 | 🟡 À FAIRE
 |===

@@ -125,6 +125,52 @@ et `plantuml.boundary.TranslationStrategy` (TRANSLATE/BORROW/PRESERVE) décriven
 **la même décision sémantique** avec deux noms. Toute évolution doit être faite
 deux fois — ou jamais.
 
+=== Constat C-4 (affiné S-221) — Triple split-brain de version toolchain
+
+L'audit US-5 a révélé que la version asciidoctor-diagram/plantuml n'a pas un
+propriétaire, mais **trois sources divergentes** :
+
+[cols="2,2,2"]
+|===
+| Source | asciidoctorj-diagram | asciidoctorj-diagram-plantuml
+| `bakery.SiteManager` (hardcodé) | **3.0.1** | **1.2025.3**
+| `bakery` toml local | 3.0.1 | 1.2026.2
+| MEMPHIS BOM toml | **3.2.0** | 1.2025.3
+|===
+
+Le **classpath de bake** (`jbakeRuntime`, `SiteManager`) est une **liste
+hardcodée** — il ignore à la fois le toml local, le catalogue `ws` et le BOM. La
+version PlantUML **effectivement bakée** est celle **bundlée** dans
+`asciidoctorj-diagram-plantuml` (`1.2025.3` → `plantuml-lgpl-1.2025.3`). **Cause
+probable de D1** : le JAR standalone `net.sourceforge.plantuml:plantuml:1.2026.0`
+(tiré transitivement via `document-plugin → plantuml-plugin`) **shadow** le
+PlantUML bundlé sur ce classpath → une version de rendu non maîtrisée. US-5 doit
+d'abord **prouver** ce shadowing (`dependencyInsight` sur la configuration de
+bake), puis établir la **source unique** (catalogue `ws` consommé par
+`SiteManager`) et une **garde** local↔CI.
+
+**Indice supplémentaire (S-221)** : le bake **local** produit `<?plantuml 1.2026.2?>`
+alors que `SiteManager` hardcode `1.2025.3` — donc le bake local **ne passe pas**
+par cette liste hardcodée (il lit le toml bakery `1.2026.2`), tandis que la CI
+produit `1.2026.0`. Trois mécanismes de résolution coexistent : il faut
+**identifier lequel la CI emprunte** avant de gouverner la version.
+
+**Preuve (S-221, `dependencyInsight` sur `bakery:runtimeClasspath`)** :
+
+[source]
+----
+net.sourceforge.plantuml:plantuml:1.2026.0
+\--- education.cccp:plantuml-plugin:0.0.5
+     \--- education.cccp:document-plugin:0.0.20   (requested education.cccp:workspace-bom:0.0.65)
+          \--- runtimeClasspath (requested education.cccp:document-plugin)
+----
+
+Le JAR **standalone** `net.sourceforge.plantuml:plantuml:1.2026.0` entre dans le
+classpath de bakery **via `document-plugin → plantuml-plugin`** — il cohabite avec
+le PlantUML **bundlé** dans `asciidoctorj-diagram-plantuml`. C'est la collision de
+classes à arbitrer en US-5 (ordre de classpath / exclusion / source unique).
+
+
 === Synthèse — un bloc, cinq propriétaires de fait, zéro propriétaire de droit
 
 |===

@@ -42,11 +42,22 @@ parse plus doit être **rejeté** (repli sur la source), jamais publié (D5).
 
 * **US-4** : document délègue au contrat (cross-borough document+bakery ; question
   d'injection du port à cadrer).
-* **US-5** : version toolchain gouvernée (résout D1 CHE-DIAGRAM).
+* **US-5** : version toolchain gouvernée (résout D1 CHE-DIAGRAM) — **cadré S-221**.
 * **US-6/7** : chaîne E2E + dogfooding.
+
+== US-5 — cadrage/diagnostic (S-221, non implémenté)
+
+L'audit US-5 a révélé un **triple split-brain** de version toolchain
+(`bakery.SiteManager` hardcodé `3.0.1`/`1.2025.3` ; toml bakery `3.0.1`/`1.2026.2` ;
+BOM `3.2.0`/`1.2025.3`). **Preuve `dependencyInsight`** sur
+`bakery:runtimeClasspath` : le JAR standalone `net.sourceforge.plantuml:plantuml:1.2026.0`
+entre **via `document-plugin → plantuml-plugin`**, cohabitant avec le PlantUML
+bundlé dans `asciidoctorj-diagram-plantuml` — collision à arbitrer. Diagnostic
+consigné dans le cadrage (constat C-4 affiné). **Implémentation reportée** :
+modifier le classpath de bake touche le chemin critique de déploiement → session
+dédiée avec preuve de shadowing et garde local↔CI.
 
 == Notes
 
-* Pas de publication cette session (code non distribué) : le round-trip est un
-  garde-fou interne au port, consommé par document en US-4.
+* Pas de publication cette session (US-3 code non distribué ; US-5 cadrage).
 * Zéro secret, zéro Python.
