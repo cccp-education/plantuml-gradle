@@ -3,6 +3,19 @@
 _Voir BACKLOG.adoc section "Prochains EPICs — pistes consolidées" pour le
 détail priorisé et les sources (code review, audit code)._
 
+== EPIC PLT-DIAGRAM-OWNERSHIP (cadré S-219)
+
+Le borough plantuml doit posséder le bloc diagramme de bout en bout (modèle,
+traduction, validation, version toolchain). Split-brain constaté : document
+réimplémente une logique PlantUML pauvre alors que `plantuml.boundary`
+(PLT-BOUNDARY, 26 pts) n'est jamais consommé. Déclencheur : CHE-DIAGRAM
+(diagrammes blancs cheroliv.com). 8 US ~22 pts, cross-borough
+MEMPHIS/plantuml/document/bakery/runner.
+
+→ **PLT-DIAGRAM-OWNERSHIP** dans BACKLOG.adoc +
+`.agents/CADRAGE_EPIC_PLT_DIAGRAM_OWNERSHIP.adoc`.
+Prochaine session (220) : US-1 contrat N0 `plantuml-contracts`.
+
 == Pool de clés freemium rotatif
 
 Integrer un pool de clé gemini/ollama.cloud/huggingface/mistral/groq rotatif

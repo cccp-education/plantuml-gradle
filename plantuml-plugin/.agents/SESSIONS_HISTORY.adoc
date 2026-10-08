@@ -1,5 +1,28 @@
 = Historique des Sessions
 
+== Session 219 (2026-10-08) — Cadrage EPIC PLT-DIAGRAM-OWNERSHIP : le borough plantuml possède le bloc diagramme ✅
+
+Demande pilote : « cadrer les epic pour le borough plantuml car son support au
+sein de document n'est pas optimisé […] en extraire les plantuml dans le asciidoc
+pour que cela soit le borough plantuml qui en fasse la traduction et la correction
+de syntaxe et alignement des dépendances plantuml/asciidoc. » Déclencheur :
+CHE-DIAGRAM (cheroliv.com S-068) — diagrammes blancs au déploiement.
+
+**Audit 5 constats** : (C-1) split-brain — `plantuml.boundary` riche (PLT-BOUNDARY
+S163-166, 26 pts) jamais importé par document (grep=0) qui réimplémente une version
+pauvre (`PlantUmlClassifier`/`PlantUmlStrategy`) ; (C-2) la traduction casse `\n`
+(`Syntax Error?` → bloc dégradé, = D2 CHE-DIAGRAM) ; (C-3) pas de contrat N0
+(couplage N2→N2 `implementation(libs.plantuml.plugin)`) ; (C-4) version toolchain
+non gouvernée (drift CI 1.2026.0 ≠ local 1.2026.2, = D1 CHE-DIAGRAM) ; (C-5) deux
+vocabulaires de stratégie.
+
+**Livrable** : `.agents/CADRAGE_EPIC_PLT_DIAGRAM_OWNERSHIP.adoc` — 5 constats,
+10 décisions, 3 options écartées, **8 US US-0→US-7 ~22 pts** (contrat N0
+`plantuml-contracts` MEMPHIS + implémentation du port + round-trip syntaxe +
+document délègue + version toolchain gouvernée + E2E). Cross-borough
+MEMPHIS/plantuml/document/bakery/runner. Gouvernance synchronisée. Zéro code,
+zéro secret, zéro Python.
+
 == Session 218 (2026-09-10) — PUB 0.0.5 : publication Maven Central du HEAD réel ✅
 
 Le Central 0.0.4 était **périmé** (POM `workspace-bom:0.0.19`, dernier code

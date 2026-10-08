@@ -1,0 +1,81 @@
+= Session 219 — Cadrage EPIC PLT-DIAGRAM-OWNERSHIP (le borough plantuml possède le bloc diagramme)
+
+_Date_ : 2026-10-08
+_Borough_ : plantuml-gradle (HTOWN)
+_Type_ : cadrage / audit / gouvernance pure (pattern S-057/S-063)
+
+== Mission d'ouverture
+
+Demande pilote (S-219) :
+
+*« cadrer les epic pour le borough plantuml car son support au sein de document
+n'est pas optimisé et doit être architecturé de manière à passer la chaîne de
+transmission en douceur depuis bakery puis article vers document et en extraire
+les plantuml dans le asciidoc pour que cela soit le borough plantuml qui en fasse
+la traduction et la correction de syntaxe et alignement des dépendances
+plantuml/asciidoc. »*
+
+Déclencheur : le cadrage CHE-DIAGRAM (cheroliv.com S-068) a montré que les
+diagrammes PlantUML rendent **blanc** au déploiement. Cause racine
+**architecturale** : le bloc PlantUML n'a pas de **propriétaire de droit**.
+
+Mission : **cadrer une EPIC cross-borough** (gouvernance pure, zéro code).
+
+== Audit (5 constats)
+
+* **C-1 — split-brain du domaine de traduction.** plantuml possède un domaine
+  `plantuml.boundary` complet (PLT-BOUNDARY S163-166, 26 pts : `TranslationResolver`,
+  `TextClassifier`, `IdiomaticGlossary`, `NonTraduisibleTermRegistry`,
+  `TranslationStrategy`) ; document **ne l'importe pas** (grep = 0) et
+  réimplémente une version pauvre (`PlantUmlClassifier`, `PlantUmlStrategy`). La
+  valeur S163-166 est morte pour le pipeline site.
+* **C-2 — la traduction casse la syntaxe.** `PlantUmlTranslationAdapter` traduit
+  les labels par regex ; le LLM restitue un retour-ligne réel là où la source
+  portait `\n` → `Syntax Error?` → asciidoctor-diagram dégrade en listing. C'est
+  le défaut D2 de CHE-DIAGRAM. Validation `LENIENT` = warn silencieux.
+* **C-3 — pas de contrat N0.** document dépend du **plugin** complet
+  (`implementation(libs.plantuml.plugin)`) pour `PlantumlService.validateSyntax`
+  — couplage N2→N2. Le BACKLOG plantuml anticipe déjà l'extraction N0.
+* **C-4 — version toolchain non gouvernée.** asciidoctor-diagram/plantuml
+  hardcodés dans `bakery.SiteManager` (`3.0.1`/`1.2025.3`), BOM publie `3.2.0`,
+  runner force BOM 0.0.65 → version résolue CI (1.2026.0) ≠ local (1.2026.2) →
+  défaut D1 CHE-DIAGRAM.
+* **C-5 — deux vocabulaires.** `document.PlantUmlStrategy`
+  (TranslateLabels/PreserveTechnical/BorrowVocabulary) et
+  `plantuml.boundary.TranslationStrategy` (TRANSLATE/BORROW/PRESERVE) décrivent
+  la même décision avec deux noms.
+
+== Livrable
+
+* **`.agents/CADRAGE_EPIC_PLT_DIAGRAM_OWNERSHIP.adoc`** — 5 constats, 10
+  décisions, 3 options écartées, 8 US (US-0→US-7, ~22 pts),
+  boundary cible + lien CHE-DIAGRAM, preuves reproductibles.
+* **BACKLOG.adoc** — nouvelle section EPIC PLT-DIAGRAM-OWNERSHIP.
+* **INDEX / SESSIONS_HISTORY / PROMPT_REPRISE / AGENT / archive** — synchronisés.
+
+== Décisions clés
+
+* **D1** — le bloc PlantUML a un propriétaire : plantuml-gradle.
+* **D2** — contrat N0 `plantuml-contracts` (MEMPHIS) : `PlantUmlBlock`,
+  `SyntaxValidationResult`, `PlantUmlSyntaxValidator`, `PlantUmlTranslationPort`.
+* **D3** — le port est implémenté par le domaine boundary riche de plantuml.
+* **D4** — un seul vocabulaire (`TranslationStrategy`).
+* **D5** — la traduction ne casse jamais la syntaxe (round-trip obligatoire).
+* **D6** — la version du toolchain est une donnée gouvernée (fin du drift D1).
+* **D7** — chaîne de transmission testée E2E (bakery→document→port→plantuml).
+
+== Notes
+
+* Session de **gouvernance pure** : zéro code, zéro bake, zéro publication.
+* Le rendu SVG reste dans le bake (asciidoctor-diagram) : seule sa **version**
+  est gouvernée par plantuml (option écartée : faire porter le rendu au plugin).
+* `site.yml` non touché. Zéro secret, zéro Python.
+
+== Reste (S-220→)
+
+* **US-1** : contrat N0 `plantuml-contracts` (MEMPHIS).
+* **US-2** : implémentation du port par le boundary plantuml.
+* **US-3** : correction/garantie de syntaxe (round-trip, `\n` préservé).
+* **US-4** : document délègue au contrat (fin du split-brain).
+* **US-5** : version toolchain gouvernée (fin du drift D1).
+* **US-6/7** : chaîne E2E + dogfooding.

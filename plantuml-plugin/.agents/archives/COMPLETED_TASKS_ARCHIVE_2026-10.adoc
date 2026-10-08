@@ -1,0 +1,22 @@
+= COMPLETED_TASKS_ARCHIVE — 2026-10
+
+== Session 219 (2026-10-08) — Cadrage EPIC PLT-DIAGRAM-OWNERSHIP ✅
+
+=== Fait
+- Demande pilote : cadrer une EPIC pour que le borough plantuml possède le bloc diagramme de bout en bout (traduction, correction de syntaxe, alignement dépendances plantuml/asciidoc) ✅
+- Déclencheur CHE-DIAGRAM (cheroliv.com S-068) — diagrammes PlantUML blancs au déploiement, cause racine architecturale ✅
+- Audit 5 constats : C-1 split-brain (`plantuml.boundary` riche non importé par document, grep=0) ; C-2 traduction casse `\n` → `Syntax Error?` (= D2 CHE-DIAGRAM) ; C-3 pas de contrat N0 (couplage N2→N2) ; C-4 version toolchain non gouvernée (drift CI 1.2026.0 ≠ local 1.2026.2, = D1 CHE-DIAGRAM) ; C-5 deux vocabulaires de stratégie ✅
+- Livrable `.agents/CADRAGE_EPIC_PLT_DIAGRAM_OWNERSHIP.adoc` : 5 constats, 10 décisions, 3 options écartées, 8 US US-0→US-7 ~22 pts ✅
+- Décisions clés : D1 propriétaire unique ; D2 contrat N0 `plantuml-contracts` (MEMPHIS) ; D3 port implémenté par le boundary riche ; D4 vocabulaire unique ; D5 round-trip syntaxe obligatoire ; D6 version toolchain gouvernée ; D7 chaîne E2E ✅
+- Boundary cible + lien CHE-DIAGRAM (3 défauts → US de résolution) ✅
+- Gouvernance : BACKLOG + INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 220 + archive 2026-10 créée ✅
+- Zéro code, zéro bake, zéro publication, zéro secret, zéro Python
+
+=== Prochaine session (220)
+- **US-1** : contrat N0 `plantuml-contracts` (MEMPHIS) — `PlantUmlBlock`, `SyntaxValidationResult`, `PlantUmlSyntaxValidator`, `PlantUmlTranslationPort`
+- **Fichier à lire en priorité** : `.agents/CADRAGE_EPIC_PLT_DIAGRAM_OWNERSHIP.adoc`
+
+== Sessions antérieures 2026-09
+- Session 218 — PUB 0.0.5 : publication Maven Central du HEAD réel ✅
+- Session 217 — FIX-BASELINE : échecs cucumber préexistants résolus ✅
+- Session 216 — RENAME-5 : neutralisation registre non-traductible ✅

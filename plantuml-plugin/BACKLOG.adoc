@@ -1,18 +1,52 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-09-10 (Session 217 — FIX-BASELINE échecs cucumber)
+:last_update: 2026-10-08 (Session 219 — Cadrage EPIC PLT-DIAGRAM-OWNERSHIP)
 
 '''
-== Session 217 (2026-09-10) — FIX-BASELINE ✅ TERMINÉ
+== 🟡 EPIC PLT-DIAGRAM-OWNERSHIP — Le borough plantuml possède le bloc diagramme (CADRÉ S-219)
 
-Solutions apportées aux 3 échecs cucumber **préexistants** de HEAD
-(stash-confirmés S-216) — la baseline cucumber est désormais VERTE.
-Correctifs **TEST-only** (aucun fichier production, zéro bump BOM).
-Gates : `@rag` 4/4 PASSED (log `Skipped rag-test.puml` confirmé),
-`@plantuml` 3/3 (XML Attempt History tests=3 failures=0). Voir rapport
-`.agents/sessions/217-fix-baseline.adoc`.
+*Statut* : 🟡 CADRÉ (S-219) — 0/7 US, implémentation à planifier
+*Cadrage* : `.agents/CADRAGE_EPIC_PLT_DIAGRAM_OWNERSHIP.adoc`
+*Priorité* : 🟠 HAUTE — cause racine cross-borough de CHE-DIAGRAM (diagrammes blancs)
+*Charge* : ~22 pts (8 US, ~6 sessions)
+*Déclencheur* : CHE-DIAGRAM (cheroliv.com S-068) — les diagrammes PlantUML
+rendent **blanc** au déploiement ; la cause est architecturale (pas de
+propriétaire unique du bloc PlantUML).
+
+=== Contexte
+
+Le support PlantUML au sein de `document-gradle` n'est pas optimisé : document a
+réimplémenté une logique PlantUML pauvre alors que plantuml-gradle possède un
+domaine Translation Boundary riche (PLT-BOUNDARY, 26 pts) **jamais consommé**.
+Il faut que la chaîne bakery → article → document délègue à plantuml
+(traduction, correction de syntaxe, alignement des dépendances plantuml/asciidoc).
+
+=== Constats (audit S-219)
+
+* **C-1** — split-brain : `plantuml.boundary` riche non importé par document (grep=0) ; document duplique (`PlantUmlClassifier`/`PlantUmlStrategy`).
+* **C-2** — la traduction casse `\n` → `Syntax Error?` → bloc dégradé en listing (= D2 CHE-DIAGRAM).
+* **C-3** — pas de contrat N0 : couplage N2→N2 `implementation(libs.plantuml.plugin)`.
+* **C-4** — version toolchain non gouvernée : drift CI 1.2026.0 ≠ local 1.2026.2 (= D1 CHE-DIAGRAM).
+* **C-5** — deux vocabulaires de stratégie (`PlantUmlStrategy` vs `TranslationStrategy`).
+
+=== User Stories
+
+[cols="1,5,1,2"]
+|===
+| US | Description | Pts | Statut
+
+| US-0 | Cadrage (audit 5 constats, 10 décisions, 3 options écartées) | 1 | ✅ S-219
+| US-1 | Contrat N0 `plantuml-contracts` (MEMPHIS) — `PlantUmlBlock`, `SyntaxValidationResult`, `PlantUmlSyntaxValidator`, `PlantUmlTranslationPort` | 3 | 🟡 À FAIRE
+| US-2 | plantuml implémente le port (boundary riche + validation, type déplacé vers N0) | 3 | 🟡 À FAIRE
+| US-3 | Correction/garantie de syntaxe — `\n` préservé, round-trip obligatoire, bloc cassé jamais publié + BDD `@plantuml-roundtrip` | 3 | 🟡 À FAIRE
+| US-4 | document délègue au contrat — suppression `PlantUmlClassifier`/`PlantUmlStrategy`/`PlantUmlTranslationAdapter` privés | 4 | 🟡 À FAIRE
+| US-5 | Version toolchain gouvernée — plantuml expose la version, bakery s'aligne, garde anti-drift | 3 | 🟡 À FAIRE
+| US-6 | Chaîne de transmission E2E (bakery→document→port→plantuml, rendu non blanc) | 3 | 🟡 À FAIRE
+| US-7 | Dogfooding + non-régression (re-bake cheroliv.com, contrat VERT) | 2 | 🟡 À FAIRE
+|===
 
 '''
+
 == ✅ FIX-BASELINE — échecs cucumber préexistants (TERMINÉ en S-217)
 
 Le périmètre cucumber est résolu (les 3 FAIL de `cucumberTest`) :

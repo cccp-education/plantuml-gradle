@@ -1,0 +1,355 @@
+= CADRAGE EPIC PLT-DIAGRAM-OWNERSHIP — Le borough plantuml possède le bloc diagramme de bout en bout
+:epic: PLT-DIAGRAM-OWNERSHIP
+:session: 219
+:date: 2026-10-08
+:statut: 🟡 CADRÉ (S-219) — 0/7 US, implémentation à planifier
+
+== Contexte
+
+Demande pilote (S-219) :
+
+*« cadrer les epic pour le borough plantuml car son support au sein de document
+n'est pas optimisé et doit être architecturé de manière à passer la chaîne de
+transmission en douceur depuis bakery puis article vers document et en extraire
+les plantuml dans le asciidoc pour que cela soit le borough plantuml qui en fasse
+la traduction et la correction de syntaxe et alignement des dépendances
+plantuml/asciidoc. »*
+
+Déclencheur : le cadrage **CHE-DIAGRAM** (cheroliv.com S-068) a prouvé que les
+diagrammes PlantUML rendent **blanc** au déploiement et que les variantes ne les
+rendent **pas** — un symptôme dont la cause racine est **architecturale**: le
+bloc PlantUML de l'article n'a **pas un propriétaire unique**.
+
+Session de **gouvernance pure** (pattern S-057/S-063) : audit mesuré, décisions,
+découpage en US. **Zéro code modifié.**
+
+---
+
+== Audit mesuré (S-219)
+
+=== La chaîne réelle
+
+[source]
+----
+bakery/runner (N3/N2, orchestration traduction arctique + bake)
+        │  MigrateContentI18nTask.translateSingleFileWithBlockDelta
+        ▼
+document-gradle (N2)  DocumentTranslator
+        │  AsciiDocParser → PivotBlock.Source(language="plantuml")
+        │  PlantUmlTranslationAdapter  ← ⚠️ domaine PlantUML PRIVÉ à document
+        │  AsciiDocRenderer / JbakeNativeRenderer
+        ▼
+bakery bake (asciidoctor-diagram, jbakeRuntime)  ← ⚠️ rendu SVG, version codée en dur
+        ▼
+cheroliv.com jbake/i18n/{lang}/…  (SVG généré au bake)
+----
+
+=== Constat C-1 — Split-brain du domaine de traduction
+
+plantuml-gradle possède un **domaine Translation Boundary** complet (EPIC
+PLT-BOUNDARY, S163-166, 8 US, ~26 pts) :
+
+* `plantuml.boundary.TranslationResolver` — applique la stratégie
+* `TextClassifier` — 3 natures (`PRESENTATION` / `SEMANTIC_IDENTITY` / `LEXICAL_FIELD`)
+* `IdiomaticGlossary` + `NonTranslatableTermRegistry` — glossaire/registre YAML configurables
+* `TranslationStrategy` enum — `TRANSLATE` / `BORROW` / `PRESERVE`
+* `PlantumlTranslationServiceAdapter` — implémente le `TranslationService` N0
+
+**document-gradle ne le consomme PAS.** `grep` à l'appui : **zéro import
+`plantuml.boundary`** dans document. document réimplémente une version **plus
+pauvre** :
+
+|===
+| plantuml (riche, inutilisé) | document (pauvre, actif)
+| `TranslationCategory` (3 natures) | — (absent)
+| `TranslationStrategy` (TRANSLATE/BORROW/PRESERVE) | `PlantUmlStrategy` (TranslateLabels/PreserveTechnical/BorrowVocabulary)
+| `IdiomaticGlossary` (YAML) | — (absent)
+| `NonTranslatableTermRegistry` (YAML) | — (absent)
+| `TranslationResolver` (stratégie + glossaire) | `PlantUmlClassifier` + regex `"…"`
+| `plantuml.validation.SyntaxValidationResult` standalone | `document.…PlantUmlValidationResult` (wrapper)
+|===
+
+Le domaine riche de plantuml est **mort pour le pipeline site** : la valeur
+produite en S163-166 (26 pts) n'atteint jamais l'article.
+
+=== Constat C-2 — La traduction de document casse la syntaxe PlantUML
+
+`PlantUmlTranslationAdapter.translateLabels` remplace les labels par regex
+`"([^"]+)"`. Or la traduction LLM restitue un **retour-ligne réel** là où la
+source portait un échappement `\n` :
+
+[source]
+----
+FR : rectangle "CLI de vibe coding\nOpen source, gratuit" as CLI
+EN : rectangle "vibe coding CLI
+     Open source, free" as CLI        ← saut de ligne réel
+----
+
+PlantUML échoue (`Syntax Error?`), asciidoctor-diagram **dégrade le bloc en
+listing brut**. C'est exactement le défaut **D2 de CHE-DIAGRAM** (EN 0125 =
+0 `<img>` / 5 `@startuml`). document valide *après* traduction
+(`PlantUmlSyntaxValidator`) mais en mode `LENIENT` → **warn silencieux**, le bloc
+cassé est publié.
+
+=== Constat C-3 — Pas de contrat N0, couplage N2→N2
+
+document déclare `implementation(libs.plantuml.plugin)` — une dépendance
+**plugin-à-plugin** (N2→N2) pour n'utiliser que `PlantumlService.validateSyntax()`
++ `SyntaxValidationResult`. Le BACKLOG plantuml **anticipe déjà** l'extraction
+d'un contrat N0 :
+
+[quote]
+----
+Aujourd'hui le type standalone vit dans plantuml-plugin. Si d'autres boroughs
+(codex, slider, bakery) ont besoin de valider du PlantUML sans dépendre du
+plugin complet, un contrat N0 plantuml-validation-contracts pourra être extrait
+dans le BOM.
+----
+
+=== Constat C-4 — Le rendu (toolchain) n'est pas gouverné
+
+Le rendu `[plantuml] → SVG` est fait par asciidoctor-diagram dans bakery
+(`SiteManager.createJBakeRuntimeConfiguration`, `jbakeRuntime`), avec des versions
+**codées en dur** (`asciidoctorj-diagram:3.0.1` + `…-plantuml:1.2025.3`). Le BOM
+publie `asciidoctorj-diagram:3.2.0` / `…-plantuml:1.2025.3` ; le runner force
+`workspace-bom:0.0.65`. La version résolue en CI (**PlantUML 1.2026.0**) diffère
+du local (**1.2026.2**) → **défaut D1 de CHE-DIAGRAM** (SVG `xmlns=''` → blanc).
+
+Personne ne possède la version de la chaîne PlantUML : chaque maillon la
+redécide.
+
+=== Constat C-5 — Deux vocabulaires de stratégie divergents
+
+`document.PlantUmlStrategy` (TranslateLabels/PreserveTechnical/BorrowVocabulary)
+et `plantuml.boundary.TranslationStrategy` (TRANSLATE/BORROW/PRESERVE) décrivent
+**la même décision sémantique** avec deux noms. Toute évolution doit être faite
+deux fois — ou jamais.
+
+=== Synthèse — un bloc, cinq propriétaires de fait, zéro propriétaire de droit
+
+|===
+| Maillon | Qui code aujourd'hui | Devrait posséder
+| Extraction du bloc `[plantuml]` | document (`AsciiDocParser`) | document (pivot AsciiDoc) ✅
+| Modèle du bloc (`PlantUmlBlock`) | document (privé) | **plantuml** (contrat N0)
+| Traduction des labels | document (regex pauvre) | **plantuml** (boundary riche)
+| Validation syntaxique | document (wrapper) | **plantuml** (contrat N0)
+| Version asciidoctor-diagram/plantuml | bakery (hardcodé) | **plantuml** (source unique)
+| Rendu SVG | bakery/asciidoctor-diagram | bakery (mais version pilotée par plantuml)
+|===
+
+---
+
+== Décisions
+
+[cols="1,5"]
+|===
+| # | Décision
+
+| D1
+| **Le bloc PlantUML a un propriétaire : plantuml-gradle.** Le modèle, la
+traduction, la validation et la **version du toolchain** appartiennent au
+borough plantuml. document **extrait** le bloc et **délègue** ; il ne
+réimplémente plus la logique PlantUML.
+
+| D2
+| **Contrat N0 `plantuml-contracts` (MEMPHIS).** Les types stables migrent du
+plugin vers un artefact N0 minimal : `PlantUmlBlock`, `SyntaxValidationResult`,
+`PlantUmlSyntaxValidator` (interface), `PlantUmlTranslationPort` (port de
+traduction). document et bakery consomment le **contrat**, pas le plugin — fin
+du couplage N2→N2 (C-3). Pattern des contrats existants
+(`agent-contracts`, `i18n-contracts`, `ocr-contracts`).
+
+| D3
+| **Le port de traduction est implémenté par le domaine boundary de plantuml.**
+| `PlantUmlTranslationPort` est le seul point d'entrée ; l'implémentation
+réutilise `TranslationResolver` + `TextClassifier` + `IdiomaticGlossary` +
+`NonTranslatableTermRegistry` (C-1) — la valeur S163-166 devient vivante.
+
+| D4
+| **Un seul vocabulaire de stratégie.** `document.PlantUmlStrategy` est
+**supprimé** au profit de `TranslationStrategy` (TRANSLATE/BORROW/PRESERVE) du
+contrat N0 (C-5). Un concept, un nom.
+
+| D5
+| **La traduction ne casse jamais la syntaxe (C-2).** Le port garantit qu'un
+label traduit respecte l'échappement PlantUML (`\n` préservé) ; après
+traduction, une **validation round-trip** (re-parse PlantUML) est obligatoire ;
+un bloc invalide **n'est jamais publié** — soit il est **corrigé** (repli sur la
+source), soit la stratégie est `PRESERVE`.
+
+| D6
+| **La version du toolchain est une donnée gouvernée.** plantuml-gradle
+**expose** la version asciidoctor-diagram/plantuml de référence (attribut du
+contrat ou constante publiée) ; bakery s'aligne dessus. Fin du drift
+local↔CI (C-4, défaut D1 CHE-DIAGRAM).
+
+| D7
+| **La chaîne de transmission est explicite et testée de bout en bout.**
+| Un scénario Cucumber traverse bakery → document → port → plantuml sur un
+article réel à diagrammes, et vérifie : bloc extrait, labels traduits, syntaxe
+valide, **rendu non blanc**.
+
+| D8
+| **Baby-step DDD/TDD/BDD strict** : RED (compile failure / assertion), GREEN,
+REFACTOR ; unit → functional → cucumber. Aucune garde affaiblie.
+
+| D9
+| **Ordre DAG N0→N2 → N3.** Le contrat N0 est publié **avant** que document et
+bakery le consomment. plantuml-plugin implémente le port ; la propagation BOM
+suit l'ordre MEMPHIS → plantuml → document → bakery → runner.
+
+| D10
+| **Boundary** : plantuml possède le domaine + le contrat + la version ;
+document possède l'extraction pivot AsciiDoc + le rendu AsciiDoc ; bakery
+possède l'orchestration traduction + bake ; le rendu SVG reste dans le bake mais
+sa version est pilotée par plantuml.
+
+|===
+
+=== Options écartées
+
+* **Laisser document dupliquer (statu quo)** — deux vocabulaires, deux
+traductions, la valeur PLT-BOUNDARY reste morte ; le bug `\n` persiste.
+* **Faire porter le rendu SVG par plantuml-gradle** — contredit le bake
+JBake/asciidoctor-diagram ; le rendu doit rester au bake, seule sa **version**
+est gouvernée.
+* **document dépend du plugin complet** (sans contrat N0) — conserve la dette
+N2→N2 et expose toute l'API du plugin ; le contrat N0 est le remède prévu par
+le BACKLOG.
+* **Contrat N0 dans `workspace-bom` monolithe** — non : artefact standalone
+comme `ocr-contracts`/`runtime-contracts`.
+
+---
+
+== User Stories
+
+[cols="1,5,1,2"]
+|===
+| US | Description | Pts | Statut
+
+| US-0
+| Cadrage (ce document) — audit 5 constats, 10 décisions, 3 options écartées
+| 1
+| ✅ S-219
+
+| US-1
+| **Contrat N0 `plantuml-contracts`** (MEMPHIS) — `PlantUmlBlock`,
+`SyntaxValidationResult` (extrait du plugin), `PlantUmlSyntaxValidator`
+(interface), `PlantUmlTranslationPort` (port). Package dédié, zéro dépendance
+Gradle/PlantUML. Publication Central + BOM.
+| 3
+| 🟡 À FAIRE
+
+| US-2
+| **plantuml-gradle implémente le port** — `PlantUmlTranslationPort`
+implémenté par le domaine boundary (`TranslationResolver` + `TextClassifier` +
+`IdiomaticGlossary` + registry) ; `SyntaxValidationResult` déplacé vers le
+contrat ; API publique stable.
+| 3
+| 🟡 À FAIRE
+
+| US-3
+| **Correction/garantie de syntaxe** — le port préserve les échappements
+(`\n`) ; validation **round-trip** post-traduction obligatoire ; un bloc cassé
+n'est jamais publié (correction ou PRESERVE) ; BDD `@plantuml-roundtrip`.
+| 3
+| 🟡 À FAIRE
+
+| US-4
+| **document délègue au contrat** — suppression de `PlantUmlClassifier` +
+`PlantUmlStrategy` + `PlantUmlTranslationAdapter` privés ; `DocumentTranslator`
+appelle `PlantUmlTranslationPort` ; fin du couplage `libs.plantuml.plugin`.
+| 4
+| 🟡 À FAIRE
+
+| US-5
+| **Version toolchain gouvernée** — plantuml-gradle expose la version
+asciidoctor-diagram/plantuml de référence ; bakery (`SiteManager`) s'aligne ;
+garde anti-drift local↔CI ; preuve que le bake CI produit la même version que le
+local.
+| 3
+| 🟡 À FAIRE
+
+| US-6
+| **Chaîne de transmission E2E** — scénario Cucumber bakery→document→port→plantuml
+sur article réel à diagrammes : bloc extrait, labels traduits, syntaxe valide,
+**rendu non blanc** (lien CHE-DIAGRAM D1/D2).
+| 3
+| 🟡 À FAIRE
+
+| US-7
+| **Dogfooding + non-régression** — re-bake cheroliv.com (référence + variantes) ;
+zéro diagramme blanc/dégradé ; contrat final VERT.
+| 2
+| 🟡 À FAIRE
+|===
+
+*Total* : 8 US (US-0→US-7), ~22 pts. Cross-borough : MEMPHIS (N0) + plantuml
+(N2) + document (N2) + bakery (N2) + runner (N3).
+
+---
+
+== Boundary cible (schéma)
+
+[source]
+----
+bakery/runner ── article ──► document (pivot AsciiDoc)
+                                  │  extrait [plantuml] → PlantUmlBlock (N0)
+                                  ▼
+                        PlantUmlTranslationPort (N0)  ◄── contrat partagé
+                                  │
+                                  ▼
+                        plantuml-gradle (boundary riche + validation + version)
+                                  │
+                                  ▼
+                        document render ──► bakery bake (SVG, version pilotée)
+----
+
+---
+
+== Lien avec CHE-DIAGRAM (cheroliv.com)
+
+[cols="2,3"]
+|===
+| Défaut CHE-DIAGRAM | US PLT-DIAGRAM-OWNERSHIP qui le résout
+| D1 — SVG blancs (version/encodage toolchain) | US-5 (+ US-1 contrat) 
+| D2 — variantes non rendues (traduction casse `\n`) | US-3 + US-4 + US-6
+| D3 — aucune garde | US-3 (round-trip) + US-6 (E2E)
+|===
+
+CHE-DIAGRAM reste **côté cheroliv.com** (garde `DiagramIntegrity`, contrat
+site) ; PLT-DIAGRAM-OWNERSHIP est la **cause racine cross-borough**.
+
+---
+
+== Preuves de l'audit
+
+[source,bash]
+----
+# C-1 split-brain — document n'importe pas plantuml.boundary
+grep -rn "plantuml.boundary" document-gradle/document-plugin/src/main/kotlin/   # 0
+
+# C-2 traduction casse \n → Syntax Error (déploiement cheroliv.com)
+gh run view 37690387409 --log | grep "Failed to generate image"
+
+# C-3 couplage N2→N2
+grep -n "plantuml.plugin" document-gradle/document-plugin/build.gradle.kts   # implementation
+
+# C-4 versions toolchain divergentes
+grep -n "asciidoctorj-diagram" workspace-bom/gradle/libs.versions.toml       # 3.2.0 / 1.2025.3
+grep -n "asciidoctorj-diagram" bakery-gradle/…/SiteManager.kt                # 3.0.1 / 1.2025.3 hardcodé
+
+# C-5 deux vocabulaires
+grep -rn "TranslateLabels\|BorrowVocabulary" document-gradle/…/PlantUmlClassifier.kt
+----
+
+---
+
+== Références
+
+* `I18N_BOUNDARY_VISION.adoc` — vision du domaine boundary (3 natures, 3 stratégies)
+* BACKLOG plantuml — EPIC PLT-BOUNDARY ✅, EPIC PLT-VALIDATION-CONTRACT ✅ (note N0 future)
+* CHE-DIAGRAM — `.agents/CADRAGE_EPIC_CHE_DIAGRAM.adoc` (cheroliv.com, symptôme)
+* `document.translation.plantuml.PlantUmlTranslationAdapter` (document, à retirer)
+* `plantuml.boundary.TranslationResolver` (plantuml, à exposer via port)
+* `bakery.SiteManager.createJBakeRuntimeConfiguration` (version toolchain, à gouverner)
