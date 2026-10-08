@@ -521,6 +521,9 @@ kover {
 
 // Kover verification - fail build if coverage < 75%
 tasks.register("koverThresholdCheck") {
+    // The check reads the XML report — it must be generated first (latent wiring
+    // bug masked by a dead CI, surfaced by S-222 CI resurrection).
+    dependsOn("koverXmlReport")
     doLast {
         val reportFile = layout.buildDirectory.file("reports/kover/xml/report.xml").get().asFile
         if (!reportFile.exists()) {
