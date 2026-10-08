@@ -471,12 +471,24 @@ for attempt in range(1, 4):
     }
 }
 
-// Attach model + image build as dependencies of functionalTest
+// Attach model + image build as dependencies of functionalTest — ONLY when the
+// fine-tune suite is requested. The fine-tune tests are tag-gated (excluded by
+// default), so downloading a ~270 MB model and building a Docker image on every
+// `check`/CI run is pure waste (Loi de l'Économie d'Encre) and breaks CI (no
+// Docker/creds). Enabler: `-Ptest.tags="fine-tune"`.
+val runFineTuning = providers.gradleProperty("test.tags")
+    .map { it.contains("fine-tune") }
+    .orElse(false)
+
 tasks.named("functionalTest") {
-    dependsOn(buildFineTuningImage, downloadFineTuningModel)
+    if (runFineTuning.get()) {
+        dependsOn(buildFineTuningImage, downloadFineTuningModel)
+    }
 }
 tasks.named(functionalTest.processResourcesTaskName) {
-    dependsOn(buildFineTuningImage, downloadFineTuningModel)
+    if (runFineTuning.get()) {
+        dependsOn(buildFineTuningImage, downloadFineTuningModel)
+    }
 }
 
 
