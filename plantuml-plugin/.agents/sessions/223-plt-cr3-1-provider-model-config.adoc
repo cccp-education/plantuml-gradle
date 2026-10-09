@@ -1,0 +1,74 @@
+= Session 223 — PLT-CR3-1 : modèles HuggingFace / Groq configurables
+:session: 223
+:date: 2026-10-09
+:type: feat (DDD/TDD/BDD)
+:statut: ✅ TERMINÉ
+
+== Mission
+
+EPIC **PLT-CR3** (revue CR-GLOBALE-003), item **PLT-CR3-1** : « Rendre
+configurables les modèles hardcodés HuggingFace/Groq ». Petit item autonome,
+dans le borough plantuml seul (pas d'arbitrage cross-borough).
+
+== Constat
+
+HuggingFace et Groq étaient les **2 seuls** providers à ignorer la
+configuration : `LlmService.createHuggingFaceModel` hardcodait `gpt2` et
+`createGroqModel` hardcodait `llama3-8b-8192`, alors que le champ
+`ApiKeyConfig.modelName` **existait déjà** (models.kt) et était **mergé par la
+cascade 4 couches** (`ConfigMerger` : CLI > env > YAML > gradle.properties).
+L'écart était purement dans le service.
+
+== Livrable — domaine pur `plantuml.service.ProviderModelResolver`
+
+Baby-step **DDD/TDD/BDD** strict (RED → GREEN). Local = Build, Tests = CI.
+
+=== RED (prouvé)
+
+`ProviderModelResolverTest` écrit **avant** le code → `compileTestKotlin` échoue
+avec **`Unresolved reference 'ProviderModelResolver'`**.
+
+=== GREEN
+
+* `src/main/kotlin/plantuml/service/ProviderModelResolver.kt` — objet pur (sans
+  LangChain4j, sans I/O) : `huggingFace(config)` / `groq(config)` résolvent le
+  modèle effectif = `modelName` configuré si non-blanc, sinon le **défaut
+  historique** (`gpt2` / `llama3-8b-8192`) — backward compat.
+* `LlmService.createHuggingFaceModel` / `createGroqModel` délèguent au résolveur
+  (2 sites hardcodés supprimés).
+* `src/test/kotlin/plantuml/service/ProviderModelResolverTest.kt` — 4 tests
+  (configuré + défaut, ×2 providers).
+
+=== BDD `@provider-model`
+
+`src/test/features/25_provider_model_config.feature` — 4 scénarios
+(`@huggingface`/`@groq` × `@configured`/`@default`) + `ProviderModelSteps`
+(steps préfixés sans collision, glue partagée, règle S-088).
+
+== Preuve CI
+
+Run **`37863016696`** — `BUILD SUCCESSFUL` **10m17s** :
+* BDD `@provider-model` **4/4** scénarios PASSED ;
+* `ProviderModelResolverTest` **4/4** PASSED ;
+* `koverThresholdCheck` PASS — **84.26 %** (≥ 75) ;
+* `test` + `functionalTest` + `cucumberTest` VERTS.
+
+== Fichiers
+
+[cols="1,3"]
+|===
+| Type | Fichier
+
+| prod (nouveau) | `src/main/kotlin/plantuml/service/ProviderModelResolver.kt`
+| prod (modifié) | `src/main/kotlin/plantuml/service/LlmService.kt` (2 sites)
+| test (nouveau) | `src/test/kotlin/plantuml/service/ProviderModelResolverTest.kt`
+| test (nouveau) | `src/test/features/25_provider_model_config.feature`
+| test (nouveau) | `src/test/scenarios/plantuml/scenarios/ProviderModelSteps.kt`
+|===
+
+Zéro secret, zéro Python. Commit/push `a5fdcdf`.
+
+== Reste EPIC
+
+PLT-CR3-2 (probe de sortie diagramme — recoupe US-6), puis US-4 (arbitrage
+injection A/B), US-6, US-7.

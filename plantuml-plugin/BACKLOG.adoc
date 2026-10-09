@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-10-09 (Session 222 — US-5 toolchain gouvernée + publication 0.0.8)
+:last_update: 2026-10-09 (Session 223 — PLT-CR3-1 modèles HuggingFace/Groq configurables)
 
 '''
 == 🟡 EPIC PLT-DIAGRAM-OWNERSHIP — Le borough plantuml possède le bloc diagramme (CADRÉ S-219, US-1→US-3 + US-5 ✅)
@@ -791,7 +791,7 @@ _Focus_ : robustesse des providers LLM pour la génération de diagrammes.
 | **Rendre configurables les modèles hardcodés HuggingFace/Groq** — `LlmService.createHuggingFaceModel`
 hardcode `modelName("gpt2")` ; `createGroqModel` hardcode `llama3-8b-8192`. Exposer via la config
 `langchain4j.huggingface.modelName` / `langchain4j.groq.modelName` comme les autres providers.
-| 🟡 P2
+| ✅ TERMINÉ S-223
 
 | PLT-CR3-2
 | **Probe de sortie diagramme** — Aucun garde-fou vérifiant qu'un diagramme PlantUML généré est

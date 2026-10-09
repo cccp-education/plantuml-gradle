@@ -1,5 +1,20 @@
 = Historique des Sessions
 
+== Session 223 (2026-10-09) — PLT-CR3-1 : modèles HuggingFace/Groq configurables ✅
+
+EPIC **PLT-CR3** (revue CR-GLOBALE-003), item PLT-CR3-1. HuggingFace et Groq
+étaient les **2 seuls** providers à ignorer la config (`LlmService` hardcodait
+`gpt2` / `llama3-8b-8192`), alors que `ApiKeyConfig.modelName` existait déjà et
+était mergé par la cascade 4 couches. Nouveau domaine pur
+`plantuml.service.ProviderModelResolver` (objet sans I/O) : modèle effectif =
+`modelName` configuré si non-blanc, sinon défaut historique (backward compat) ;
+`LlmService.createHuggingFaceModel`/`createGroqModel` délèguent. Baby-step
+DDD/TDD/BDD strict : RED prouvé (`Unresolved reference 'ProviderModelResolver'`)
+→ GREEN. 4 unit + BDD `@provider-model` (`25_provider_model_config.feature`,
+4 scénarios + `ProviderModelSteps`). **CI VERTE run `37863016696`** (10m17s,
+`@provider-model` 4/4 PASSED, `ProviderModelResolverTest` 4/4 PASSED, kover
+84.26 %). Zéro secret.
+
 == Session 222 (2026-10-09) — US-5 PLT-DIAGRAM-OWNERSHIP : version toolchain gouvernée + publication 0.0.8 ✅
 
 Deux missions non bloquées. **US-5 (D6)** — le borough plantuml **expose** la

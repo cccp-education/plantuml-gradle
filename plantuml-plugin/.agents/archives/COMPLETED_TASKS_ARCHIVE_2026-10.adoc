@@ -1,5 +1,19 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-10
 
+== Session 223 (2026-10-09) — PLT-CR3-1 : modèles HuggingFace/Groq configurables ✅
+
+=== Fait
+- Domaine pur `plantuml.service.ProviderModelResolver` (objet sans I/O) : modèle effectif = `modelName` configuré si non-blanc, sinon défaut historique (backward compat) ✅
+- `LlmService.createHuggingFaceModel`/`createGroqModel` délèguent au résolveur (2 sites hardcodés `gpt2`/`llama3-8b-8192` supprimés) ✅
+- Baby-step DDD/TDD/BDD strict : RED prouvé (`Unresolved reference 'ProviderModelResolver'`) → GREEN ✅
+- 4 unit (`ProviderModelResolverTest`) + BDD `@provider-model` (`25_provider_model_config.feature`, 4 scénarios + `ProviderModelSteps`) ✅
+- **Preuve CI VERTE** : run `37863016696` — BUILD SUCCESSFUL 10m17s, `@provider-model` 4/4 + 4 unit PASSED, kover 84.26 % ✅
+- Zéro secret, zéro Python
+
+=== Prochaine session (224)
+- **PLT-CR3-2** : probe de sortie diagramme (PNG non vide + re-parse) — autonome. Sinon **US-4** (arbitrage injection A/B/C) / **US-7** (dogfooding)
+- **Fichier à lire en priorité** : `.agents/CADRAGE_EPIC_PLT_DIAGRAM_OWNERSHIP.adoc`
+
 == Session 222 (2026-10-09) — US-5 PLT-DIAGRAM-OWNERSHIP + publication 0.0.8 ✅
 
 === Fait
