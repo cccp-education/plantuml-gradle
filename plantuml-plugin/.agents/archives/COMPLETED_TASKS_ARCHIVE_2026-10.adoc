@@ -8,6 +8,8 @@
 - Baby-step DDD/TDD/BDD strict : RED prouvé (8 `Unresolved reference`) → GREEN → REFACTOR ✅
 - Publication `0.0.8` (porte US-3 round-trip, non publié en 0.0.7) : DAG MEMPHIS `0.0.70→0.0.71` (bundle `d524d0ae`) → plantuml `0.0.7→0.0.8` (bundle `2c316a14`), POM importe workspace-bom 0.0.71, repo1 HTTP 200 ✅
 - Gates Local = Build : compileKotlin/compileTestKotlin VERT, publishToMavenLocal VERT ×2 ✅
+- **Résurrection CI (6 verrous)** : la CI `Test` était rouge sur tous les pushs depuis ≥ 2026-09-17 (morte en configuration) → V1 working-directory plantuml-plugin, V2 JDK 25, V3 fallback nmcp, V4 prérequis fine-tune tag-gated, V5 PlantumlPluginPublicationTest version injectée (D5-RACE), V6 koverThresholdCheck dependsOn koverXmlReport ✅
+- **Preuve CI VERTE** : run `37861407600` — BUILD SUCCESSFUL 10m51s, 2547 unit 0 FAIL (PlantUmlToolchainTest 3/3), functionalTest+cucumberTest VERTS, kover 84.23 % ✅
 - Zéro secret, zéro Python
 
 === Prochaine session (223)

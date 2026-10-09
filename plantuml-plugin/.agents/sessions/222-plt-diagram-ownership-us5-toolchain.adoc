@@ -88,6 +88,35 @@ rejette un bloc traduit invalide, repli source D5).
 
 Les `test`/`functionalTest`/`cucumberTest`/`check` s'exécutent en **CI** (règle EAGER).
 
+== Livrable 3 — Résurrection de la CI (6 verrous)
+
+L'audit d'ouverture a révélé que la CI `Test` était **rouge sur tous les pushs
+depuis ≥ 2026-09-17** — morte **en configuration**, donc **masquant toute la
+dette de tests en aval** (miroir bakery S-243 / Queens S-269 / codex S-269).
+
+[cols="1,4"]
+|===
+| Verrou | Cause → Correctif
+
+| V1 | `Included build '../workspace-bom' does not exist` (la racine git importe un repo frère absent en CI) → build du sous-projet autonome `defaults.run.working-directory: plantuml-plugin` (son `settings.gradle.kts` résout le catalogue `ws` depuis Central).
+| V2 | JDK 24 < exigence conventions-plugin `0.0.7` (JDK 25) → JDK 25.
+| V3 | `ossrhUsername not found` (`settings.gradle.kts:23` faisait `error(...)` sans `~/.gradle/gradle.properties`) → fallback `?: ""` (nmcp inerte sans creds).
+| V4 | `:downloadFineTuningModel` (Docker + ~270 Mo) câblé **inconditionnellement** à `functionalTest` alors que les tests fine-tune sont exclus par tag → conditionné à `-Ptest.tags="fine-tune"` (Économie d'Encre + CI-safe).
+| V5 | `PlantumlPluginPublicationTest` lisait le **working tree du repo voisin** (`../workspace-bom`) — racy/absent en CI → version **injectée par Gradle** (`systemProperty plantuml.publishedCatalog.*`, patron D5-RACE graphify S-029).
+| V6 | `:koverThresholdCheck` lisait le rapport XML sans dépendre de `:koverXmlReport` → `dependsOn("koverXmlReport")`.
+|===
+
+**Preuve CI VERTE** : run **`37861407600`** — `BUILD SUCCESSFUL` 10m51s,
+**2547 unit tests** 0 FAIL (dont `PlantUmlToolchainTest` 3/3 PASSED),
+`functionalTest` + `cucumberTest` VERTS, **kover 84.23 %** (≥ 75),
+`:koverThresholdCheck` PASS. **Première CI plantuml verte depuis ≥ 2026-09-17.**
+
+Leçons : (1) une CI morte **en configuration masque** toute la dette de tests en
+aval ; (2) un test lisant un repo frère est racy et non CI-portable — la version
+doit être **injectée** ; (3) un prérequis lourd non tag-gated casse la CI et
+gaspille (`Économie d'Encre`).
+
+
 == Fichiers
 
 [cols="1,3"]
