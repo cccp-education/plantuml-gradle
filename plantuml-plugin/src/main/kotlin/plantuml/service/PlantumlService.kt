@@ -4,6 +4,7 @@ import net.sourceforge.plantuml.SourceStringReader
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import plantuml.PlantumlMessages
+import contracts.plantuml.PlantUmlSyntaxValidator
 import contracts.plantuml.SyntaxValidationResult
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -67,4 +68,10 @@ class PlantumlService {
             }
         }
     }
+
+    /**
+     * The native parser exposed through the N0 validation port (PLT-CR3-2), so the
+     * output probe can re-parse the produced diagram source.
+     */
+    fun syntaxValidator(): PlantUmlSyntaxValidator = PlantUmlSyntaxValidator { code -> validateSyntax(code) }
 }

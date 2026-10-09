@@ -15,6 +15,8 @@ import plantuml.boundary.TextClassifier
 import plantuml.boundary.TranslationResolver
 import plantuml.incremental.IncrementalProcessor
 import plantuml.incremental.ProcessingDecision
+import plantuml.service.DiagramOutputProbe
+import plantuml.service.DiagramOutputVerdict
 import plantuml.service.DiagramProcessor
 import plantuml.service.LlmService
 import plantuml.service.PlantumlService
@@ -290,6 +292,24 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
 
                 // Generate actual PlantUML image
                 diagramProcessor.plantumlService.generateImage(diagram.plantuml.code, imageFile)
+
+                // PLT-CR3-2 — probe the produced artifact: generateImage silently
+                // writes its textual fallback into the image on failure (a non-empty
+                // file that is not an image = a "white" diagram). Surface it.
+                val verdict = DiagramOutputProbe.probe(
+                    imageFile.readBytes(),
+                    diagram.plantuml.code,
+                    diagramProcessor.plantumlService.syntaxValidator(),
+                )
+                if (verdict !is DiagramOutputVerdict.Rendered) {
+                    val reason = when (verdict) {
+                        is DiagramOutputVerdict.EmptyImage -> "empty image"
+                        is DiagramOutputVerdict.NotAnImage -> verdict.message
+                        is DiagramOutputVerdict.InvalidSyntax -> verdict.message
+                        is DiagramOutputVerdict.Rendered -> ""
+                    }
+                    logger.lifecycle("[plantuml] Diagram output probe failed for ${imageFile.name}: $reason")
+                }
             } catch (e: Exception) {
                 logger.lifecycle(PlantumlMessages.format("generate.image_warning", lang, e.message ?: "Unknown error"))
             }
