@@ -1,5 +1,21 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-10
 
+== Session 224 (2026-10-09) — PLT-CR3-2 : probe de sortie diagramme ✅
+
+=== Fait
+- Constat : `PlantumlService.generateImage` écrit le texte source dans le `.png` en cas d'échec (dégradation silencieuse = vecteur du blanc) ; test existant ne vérifiait que `length() > 0` (faux positif) ✅
+- Domaine pur `plantuml.service.DiagramOutputProbe` (octets + port N0, sans I/O) : verdict `Rendered`/`EmptyImage`/`NotAnImage`/`InvalidSyntax` (signature PNG/JPEG/SVG + re-parse) ✅
+- Câblage `GeneratePlantumlDiagramsTask` (probe + warn non-fatal) + `PlantumlService.syntaxValidator()` ✅
+- Baby-step DDD/TDD/BDD strict : RED prouvé (`Unresolved reference 'DiagramOutputProbe'`) → GREEN ✅
+- 6 unit (`DiagramOutputProbeTest`) + BDD `@diagram-probe` (`26_diagram_output_probe.feature`, 4 scénarios + steps) ✅
+- **Preuve CI VERTE** : run `37864982511` — BUILD SUCCESSFUL 13m7s, `@diagram-probe` 4/4 + 6 unit PASSED, kover 84.20 % ✅
+- **EPIC PLT-CR3 TERMINÉ 2/2** ✅
+- Zéro secret, zéro Python
+
+=== Prochaine session (225)
+- **US-4** : document délègue au contrat (ARBITRAGE injection A/B/C). Sinon **US-7** (dogfooding)
+- **Fichier à lire en priorité** : `.agents/CADRAGE_EPIC_PLT_DIAGRAM_OWNERSHIP.adoc`
+
 == Session 223 (2026-10-09) — PLT-CR3-1 : modèles HuggingFace/Groq configurables ✅
 
 === Fait

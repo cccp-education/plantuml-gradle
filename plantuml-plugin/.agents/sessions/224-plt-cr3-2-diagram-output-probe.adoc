@@ -1,0 +1,85 @@
+= Session 224 — PLT-CR3-2 : probe de sortie diagramme (garde anti « diagramme blanc »)
+:session: 224
+:date: 2026-10-09
+:type: feat (DDD/TDD/BDD)
+:statut: ✅ TERMINÉ
+
+== Mission
+
+EPIC **PLT-CR3** (revue CR-GLOBALE-003), item **PLT-CR3-2** : « Probe de sortie
+diagramme — garde-fou vérifiant qu'un diagramme PlantUML généré est valide
+*après* rendu LLM : image PNG non vide + syntaxe re-parsable ». Autonome, dans
+le borough plantuml.
+
+== Constat (le vrai vecteur du « diagramme blanc »)
+
+`PlantumlService.generateImage` **dégrade silencieusement** : en cas d'échec
+PlantUML, il écrit le **texte source** (et l'erreur) **DANS** le `.png`
+(lignes 54-66 du service) — un fichier **non vide qui n'est pas une image**.
+Le test existant (`PlantumlServiceTest.should generate image`) ne vérifiait que
+`outputFile.length() > 0` → **faux positif** : un « rendu blanc » passait vert.
+
+C'est exactement la classe de défaut CHE-DIAGRAM (diagramme non rendu) mais
+côté **production de l'artefact** par le plugin.
+
+== Livrable — domaine pur `plantuml.service.DiagramOutputProbe`
+
+Baby-step **DDD/TDD/BDD** strict (RED → GREEN). Local = Build, Tests = CI.
+
+=== RED (prouvé)
+
+`DiagramOutputProbeTest` écrit **avant** le code → `compileTestKotlin` échoue avec
+`Unresolved reference 'DiagramOutputProbe'` / `'DiagramOutputVerdict'`.
+
+=== GREEN
+
+* `src/main/kotlin/plantuml/service/DiagramOutputProbe.kt` — objet pur (opère sur
+  octets + port N0 `PlantUmlSyntaxValidator`, **sans I/O**) :
+  * rejette un artéfact vide → `EmptyImage` ;
+  * rejette un artéfact sans signature d'image (PNG/JPEG/SVG) → `NotAnImage`
+    (détecte précisément le texte de fallback de `generateImage`) ;
+  * si un validateur N0 est fourni, rejette une source qui ne parse plus →
+    `InvalidSyntax` ;
+  * sinon `Rendered(byteLength)`.
+  * `DiagramOutputVerdict` — sealed class (`Rendered`/`EmptyImage`/`NotAnImage`/
+    `InvalidSyntax`).
+* `PlantumlService.syntaxValidator()` — expose le parser natif derrière le port N0.
+* `GeneratePlantumlDiagramsTask` — après `generateImage`, probe l'artéfact et
+  logge un avertissement si le verdict n'est pas `Rendered` (observabilité
+  **non-fatale**, backward compat : aucun changement de comportement de build).
+
+=== BDD `@diagram-probe`
+
+`src/test/features/26_diagram_output_probe.feature` — 4 scénarios (`@rendered`,
+`@empty`, `@fallback`, `@invalid-syntax`) + `DiagramOutputProbeSteps` (steps
+préfixés sans collision, règle S-088). Vérification statique des collisions
+`uniq -d` = zéro.
+
+== Preuve CI
+
+Run **`37864982511`** — `BUILD SUCCESSFUL` **13m7s** :
+* BDD `@diagram-probe` **4/4** scénarios PASSED (logs streamés) ;
+* `DiagramOutputProbeTest` **6/6** PASSED ;
+* `koverThresholdCheck` PASS — **84.20 %** (≥ 75) ;
+* `test` + `functionalTest` + `cucumberTest` VERTS.
+
+== Fichiers
+
+[cols="1,3"]
+|===
+| Type | Fichier
+
+| prod (nouveau) | `src/main/kotlin/plantuml/service/DiagramOutputProbe.kt`
+| prod (modifié) | `src/main/kotlin/plantuml/service/PlantumlService.kt` (`syntaxValidator()`)
+| prod (modifié) | `src/main/kotlin/plantuml/tasks/GeneratePlantumlDiagramsTask.kt` (probe + warn)
+| test (nouveau) | `src/test/kotlin/plantuml/service/DiagramOutputProbeTest.kt`
+| test (nouveau) | `src/test/features/26_diagram_output_probe.feature`
+| test (nouveau) | `src/test/scenarios/plantuml/scenarios/DiagramOutputProbeSteps.kt`
+|===
+
+Zéro secret, zéro Python. Commit/push `c855658`.
+
+== Reste EPIC
+
+PLT-CR3 ✅ 2/2. PLT-DIAGRAM-OWNERSHIP : reste US-4 (arbitrage injection A/B),
+US-6, US-7. PL-3 bloqué ABIDJAN.

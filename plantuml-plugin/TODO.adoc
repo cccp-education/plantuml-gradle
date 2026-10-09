@@ -16,8 +16,9 @@ MEMPHIS/plantuml/document/bakery/runner.
 `.agents/CADRAGE_EPIC_PLT_DIAGRAM_OWNERSHIP.adoc`.
 US-1 contrat N0 ✅ S-280, US-2 ✅ S-220, US-3 ✅ S-221, US-5 (toolchain) ✅ S-222
 (publication plantuml `0.0.8`). PLT-CR3-1 (modèles HF/Groq configurables) ✅ S-223.
-Prochaine session (224) : PLT-CR3-2 (probe sortie diagramme) ou US-4 (document
-délègue, **arbitrage pilote injection A/B/C**) ou US-7 (dogfooding).
+PLT-CR3-2 (probe sortie diagramme) ✅ S-224 — EPIC PLT-CR3 TERMINÉ 2/2.
+Prochaine session (225) : US-4 (document délègue, **arbitrage pilote injection
+A/B/C**) ou US-7 (dogfooding).
 
 == Pool de clés freemium rotatif
 

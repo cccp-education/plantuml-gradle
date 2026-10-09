@@ -267,6 +267,16 @@ Les 15 tests fonctionnels GradleRunner couvrent les user journeys critiques :
 * ~~**Tests unitaires renderer** : `cleanLabel()`, `nodeTypes` filter, `isMethodNode()` non couverts~~ ✅ **COMBLÉS Session 130** — 15 tests ajoutés
 * **Test de régression mavenLocal** : Aucun test ne vérifie que le JAR publié correspond au code source — c'est un problème de processus, pas de code
 
+=== Session 224 — PLT-CR3-2 probe de sortie diagramme (6 unit + 4 BDD)
+
+|===
+| Couche | Tests | État
+| Unit `DiagramOutputProbeTest` | 6 (rendered, empty, fallback, invalid-syntax, svg, no-validator) | ✅ CI (run 37864982511)
+| BDD `@diagram-probe` (feature 26) | 4 scénarios + `DiagramOutputProbeSteps` | ✅ CI 4/4 PASSED
+|===
+
+Couverture : +1 fichier production (`DiagramOutputProbe.kt`), +6 unit, +1 feature, +1 steps.
+
 === Session 223 — PLT-CR3-1 modèles HuggingFace/Groq (4 unit + 4 BDD)
 
 |===

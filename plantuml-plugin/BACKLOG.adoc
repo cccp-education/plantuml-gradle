@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-10-09 (Session 223 — PLT-CR3-1 modèles HuggingFace/Groq configurables)
+:last_update: 2026-10-09 (Session 224 — PLT-CR3-2 probe de sortie diagramme, EPIC PLT-CR3 terminé)
 
 '''
 == 🟡 EPIC PLT-DIAGRAM-OWNERSHIP — Le borough plantuml possède le bloc diagramme (CADRÉ S-219, US-1→US-3 + US-5 ✅)
@@ -778,7 +778,7 @@ PASS, 122/122 Cucumber PASS.
 |===
 
 '''
-== 🟡 EPIC PLT-CR3 — Revue CR-GLOBALE-003 : Création de Contenu Solide
+== ✅ EPIC PLT-CR3 — Revue CR-GLOBALE-003 : Création de Contenu Solide (TERMINÉ 2/2)
 
 _Source_ : `GLOBAL_CODE_REVIEW.adoc` (workspace root) — session CR-GLOBALE-003 (2026-08-04).
 _Focus_ : robustesse des providers LLM pour la génération de diagrammes.
@@ -797,7 +797,7 @@ hardcode `modelName("gpt2")` ; `createGroqModel` hardcode `llama3-8b-8192`. Expo
 | **Probe de sortie diagramme** — Aucun garde-fou vérifiant qu'un diagramme PlantUML généré est
 syntaxiquement valide *après* rendu LLM (au-delà de `validatePlantumlSyntax`). Ajouter un check
 de non-régression : image PNG non vide + syntaxe PlantUML re-parsable.
-| 🟡 P2
+| ✅ TERMINÉ S-224
 |===
 
 '''

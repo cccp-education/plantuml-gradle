@@ -1,31 +1,29 @@
-= PROMPT_REPRISE — Plantuml — Session 224
-:session: 224
+= PROMPT_REPRISE — Plantuml — Session 225
+:session: 225
 :date: 2026-10-09
 
-== État — PLT-CR3-1 livré (S-223) ; EPIC PLT-DIAGRAM-OWNERSHIP 5/8
+== État — PLT-CR3 TERMINÉ 2/2 (S-223/S-224) ; EPIC PLT-DIAGRAM-OWNERSHIP 5/8
 
-* **PLT-CR3-1** ✅ (S-223) : modèles HuggingFace/Groq configurables — domaine pur
-  `plantuml.service.ProviderModelResolver` + BDD `@provider-model`. CI verte
-  (run `37863016696`, kover 84.26 %).
+* **PLT-CR3-1** ✅ (S-223) : modèles HuggingFace/Groq configurables.
+* **PLT-CR3-2** ✅ (S-224) : probe de sortie diagramme (garde anti « blanc »).
+  Domaine pur `plantuml.service.DiagramOutputProbe` + BDD `@diagram-probe`.
 * **PLT-DIAGRAM-OWNERSHIP** : US-0→3 ✅, US-5 ✅ (S-222). Reste US-4/6/7.
-* **CI plantuml** ✅ ressuscitée S-222 (6 verrous), verte depuis.
+* **CI plantuml** ✅ verte (ressuscitée S-222, 6 verrous).
 
-== Mission session 224 — au choix pilote
+== Mission session 225 — au choix pilote
 
-* **PLT-CR3-2** — probe de sortie diagramme : garde-fou vérifiant, **après**
-  rendu LLM, que le PNG n'est pas vide + que le PlantUML re-parse. **Non
-  bloquée**, autonome (recoupe US-6 E2E). Candidat par défaut.
 * **US-4** — document délègue au contrat. **Bloquée sur arbitrage pilote**
   (injection A/B/C — recommandation : **option A**, bakery construit
   l'adaptateur, déjà à moitié en place `MigrateContentI18nTask.kt:186,223`).
-* **US-7** — dogfooding + non-régression (re-bake cheroliv.com).
+* **US-7** — dogfooding + non-régression (re-bake cheroliv.com, contrat VERT).
+  **Non bloquée** — candidat par défaut si aucun arbitrage.
+* **US-6** — chaîne E2E bakery→document→port→plantuml (dépend US-4).
 
-== Reste EPIC / backlog
+== Reste backlog
 
 [cols="1,4,1"]
 |===
 | Priorité | Tâche | Est.
-| 🟡 PLT-CR3-2 | probe de sortie diagramme (PNG non vide + re-parse) | ~0.5 session
 | 🟡 US-4 | document délègue au contrat (ARBITRAGE A/B/C) | ~1 session
 | 🟡 US-6 | chaîne E2E bakery→document→port→plantuml | ~1 session
 | 🟡 US-7 | dogfooding + non-régression (re-bake cheroliv.com) | ~1 session
@@ -47,4 +45,4 @@ Local = Build, Tests = CI (règle EAGER). **Pas de test/check en local.**
 - Cucumber : runner **global unique** (`CucumberTestRunner`, glue `plantuml.scenarios`,
   features `src/test/features/`)
 - CI : `.github/workflows/test.yml` (`working-directory: plantuml-plugin`, JDK 25)
-- EPIC en cours : **PLT-DIAGRAM-OWNERSHIP** (US-0→3 ✅, US-5 ✅) ; **PLT-CR3** (1/2 ✅)
+- EPIC en cours : **PLT-DIAGRAM-OWNERSHIP** (US-0→3 ✅, US-5 ✅) ; **PLT-CR3 ✅ 2/2**
