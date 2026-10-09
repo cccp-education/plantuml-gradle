@@ -298,7 +298,7 @@ class LlmService(
         return OpenAiChatModel.builder()
             .apiKey(apiKey)
             .baseUrl("https://api-inference.huggingface.co")
-            .modelName("gpt2") // Default model, can be made configurable
+            .modelName(ProviderModelResolver.huggingFace(config.langchain4j.huggingface))
             .temperature(0.7)
             .timeout(Duration.ofSeconds(getTimeoutInSeconds()))
             .build()
@@ -314,7 +314,7 @@ class LlmService(
         return OpenAiChatModel.builder()
             .apiKey(apiKey)
             .baseUrl("https://api.groq.com/openai/v1")
-            .modelName("llama3-8b-8192") // Default model, can be made configurable
+            .modelName(ProviderModelResolver.groq(config.langchain4j.groq))
             .temperature(0.7)
             .timeout(Duration.ofSeconds(getTimeoutInSeconds()))
             .build()
