@@ -1,5 +1,15 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-10
 
+== Session 227 (2026-10-11) — Release 0.0.9 (bump + dépendances) ✅
+
+=== Fait
+- [x] Bump `plantuml 0.0.8 → 0.0.9` + pins catalog/BOM `0.0.71 → 0.0.78`
+- [x] Dépendances : `jgit 7.8.0`, `asciidoctorj-diagram 3.2.1`, `-plantuml 1.2026.2`
+- [x] `publishToMavenLocal` + Central bundle `dcb6d30e-fcff-45b3-a9c1-d9ba435a3cf3`, propagation HTTP 200
+- [x] Compile 3 source sets VERT ; POM importe `workspace-bom:0.0.78`
+- [x] `plantuml-engine` standalone inchangé (1.2026.0) → US-3
+- [x] Zéro secret, zéro Python
+
 == Session 226 (2026-10-11) — GBL-010 G-3 : intégrité de label PlantUML ✅
 
 === Fait

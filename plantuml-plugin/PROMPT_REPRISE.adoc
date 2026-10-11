@@ -1,16 +1,17 @@
-= PROMPT_REPRISE — Plantuml — Session 227
-:session: 227
+= PROMPT_REPRISE — Plantuml — Session 228
+:session: 228
 :date: 2026-10-11
 
-== État — GBL-010 G-3 (partiel) ✅ ; PLT-DIAGRAM-OWNERSHIP US-4 ✅
+== État — Release 0.0.9 publiée Central (S-227) ; GBL-010 G-3 partiel ✅
 
-* **GBL-010 G-3** (partiel, S-226) : `plantuml.repair.PlantumlLabelIntegrity` —
-  `escapeNewlines` (correction canonique, **extraite du port** qui délègue : source
-  unique D5) + `hasBrokenQuotedLabel` (audit source) + `repair`. 7 unit + BDD
-  `@plantuml-repair`. Reste : statut par bloc + correction IA.
-* **PLT-DIAGRAM-OWNERSHIP** : US-0→3 ✅, US-5 ✅ (S-222) ; **US-4 ✅ S-283/S-284**
-  (document délègue au port N0, bakery injecte). Reste US-6/7.
-* **PLT-CR3-2** ✅ (S-224) : `DiagramOutputProbe` (garde anti « blanc »).
+* **Release 0.0.9** (S-227) : bump `plantuml 0.0.8 → 0.0.9` + pins catalog/BOM
+  `0.0.78` + dépendances (`jgit 7.8.0`, `asciidoctorj-diagram 3.2.1`,
+  `-plantuml 1.2026.2`). Publication Central bundle
+  `dcb6d30e-fcff-45b3-a9c1-d9ba435a3cf3`, propagation repo1 HTTP 200.
+  `plantuml-engine` standalone **non bumpé** (1.2026.0 → US-3).
+* **GBL-010 G-3** (partiel, S-226) : `PlantumlLabelIntegrity` (détection + correction
+  `\n`). Reste : statut par bloc + correction IA.
+* **PLT-DIAGRAM-OWNERSHIP** : US-0→5 ✅, US-4 ✅ ; reste US-6/7.
 * **CI plantuml** ✅ verte.
 
 == Vision (GBL-010)

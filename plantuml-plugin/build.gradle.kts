@@ -28,7 +28,7 @@ plugins {
 
     // Apply the BOM
     dependencies {
-        implementation(platform("education.cccp:workspace-bom:0.0.71"))
+        implementation(platform("education.cccp:workspace-bom:0.0.78"))
     }
 
 group = "education.cccp"

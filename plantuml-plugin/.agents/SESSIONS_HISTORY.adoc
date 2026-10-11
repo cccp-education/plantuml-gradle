@@ -1,5 +1,16 @@
 = Historique des Sessions
 
+== Session 227 (2026-10-11) — Release 0.0.9 (bump + dépendances) ✅
+
+Accord pilote : publication de la feuille PlantUML (S-226 `PlantumlLabelIntegrity`)
++ mise à jour des dépendances. Bump `plantuml 0.0.8 → 0.0.9`, pins catalog/BOM
+`0.0.71 → 0.0.78`, `jgit 7.5 → 7.8.0`, `asciidoctorj-diagram 3.2.0 → 3.2.1`,
+`asciidoctorj-diagram-plantuml 1.2025.3 → 1.2026.2`. `publishToMavenLocal` +
+Central bundle `dcb6d30e-fcff-45b3-a9c1-d9ba435a3cf3` (AUTOMATIC), propagation repo1
+HTTP 200 ; POM importe `workspace-bom:0.0.78`. Compile 3 source sets VERT.
+`plantuml-engine` standalone laissé à 1.2026.0 (US-3 dédiée). Zéro secret.
+Rapport `.agents/sessions/227-release-0.0.9-bump-deps.adoc`.
+
 == Session 226 (2026-10-11) — GBL-010 G-3 : intégrité de label PlantUML ✅
 
 Feuille `[plantuml]` de l'arbre de traduction (GBL-010, branche Data). Le défaut D2
