@@ -55,10 +55,15 @@ class PlantumlTranslationPortAdapter(
             return PlantUmlTranslationOutcome.Preserved("no translatable label")
         }
 
+        // S-073 — one batched provider call for the whole diagram (falls back to
+        // per-label when the provider cannot batch). The run bottleneck was the
+        // per-label round-trip: a 20-label diagram cost 20 LLM calls.
+        val translations = translateLabels(labels, request)
+
         var raw = block.raw
         var changed = false
         for (label in labels) {
-            val resolved = translateLabel(label, request.sourceLanguage, request.targetLanguage) ?: continue
+            val resolved = translations[label] ?: continue
             if (resolved == label) continue
             val escaped = PlantumlLabelIntegrity.escapeNewlines(resolved)
             // Quoted label (`class "Utilisateur"`) — replace the quoted form only.
@@ -89,6 +94,33 @@ class PlantumlTranslationPortAdapter(
         } else {
             PlantUmlTranslationOutcome.Preserved("no label changed (PRESERVE / provider failure)")
         }
+    }
+
+    /**
+     * S-073 — translates all [labels] in **one** provider call ([PlantumlLabelBatch]),
+     * falling back to the per-label path whenever the provider cannot batch (a
+     * single label, a missing sentinel, or a mismatched count). A batching failure
+     * is thus never a translation loss.
+     */
+    private fun translateLabels(
+        labels: List<String>,
+        request: PlantUmlTranslationRequest,
+    ): Map<String, String> {
+        if (labels.size == 1) {
+            return translateLabel(labels[0], request.sourceLanguage, request.targetLanguage)
+                ?.let { mapOf(labels[0] to it) }
+                ?: emptyMap()
+        }
+        val joined = PlantumlLabelBatch.join(labels)
+        val result = translator.translate(TranslationRequest(joined, request.sourceLanguage, request.targetLanguage))
+        if (result is TranslationResult.Success) {
+            val parts = PlantumlLabelBatch.split(result.translatedText, labels.size)
+            if (parts != null) return labels.zip(parts).toMap()
+        }
+        return labels
+            .mapNotNull { label ->
+                translateLabel(label, request.sourceLanguage, request.targetLanguage)?.let { label to it }
+            }.toMap()
     }
 
     private fun translateLabel(text: String, sourceLanguage: String, targetLanguage: String): String? {

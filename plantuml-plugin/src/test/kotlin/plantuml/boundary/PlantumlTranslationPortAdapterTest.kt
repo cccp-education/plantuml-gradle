@@ -134,4 +134,53 @@ class PlantumlTranslationPortAdapterTest {
         val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
         assertTrue(outcome is PlantUmlTranslationOutcome.Preserved)
     }
+
+    // ── S-073 — label batching (one provider call per diagram) ────────────────
+
+    @Test
+    fun `batch translates every label in a single provider call`() {
+        val calls = mutableListOf<String>()
+        val batching =
+            object : TranslationService {
+                override fun translate(request: TranslationRequest): TranslationResult {
+                    calls += request.sourceText
+                    val labels = request.sourceText.split("\n${PlantumlLabelBatch.SEPARATOR}\n")
+                    return TranslationResult.Success(labels.joinToString("\n${PlantumlLabelBatch.SEPARATOR}\n") { "T:$it" })
+                }
+            }
+        val adapter = PlantumlTranslationPortAdapter(batching)
+        val block = PlantUmlBlock("@startuml\nclass \"Alpha\"\nclass \"Beta\"\n@enduml")
+
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+
+        val raw = (outcome as PlantUmlTranslationOutcome.Translated).block.raw
+        assertTrue(raw.contains("\"T:Alpha\""), raw)
+        assertTrue(raw.contains("\"T:Beta\""), raw)
+        assertEquals(1, calls.size, "exactly one batched provider call expected")
+    }
+
+    @Test
+    fun `batch falls back to per-label when the provider cannot batch`() {
+        val calls = mutableListOf<String>()
+        val nonBatching =
+            object : TranslationService {
+                override fun translate(request: TranslationRequest): TranslationResult {
+                    calls += request.sourceText
+                    return when (request.sourceText) {
+                        "Alpha" -> TranslationResult.Success("A")
+                        "Beta" -> TranslationResult.Success("B")
+                        else -> TranslationResult.Failure("cannot batch")
+                    }
+                }
+            }
+        val adapter = PlantumlTranslationPortAdapter(nonBatching)
+        val block = PlantUmlBlock("@startuml\nclass \"Alpha\"\nclass \"Beta\"\n@enduml")
+
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+
+        val raw = (outcome as PlantUmlTranslationOutcome.Translated).block.raw
+        assertTrue(raw.contains("\"A\""), raw)
+        assertTrue(raw.contains("\"B\""), raw)
+        assertEquals(3, calls.size, "one batch attempt then two per-label calls")
+    }
 }
