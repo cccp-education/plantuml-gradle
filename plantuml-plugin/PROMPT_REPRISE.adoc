@@ -1,30 +1,42 @@
-= PROMPT_REPRISE — Plantuml — Session 225
-:session: 225
-:date: 2026-10-09
+= PROMPT_REPRISE — Plantuml — Session 226
+:session: 226
+:date: 2026-10-11
 
-== État — PLT-CR3 TERMINÉ 2/2 (S-223/S-224) ; EPIC PLT-DIAGRAM-OWNERSHIP 5/8
+== État — Cadrage GBL-010 (feuille PlantUML) ; PLT-DIAGRAM-OWNERSHIP US-4 ✅
 
-* **PLT-CR3-1** ✅ (S-223) : modèles HuggingFace/Groq configurables.
-* **PLT-CR3-2** ✅ (S-224) : probe de sortie diagramme (garde anti « blanc »).
-  Domaine pur `plantuml.service.DiagramOutputProbe` + BDD `@diagram-probe`.
-* **PLT-DIAGRAM-OWNERSHIP** : US-0→3 ✅, US-5 ✅ (S-222). Reste US-4/6/7.
-* **CI plantuml** ✅ verte (ressuscitée S-222, 6 verrous).
+* **GBL-010** : nouvel EPIC transverse (« Arbre de traduction du site, 2 branches »).
+  plantuml possède la **feuille `[plantuml]`** de la branche Data. Reformulation
+  persistée dans `BACKLOG.adoc` § EPIC GBL-010 (G-3/G-3b).
+* **PLT-DIAGRAM-OWNERSHIP** : US-0→3 ✅, US-5 ✅ (S-222) ; **US-4 ✅ S-283/S-284**
+  (document délègue au port N0, bakery injecte). Reste US-6/7.
+* **PLT-CR3-2** ✅ (S-224) : `DiagramOutputProbe` (garde anti « blanc »).
+* **CI plantuml** ✅ verte.
 
-== Mission session 225 — au choix pilote
+== Vision (GBL-010)
 
-* **US-4** — document délègue au contrat. **Bloquée sur arbitrage pilote**
-  (injection A/B/C — recommandation : **option A**, bakery construit
-  l'adaptateur, déjà à moitié en place `MigrateContentI18nTask.kt:186,223`).
+plantuml gère la **traduction et le débugage/correction assisté par IA** de la
+feuille `[plantuml]` dans l'AST AsciiDoc : port N0 `PlantUmlTranslationPort`
+(point d'entrée unique), `PLT-BOUNDARY` (`TextClassifier` 3 natures,
+`TranslationStrategy` TRANSLATE/BORROW/PRESERVE, glossaire), round-trip (un bloc
+cassé n'est jamais publié), statut par bloc
+(`MISSING`/`PENDING`/`TRANSLATED`/`BROKEN`), version toolchain exposée.
+Cadrage racine : `CADRAGE_EPIC_GBL_010_ARBRE_TRADUCTION_SITE.adoc`.
+
+== Mission session 226 — au choix pilote
+
+* **G-3** — feuille PlantUML : audit + correction IA (statut par bloc, round-trip,
+  `\n`, notes) + BDD `@plantuml-repair`. Réutilise `PLT-BOUNDARY` + port N0 +
+  `DiagramOutputProbe`.
 * **US-7** — dogfooding + non-régression (re-bake cheroliv.com, contrat VERT).
   **Non bloquée** — candidat par défaut si aucun arbitrage.
-* **US-6** — chaîne E2E bakery→document→port→plantuml (dépend US-4).
+* **US-6** — chaîne E2E bakery→document→port→plantuml.
 
 == Reste backlog
 
 [cols="1,4,1"]
 |===
 | Priorité | Tâche | Est.
-| 🟡 US-4 | document délègue au contrat (ARBITRAGE A/B/C) | ~1 session
+| 🟡 G-3 | feuille PlantUML — audit + correction IA (GBL-010) | ~1 session
 | 🟡 US-6 | chaîne E2E bakery→document→port→plantuml | ~1 session
 | 🟡 US-7 | dogfooding + non-régression (re-bake cheroliv.com) | ~1 session
 | 🟡 PL-3 | ktlint ou detekt | BLOQUÉ ABIDJAN
@@ -34,6 +46,7 @@
 
 Baby-step DDD/TDD/BDD (unit → functional → cucumber). Red→Green→Refactor.
 Local = Build, Tests = CI (règle EAGER). **Pas de test/check en local.**
+Zéro Python ; English only code/tests/features (gouvernance .adoc en français).
 
 == Rappels
 
@@ -45,4 +58,4 @@ Local = Build, Tests = CI (règle EAGER). **Pas de test/check en local.**
 - Cucumber : runner **global unique** (`CucumberTestRunner`, glue `plantuml.scenarios`,
   features `src/test/features/`)
 - CI : `.github/workflows/test.yml` (`working-directory: plantuml-plugin`, JDK 25)
-- EPIC en cours : **PLT-DIAGRAM-OWNERSHIP** (US-0→3 ✅, US-5 ✅) ; **PLT-CR3 ✅ 2/2**
+- EPIC en cours : **GBL-010** (G-3) ; **PLT-DIAGRAM-OWNERSHIP** (US-6/7)

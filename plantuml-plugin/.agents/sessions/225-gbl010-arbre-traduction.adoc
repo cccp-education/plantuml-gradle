@@ -1,0 +1,55 @@
+= Session 225 — Cadrage GBL-010 : arbre de traduction (feuille PlantUML)
+
+_Date_ : 2026-10-11
+_Borough_ : plantuml-gradle (HTOWN, N2)
+_Type_ : cadrage / gouvernance pure (pattern S-057/S-063)
+
+== Mission
+
+Demande pilote (S-069, reprise cheroliv.com) : la traduction d'un site est **un
+arbre à deux branches** ; plantuml possède la **feuille `[plantuml]`** de la branche
+Data (article → document → AST). Chaque article est un document dont l'AST porte des
+balises plantuml, et c'est le borough plantuml qui gère sa **traduction et son
+débugage/correction assisté par IA**. Persister la **reformulation spécifique
+plantuml** dans le backlog, avec vision + roadmap. Gouvernance pure : **zéro code**.
+
+== Livrable
+
+* **`BACKLOG.adoc` § EPIC GBL-010** — prompt reformulé (plantuml possède la feuille
+  `[plantuml]`) ; 2 US :
+  * **G-3** — feuille PlantUML : audit + **correction assistée par IA** (statut par
+    bloc, round-trip, `\n`, notes) ; réutilise `PLT-BOUNDARY` + `PlantUmlTranslationPort`
+    (N0) + `DiagramOutputProbe` ; BDD `@plantuml-repair`.
+  * **G-3b** — statut par bloc + version toolchain de référence exposés au contrat
+    (audit d'arbre unifié) ; garde anti-drift local↔CI préservée.
+* **PROMPT_REPRISE** (session 226) / **INDEX** / **SESSIONS_HISTORY** / archive —
+  synchronisés.
+
+== Vision (GBL-010)
+
+[source]
+----
+Article (document) → AST AsciiDoc
+    └── blocs `[plantuml,…]`  (feuille possédée par plantuml)
+        ├── labels quotés     → traduction + correction IA (round-trip)
+        ├── notes             → traduction ou conservation
+        └── directives/échappements (`\n`, title, header, footer)
+----
+
+Un nœud, un propriétaire, un **statut** (`MISSING`/`PENDING`/`TRANSLATED`/`BROKEN`).
+Cadrage racine : `CADRAGE_EPIC_GBL_010_ARBRE_TRADUCTION_SITE.adoc`. **Consomme**
+`PLT-DIAGRAM-OWNERSHIP` (GBL-007) — il ne le refait pas.
+
+== Notes
+
+* Gouvernance pure : zéro code, zéro test, zéro publication.
+* `PLT-DIAGRAM-OWNERSHIP` : US-0→3 ✅, US-5 ✅ S-222 ; **US-4 ✅ S-283/S-284**
+  (document délègue, bakery injecte) ; reste US-6/US-7.
+* `PLT-CR3-2` ✅ S-224 (`DiagramOutputProbe`).
+* Zéro secret, zéro Python.
+
+== Reste (S-226→)
+
+* **G-3** feuille PlantUML : audit + correction IA ; **G-3b** statut + version exposés.
+* **US-6** chaîne E2E ; **US-7** dogfooding + non-régression (re-bake cheroliv.com).
+* **Fichier à lire en priorité** : `PROMPT_REPRISE.adoc` (session 226).

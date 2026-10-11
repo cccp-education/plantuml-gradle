@@ -1,8 +1,61 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-10-09 (Session 224 — PLT-CR3-2 probe de sortie diagramme, EPIC PLT-CR3 terminé ; US-4 soldée S-283/S-284)
+:last_update: 2026-10-11 (Session 225 — cadrage GBL-010 Arbre de traduction, feuille PlantUML ; US-4 soldée S-283/S-284)
 
 '''
+
+== 🟡 EPIC GBL-010 — Arbre de traduction (feuille PlantUML)
+
+*GBL* : EPIC transverse **GBL-010** (`CADRAGE_EPIC_GBL_010_ARBRE_TRADUCTION_SITE.adoc`,
+racine workspace). Demande pilote S-069 : la traduction d'un site est un **arbre à
+deux branches** ; plantuml possède la **feuille `[plantuml]`** de la branche Data.
+
+*Prompt reformulé (spécifique plantuml)* :
+
+[quote]
+----
+plantuml possède la FEUILLE « bloc PlantUML » de l'AST AsciiDoc.
+
+- L'ARTICLE est un document dont l'AST porte des balises `[plantuml,…]` ; le
+  borough plantuml en gère la TRADUCTION et le DÉBUGAGE/CORRECTION assisté par IA.
+- Toute la valeur PLT-BOUNDARY (TextClassifier 3 natures, TranslationStrategy
+  TRANSLATE/BORROW/PRESERVE, IdiomaticGlossary, NonTranslatableTermRegistry) et le
+  port N0 `PlantUmlTranslationPort` sont le point d'entrée unique (GBL-007).
+- La traduction ne casse JAMAIS la syntaxe : round-trip obligatoire, échappements
+  `\n` préservés, `note` traités ou conservés ; un bloc cassé n'est jamais publié
+  (corrigé ou PRESERVE). Correction assistée par IA = étape de la feuille.
+- plantuml expose un STATUT par bloc (`MISSING`/`PENDING`/`TRANSLATED`/`BROKEN`)
+  et la VERSION de référence du toolchain (asciidoctor-diagram/plantuml/saxon)
+  que bakery s'aligne.
+----
+
+*Cadrage* : `CADRAGE_EPIC_GBL_010_ARBRE_TRADUCTION_SITE.adoc` (racine) ; cet EPIC
+consomme `PLT-DIAGRAM-OWNERSHIP` (GBL-007), il ne le refait pas.
+
+[cols="1,4,1,2", options="header"]
+|===
+| US | Description | Pts | Statut
+
+| G-3
+| **Feuille PlantUML — audit + correction IA.** plantuml expose, par bloc, un
+statut (`TRANSLATED`/`PENDING`/`BROKEN`) et **corrige** (round-trip, `\n`, notes)
+assisté par IA ; réutilise `PLT-BOUNDARY` + `PlantUmlTranslationPort` (N0) +
+`DiagramOutputProbe`. BDD `@plantuml-repair`.
+| 3
+| 🟡 À FAIRE
+
+| G-3b
+| **Statut + version exposés au contrat.** Le statut par bloc et la version
+toolchain de référence sont lisibles par document/cheroliv (audit d'arbre unifié) ;
+garde anti-drift local↔CI préservée.
+| 2
+| 🟡 À FAIRE
+|===
+
+*Prérequis* : `GBL-007` US-3 (round-trip ✅) / US-4 (délégation document ✅ S-283/S-284).
+*Dépend de* : `plantuml-contracts` (N0 ✅ 0.0.1). *Relie* : `PLT-DIAGRAM-OWNERSHIP`,
+`PLT-CR3-2` (`DiagramOutputProbe` ✅).
+
 == 🟡 EPIC PLT-DIAGRAM-OWNERSHIP — Le borough plantuml possède le bloc diagramme (CADRÉ S-219, US-1→US-3 + US-5 ✅)
 
 *GBL* : EPIC transverse **GBL-007** (BACKLOG racine workspace) — propriété du pipeline PlantUML.

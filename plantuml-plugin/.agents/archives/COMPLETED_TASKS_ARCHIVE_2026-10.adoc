@@ -1,5 +1,15 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-10
 
+== Session 225 (2026-10-11) — Cadrage GBL-010 : arbre de traduction (feuille PlantUML) ✅
+
+=== Fait
+- Modèle d'arbre : plantuml possède la **feuille `[plantuml]`** de la branche Data (article → document → AST) ✅
+- Traduction + **débugage/correction assisté par IA** via port N0 `PlantUmlTranslationPort` + `PLT-BOUNDARY` + `DiagramOutputProbe` ✅
+- Statut par bloc (`MISSING`/`PENDING`/`TRANSLATED`/`BROKEN`) + reprise en **économie d'encre** ✅
+- `BACKLOG.adoc` § EPIC GBL-010 : prompt reformulé plantuml + **G-3** (audit + correction IA) + **G-3b** (statut + version exposés) ✅
+- Cadrage racine `CADRAGE_EPIC_GBL_010_ARBRE_TRADUCTION_SITE.adoc` ; gouvernance pure, zéro code ✅
+- Zéro secret, zéro Python
+
 == Session 224 (2026-10-09) — PLT-CR3-2 : probe de sortie diagramme ✅
 
 === Fait

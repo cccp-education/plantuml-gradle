@@ -1,5 +1,19 @@
 = Historique des Sessions
 
+== Session 225 (2026-10-11) — Cadrage GBL-010 : arbre de traduction (feuille PlantUML) ✅
+
+Cadrage de l'EPIC transverse **GBL-010** (« arbre de traduction du site, deux
+branches »). plantuml possède la **feuille `[plantuml]`** de la branche Data :
+chaque article est un document dont l'AST AsciiDoc porte des balises plantuml, et le
+borough en gère la **traduction et le débugage/correction assisté par IA**. Livrable :
+`BACKLOG.adoc` § EPIC GBL-010 — prompt reformulé plantuml + **G-3** (feuille PlantUML :
+audit + correction IA, statut par bloc, round-trip, `\n`, notes ; `PLT-BOUNDARY` + port
+N0 + `DiagramOutputProbe` ; BDD `@plantuml-repair`) + **G-3b** (statut + version
+toolchain exposés). Statut par nœud (`MISSING`/`PENDING`/`TRANSLATED`/`BROKEN`) +
+reprise en **économie d'encre**. Cadrage racine
+`CADRAGE_EPIC_GBL_010_ARBRE_TRADUCTION_SITE.adoc`. Session de gouvernance pure, zéro
+code. Rapport `.agents/sessions/225-gbl010-arbre-traduction.adoc`.
+
 == Session 224 (2026-10-09) — PLT-CR3-2 : probe de sortie diagramme ✅
 
 EPIC **PLT-CR3**, item PLT-CR3-2. Constat : `PlantumlService.generateImage` dégrade
