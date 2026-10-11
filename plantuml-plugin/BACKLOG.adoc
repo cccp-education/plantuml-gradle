@@ -42,7 +42,7 @@ statut (`TRANSLATED`/`PENDING`/`BROKEN`) et **corrige** (round-trip, `\n`, notes
 assisté par IA ; réutilise `PLT-BOUNDARY` + `PlantUmlTranslationPort` (N0) +
 `DiagramOutputProbe`. BDD `@plantuml-repair`.
 | 3
-| 🟡 À FAIRE
+| 🟡 PARTIEL S-226 — `plantuml.repair.PlantumlLabelIntegrity` (détection `hasBrokenQuotedLabel` + correction `escapeNewlines`/`repair`, port délègue — D5) ; reste statut par bloc + correction IA
 
 | G-3b
 | **Statut + version exposés au contrat.** Le statut par bloc et la version

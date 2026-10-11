@@ -1,5 +1,15 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-10
 
+== Session 226 (2026-10-11) — GBL-010 G-3 : intégrité de label PlantUML ✅
+
+=== Fait
+- Domaine pur `plantuml.repair.PlantumlLabelIntegrity` : `escapeNewlines` (correction canonique, extraite du port), `hasBrokenQuotedLabel` (audit source), `repair` (labels quotés) ✅
+- `PlantumlTranslationPortAdapter` délègue à `PlantumlLabelIntegrity` (source unique D5, split-brain latent tué) ✅
+- Preuve réelle : source EN 0125 gelée avec label cassé (retour-ligne réel) vs FR `\n` ✅
+- Baby-step DDD/TDD/BDD strict : RED compile prouvé → GREEN compile ✅
+- 7 unit `PlantumlLabelIntegrityTest` + BDD `@plantuml-repair` (3 scénarios, `PlantumlRepairSteps`, steps uniques S-088) ✅
+- Zéro secret, zéro Python
+
 == Session 225 (2026-10-11) — Cadrage GBL-010 : arbre de traduction (feuille PlantUML) ✅
 
 === Fait

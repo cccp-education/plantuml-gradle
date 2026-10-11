@@ -11,6 +11,7 @@ import contracts.plantuml.PlantUmlTranslationOutcome
 import contracts.plantuml.PlantUmlTranslationPort
 import contracts.plantuml.PlantUmlTranslationRequest
 import contracts.plantuml.SyntaxValidationResult
+import plantuml.repair.PlantumlLabelIntegrity
 
 /**
  * Implementation of the N0 [PlantUmlTranslationPort] (EPIC PLT-DIAGRAM-OWNERSHIP
@@ -59,7 +60,7 @@ class PlantumlTranslationPortAdapter(
         for (label in labels) {
             val resolved = translateLabel(label, request.sourceLanguage, request.targetLanguage) ?: continue
             if (resolved == label) continue
-            val escaped = escapeNewlines(resolved)
+            val escaped = PlantumlLabelIntegrity.escapeNewlines(resolved)
             // Quoted label (`class "Utilisateur"`) — replace the quoted form only.
             val quotedReplaced = raw.replace("\"$label\"", "\"$escaped\"")
             val quotedChanged = quotedReplaced != raw
@@ -97,14 +98,6 @@ class PlantumlTranslationPortAdapter(
             is TranslationResult.Failure -> null
         }
     }
-
-    /**
-     * Converts a raw line break produced by the translator back to the PlantUML
-     * escape `\n`. Without this, `rectangle "a\nb"` becomes two lines and
-     * PlantUML fails (`Syntax Error?`).
-     */
-    private fun escapeNewlines(text: String): String =
-        text.replace("\r\n", "\\n").replace("\n", "\\n").replace("\r", "\\n")
 
     private companion object {
         /**

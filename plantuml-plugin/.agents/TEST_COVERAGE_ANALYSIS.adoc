@@ -1,6 +1,23 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 217 (10 septembre 2026) — FIX-BASELINE test coverage cucumber (fixtures + regex)
+_Dernière mise à jour_ : Session 226 (11 octobre 2026) — GBL-010 G-3 intégrité de label PlantUML
+
+=== Session 226 — GBL-010 G-3 (intégrité de label PlantUML)
+
+Session 226 (2026-10-11) : feuille `[plantuml]` de l'arbre de traduction.
+`plantuml.repair.PlantumlLabelIntegrity` (objet pur) — `escapeNewlines`
+(correction canonique, extraite du port qui délègue : source unique D5),
+`hasBrokenQuotedLabel` (audit source, machine à états quote-aware), `repair`
+(labels quotés). Baby-step DDD/TDD/BDD strict : RED compile prouvé → GREEN compile.
+
+* `src/test/kotlin/plantuml/repair/PlantumlLabelIntegrityTest.kt` — **7 unit**
+  (escape réel/windows/mac + idempotent, label cassé détecté, label échappé intact,
+  `repair` ré-échappe et rend intact, `repair` ne touche pas hors label).
+* `src/test/features/27_plantuml_repair.feature` — **BDD `@plantuml-repair`**
+  (3 scénarios) + `PlantumlRepairSteps` (glue `plantuml.scenarios`, steps uniques
+  S-088 ; contrôle statique `grep` = 1 fichier par phrase).
+* Preuve réelle : source EN 0125 gelée avec label cassé (retour-ligne réel) vs FR `\n`.
+* Comportement du port inchangé (round-trip `@plantuml-roundtrip` préservé).
 
 === Session 217 — FIX-BASELINE (fixtures cucumber, TEST-only)
 

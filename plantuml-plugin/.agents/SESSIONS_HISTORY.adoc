@@ -1,5 +1,21 @@
 = Historique des Sessions
 
+== Session 226 (2026-10-11) — GBL-010 G-3 : intégrité de label PlantUML ✅
+
+Feuille `[plantuml]` de l'arbre de traduction (GBL-010, branche Data). Le défaut D2
+(CHE-DIAGRAM) : une traduction qui introduit un **retour-ligne réel** dans un label
+quoté casse PlantUML (`Syntax Error?`) → bloc dégradé en listing, variante sans
+diagramme. Livrable : `plantuml.repair.PlantumlLabelIntegrity` — `escapeNewlines`
+(correction canonique, **extraite du port** qui délègue désormais : source unique
+D5), `hasBrokenQuotedLabel` (audit source, machine à états quote-aware), `repair`
+(re-échappe les retours-ligne dans les labels quotés). **Preuve réelle** : la source
+gelée EN 0125 porte le label cassé (retour-ligne réel) alors que FR porte `\n`.
+Baby-step DDD/TDD/BDD strict RED compile → GREEN compile : 7 unit
+`PlantumlLabelIntegrityTest` + BDD `@plantuml-repair` (3 scénarios,
+`PlantumlRepairSteps`, steps uniques S-088). Comportement du port inchangé
+(round-trip préservé). Zéro secret, zéro Python. Rapport
+`.agents/sessions/226-gbl010-g3-plantuml-label-integrity.adoc`.
+
 == Session 225 (2026-10-11) — Cadrage GBL-010 : arbre de traduction (feuille PlantUML) ✅
 
 Cadrage de l'EPIC transverse **GBL-010** (« arbre de traduction du site, deux

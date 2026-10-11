@@ -1,0 +1,75 @@
+= Session 226 — GBL-010 G-3 : intégrité de label PlantUML (détection + correction du `\n`)
+
+_Date_ : 2026-10-11
+_Borough_ : plantuml-gradle (HTOWN, N2)
+_Type_ : feat (DDD/TDD/BDD) — feuille PlantUML de l'arbre de traduction
+_Méthode_ : baby-step DDD/TDD/BDD strict (RED → GREEN → REFACTOR), unit → cucumber
+
+== Mission
+
+EPIC transverse **GBL-010** (arbre de traduction du site), branche Data, **G-3** :
+plantuml possède la **feuille `[plantuml]`** — traduction + débugage/correction. Le
+défaut **D2** (CHE-DIAGRAM) : une traduction qui introduit un **retour-ligne réel**
+dans un label quoté casse PlantUML (`Syntax Error?`) → le bloc dégrade en listing et
+la variante ne rend aucun diagramme.
+
+== Livrable — domaine pur `plantuml.repair.PlantumlLabelIntegrity`
+
+* `escapeNewlines(label)` — la correction canonique (retour-ligne réel → escape
+  `\n`), **extraite du port** et devenue la source unique (le port délègue, D5).
+* `hasBrokenQuotedLabel(source)` — l'audit **au niveau source** : détecte un label
+  quoté qui s'étale sur un retour-ligne réel (machine à états quote-aware,
+  échappements `\"`/`\\` honorés).
+* `repair(source)` — re-échappe les retours-ligne **à l'intérieur des labels
+  quotés** uniquement, le reste du bloc byte-identique.
+
+*Refactor* : `PlantumlTranslationPortAdapter` ne porte plus sa copie privée
+d'`escapeNewlines` — il **délègue** à `PlantumlLabelIntegrity` (fin du split-brain
+latent). Comportement inchangé (round-trip `@plantuml-roundtrip` préservé).
+
+== Preuve réelle (corpus cheroliv.com, hors test)
+
+Le défaut D2 est **présent** dans la source gelée de la variante EN 0125 :
+
+[source]
+----
+FR référence (correct)  : rectangle "CLI de vibe coding\nOpen source, gratuit" as CLI
+EN variante  (cassé)     : rectangle "vibe coding CLI
+                           Open source, free" as CLI      ← retour-ligne réel
+----
+
+`hasBrokenQuotedLabel` le détecte ; `repair` le corrige.
+
+== Tests (Local = Build, Tests = CI)
+
+* **RED** : `compileTestKotlin` échoue (`Unresolved reference 'PlantumlLabelIntegrity'`).
+* **GREEN** : `compileKotlin compileTestKotlin` VERT.
+* **Unit** — `PlantumlLabelIntegrityTest` (7) : escape réel/windows/mac, idempotent ;
+  label cassé détecté ; label échappé intact ; `repair` ré-échappe et rend intact ;
+  `repair` ne touche pas hors label quoté.
+* **BDD** — `27_plantuml_repair.feature` `@plantuml-repair` (3 scénarios) +
+  `PlantumlRepairSteps` (glue `plantuml.scenarios`, steps uniques — S-088).
+
+== Fichiers
+
+[cols="1,3"]
+|===
+| Type | Fichier
+
+| prod (nouveau) | `src/main/kotlin/plantuml/repair/PlantumlLabelIntegrity.kt`
+| prod (modifié) | `src/main/kotlin/plantuml/boundary/PlantumlTranslationPortAdapter.kt` (délégation D5)
+| test (nouveau) | `src/test/kotlin/plantuml/repair/PlantumlLabelIntegrityTest.kt`
+| test (nouveau) | `src/test/scenarios/plantuml/scenarios/PlantumlRepairSteps.kt`
+| test (nouveau) | `src/test/features/27_plantuml_repair.feature`
+|===
+
+== Notes
+
+* Baby-step DDD/TDD/BDD strict : RED compile → GREEN compile. Aucun test en local.
+* Zéro secret, zéro Python. Périmètre git propre (feuille + steps + feature).
+
+== Reste EPIC GBL-010 / PLT-DIAGRAM-OWNERSHIP
+
+* **G-3 (reste)** — statut par bloc (`TRANSLATED`/`PENDING`/`BROKEN`) + correction IA.
+* **US-6** chaîne E2E ; **US-7** dogfooding + non-régression (re-bake cheroliv.com).
+* **Fichier à lire en priorité** : `PROMPT_REPRISE.adoc` (session 227).
