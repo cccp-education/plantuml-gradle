@@ -40,7 +40,7 @@ object PlantUmlToolchain {
     val reference: PlantUmlToolchainReference =
         PlantUmlToolchainReference(
             engineVersion = "1.2026.0",
-            diagramVersion = "3.2.0",
-            diagramPlantumlVersion = "1.2025.3",
+            diagramVersion = "3.2.1",
+            diagramPlantumlVersion = "1.2026.2",
         )
 }
