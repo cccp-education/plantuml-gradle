@@ -1,6 +1,6 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 226 (11 octobre 2026) — GBL-010 G-3 intégrité de label PlantUML
+_Dernière mise à jour_ : Session 233 (12 octobre 2026) — PLT-CONTEXT US-1/2 (CTX-01/02)
 
 === Session 226 — GBL-010 G-3 (intégrité de label PlantUML)
 
@@ -318,3 +318,41 @@ asciidoctor-diagram/plantuml de référence (D6).
 Couverture : +1 fichier production (`PlantUmlToolchain.kt`, objet pur + value
 object), +1 fichier test unit, +1 feature, +1 steps. Tags non filtrés →
 feature exécuté (contrôle anti « test fantôme », leçon Queens S-269).
+
+=== Session 233 — PLT-CONTEXT US-1/2 (6 unit + 3 BDD)
+
+Nouveau domaine `plantuml.context` (EPIC PLT-CONTEXT) : le contrat N0
+`contracts.context.*` est adopté (CTX-01) et l'assembleur pur `PlantumlContextBuilder`
+(CTX-02) le rend en bloc prompt-ready.
+
+|===
+| Couche | Tests | État
+| Unit `PlantumlContextBuilderTest` | 6 (rendu sectionné, canaux vides jetés, composite vide → vide, ordre EAGER→RAG→GRAPHIFY→DOCS, budget tronque, budget par défaut N0) | ✅ CI (run 38257581112)
+| BDD `@context` (feature 29) | 3 scénarios + `PlantumlContextSteps` | ✅ CI 3/3 PASSED
+|===
+
+Couverture : +2 fichiers production (`PlantumlContextBuilder.kt`, `PlantumlContext`
+data class), +6 unit, +1 feature, +1 steps. Contrat N0 `codebase-contracts:0.0.2`
+(seam provider-agnostique ; moteur = N1 codebase, wiring = CTX-03/04 à venir).
+
+=== Session 230 — PLT-AGENT DIA-01→07 (+37 unit + 18 BDD)
+
+Nouveau domaine pur `plantuml.agent` (EPIC PLT-AGENT) : techniques portées de
+`docToolChain/diag-agent` sur l'infra HTOWN native (Kroki/MCP rejetés).
+
+|===
+| Objet (unit) | Tests | Objet (BDD)
+| `LlmCodeExtractorTest` (DIA-04) | 9 | `28_agent_loop.feature` `@agent-loop` (18 scénarios)
+| `GenerationBudgetTest` (DIA-03) | 6 | — (budget : 3 scénarios)
+| `DiagramSubtypeDetectorTest` (DIA-06) | 7 | — (subtype : 3 scénarios)
+| `DescriptionPreflightTest` (DIA-02) | 5 | — (preflight : 3 scénarios)
+| `DiagramExampleCatalogTest` (DIA-05) | 2 | — (examples : 2 scénarios)
+| `DesignReviewTest` (DIA-01) | 4 | — (design-review : 2 scénarios)
+| `DesignConvergenceTest` (DIA-07) | 4 | — (convergence : 2 scénarios)
+| **Total** | **37** | **18**
+|===
+
+Couverture : +8 fichiers production (`plantuml.agent.*` + `DesignReviewer` port +
+`VisionDesignReviewer` adapter + `PlantumlService.renderPng`), +7 fichiers test unit,
++1 feature, +1 steps. Config opt-in (défaut off). Correctif dette : drift toolchain
+S-227 (`PlantUmlToolchain.reference`).
