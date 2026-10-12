@@ -74,7 +74,7 @@ class GenerateAugmentedContextWiringFunctionalTest {
 
         val result = runner(
             "generatePlantumlDiagrams",
-            "-Dplantuml.test.mode=true",
+            "-Pplantuml.test.mode=true",
         ).build()
 
         assertEquals(
@@ -96,7 +96,7 @@ class GenerateAugmentedContextWiringFunctionalTest {
 
         runner(
             "generatePlantumlDiagrams",
-            "-Dplantuml.test.mode=true",
+            "-Pplantuml.test.mode=true",
         ).build()
 
         val artefact = projectDir.resolve("build/plantuml/augmented-context.txt")
@@ -113,7 +113,7 @@ class GenerateAugmentedContextWiringFunctionalTest {
 
         val result = runner(
             "generatePlantumlDiagrams",
-            "-Dplantuml.test.mode=true",
+            "-Pplantuml.test.mode=true",
         ).build()
 
         assertEquals(
