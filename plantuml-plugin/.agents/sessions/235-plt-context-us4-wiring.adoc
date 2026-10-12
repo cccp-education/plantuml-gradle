@@ -50,6 +50,16 @@ dans le prompt de génération LLM ; `DocKnowledgeBase` reste le **repli hors-li
   dépendance collecteur↔génération, artefact EAGER produit, succès sans fichiers EAGER).
 * Local = Build : 3 source sets `compile*Kotlin` **VERTS** + `assemble` +
   `validatePlugins` **VERTS**. **Tests = CI.**
+* **CI VERTE** run `38263864916` (commit `d14f735`, `Check plantuml-plugin` ✓).
+  **Preuve de validité de la session.**
+* **2 itérations CI rouges, puis verte** (diagnostic par les logs CI, pas de test local) :
+  1. run `38263002905` ROUGE — `GenerateAugmentedContextWiringFunctionalTest` : le flag
+     `-Dplantuml.test.mode=true` (propriété JVM) est ignoré par la tâche qui lit la
+     **propriété Gradle** `project.findProperty(...)` → `-Pplantuml.test.mode=true`.
+  2. run `38263437994` ROUGE — même en test mode, `LlmService.createChatModel()` ne
+     renvoie `null` que si `baseUrl` **ne contient pas** `localhost` (sinon il suppose un
+     mock serveur) → baseUrl `http://127.0.0.1:11434` → voie simulée, zéro réseau.
+  3. run `38263864916` **VERT**.
 
 == Décisions / notes
 

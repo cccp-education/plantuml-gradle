@@ -14,7 +14,8 @@ provider filtrant les fichiers existants). Tests 3 niveaux : **4 unit** (`Augmen
 `31_plantuml_context_wiring.feature` (`@context @wiring`, 2 scénarios) + `AugmentedContextPromptSteps`
 + **3 functional** TestKit (`GenerateAugmentedContextWiringFunctionalTest`). Frontière : le domaine
 ne connaît que le **texte** (artefact). Local = Build (3 source sets compile VERT + `assemble` +
-`validatePlugins` VERT) ; preuve = CI. **PLT-CONTEXT TERMINÉ 4/4.** Zéro secret, zéro Python, zéro
+`validatePlugins` VERT) ; **CI VERTE run `38263864916`** (commit `d14f735`, 2 itérations rouges
+corrigées par les logs CI). **PLT-CONTEXT TERMINÉ 4/4.** Zéro secret, zéro Python, zéro
 publication. Rapport `.agents/sessions/235-plt-context-us4-wiring.adoc`.
 
 == Session 234 (2026-10-12) — PLT-CONTEXT US-3 (CTX-03 collecteur `collectPlantumlAugmentedContext`) ✅

@@ -9,7 +9,7 @@
 - [x] `generatePlantumlDiagrams` **dépend** de `collectPlantumlAugmentedContext` + durcissement entrée tolérante (CTX-03) ✅
 - [x] Tests : **4 unit** (`AugmentedContextPromptTest`) + **2 unit** (`DiagramProcessorContextTest`) + BDD `31_plantuml_context_wiring.feature` (`@context @wiring`, 2 scénarios) + **3 functional** TestKit ✅
 - [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 236 + BACKLOG (CTX-04 ✅, EPIC ✅ TERMINÉ 4/4) + TODO + archive ✅
-- [x] Local = Build (3 source sets compile + `assemble` + `validatePlugins` VERT) ; zéro secret, zéro Python, zéro publication ✅
+- [x] Local = Build (3 source sets compile + `assemble` + `validatePlugins` VERT) ; **CI VERTE run `38263864916`** (commit `d14f735`) ; zéro secret, zéro Python, zéro publication ✅
 
 === Prochaine session (236)
 - **GBL-010 `G-3b`** (statut par bloc + version toolchain exposés au contrat) ; sinon PLT-DIAGRAM-OWNERSHIP US-6/US-7
