@@ -10,7 +10,8 @@ si re-parse** → sinon source préservée, round-trip D5). **Adaptateur de réf
 (prompt English → `ChatModel.chat` → `LlmCodeExtractor` PLT-AGENT DIA-04). Tests : **9 unit**
 (`PlantumlBlockCorrectorTest`) + **3 unit** (`ChatModelBlockRepairerTest`) + **BDD**
 `33_plantuml_block_correction.feature` (`@plantuml-correction`, 4 scénarios) + `PlantumlBlockCorrectionSteps`.
-Local = Build (compile 3 source sets + `assemble` + `validatePlugins` VERT) ; preuve = CI. Zéro secret,
+Local = Build (compile 3 source sets + `assemble` + `validatePlugins` VERT) ; **CI VERTE run `38270262874`**
+(commit `4110ea8`). Zéro secret,
 zéro Python, zéro publication. Rapport `.agents/sessions/237-gbl010-g3-corrector.adoc`.
 
 == Session 236 (2026-10-12) — GBL-010 G-3b (feuille PlantUML : statut par bloc + version toolchain) ✅

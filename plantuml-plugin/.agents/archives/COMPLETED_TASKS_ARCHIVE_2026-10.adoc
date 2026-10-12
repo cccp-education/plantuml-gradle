@@ -8,7 +8,7 @@
 - [x] `ChatModelBlockRepairer` — adaptateur de référence (prompt English → `ChatModel.chat` → `LlmCodeExtractor` DIA-04) ✅
 - [x] Tests : **9 unit** (`PlantumlBlockCorrectorTest`) + **3 unit** (`ChatModelBlockRepairerTest`) + BDD `33_plantuml_block_correction.feature` (`@plantuml-correction`, 4 scénarios) ✅
 - [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 238 + BACKLOG (G-3) + TODO + archive ✅
-- [x] Local = Build (compile 3 source sets + `assemble` + `validatePlugins` VERT) ; zéro secret, zéro Python, zéro publication ✅
+- [x] Local = Build (compile 3 source sets + `assemble` + `validatePlugins` VERT) ; **CI VERTE run `38270262874`** (commit `4110ea8`) ; zéro secret, zéro Python, zéro publication ✅
 
 === Prochaine session (238)
 - **PLT-DIAGRAM-OWNERSHIP US-6 (chaîne E2E)** ; sinon US-7 (dogfooding) ; GBL-010 `G-3` (reste : notes)

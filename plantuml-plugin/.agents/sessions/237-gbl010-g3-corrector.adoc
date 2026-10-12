@@ -43,6 +43,8 @@ feuille `[plantuml]` **corrige** les blocs qui ne convergent pas — réparation
   `PlantumlBlockCorrectionSteps` (glue `plantuml.scenarios`, steps préfixés S-088).
 * Local = Build : compile 3 source sets + `assemble` + `validatePlugins` **VERTS**.
   **Tests = CI.**
+* **CI VERTE** run `38270262874` (commit `4110ea8`, `Check plantuml-plugin` ✓).
+  **Preuve de validité de la session.**
 
 == Fichiers
 
