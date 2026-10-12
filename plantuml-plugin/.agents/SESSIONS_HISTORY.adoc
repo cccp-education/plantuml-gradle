@@ -1,5 +1,21 @@
 = Historique des Sessions
 
+== Session 233 (2026-10-12) — PLT-CONTEXT US-1/2 (CTX-01 contrat N0 + CTX-02 assembleur pur) ✅
+
+Implémentation (baby-step DDD/TDD/BDD). **CTX-01** : `build.gradle.kts` adopte le
+**contrat N0** `education.cccp:codebase-contracts:0.0.2` (`contracts.context.*` :
+`CompositeContext`/`ContextChannel`/`ChannelBudget`/`CompositeContextConfig`) — le seam
+provider-agnostique du contexte augmenté, alimenté par le **N1 codebase**. **CTX-02** :
+objet **pur** `plantuml.context.PlantumlContextBuilder` (miroir `CapsuleContextBuilder`)
+— `toChannels`/`channelsWithBudget`/`merge` (`==== <sectionHeader> (<name>)`)/`build` →
+`PlantumlContext` (`rendered`/`nonEmptyCount`/`tokenEstimate`) + `defaultBudget()`
+(N0 8000, 40/30/20/10). 6 unit (`PlantumlContextBuilderTest`) + BDD
+`29_plantuml_context.feature` (`@context`, 3 scénarios) + `PlantumlContextSteps` (runner
+global unique). Frontière : seam **N0**, moteur **N1**, `DocKnowledgeBase` conservé en
+repli (CTX-04). Local = Build (`compileKotlin`/`compileTestKotlin` VERT, contrat N0 résolu) ;
+preuve = CI. **PLT-CONTEXT 2/4**. Zéro secret, zéro Python. Rapport
+`.agents/sessions/233-plt-context-us1-us2.adoc`.
+
 == Session 232 (2026-10-12) — Arbitrage CTX-05 : LlmBuildService (VERDICT : CADUQUE) ✅
 
 Question pilote : remplacer le `LlmService` local par le hub N1 `LlmBuildService` ?

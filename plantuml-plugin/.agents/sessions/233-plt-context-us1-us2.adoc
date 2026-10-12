@@ -1,0 +1,56 @@
+= Session 233 — PLT-CONTEXT US-1/2 : contrat N0 + assembleur pur (CTX-01/02)
+:session: 233
+:date: 2026-10-12
+:borough: HTOWN (plantuml-gradle)
+:type: feat + test (DDD/TDD/BDD)
+:statut: TERMINÉ
+:methode: baby-step DDD/TDD/BDD (unit → cucumber)
+
+== Mission
+
+`PLT-CONTEXT` US-1 (`CTX-01`) puis US-2 (`CTX-02`) : adopter le **contrat N0**
+`codebase-contracts` (`contracts.context.*`) et écrire l'**assembleur pur** du contexte
+augmenté, en miroir du patron capsule.
+
+== Livré
+
+=== CTX-01 — contrat N0 `codebase-contracts`
+
+* `build.gradle.kts` : `implementation("education.cccp:codebase-contracts:0.0.2")`
+  (même style que les autres N0 du build : `i18n-contracts`, `plantuml-contracts`).
+* Types consommés : `contracts.context.{CompositeContext, ContextChannel, ChannelBudget,
+  CompositeContextConfig}` — les 5 canaux EAGER/RAG/GRAPHIFY/DOCS/RESOURCE + budget 40/30/20/10.
+
+=== CTX-02 — assembleur pur `plantuml.context.PlantumlContextBuilder`
+
+* `PlantumlContextBuilder` (objet **pur**, sans I/O) : `toChannels`, `channelsWithBudget`,
+  `merge` (bloc sectionné `==== <header> (<name>)`), `build(composite, budget)` → `PlantumlContext`,
+  `defaultBudget()`.
+* `PlantumlContext` (data class) : `channels`, `rendered`, `isEmpty`, `nonEmptyCount`,
+  `tokenEstimate`.
+* Miroir de `capsule.context.CapsuleContextBuilder` → un seul idiome cross-borough.
+
+== Tests
+
+* Unit : `PlantumlContextBuilderTest` (6) — rendu sectionné, canaux vides jetés, composite
+  vide → contexte vide, ordre contractuel EAGER→RAG→GRAPHIFY→DOCS, budget qui tronque,
+  budget par défaut = N0.
+* BDD : `29_plantuml_context.feature` (`@context`, 3 scénarios) + `PlantumlContextSteps`
+  (runner Cucumber global unique).
+* Local = Build : `compileKotlin`/`compileTestKotlin` **VERTS** (contrat N0 résolu).
+  **Tests = CI.**
+
+== Décisions / notes
+
+* Le seam est **N0** ; le moteur (production du `CompositeContext`) est **N1 codebase** —
+  le wiring (`CTX-03` collecteur / `CTX-04` `DiagramProcessor`) relève des sessions suivantes.
+* `DocKnowledgeBase` statique **conservé** (repli hors-ligne, CTX-04).
+* `CTX-05` **CADUQUE** (S-232) — `LlmService` non remplacé.
+
+== Reste à faire
+
+* [ ] `CTX-03` — collecteur `collectPlantumlAugmentedContext` (EAGER + canaux injectés → artefact).
+* [ ] `CTX-04` — wiring `DiagramProcessor` (contexte dans le prompt, repli statique).
+* [ ] Session suivante : `CTX-03` / `CTX-04`.
+
+_Score : 9/10 (DDD/TDD/BDD, contrat N0 adopté, assembleur pur testé)._

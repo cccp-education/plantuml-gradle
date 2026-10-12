@@ -1,43 +1,43 @@
-= PROMPT_REPRISE — Plantuml — Session 233
-:session: 233
+= PROMPT_REPRISE — Plantuml — Session 234
+:session: 234
 :date: 2026-10-12
 
-== État — PLT-AGENT ✅ 7/7 (S-230) ; PLT-CONTEXT cadré + CTX-05 CADUQUE (S-231/232)
+== État — PLT-AGENT ✅ 7/7 ; PLT-CONTEXT 2/4 (CTX-01/02 ✅ S-233, CTX-05 CADUQUE)
 
-* **EPIC `PLT-AGENT` ✅ 7/7** (S-230) : techniques `diag-agent` (domaine pur
-  `plantuml.agent`) — extracteur, budget mur, sous-type, pré-vol de description,
-  exemples canoniques, revue design par vision, convergence. Config
-  `langchain4j.{maxSeconds,preflight,examples,designValidation}` (4 sources, défaut off).
-* **EPIC `PLT-CONTEXT` cadré** (S-231) : consommer le **contexte augmenté N1 codebase**
-  via le **contrat N0** `contracts.context.*` (patron capsule), au lieu du
-  `DocKnowledgeBase` statique. `CTX-01`→`CTX-04` (**~10 pts**). Doc
-  `.agents/CADRAGE_EPIC_PLT_CONTEXT.adoc`.
-* **Arbitrage `CTX-05` CADUQUE** (S-232) : on **ne remplace pas** `LlmService` par le hub
-  N1 `LlmBuildService` (superset local, hub Ollama-centré, split-brain). § 11 du cadrage.
-* **CI** : `ci.yml`+`website.yml`+`generate_deck.yml` obsolètes supprimés ; cache pgvector
-  (`test.yml`) ; cache Ollama + `qwen3.5:0.8b` (`setup-ollama`, `real_llm_test.yml`).
+* **EPIC `PLT-AGENT` ✅ 7/7** (S-230) : techniques `diag-agent` (domaine pur `plantuml.agent`).
+* **EPIC `PLT-CONTEXT`** (cadré S-231) :
+  * **CTX-01 ✅ S-233** — contrat N0 `education.cccp:codebase-contracts:0.0.2`
+    (`contracts.context.*`) adopté.
+  * **CTX-02 ✅ S-233** — assembleur pur `plantuml.context.PlantumlContextBuilder`
+    (+ `PlantumlContext`), miroir de `CapsuleContextBuilder` ; 6 unit + BDD `29_plantuml_context.feature`.
+  * **CTX-03 🟡** — collecteur `collectPlantumlAugmentedContext` (EAGER + canaux RAG/Graphify/
+    Docs → `build/plantuml/augmented-context.txt`, Économie d'Encre).
+  * **CTX-04 🟡** — wiring `DiagramProcessor` (contexte dans le prompt ; `DocKnowledgeBase` = repli).
+  * **CTX-05 ✅ CADUQUE** (S-232) — `LlmService` non remplacé par le hub N1.
+* **CI** : workflows obsolètes supprimés ; cache pgvector + cache Ollama `qwen3.5:0.8b`.
 
-== Mission Session 233 — au choix pilote
+== Mission Session 234 — au choix pilote
 
-* **PLT-CONTEXT US-1 (`CTX-01`)** — adopter le contrat N0 `codebase-contracts`
-  (`contracts.context.*`) ; puis **US-2 (`CTX-02`)** assembleur pur `PlantumlContextBuilder`.
-  **Candidat par défaut.**
+* **PLT-CONTEXT US-3 (`CTX-03`)** — collecteur `collectPlantumlAugmentedContext` puis
+  **US-4 (`CTX-04`)** wiring `DiagramProcessor`. **Candidat par défaut.**
 * **GBL-010 G-3 (reste)** — statut par bloc + correction IA (feuille PlantUML).
 * **US-6/US-7 PLT-DIAGRAM-OWNERSHIP** — chaîne E2E bakery→document→port→plantuml + dogfooding.
 
 == Points d'attention
 
 * **Local = Build, Tests = CI** : ne jamais lancer `test`/`check` en local. Preuve = CI.
-* Appel LLM en CI : **Ollama caché** (`setup-ollama`, `qwen3.5:0.8b`, port 11466) ou **mock**.
-* **DAG** : plantuml (N2) consomme **N0** (`contracts.*`) et **N1** (codebase) ; **jamais
-  N2→N2**. Repli hors-ligne conservé. **NE PAS** remplacer `LlmService` (CTX-05 CADUQUE).
+* **DAG** : plantuml (N2) consomme **N0** (`contracts.*`) et **N1** (codebase) ; **jamais N2→N2**.
+  Repli hors-ligne conservé. **NE PAS** remplacer `LlmService` (CTX-05 CADUQUE).
+* **CTX-03** : le collecteur prend les canaux RAG/Graphify/Docs en **entrée** (`-Pcontext.*`
+  ou artefact codebase) — l'intégration pgvector N1 est **hors scope de la tâche** (mockable).
+  Déclarer entrées/sorties Gradle-native (UP-TO-DATE) — Loi de l'Économie d'Encre.
 * Nouvelle option → config 4 sources + CLI, défaut `false`. English only ; zéro Python ;
   zéro secret ; baby-step DDD/TDD/BDD ; runner Cucumber global unique, steps préfixés (S-088).
 
 == Rappels
 
 * GroupId `education.cccp` — version `plantuml = "0.0.9"` (catalog ws 0.0.78).
-* BOM `workspace-bom` **0.0.78** ; N0 `plantuml-contracts:0.0.1`, `i18n-contracts:0.0.4`,
-  `codebase-contracts:0.0.2` (à adopter — PLT-CONTEXT).
-* EPICs : **PLT-AGENT ✅ 7/7**, **PLT-CONTEXT 🟡** (CTX-01→04), GBL-010 (G-3),
-  PLT-DIAGRAM-OWNERSHIP (US-6/7).
+* BOM `workspace-bom` **0.0.78** ; N0 `plantuml-contracts:0.0.1`, `i18n-contracts:0.0.3`,
+  **`codebase-contracts:0.0.2`** (adopté S-233).
+* EPICs : **PLT-AGENT ✅ 7/7**, **PLT-CONTEXT 🟡** (CTX-01/02 ✅, CTX-05 CADUQUE,
+  CTX-03/04 restants), GBL-010 (G-3), PLT-DIAGRAM-OWNERSHIP (US-6/7).

@@ -1,5 +1,19 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-10
 
+== Session 233 (2026-10-12) — PLT-CONTEXT US-1/2 (CTX-01/02) ✅
+
+=== Fait
+- [x] **CTX-01** : contrat N0 `education.cccp:codebase-contracts:0.0.2` (`contracts.context.*`) adopté ✅
+- [x] **CTX-02** : assembleur pur `plantuml.context.PlantumlContextBuilder` + `PlantumlContext` (miroir capsule) ✅
+- [x] 6 unit (`PlantumlContextBuilderTest`) + BDD `29_plantuml_context.feature` (`@context`, 3 scénarios) + `PlantumlContextSteps` ✅
+- [x] Frontière DAG : seam N0, moteur N1 ; `DocKnowledgeBase` = repli (CTX-04) ✅
+- [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 234 + BACKLOG/TODO (CTX-01/02 ✅) + archive ✅
+- [x] Local = Build (compile VERT) ; zéro secret, zéro Python ✅
+
+=== Prochaine session (234)
+- **PLT-CONTEXT US-3 (`CTX-03` collecteur) puis US-4 (`CTX-04` wiring `DiagramProcessor`)**
+- **Fichier à lire en priorité** : `.agents/CADRAGE_EPIC_PLT_CONTEXT.adoc`
+
 == Session 232 (2026-10-12) — Arbitrage CTX-05 (LlmBuildService) ✅
 
 === Fait
