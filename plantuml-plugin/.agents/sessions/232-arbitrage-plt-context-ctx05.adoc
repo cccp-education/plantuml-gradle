@@ -1,0 +1,55 @@
+= Session 232 — Arbitrage CTX-05 : `LlmBuildService` (VERDICT : CADUQUE)
+:session: 232
+:date: 2026-10-12
+:borough: HTOWN (plantuml-gradle)
+:type: arbitrage (gouvernance pure)
+:statut: TERMINÉ
+:methode: pattern S-231 (zéro code modifié)
+
+== Question
+
+`PLT-CONTEXT` `CTX-05` : remplacer le `LlmService` local de plantuml par le hub N1
+`codebase.koog.llm.service.LlmBuildService` (consommé par slider/planner/capsule) ?
+
+== Verdict : **CADUQUE**
+
+On **ne remplace pas** `LlmService` par le hub.
+
+=== Motifs (audit S-232)
+
+* **Superset.** `LlmService` couvre **plus** que le hub :
+  * `LlmBuildService` = résolution **1 provider** (`LlmServiceResolver.resolveProvider(model)`)
+    + **pool Ollama local** (`OllamaPool`/`OllamaInstanceScanner`, `RotationStrategy.ROUND_ROBIN`
+    sur ports) ; **Ollama-centré**, pas de pool de clés API cloud.
+  * `LlmService` = **7 providers** + `ApiKeyPool` (ROUND_ROBIN + tiered) + `QuotaTracker`/
+    `QuotaResetManager` + **`CrossProviderFallbackOrchestrator`** + `FreemiumWeightCalculator`
+    + `QuotaAuditLogger` + `ProviderModelResolver`.
+  → le remplacement = **régression** (viole la charte § 4 du cadrage).
+* **Split-brain.** Adopter les deux (hub Ollama + `LlmService` cloud) créerait **deux
+  chemins de résolution LLM** = l'anti-pattern que le workspace combat.
+* **Gains additifs mineurs.** Le seul apport réel (DI `BuildService` + rotation de ports
+  Ollama) est petit et réalisable **côté plantuml**, sans adopter le hub.
+
+=== Conséquence
+
+* **CTX-05 CADUQUE** ; `PLT-CONTEXT` se réduit à `CTX-01`→`CTX-04` (**~10 pts**).
+* **Porte ouverte (hors plantuml)** : une convergence LLM cross-borough (unifier le socle
+  LLM dans codebase N1, avec pool de clés API cloud) = **EPIC N1 codebase**, pas une
+  décision plantuml.
+
+== Livrable
+
+Section **§ 11 « Arbitrage CTX-05 — CADUQUE »** ajoutée à
+`.agents/CADRAGE_EPIC_PLT_CONTEXT.adoc` (tableau comparatif + 4 motifs + conséquence).
+BACKLOG/TODO synchronisés (CTX-05 → ✅ CADUQUE ; charge ~10 pts).
+
+== Vérifications
+
+* Local = Build (zéro code modifié). Preuve = CI `Test` (docs-only).
+* Zéro secret, zéro Python.
+
+== Reste à faire
+
+* [ ] Session suivante : `PLT-CONTEXT` US-1 (`CTX-01`) / US-2 (`CTX-02`).
+
+_Score : 8/10 (arbitrage cross-borough, zéro code)._

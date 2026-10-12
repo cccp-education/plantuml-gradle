@@ -16,7 +16,7 @@ Patron de référence : capsule (`CapsuleContextBuilder` + `CollectCapsuleAugmen
 **aucun** type `codebase.*` ; contexte local statique (`DocKnowledgeBase`, mots-clés) ;
 **aucun** `contracts.context.*`. **Retardataire** cross-borough (capsule/planner/slider
 consomment déjà le hub N1).
-*Priorité* : 🟠 HAUTE. *Charge* : ~13 pts (5 US). *Frontière DAG* : contrat = **N0**,
+*Priorité* : 🟠 HAUTE. *Charge* : **~10 pts** (4 US après caducation de CTX-05). *Frontière DAG* : contrat = **N0**,
 moteur = **N1** ; **jamais** N2→N2. Repli statique conservé (hors-ligne).
 
 [cols="1,4,1,2", options="header"]
@@ -28,7 +28,7 @@ moteur = **N1** ; **jamais** N2→N2. Repli statique conservé (hors-ligne).
 | CTX-02 | **Assembleur pur** `plantuml.context.PlantumlContextBuilder` (mirror `CapsuleContextBuilder`) | 3 | 🟡 À FAIRE
 | CTX-03 | **Collecteur** `collectPlantumlAugmentedContext` (EAGER + RAG/Graphify/Docs → `augmented-context.txt`, Économie d'Encre) | 3 | 🟡 À FAIRE
 | CTX-04 | **Wiring `DiagramProcessor`** : contexte dans le prompt ; `DocKnowledgeBase` = repli | 3 | 🟡 À FAIRE
-| CTX-05 | *(optionnel)* hub **`LlmBuildService`** (N1) au lieu de `LlmService` local — arbitrage pilote | 3 | 🟡 À FAIRE
+| CTX-05 | *(optionnel)* hub **`LlmBuildService`** (N1) au lieu de `LlmService` local | — | ✅ **CADUQUE** (arbitrage S-232, § 11 du cadrage)
 |===
 
 *Ne pas régresser* : validation native hors-ligne, boucle `DiagramProcessor` (PLT-AGENT),

@@ -94,11 +94,11 @@ remplace un RAG jouet par le socle partagé (qualité de génération + anti-hal
 | CTX-02 | **Assembleur pur** `plantuml.context.PlantumlContextBuilder` (mirror `CapsuleContextBuilder`) : `build(composite, budget, ...)` → bloc sectionné prompt-ready ; canaux EAGER/RAG/GRAPHIFY/DOCS via `CompositeContext.toChannels` + `channelsWithBudget`. | `plantuml.context` | 3
 | CTX-03 | **Collecteur** `collectPlantumlAugmentedContext` (mirror `CollectCapsuleAugmentedContextTask`) : EAGER (fichiers du consommateur) + canaux RAG/Graphify/Docs injectés (`-Pcontext.*`) → `build/plantuml/augmented-context.txt` ; Économie d'Encre (artefact réutilisé, invalidation ciblée). | tâche Gradle | 3
 | CTX-04 | **Wiring `DiagramProcessor`** : injecter le contexte augmenté dans le prompt de génération (canal RAG/Docs) ; `DocKnowledgeBase` devient **repli** si aucun contexte. | `DiagramProcessor`, prompt | 3
-| CTX-05 | *(optionnel, arbitrage)* consommer `codebase.koog.llm.service.LlmBuildService` (hub N1) au lieu de `LlmService` local — alignement cross-borough (pattern slider/planner). | `LlmService` | 3
+| CTX-05 | *(optionnel, arbitrage)* consommer `codebase.koog.llm.service.LlmBuildService` (hub N1) au lieu de `LlmService` local. **→ CADUQUE (arbitrage S-232, § 11)**. | `LlmService` | ~~3~~
 |===
 
-*Total* : ~13 pts. `CTX-06` (BDD + provenance anti-hallucination) est absorbé dans
-CTX-02/03/04 (scénarios `@context`).
+*Total* : **~10 pts** après caducation de CTX-05 (`CTX-01`→`CTX-04`). `CTX-06` (BDD +
+provenance anti-hallucination) est absorbé dans CTX-02/03/04 (scénarios `@context`).
 
 == 6. Décisions
 
@@ -109,8 +109,9 @@ CTX-02/03/04 (scénarios `@context`).
 . **D-3 — Repli statique conservé.** `DocKnowledgeBase` = dégradation hors-ligne.
 . **D-4 — Économie d'Encre.** L'artefact `augmented-context.txt` est réutilisé ;
   invalidation ciblée (fichiers source changés), jamais globale.
-. **D-5 — `LlmBuildService` = option à arbitrer.** CTX-05 n'est pas un prérequis ;
-  le pool de clés local de plantuml est riche — décision pilote requise.
+. **D-5 — `LlmBuildService` : CADUQUE (arbitrage S-232).** On **ne remplace pas** le
+  `LlmService` local par le hub N1 (le local est un superset ; le hub est Ollama-centré ;
+  les adopter tous deux = split-brain). Voir § 11.
 . **D-6 — Provenance.** Le collecteur émet la traçabilité (anti-hallucination), comme
   capsule (`CAP-PROVENANCE`).
 . **D-7 — English only, 4 sources, défaut off** pour toute nouvelle option.
@@ -141,12 +142,12 @@ CTX-02/03/04 (scénarios `@context`).
 | US-2 | **CTX-02** assembleur pur `PlantumlContextBuilder` | 3 | 3
 | US-3 | **CTX-03** collecteur `collectPlantumlAugmentedContext` | 3 | 4
 | US-4 | **CTX-04** wiring `DiagramProcessor` + repli statique | 3 | 5
-| US-5 | **CTX-05** *(optionnel)* hub `LlmBuildService` (arbitrage pilote) | 3 | 6
+| US-5 | **CTX-05** hub `LlmBuildService` | — | ✅ **CADUQUE** (arbitrage S-232) |
 |===
 
 == 9. Reste à faire
 
-. [ ] Arbitrage pilote : périmètre (CTX-05 inclus ?) et ordre.
+. [x] Arbitrage **CTX-05** ✅ S-232 → **CADUQUE** (§ 11).
 . [ ] Vérifier `codebase-contracts:0.0.2` sur Central (`education.cccp`) + alignement BOM.
 . [ ] Confirmer la source des canaux RAG/Graphify (injection `-Pcontext.*` vs artefact
   produit par codebase `prepareContext`/`CompositeContextBuilder`).
@@ -163,3 +164,46 @@ CTX-02/03/04 (scénarios `@context`).
 * N1 : `codebase-gradle/codebase-plugin/src/main/kotlin/codebase/rag/CompositeContextBuilder.kt`,
   `codebase/store/RagVectorStore.kt`, `codebase/koog/llm/service/LlmBuildService.kt`.
 * Cadrages liés : `PLT-AGENT` (S-228/S-229/S-230), `PLT-DIAGRAM-OWNERSHIP`, `GBL-010`.
+
+== 11. Arbitrage CTX-05 — VERDICT : **CADUQUE** (S-232)
+
+_Question : remplacer le `LlmService` local de plantuml par le hub N1
+`codebase.koog.llm.service.LlmBuildService` (consommé par slider/planner/capsule) ?_
+
+=== Ce que chaque moteur couvre réellement
+
+[cols="2,3,3", options="header"]
+|===
+| Critère | `LlmBuildService` (N1 codebase) | `LlmService` (N2 plantuml)
+
+| Portée | résolution **1 provider** (`LlmServiceResolver.resolveProvider(model)`) + **pool Ollama local** (`OllamaPool`/`OllamaInstanceScanner`, `RotationStrategy.ROUND_ROBIN`) | **7 providers** (ollama/openai/gemini/mistral/claude/huggingface/groq)
+| Pool / rotation | pool **Ollama par ports** (instances locales) | `ApiKeyPool` (ROUND_ROBIN + **tiered**), `QuotaTracker`/`QuotaResetManager`, **`CrossProviderFallbackOrchestrator`**, `FreemiumWeightCalculator`, `QuotaAuditLogger`
+| Modèles par provider | provider-level | `ProviderModelResolver` (par provider)
+| DI | **Gradle `BuildService`** (partagé, cycle de vie Gradle) | instanciation directe par tâche
+| Test | mock via `-Pollama.baseUrl` | `plantuml.test.mode` → `null`
+|===
+
+=== Pourquoi le remplacement est rejeté
+
+. **Superset.** `LlmService` couvre **plus** que le hub (7 providers + pool de clés API +
+  quota + fallback cross-provider + audit + poids freemium). Le remplacer serait une
+  **régression** — violation de la charte de non-régression (§ 4).
+. **Le hub est Ollama-centré.** Son pool est une **rotation par ports** d'instances
+  locales ; il ne porte **pas** le pool de **clés API cloud** dont plantuml a besoin.
+. **Split-brain.** Adopter les deux (hub pour Ollama, `LlmService` pour le cloud) crée
+  **deux chemins de résolution LLM** = l'anti-pattern que le workspace combat
+  (`WORKSPACE_AS_PRODUCT.adoc`).
+. **Gains additifs mineurs.** Le seul apport réel (DI `BuildService` + rotation de ports
+  Ollama) est **petit** et réalisable **côté plantuml** (envelopper `LlmService` en
+  `BuildService`, ajouter une rotation de ports) **sans** adopter le hub.
+
+=== Conséquence
+
+* **CTX-05 = CADUQUE.** On **ne remplace pas** `LlmService`. `PLT-CONTEXT` se réduit à
+  `CTX-01`→`CTX-04` (le contexte augmenté — la vraie valeur) : **~10 pts**.
+* **Porte ouverte (hors périmètre plantuml).** Une **convergence LLM cross-borough**
+  (unifier le socle LLM dans codebase N1, avec pool de clés API cloud) serait un **EPIC
+  N1 codebase**, pas une décision plantuml — à arbitrer par le pilote si la parité devient
+  un objectif.
+* *Item futur optionnel plantuml* (non requis) : envelopper `LlmService` en `BuildService`
+  (DI) + rotation de ports Ollama — additif, sans adopter le hub.

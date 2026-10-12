@@ -1,5 +1,23 @@
 = Historique des Sessions
 
+== Session 232 (2026-10-12) — Arbitrage CTX-05 : LlmBuildService (VERDICT : CADUQUE) ✅
+
+Question pilote : remplacer le `LlmService` local par le hub N1 `LlmBuildService` ?
+**Non.** Audit comparatif (gouvernance pure, zéro code) : `LlmBuildService`
+(`codebase.koog.llm.service`) = résolution **1 provider** (`LlmServiceResolver.resolveProvider`)
++ **pool Ollama local** (`OllamaPool`/`OllamaInstanceScanner`, `RotationStrategy.ROUND_ROBIN`
+par ports) — **Ollama-centré**, sans pool de clés API cloud. `LlmService` (plantuml) = **7
+providers** (ollama/openai/gemini/mistral/claude/huggingface/groq) + `ApiKeyPool` (round-robin
++ tiered) + `QuotaTracker`/`QuotaResetManager` + **`CrossProviderFallbackOrchestrator`** +
+`FreemiumWeightCalculator` + `QuotaAuditLogger` + `ProviderModelResolver` → **superset**. Le
+remplacement serait une **régression** ; adopter les deux = **split-brain** (anti-pattern
+combattu par `WORKSPACE_AS_PRODUCT.adoc`). Gains additifs (DI `BuildService`, rotation de
+ports Ollama) petits, faisables **côté plantuml** sans le hub. **Verdict : CTX-05 CADUQUE** ;
+`PLT-CONTEXT` se réduit à `CTX-01`→`CTX-04` (~10 pts). Porte ouverte : convergence LLM
+cross-borough = **EPIC N1 codebase**, hors plantuml. Livrable : section § 11 du cadrage
+`.agents/CADRAGE_EPIC_PLT_CONTEXT.adoc` + BACKLOG/TODO synchronisés. Zéro code, zéro secret.
+Rapport `.agents/sessions/232-arbitrage-plt-context-ctx05.adoc`.
+
 == Session 231 (2026-10-12) — Cadrage EPIC PLT-CONTEXT (contexte augmenté via codebase N1) ✅
 
 Question pilote : la génération PlantUML doit-elle être confiée à un **contrat qui

@@ -1,5 +1,19 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-10
 
+== Session 232 (2026-10-12) — Arbitrage CTX-05 (LlmBuildService) ✅
+
+=== Fait
+- [x] Arbitrage CTX-05 : remplacer `LlmService` (N2) par le hub N1 `LlmBuildService` ? → **CADUQUE** ✅
+- [x] Audit comparatif : hub = 1 provider + pool Ollama par ports (Ollama-centré) ; `LlmService` = superset (7 providers + pool de clés API + quota + fallback + audit) ✅
+- [x] Motifs : superset (régression), hub Ollama-centré, split-brain, gains additifs mineurs ✅
+- [x] Section § 11 du cadrage `.agents/CADRAGE_EPIC_PLT_CONTEXT.adoc` + BACKLOG/TODO (CTX-05 ✅ CADUQUE, ~10 pts) ✅
+- [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 233 + archive ✅
+- [x] Zéro code modifié, zéro secret, zéro Python ✅
+
+=== Prochaine session (233)
+- **PLT-CONTEXT US-1 (`CTX-01` contrat N0) puis US-2 (`CTX-02` `PlantumlContextBuilder`)**
+- **Fichier à lire en priorité** : `.agents/CADRAGE_EPIC_PLT_CONTEXT.adoc` (§ 11)
+
 == Session 231 (2026-10-12) — Cadrage EPIC PLT-CONTEXT + dette CI ✅
 
 === Fait

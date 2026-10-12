@@ -10,7 +10,7 @@ patron capsule). plantuml applique le plugin codebase mais n'importe aucun type
 `codebase.*` ; contexte local statique. ~13 pts, 5 US.
 `.agents/CADRAGE_EPIC_PLT_CONTEXT.adoc` + BACKLOG § PLT-CONTEXT.
 
-. [ ] Arbitrer le périmètre (CTX-05 `LlmBuildService` inclus ?).
+. [x] Arbitrer **CTX-05** ✅ S-232 → **CADUQUE** (`LlmService` est un superset du hub ; le hub est Ollama-centré ; split-brain). `PLT-CONTEXT` = CTX-01→04 (~10 pts).
 . [ ] Vérifier `codebase-contracts:0.0.2` (Central) + alignement BOM.
 . [ ] Confirmer la source des canaux RAG/Graphify (injection `-Pcontext.*` vs artefact codebase).
 . [ ] US-1 (CTX-01 contrat N0) → US-2 (assembleur pur) → US-3 (collecteur) → US-4 (wiring) → US-5 (optionnel).
