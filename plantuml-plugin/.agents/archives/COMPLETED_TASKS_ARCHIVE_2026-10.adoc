@@ -1,5 +1,20 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-10
 
+== Session 234 (2026-10-12) — PLT-CONTEXT US-3 (CTX-03 collecteur + provenance) ✅
+
+=== Fait
+- [x] **Domaine pur** `plantuml.context` (provenance D-6) : `ProvenanceSource`/`ProvenanceChannel`/`ContextProvenance` (+ `toJson`) + `ProvenanceTracker` ✅
+- [x] Extension **additive** `PlantumlContextBuilder.build(composite, budget, tracker = null)` (élagage aux canaux survivants) ✅
+- [x] **Tâche** `collectPlantumlAugmentedContext` (EAGER + `-Pcontext.*` → `build/plantuml/augmented-context.txt` + `context-provenance.json`, `@DisableCachingByDefault`) ✅
+- [x] Enregistrement `PlantumlManager.Tasks.registerCollectAugmentedContextTask` + i18n `task.context.*` (10 langues) ✅
+- [x] Tests : **12 unit** (`ContextProvenanceTest`) + **+2** `PlantumlContextBuilderTest` + **4 functional** TestKit + BDD `30_plantuml_provenance.feature` (`@context @provenance`, 3 scénarios) + `PlantumlProvenanceSteps` ✅
+- [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 235 + BACKLOG (CTX-03 ✅) + TODO + archive ✅
+- [x] Local = Build (`compileKotlin`/`compileTestKotlin`/`compileFunctionalTestKotlin` + `assemble` + `validatePlugins` VERT) ; zéro secret, zéro Python, zéro publication ✅
+
+=== Prochaine session (235)
+- **PLT-CONTEXT US-4 (`CTX-04`)** : wiring `DiagramProcessor` (artefact `augmented-context.txt` dans le prompt ; `DocKnowledgeBase` = repli) → clôt PLT-CONTEXT 4/4
+- **Fichier à lire en priorité** : `.agents/CADRAGE_EPIC_PLT_CONTEXT.adoc`
+
 == Session 233 (2026-10-12) — PLT-CONTEXT US-1/2 (CTX-01/02) ✅
 
 === Fait

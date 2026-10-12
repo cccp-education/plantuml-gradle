@@ -1,5 +1,25 @@
 = Historique des Sessions
 
+== Session 234 (2026-10-12) — PLT-CONTEXT US-3 (CTX-03 collecteur `collectPlantumlAugmentedContext`) ✅
+
+Implémentation (baby-step DDD/TDD/BDD). **Domaine pur** `plantuml.context` de provenance
+(D-6) : `ProvenanceSource`/`ProvenanceChannel`/`ContextProvenance` (+ `toJson` Jackson
+`INDENT_OUTPUT`) + `ProvenanceTracker` (`trackChannel` last-write-wins + ignore vide,
+`retainOnly`, `build` snapshot immuable) ; extension **additive** de
+`PlantumlContextBuilder.build(composite, budget, tracker = null)` (élague le tracker aux
+canaux survivants, backward compatible). **Tâche Gradle** `collectPlantumlAugmentedContext`
+(`@DisableCachingByDefault`) : EAGER (`.agents/INDEX.adoc` + `PROMPT_REPRISE.adoc` +
+`AGENT.adoc`) + canaux injectés `-Pcontext.{ragContent,graphifyContent,docsContent,tokenBudget}`
+→ `build/plantuml/augmented-context.txt` + `context-provenance.json` ; enregistrée par
+`PlantumlManager.Tasks.registerCollectAugmentedContextTask` ; i18n `task.context.*` (10 langues).
+Tests 3 niveaux : **12 unit** (`ContextProvenanceTest`) + **+2** `PlantumlContextBuilderTest` ;
+**4 functional** TestKit (`CollectAugmentedContextFunctionalTest` : tâche, artefact, provenance,
+UP-TO-DATE) ; **BDD** `30_plantuml_provenance.feature` (`@context @provenance`, 3 scénarios) +
+`PlantumlProvenanceSteps`. Frontière D-1 : domaine = N0 uniquement ; provenance dupliquée N2
+(doctrine). Local = Build (`compileKotlin`/`compileTestKotlin`/`compileFunctionalTestKotlin`
+VERT, `assemble` + `validatePlugins` VERT) ; preuve = CI. **PLT-CONTEXT 3/4** (reste CTX-04).
+Zéro secret, zéro Python, zéro publication. Rapport `.agents/sessions/234-plt-context-us3-collector.adoc`.
+
 == Session 233 (2026-10-12) — PLT-CONTEXT US-1/2 (CTX-01 contrat N0 + CTX-02 assembleur pur) ✅
 
 Implémentation (baby-step DDD/TDD/BDD). **CTX-01** : `build.gradle.kts` adopte le

@@ -1,0 +1,76 @@
+= Session 234 — PLT-CONTEXT US-3 : collecteur `collectPlantumlAugmentedContext` (CTX-03)
+:session: 234
+:date: 2026-10-12
+:borough: HTOWN (plantuml-gradle)
+:type: feat + test (DDD/TDD/BDD)
+:statut: TERMINÉ
+:methode: baby-step DDD/TDD/BDD (unit → functional → cucumber)
+
+== Mission
+
+`PLT-CONTEXT` US-3 (`CTX-03`) : le **collecteur** `collectPlantumlAugmentedContext`
+(miroir de `CollectCapsuleAugmentedContextTask`) — EAGER (fichiers du consommateur) +
+canaux RAG/Graphify/Docs injectés (`-Pcontext.*`), budgétés, rendus →
+`build/plantuml/augmented-context.txt` + provenance `context-provenance.json`
+(décision D-6). Économie d'Encre : entrées/sorties Gradle-native (UP-TO-DATE).
+
+== Livré
+
+=== Baby-step A — domaine pur `plantuml.context` (provenance, D-6)
+
+* `ProvenanceSource` (data class) : `fileName` + `chars` + `tokens` (mesures).
+* `ProvenanceChannel` (data class) : `channel` + `sources` + `totalChars()`/`totalTokens()`.
+* `ContextProvenance` (data class) : `channels` + totaux dérivés + `toJson()`
+  (Jackson `INDENT_OUTPUT`, schéma `{ channels, totalChars, totalTokens }`).
+* `ProvenanceTracker` (accumulateur mutable) : `trackChannel` (last-write-wins,
+  ignore une liste vide), `retainOnly` (élagage aux canaux survivants), `build`
+  (snapshot immuable).
+* Extension **additive** de `PlantumlContextBuilder.build(composite, budget, tracker)`
+  (`tracker: ProvenanceTracker? = null`) : élague le tracker aux canaux ayant
+  survécu au budget. Backward compatible (défaut nul = zéro tracking).
+
+=== Baby-step B — tâche Gradle `collectPlantumlAugmentedContext`
+
+* `CollectPlantumlAugmentedContextTask` (`@DisableCachingByDefault`) :
+  * entrées : `eagerFiles` (`@InputFiles` RELATIVE), `ragContent`/`graphifyContent`/
+    `docsContent` (`@Input @Optional`), `tokenBudget` (`@Input`) ;
+  * sorties : `outputFile` (`build/plantuml/augmented-context.txt`) +
+    `provenanceFile` (`build/plantuml/context-provenance.json`) ;
+  * `run()` : construit `CompositeContext`, track les sources, `build` via le builder
+    (tracker), écrit l'artefact + la provenance, log `PLANTUML CONTEXT`/`PLANTUML PROVENANCE`,
+    warn si contexte vide.
+* Enregistrement dans `PlantumlManager.Tasks.registerCollectAugmentedContextTask` :
+  EAGER = `.agents/INDEX.adoc` + `PROMPT_REPRISE.adoc` + `AGENT.adoc` ; canaux via
+  `-Pcontext.{ragContent,graphifyContent,docsContent,tokenBudget}`.
+* i18n : `task.context.group` / `task.context.description` ajoutés aux **10** `Messages*.properties`.
+
+== Tests (3 niveaux)
+
+* Unit : `ContextProvenanceTest` (**12** — source default/fields, channel agrégats,
+  `ContextProvenance` JSON vide/plein/totaux, tracker vide/snapshot immuable/ignore
+  vide/remplace/`retainOnly`) + `PlantumlContextBuilderTest` **+2** (élagage du tracker
+  au survivant, tracker nul inoffensif).
+* Functional (TestKit) : `CollectAugmentedContextFunctionalTest` (**4** — tâche
+  enregistrée, artefact EAGER+RAG+Graphify, provenance JSON, UP-TO-DATE).
+* BDD : `30_plantuml_provenance.feature` (`@context @provenance`, 3 scénarios) +
+  `PlantumlProvenanceSteps` (glue `plantuml.scenarios`, steps préfixés S-088).
+* Local = Build : `compileKotlin`/`compileTestKotlin`/`compileFunctionalTestKotlin`
+  **VERTS**, `assemble` + `validatePlugins` **VERTS**. **Tests = CI.**
+
+== Décisions / notes
+
+* **D-1** respecté : le domaine n'importe que `contracts.context.*` (N0), jamais
+  un type `codebase.*` (N1) ni N2.
+* Provenance dupliquée N2 (patron capsule) : doctrine workspace — la duplication
+  verbatim entre N2 est tolérée, N0 réservé aux contrats (cf. cadrage LLM-RESILIENCE).
+* Aucune **nouvelle option** de config : l'injection est CLI (`-Pcontext.*`, défaut
+  vide) — conforme à D-7 (défaut off).
+* Publication Maven Central **non déclenchée** (hors périmètre CTX-03 ; accord pilote requis).
+
+== Reste à faire
+
+* [ ] `CTX-04` — wiring `DiagramProcessor` : injecter le contexte augmenté dans le
+  prompt de génération ; `DocKnowledgeBase` devient **repli** hors-ligne.
+* [ ] Session suivante (235) : `CTX-04` (clôt PLT-CONTEXT 4/4).
+
+_Score : 9/10 (DDD/TDD/BDD 3 niveaux, patron capsule fidèle, Économie d'Encre, zéro secret)._

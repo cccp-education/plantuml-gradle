@@ -11,9 +11,9 @@ patron capsule). plantuml applique le plugin codebase mais n'importe aucun type
 `.agents/CADRAGE_EPIC_PLT_CONTEXT.adoc` + BACKLOG § PLT-CONTEXT.
 
 . [x] Arbitrer **CTX-05** ✅ S-232 → **CADUQUE** (`LlmService` est un superset du hub ; le hub est Ollama-centré ; split-brain). `PLT-CONTEXT` = CTX-01→04 (~10 pts).
-. [ ] Vérifier `codebase-contracts:0.0.2` (Central) + alignement BOM.
-. [ ] Confirmer la source des canaux RAG/Graphify (injection `-Pcontext.*` vs artefact codebase).
-. [x] US-1 (CTX-01 contrat N0) ✅ S-233 → US-2 (assembleur pur `PlantumlContextBuilder`) ✅ S-233 → US-3 (collecteur) → US-4 (wiring).~~US-5 (optionnel)~~ ✅ CADUQUE S-232.
+. [x] Vérifier `codebase-contracts:0.0.2` (Central) + alignement BOM. ✅ adopté S-233 (BOM 0.0.78).
+. [x] Confirmer la source des canaux RAG/Graphify (injection `-Pcontext.*` vs artefact codebase). → **tranché S-234** : injection CLI `-Pcontext.*` (patron capsule, mockable), l'intégration pgvector N1 est hors scope de la tâche.
+. [x] US-1 (CTX-01 contrat N0) ✅ S-233 → US-2 (assembleur pur `PlantumlContextBuilder`) ✅ S-233 → US-3 (collecteur `collectPlantumlAugmentedContext` + provenance) ✅ S-234 → US-4 (wiring `DiagramProcessor`).~~US-5 (optionnel)~~ ✅ CADUQUE S-232.
 
 == ✅ EPIC PLT-AGENT (cadré S-228, vision S-229, TERMINÉ S-230)
 

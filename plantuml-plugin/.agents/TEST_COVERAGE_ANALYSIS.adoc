@@ -1,6 +1,26 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 233 (12 octobre 2026) — PLT-CONTEXT US-1/2 (CTX-01/02)
+_Dernière mise à jour_ : Session 234 (12 octobre 2026) — PLT-CONTEXT US-3 (CTX-03 collecteur + provenance)
+
+=== Session 234 — PLT-CONTEXT US-3 (CTX-03 collecteur `collectPlantumlAugmentedContext`)
+
+Session 234 (2026-10-12) : collecteur du contexte augmenté + provenance (D-6),
+patron capsule. Baby-step DDD/TDD/BDD 3 niveaux.
+
+* `src/test/kotlin/plantuml/context/ContextProvenanceTest.kt` — **12 unit**
+  (`ProvenanceSource` defaults/champs, `ProvenanceChannel` agrégats,
+  `ContextProvenance` JSON vide/plein/totaux, `ProvenanceTracker` vide /
+  snapshot immuable / ignore liste vide / remplace canal répété / `retainOnly`).
+* `src/test/kotlin/plantuml/context/PlantumlContextBuilderTest.kt` — **+2 unit**
+  (le builder élague le tracker aux canaux survivants ; tracker nul = zéro tracking).
+* `src/functionalTest/kotlin/plantuml/CollectAugmentedContextFunctionalTest.kt` —
+  **4 functional** TestKit (tâche enregistrée ; artefact EAGER+RAG+Graphify ;
+  provenance JSON D-6 ; UP-TO-DATE inchangé — Économie d'Encre).
+* `src/test/features/30_plantuml_provenance.feature` — **BDD `@context @provenance`**
+  (3 scénarios) + `PlantumlProvenanceSteps` (glue `plantuml.scenarios`, steps
+  préfixés S-088).
+* Local = Build : `compileKotlin`/`compileTestKotlin`/`compileFunctionalTestKotlin`
+  + `assemble` + `validatePlugins` **VERTS**. **Tests = CI** (preuve = run CI).
 
 === Session 226 — GBL-010 G-3 (intégrité de label PlantUML)
 
