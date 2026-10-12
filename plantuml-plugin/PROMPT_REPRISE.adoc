@@ -1,24 +1,23 @@
-= PROMPT_REPRISE — Plantuml — Session 237
-:session: 237
+= PROMPT_REPRISE — Plantuml — Session 238
+:session: 238
 :date: 2026-10-12
 
-== État — PLT-AGENT ✅ 7/7 ; PLT-CONTEXT ✅ 4/4 ; GBL-010 G-3b ✅ (S-236)
+== État — PLT-AGENT ✅ 7/7 ; PLT-CONTEXT ✅ 4/4 ; GBL-010 G-3b ✅ (S-236) ; G-3 correction ✅ (S-237)
 
-* **EPIC `PLT-AGENT` ✅ 7/7** (S-230) — techniques `diag-agent` (domaine pur `plantuml.agent`).
-* **EPIC `PLT-CONTEXT` ✅ 4/4 TERMINÉ** (S-235) — contexte augmenté (CTX-01→04).
-* **GBL-010 `G-3b` ✅ S-236** — feuille `[plantuml]` : `plantuml.repair`
-  (`PlantumlBlockStatus`/`PlantumlBlockEntry`/`PlantumlBlockClassifier`/`PlantumlBlockReport`)
-  expose le **statut par bloc** + la **version toolchain** (JSON) à l'arbre unifié (G-4).
+* **EPIC `PLT-AGENT` ✅ 7/7** (S-230).
+* **EPIC `PLT-CONTEXT` ✅ 4/4 TERMINÉ** (S-235).
+* **GBL-010 `G-3b` ✅ S-236** — feuille `[plantuml]` : statut par bloc + version toolchain.
+* **GBL-010 `G-3` (correction) ✅ S-237** — `plantuml.repair` : `PlantumlBlockCorrector`
+  (réparation déterministe `\n` + port IA `PlantumlBlockRepairer`, round-trip D5) +
+  `ChatModelBlockRepairer` (adaptateur de référence, réutilise `LlmCodeExtractor` DIA-04).
 * **CI** : workflows obsolètes supprimés ; cache pgvector + cache Ollama `qwen3.5:0.8b`.
 
-== Mission Session 237 — au choix pilote
+== Mission Session 238 — au choix pilote
 
-* **GBL-010 `G-3` (reste)** — correction assistée IA des blocs `PENDING` (au-delà de
-  `PlantumlLabelIntegrity`) ; round-trip, `\n`, notes. **Candidat par défaut** (borné,
-  réutilise `PlantUmlTranslationPort` N0 + `DiagramOutputProbe`).
-* **PLT-DIAGRAM-OWNERSHIP US-6** — chaîne E2E bakery→document→port→plantuml (rendu non
-  blanc), cross-borough (3 pts).
-* **PLT-DIAGRAM-OWNERSHIP US-7** — dogfooding + non-régression (re-bake cheroliv.com) (2 pts).
+* **PLT-DIAGRAM-OWNERSHIP US-6** — chaîne de transmission E2E bakery→document→port→plantuml
+  (rendu non blanc), cross-borough (3 pts). **Candidat par défaut.**
+* **PLT-DIAGRAM-OWNERSHIP US-7** — dogfooding + non-régression (re-bake cheroliv.com, contrat VERT) (2 pts).
+* **GBL-010 `G-3` (reste)** — traitement explicite des **notes** PlantUML.
 * **PLT-AGENT (optionnels)** — FT TestKit `preflightPlantumlDescription` + mock LLM ;
   vérifier qu'un modèle du pool expose la vision.
 
@@ -27,8 +26,7 @@
 * **Local = Build, Tests = CI** : ne jamais lancer `test`/`check` en local. Preuve = CI.
 * **DAG** : plantuml (N2) consomme **N0** (`contracts.*`) et **N1** (codebase) ; **jamais N2→N2**.
   Repli hors-ligne conservé. **NE PAS** remplacer `LlmService` (CTX-05 CADUQUE).
-* **GBL-010** : la feuille plantuml est **pure** (classifieur) — le parcours AST (document G-2)
-  et la fusion des 3 rapports (cheroliv G-4) sont hors plantuml.
+* **US-6** touche bakery/document → **arbitrage pilote** probable (cross-borough).
 * Nouvelle option → config 4 sources + CLI, défaut `false`. English only ; zéro Python ;
   zéro secret ; baby-step DDD/TDD/BDD ; runner Cucumber global unique, steps préfixés (S-088).
 
@@ -37,5 +35,5 @@
 * GroupId `education.cccp` — version `plantuml = "0.0.9"` (catalog ws 0.0.78).
 * BOM `workspace-bom` **0.0.78** ; N0 `plantuml-contracts:0.0.1`, `i18n-contracts:0.0.3`,
   `codebase-contracts:0.0.2`.
-* EPICs : **PLT-AGENT ✅ 7/7**, **PLT-CONTEXT ✅ 4/4**, GBL-010 (`G-3` partiel / `G-3b` ✅,
+* EPICs : **PLT-AGENT ✅ 7/7**, **PLT-CONTEXT ✅ 4/4**, GBL-010 (G-3/G-3b ✅ côté feuille ;
   G-1/G-2/G-4 hors plantuml), PLT-DIAGRAM-OWNERSHIP (US-6/7).

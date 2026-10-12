@@ -1,0 +1,70 @@
+= Session 237 — GBL-010 G-3 : correction d'un bloc PlantUML (déterministe + assistée IA)
+:session: 237
+:date: 2026-10-12
+:borough: HTOWN (plantuml-gradle)
+:type: feat + test (DDD/TDD/BDD)
+:statut: TERMINÉ
+:methode: baby-step DDD/TDD/BDD (unit → cucumber)
+
+== Mission
+
+EPIC transverse **GBL-010** (arbre de traduction), branche Data, **G-3 (reste)** : la
+feuille `[plantuml]` **corrige** les blocs qui ne convergent pas — réparation
+**déterministe** (`\n`) puis **assistée par IA** — toujours derrière le **round-trip**
+(D5 : un bloc qui ne re-parse pas est rejeté, la source est préservée).
+
+== Livrable — domaine pur `plantuml.repair` + adaptateur IA
+
+* `PlantumlBlockRepairer` — **port** (`fun interface`) : `repair(source): String?`
+  (propose une source corrigée, jamais acceptée sans round-trip).
+* `PlantumlCorrectionStrategy` — enum `DETERMINISTIC` / `AI` / `PRESERVED`.
+* `PlantumlBlockCorrection` — data class `source` + `status` + `strategy`
+  (`corrected` = stratégie ≠ PRESERVED).
+* `PlantumlBlockCorrector` — objet **pur** : pipeline
+  1. déterministe (`PlantumlLabelIntegrity.repair` sur un label cassé D2) ;
+  2. IA (port injecté) **acceptée seulement si elle re-parse** ;
+  3. sinon source préservée verbatim.
+  Un bloc déjà `TRANSLATED`/`MISSING` est un no-op (`PRESERVED`).
+* `ChatModelBlockRepairer` — **adaptateur de référence** du port : prompt
+  (English only) → `ChatModel.chat` → extraction via `LlmCodeExtractor` (PLT-AGENT
+  DIA-04, fenced puis `@startuml…@enduml`). Ne valide pas (le correcteur tient la porte).
+
+*Frontière* : le **domaine pur** (pipeline) + l'adaptateur ; le round-trip est le N0
+`PlantUmlSyntaxValidator`. La feuille est consommée par l'arbre unifié G-4.
+
+== Tests (Local = Build, Tests = CI)
+
+* Unit — `PlantumlBlockCorrectorTest` (9) : TRANSLATED/MISSING préservés, label cassé
+  réparé déterministe (avec/sans validateur), bloc `PENDING` corrigé par l'IA quand il
+  re-parse, proposition IA non-parsable rejetée, sans repairer préservé, proposition
+  nulle ignorée, sans validateur l'IA n'est pas consultée.
+* Unit — `ChatModelBlockRepairerTest` (3) : extraction fenced, extraction brute, null.
+* BDD — `33_plantuml_block_correction.feature` (`@plantuml-correction`, 4 scénarios) +
+  `PlantumlBlockCorrectionSteps` (glue `plantuml.scenarios`, steps préfixés S-088).
+* Local = Build : compile 3 source sets + `assemble` + `validatePlugins` **VERTS**.
+  **Tests = CI.**
+
+== Fichiers
+
+[cols="1,3"]
+|===
+| Type | Fichier
+
+| prod (nouveau) | `src/main/kotlin/plantuml/repair/PlantumlBlockRepairer.kt`
+| prod (nouveau) | `src/main/kotlin/plantuml/repair/PlantumlCorrectionStrategy.kt`
+| prod (nouveau) | `src/main/kotlin/plantuml/repair/PlantumlBlockCorrection.kt`
+| prod (nouveau) | `src/main/kotlin/plantuml/repair/PlantumlBlockCorrector.kt`
+| prod (nouveau) | `src/main/kotlin/plantuml/repair/ChatModelBlockRepairer.kt`
+| test (nouveau) | `src/test/kotlin/plantuml/repair/PlantumlBlockCorrectorTest.kt`
+| test (nouveau) | `src/test/kotlin/plantuml/repair/ChatModelBlockRepairerTest.kt`
+| test (nouveau) | `src/test/features/33_plantuml_block_correction.feature`
+| test (nouveau) | `src/test/scenarios/plantuml/scenarios/PlantumlBlockCorrectionSteps.kt`
+|===
+
+== Reste (GBL-010 / PLT-DIAGRAM-OWNERSHIP)
+
+* **G-3 (reste)** — traitement explicite des **notes** PlantUML ; G-1/G-2/G-4 hors plantuml.
+* **US-6** chaîne E2E bakery→document→port→plantuml ; **US-7** dogfooding + non-régression.
+* **Fichier à lire en priorité** : `PROMPT_REPRISE.adoc` (session 238).
+
+_Score : 9/10 (DDD/TDD/BDD, pipeline pur + port IA + adaptateur de référence, réutilise PLT-AGENT DIA-04)._

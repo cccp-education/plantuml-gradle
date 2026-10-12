@@ -1,5 +1,18 @@
 = Historique des Sessions
 
+== Session 237 (2026-10-12) — GBL-010 G-3 (correction d'un bloc PlantUML : déterministe + IA) ✅
+
+Implémentation (baby-step DDD/TDD/BDD). **Domaine pur** `plantuml.repair` : `PlantumlBlockRepairer`
+(port `fun interface`), `PlantumlCorrectionStrategy` (`DETERMINISTIC`/`AI`/`PRESERVED`),
+`PlantumlBlockCorrection` (`source`+`status`+`strategy`), `PlantumlBlockCorrector` (pipeline pur :
+réparation déterministe `PlantumlLabelIntegrity.repair` sur label cassé D2 → port IA accepté **seulement
+si re-parse** → sinon source préservée, round-trip D5). **Adaptateur de référence** `ChatModelBlockRepairer`
+(prompt English → `ChatModel.chat` → `LlmCodeExtractor` PLT-AGENT DIA-04). Tests : **9 unit**
+(`PlantumlBlockCorrectorTest`) + **3 unit** (`ChatModelBlockRepairerTest`) + **BDD**
+`33_plantuml_block_correction.feature` (`@plantuml-correction`, 4 scénarios) + `PlantumlBlockCorrectionSteps`.
+Local = Build (compile 3 source sets + `assemble` + `validatePlugins` VERT) ; preuve = CI. Zéro secret,
+zéro Python, zéro publication. Rapport `.agents/sessions/237-gbl010-g3-corrector.adoc`.
+
 == Session 236 (2026-10-12) — GBL-010 G-3b (feuille PlantUML : statut par bloc + version toolchain) ✅
 
 Implémentation (baby-step DDD/TDD/BDD). **Domaine pur** `plantuml.repair` : `PlantumlBlockStatus`

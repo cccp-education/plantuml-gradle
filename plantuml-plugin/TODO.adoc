@@ -54,8 +54,9 @@ PLT-CR3-2 (probe sortie diagramme) ✅ S-224 — EPIC PLT-CR3 TERMINÉ 2/2.
 US-4 ✅ S-283/S-284 (document délègue, bakery injecte). Reste US-6 (chaîne E2E) / US-7 (dogfooding).
 
 → **GBL-010** (arbre de traduction) : G-3 `PlantumlLabelIntegrity` ✅ S-226 ; **G-3b ✅ S-236**
-(feuille `plantuml.repair` : statut par bloc + version toolchain exposés). Reste **G-3 correction
-IA des blocs `PENDING`** ; G-1/G-2/G-4 hors plantuml.
+(feuille `plantuml.repair` : statut par bloc + version toolchain exposés) ; **G-3 correction ✅ S-237**
+(`PlantumlBlockCorrector` déterministe+IA round-trip + `ChatModelBlockRepairer`). Reste **notes PlantUML** ;
+G-1/G-2/G-4 hors plantuml.
 
 == Pool de clés freemium rotatif
 

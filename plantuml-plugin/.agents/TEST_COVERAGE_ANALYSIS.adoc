@@ -1,6 +1,22 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 236 (12 octobre 2026) — GBL-010 G-3b (feuille PlantUML : statut par bloc + version toolchain)
+_Dernière mise à jour_ : Session 237 (12 octobre 2026) — GBL-010 G-3 (correction d'un bloc PlantUML)
+
+=== Session 237 — GBL-010 G-3 (correction d'un bloc PlantUML : déterministe + IA)
+
+Session 237 (2026-10-12) : la feuille `[plantuml]` corrige les blocs non convergés.
+Baby-step DDD/TDD/BDD.
+
+* `src/test/kotlin/plantuml/repair/PlantumlBlockCorrectorTest.kt` — **9 unit**
+  (TRANSLATED/MISSING préservés, label cassé réparé déterministe avec/sans validateur,
+  bloc `PENDING` corrigé par l'IA si re-parse, proposition IA invalide rejetée, sans
+  repairer préservé, proposition nulle ignorée, sans validateur l'IA n'est pas consultée).
+* `src/test/kotlin/plantuml/repair/ChatModelBlockRepairerTest.kt` — **3 unit**
+  (extraction fenced / brute / null via `LlmCodeExtractor`).
+* `src/test/features/33_plantuml_block_correction.feature` — **BDD `@plantuml-correction`**
+  (4 scénarios) + `PlantumlBlockCorrectionSteps` (glue `plantuml.scenarios`, steps préfixés S-088).
+* Local = Build : 3 source sets `compile*Kotlin` + `assemble` + `validatePlugins` **VERTS**.
+  **Tests = CI** (preuve = run CI).
 
 === Session 236 — GBL-010 G-3b (feuille PlantUML : statut par bloc + version toolchain)
 
