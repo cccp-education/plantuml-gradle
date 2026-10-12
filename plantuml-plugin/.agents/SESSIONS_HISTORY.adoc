@@ -1,5 +1,18 @@
 = Historique des Sessions
 
+== Session 241 (2026-10-12) — Cadrage cross-borough PLT-DIAGRAM-OWNERSHIP US-6/US-7 ✅
+
+Gouvernance pure (zéro code). Audit de la chaîne E2E : **MEMPHIS N0 ✅** (`plantuml-contracts:0.0.1`),
+**plantuml ✅** (port US-2, round-trip US-3, toolchain US-5, GBL-010), **document ✅** (US-4
+`DocumentTranslatorPlantUmlPortTest` + `plantuml_validation.feature`), **bakery 🟡 partiel**
+(`MigrateContentI18nDeploySmokeFunctionalTest`/`CherolivComDogfoodingDryRunFunctionalTest` : article
+`[plantuml]` traduit sans crash, **mais** pas d'assertion « labels traduits + round-trip + rendu non
+blanc »), **cheroliv.com 🟡** (garde `DiagramIntegrity`). **US-6** = FT bakery 2 niveaux (contrat sans
+bake + rendu non blanc gaté) ; **US-7** = re-bake cheroliv.com. Ordonnancement : S-242/243 bakery,
+S-244 cheroliv. Décisions D-U6/D-U7 (US-6 dans bakery, aucun N2→N2, pas de nouveau domaine). Doc
+`.agents/CADRAGE_PLT_DIAGRAM_OWNERSHIP_US6_US7.adoc` ; BACKLOG US-6/US-7 CADRÉS S-241. Zéro secret,
+zéro Python. Rapport `.agents/sessions/241-cadrage-us6-us7.adoc`.
+
 == Session 240 (2026-10-12) — FIX-BASELINE `FilePermission` (résolu : durcissement environnemental) ✅
 
 Dette historique S-030 soldée. **Diagnostic par logs CI** (Local = Build, Tests = CI) : les **4**

@@ -1,5 +1,19 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-10
 
+== Session 241 (2026-10-12) — Cadrage cross-borough PLT-DIAGRAM-OWNERSHIP US-6/US-7 ✅
+
+=== Fait
+- [x] Audit de la chaîne E2E (MEMPHIS N0 ✅ / plantuml ✅ / document ✅ / bakery 🟡 / cheroliv 🟡) ✅
+- [x] Spec US-6 (FT bakery 2 niveaux : contrat sans bake + rendu non blanc gaté) + US-7 (re-bake cheroliv) ✅
+- [x] Doc `.agents/CADRAGE_PLT_DIAGRAM_OWNERSHIP_US6_US7.adoc` + décisions D-U6/D-U7 ✅
+- [x] BACKLOG : US-6/US-7 CADRÉS S-241 (bakery S-242/243, cheroliv S-244) ; statut EPIC à jour ✅
+- [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 242 + archive ✅
+- [x] Gouvernance pure (zéro code, zéro test, zéro publication) ; zéro secret, zéro Python ✅
+
+=== Prochaine session (242)
+- **bakery-gradle US-6a** (FT contrat : bloc extrait + labels traduits + round-trip valide)
+- **Fichier à lire en priorité** : `.agents/CADRAGE_PLT_DIAGRAM_OWNERSHIP_US6_US7.adoc`
+
 == Session 240 (2026-10-12) — FIX-BASELINE `FilePermission` (résolu : durcissement environnemental) ✅
 
 === Fait

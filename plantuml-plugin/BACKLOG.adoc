@@ -139,7 +139,7 @@ garde anti-drift local↔CI préservée.
 == 🟡 EPIC PLT-DIAGRAM-OWNERSHIP — Le borough plantuml possède le bloc diagramme (CADRÉ S-219, US-1→US-3 + US-5 ✅)
 
 *GBL* : EPIC transverse **GBL-007** (BACKLOG racine workspace) — propriété du pipeline PlantUML.
-*Statut* : 🟡 EN COURS — US-1 ✅ (S-280 MEMPHIS), US-2 ✅ (S-220), US-3 ✅ (S-221), US-5 ✅ (S-222, partie toolchain), reste US-4/US-6/US-7 (D2/D3 côté cheroliv)
+*Statut* : 🟡 EN COURS — US-0 ✅, US-1 ✅ (S-280 MEMPHIS), US-2 ✅ (S-220), US-3 ✅ (S-221), US-4 ✅ (S-283/S-284), US-5 ✅ (S-222) ; **reste US-6/US-7 CADRÉS S-241** (E2E bakery + dogfooding cheroliv — `.agents/CADRAGE_PLT_DIAGRAM_OWNERSHIP_US6_US7.adoc`)
 *Cadrage* : `.agents/CADRAGE_EPIC_PLT_DIAGRAM_OWNERSHIP.adoc`
 *Priorité* : 🟠 HAUTE — cause racine cross-borough de CHE-DIAGRAM (diagrammes blancs)
 *Charge* : ~22 pts (8 US, ~6 sessions)
@@ -156,8 +156,8 @@ garde anti-drift local↔CI préservée.
 | US-3 | Correction/garantie de syntaxe — round-trip obligatoire, bloc cassé jamais publié + BDD `@plantuml-roundtrip` | 3 | ✅ S-221
 | US-4 | document délègue au contrat — suppression `PlantUmlClassifier`/`PlantUmlStrategy`/`PlantUmlTranslationAdapter` privés (option A : bakery injecte le port) | 4 | ✅ S-283 (document, seam) + S-284 (document types/adaptateur supprimés, bakery injecte, document 0.0.23 + bakery 0.0.25 Central)
 | US-5 | Version toolchain gouvernée — plantuml expose la version, bakery s'aligne, garde anti-drift | 3 | ✅ S-222 (partie plantuml : domaine `plantuml.toolchain` = source unique D6 + garde anti-drift `@toolchain` ; D1 fixé via runner+bakery S-250 ; reste garde côté bakery/runner)
-| US-6 | Chaîne de transmission E2E (bakery→document→port→plantuml, rendu non blanc) | 3 | 🟡 À FAIRE
-| US-7 | Dogfooding + non-régression (re-bake cheroliv.com, contrat VERT) | 2 | 🟡 À FAIRE
+| US-6 | Chaîne de transmission E2E (bakery→document→port→plantuml, rendu non blanc) | 3 | 🟡 CADRÉ S-241 → **bakery-gradle S-242/243** (`.agents/CADRAGE_PLT_DIAGRAM_OWNERSHIP_US6_US7.adoc`)
+| US-7 | Dogfooding + non-régression (re-bake cheroliv.com, contrat VERT) | 2 | 🟡 CADRÉ S-241 → **cheroliv.com S-244** (`.agents/CADRAGE_PLT_DIAGRAM_OWNERSHIP_US6_US7.adoc`)
 |===
 
 '''

@@ -1,38 +1,36 @@
-= PROMPT_REPRISE — Plantuml — Session 241
-:session: 241
+= PROMPT_REPRISE — Plantuml — Session 242
+:session: 242
 :date: 2026-10-12
 
-== État — dette fonctionnelle soldée ; reste cross-borough + optionnels
+== État — plantuml-local TOUT soldé ; reste cross-borough (cadré S-241)
 
-* **PLT-AGENT ✅ 7/7** (+ FT `preflightPlantumlDescription` S-238).
-* **PLT-CONTEXT ✅ 4/4** (S-235).
-* **GBL-010 feuille plantuml ✅** — G-3b (S-236) + G-3 correction (S-237) + notes & câblage port (S-238/S-239).
-* **FIX-BASELINE ✅ entièrement résolu** — cucumber (S-217) + functional `FilePermission`
-  (S-240, durcissement `assumeTrue` : environnement root/conteneur).
-* **Drift gouvernance** corrigé S-238 (`ROADMAP.adoc`, `TODO.adoc`).
-* **CI** : workflows obsolètes supprimés ; cache pgvector + cache Ollama `qwen3.5:0.8b`.
+* **PLT-AGENT ✅ 7/7** (+ FT preflight S-238) ; **PLT-CONTEXT ✅ 4/4** (S-235).
+* **GBL-010 feuille plantuml ✅** (G-3b S-236, G-3 correction S-237, notes+câblage S-238/S-239).
+* **FIX-BASELINE ✅** (cucumber S-217 + functional FilePermission S-240).
+* **PLT-DIAGRAM-OWNERSHIP** : US-0→5 ✅ ; **US-6/US-7 CADRÉS S-241**
+  (`.agents/CADRAGE_PLT_DIAGRAM_OWNERSHIP_US6_US7.adoc`).
 
-== Mission Session 241 — au choix pilote
+== Mission Session 242 — cross-borough (bakery-gradle)
 
-* **PLT-DIAGRAM-OWNERSHIP US-6** — chaîne E2E bakery→document→port→plantuml (rendu non blanc),
-  cross-borough (**arbitrage pilote requis**), 3 pts. **Candidat par défaut.**
-* **PLT-DIAGRAM-OWNERSHIP US-7** — dogfooding + non-régression (re-bake cheroliv.com) (2 pts).
-* **PLT-AGENT optionnel (b)** — vérifier qu'un modèle du pool expose la vision.
+* **US-6a (bakery-gradle)** — FT « contrat » : `migrateContentI18n` sur l'article cheroliv
+  à `[plantuml]` → bloc extrait + labels traduits + **round-trip valide** (validator N0),
+  **sans bake** (CI-friendly). Étendre/ajouter dans
+  `MigrateContentI18nDeploySmokeFunctionalTest` / `CherolivComDogfoodingDryRunFunctionalTest`.
+  **Candidat par défaut.**
+* **US-6b (bakery-gradle, S-243)** — FT « rendu » : SVG/PNG **non blanc** au bake (gaté toolchain).
+* **US-7 (cheroliv.com, S-244)** — re-bake référence + variantes, garde `DiagramIntegrity`, contrat VERT.
+* Côté plantuml-local : **PLT-AGENT optionnel (b)** (vérifier vision d'un modèle du pool).
 
 == Points d'attention
 
-* **Local = Build, Tests = CI** : ne jamais lancer `test`/`check` en local. Preuve = CI.
-* **DAG** : plantuml (N2) consomme **N0** (`contracts.*`) et **N1** (codebase) ; **jamais N2→N2**.
-  Repli hors-ligne conservé. **NE PAS** remplacer `LlmService` (CTX-05 CADUQUE).
-* **US-6/US-7** touchent bakery/document → **arbitrage pilote** probable (cross-borough).
-* Nouvelle option → config 4 sources + CLI, défaut `false`. English only ; zéro Python ;
-  zéro secret ; baby-step DDD/TDD/BDD ; runner Cucumber global unique, steps préfixés (S-088).
+* **Local = Build, Tests = CI** : par borough. Preuve = CI du borough modifié.
+* **DAG** : N0 (MEMPHIS) → plantuml (N2) → document (N2) → bakery (N2) → cheroliv (site).
+  **Un borough par session** (gouvernance workspace) — ne pas mélanger.
+* **US-6** vit dans **bakery-gradle** (aucun N2→N2) ; plantuml fournit le port + `DiagramOutputProbe`.
+* English only ; zéro Python ; zéro secret ; baby-step DDD/TDD/BDD ; steps préfixés (S-088).
 
 == Rappels
 
-* GroupId `education.cccp` — version `plantuml = "0.0.9"` (catalog ws 0.0.78).
-* BOM `workspace-bom` **0.0.78** ; N0 `plantuml-contracts:0.0.1`, `i18n-contracts:0.0.3`,
-  `codebase-contracts:0.0.2`.
-* EPICs plantuml-local : **tous soldés** (PLT-AGENT, PLT-CONTEXT, GBL-010 feuille, FIX-BASELINE).
-  Reste : PLT-DIAGRAM-OWNERSHIP (US-6/7, cross-borough) ; GBL-010 G-1/G-2/G-4 (hors plantuml) ;
-  PLT-AGENT optionnel (b) ; PL-3 (bloqué ABIDJAN).
+* Plantuml `0.0.9` (catalog ws 0.0.78) ; N0 `plantuml-contracts:0.0.1`.
+* Cadrage US-6/US-7 : `.agents/CADRAGE_PLT_DIAGRAM_OWNERSHIP_US6_US7.adoc`.
+* Plantuml-local : **tous les EPICs soldés** — le borough est en mode maintenance.

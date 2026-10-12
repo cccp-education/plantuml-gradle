@@ -1,0 +1,60 @@
+= Session 241 — Cadrage cross-borough PLT-DIAGRAM-OWNERSHIP US-6 / US-7
+:session: 241
+:date: 2026-10-12
+:borough: HTOWN (plantuml-gradle) — cadrage piloté
+:type: gouvernance pure (zéro code)
+:statut: TERMINÉ
+:methode: audit + plan cross-borough (pattern S-057/S-063)
+
+== Mission
+
+Cadrer les deux dernières US de `PLT-DIAGRAM-OWNERSHIP` (GBL-007) : **US-6** (chaîne de
+transmission E2E) et **US-7** (dogfooding cheroliv.com). Ces US traversent **3 boroughs
+gouvernés** (document, bakery, cheroliv.com) — l'implémentation se fait par **sessions
+dédiées** (un borough par session).
+
+== Audit de la chaîne (état 2026-10-12)
+
+|===
+| Maillon | État | Preuve
+
+| MEMPHIS N0 `plantuml-contracts:0.0.1` | ✅ | `PlantUmlBlock`/`Strategy`/`Classifier`/`SyntaxValidator`/`TranslationPort`
+| plantuml N2 | ✅ | port (US-2), round-trip (US-3), toolchain (US-5), GBL-010
+| document N2 | ✅ | `DocumentTranslatorPlantUmlPortTest` (US-4) + `plantuml_validation.feature`
+| bakery N2 | 🟡 partiel | FT traduisent `[plantuml]` **sans crash** ; **manque** l'assertion labels+round-trip+rendu non blanc
+| cheroliv.com | 🟡 | garde `DiagramIntegrity` (`CADRAGE_EPIC_CHE_DIAGRAM.adoc`)
+|===
+
+*Conclusion* : la cause racine cross-borough est traitée ; il manque la **preuve E2E** (US-6)
+et le **dogfooding** (US-7).
+
+== Livrable
+
+* `.agents/CADRAGE_PLT_DIAGRAM_OWNERSHIP_US6_US7.adoc` — audit + spec US-6 (2 niveaux :
+  contrat sans bake / rendu non blanc gaté) + spec US-7 + décisions D-U6/D-U7 + ordonnancement.
+* `BACKLOG.adoc` — US-6/US-7 **CADRÉS S-241** (bakery S-242/243, cheroliv S-244) ;
+  statut EPIC mis à jour (US-4 ✅ S-283/S-284).
+
+== Décisions
+
+* **D-U6-1** — US-6 vit dans **bakery-gradle** (orchestrateur/bake) ; plantuml fournit le port
+  + `DiagramOutputProbe` (aucun N2→N2).
+* **D-U6-2** — Deux niveaux : contrat (bloc+labels+round-trip, sans bake, CI-friendly) **puis**
+  rendu (SVG non blanc, gaté toolchain).
+* **D-U6-3** — Pas de nouveau domaine (réutilisation N0 + probe).
+* **D-U7-1** — US-7 = session **cheroliv.com** distincte (site gouverné).
+* **D-U7-2** — Ordre : US-6 (bakery) → US-7 (cheroliv).
+
+== Ordonnancement
+
+* **S-242** bakery-gradle — US-6a (FT contrat : bloc extrait + labels traduits + round-trip).
+* **S-243** bakery-gradle — US-6b (FT rendu : SVG non blanc, gaté).
+* **S-244** cheroliv.com — US-7 (re-bake référence + variantes, contrat VERT).
+
+== Notes
+
+* Gouvernance pure : zéro code, zéro test, zéro publication. Aucun changement N0.
+* plantuml-local : **tous les EPICs soldés** ; reste l'optionnel PLT-AGENT (b).
+* Zéro secret, zéro Python. Rapport archivé.
+
+_Score : 9/10 (audit complet, spec E2E actionnable, ordonnancement par borough)._

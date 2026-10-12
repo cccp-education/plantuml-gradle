@@ -1,0 +1,118 @@
+= CADRAGE cross-borough — PLT-DIAGRAM-OWNERSHIP US-6 / US-7 (chaîne E2E + dogfooding)
+:session: 241
+:borough: HTOWN (plantuml-gradle) — cadrage piloté
+:date: 2026-10-12
+:toc:
+
+_Cadrage des deux dernières US de `PLT-DIAGRAM-OWNERSHIP` (GBL-007) : la **chaîne de
+transmission E2E** (US-6) et le **dogfooding** (US-7). Gouvernance pure — zéro code.
+Périmètre cross-borough : MEMPHIS (N0) + plantuml (N2) + document (N2) + bakery (N2)
++ cheroliv.com (site gouverné)._
+
+== 0. Pourquoi un cadrage (et pas une implémentation mono-session)
+
+`US-6`/`US-7` traversent **3 boroughs gouvernés** (document, bakery, cheroliv.com),
+chacun avec son `AGENT.adoc` + clôture de session. L'implémentation se fait **par
+sessions dédiées** (règle workspace : un borough par session). Ce cadrage fige la
+cible, l'emplacement des tests et les assertions pour rendre ces sessions mécaniques.
+
+== 1. Audit de la chaîne (état réel 2026-10-12)
+
+[cols="1,2,3", options="header"]
+|===
+| Maillon | État | Preuve
+
+| **MEMPHIS N0** `plantuml-contracts:0.0.1`
+| ✅ | `PlantUmlBlock` (+`labels()`), `PlantUmlStrategy`, `PlantUmlClassifier`,
+`PlantUmlSyntaxValidator`, `PlantUmlTranslationPort`, `SyntaxValidationResult`.
+| **plantuml N2** (US-2/3/5 + GBL-010)
+| ✅ | `PlantumlTranslationPortAdapter` (port implémenté, round-trip D5),
+`PlantumlSyntaxValidatorAdapter`, `PlantUmlToolchain` (version gouvernée D6),
+`PlantumlLabelIntegrity`/`PlantumlBlockCorrector`/`PlantumlNoteExtractor` (GBL-010).
+| **document N2** (US-4)
+| ✅ | `DocumentTranslator` délègue au port N0 (`DocumentTranslatorPlantUmlPortTest`) ;
+adaptateur privé supprimé ; `plantuml_validation.feature` (Cucumber, 5 scénarios) +
+`PlantUmlValidationCucumberRunner`.
+| **bakery N2** (orchestration)
+| 🟡 partiel | `MigrateContentI18nDeploySmokeFunctionalTest` + `CherolivComDogfoodingDryRunFunctionalTest`
+(FT TestKit) : traduisent un article cheroliv **avec `[plantuml]` sans crash** (dry-run).
+**Absent** : assertion « labels traduits + syntaxe valide + **rendu non blanc** ».
+| **cheroliv.com** (site)
+| 🟡 | `.agents/CADRAGE_EPIC_CHE_DIAGRAM.adoc` (garde site `DiagramIntegrity`) ; le re-bake
+référence + variantes n'est pas prouvé post-US-5.
+|===
+
+*Conclusion* : la **cause racine cross-borough** (D1/D2/D3 CHE-DIAGRAM) est traitée
+(N0 + plantuml + document). Ce qui manque est la **preuve E2E** (US-6) et le
+**dogfooding** (US-7) — pas de nouveau code de domaine.
+
+== 2. US-6 — Chaîne de transmission E2E (3 pts)
+
+*Objet* : un **scénario qui traverse la chaîne** sur un article réel à diagrammes et
+vérifie : bloc extrait, labels traduits, **syntaxe valide (round-trip)**, **rendu non blanc**.
+
+*Emplacement* : **bakery-gradle** (le maillon qui orchestre et exécute le bake). Deux
+niveaux :
+. **domaine/FT** (prioritaire) — étendre `MigrateContentI18nDeploySmokeFunctionalTest` /
+  `CherolivComDogfoodingDryRunFunctionalTest` : après `migrateContentI18n`, le bloc
+  `[plantuml]` traduit doit être **re-parsable** (validator N0) et les labels traduits
+  présents (ex. `"User"` pour `"Utilisateur"`).
+. **rendu** (le « non blanc ») — au **bake** (asciidoctor-diagram → SVG) : l'artefact
+  SVG/PNG du diagramme doit passer `DiagramOutputProbe` (non vide + magic bytes →
+  `Rendered`). *Outil disponible* : `plantuml.service.DiagramOutputProbe` (PLT-CR3-2,
+N2→N2 interdit → porter l'assertion au niveau bakery : taille SVG > 0 et non-fallback).
+
+*Assertions cibles* :
+* bloc extrait (`[plantuml]` → `PlantUmlBlock`) ;
+* labels traduits (le port a modifié le bloc) ;
+* `validator.validate(translated) is Valid` (round-trip) ;
+* artefact de rendu **non blanc** (SVG non vide, sans texte de fallback).
+
+*Risque* : le bake réel nécessite la toolchain asciidoctor-diagram (lourde) — d'où un
+niveau FT « contrat » (re-parse + labels) **sans** bake, et un niveau « rendu » gaté.
+
+== 3. US-7 — Dogfooding + non-régression (2 pts)
+
+*Objet* : re-baker **cheroliv.com** (article référence + variantes EN), vérifier
+**zéro diagramme blanc/dégradé**, contrat final VERT.
+
+*Emplacement* : **cheroliv.com** (site gouverné) — tâche de bake + garde
+`DiagramIntegrity` (déjà cadrée côté site). *Protocole* : (1) bake référence (FR) ;
+(2) bake variante EN ; (3) audit des SVG `[plantuml]` (non blanc, re-parse) ; (4)
+`check` du site VERT. Aucune régression du contrat site.
+
+== 4. Décisions
+
+. **D-U6-1 — US-6 vit dans bakery-gradle** (orchestrateur/bake), pas dans plantuml
+  (aucun N2→N2). plantuml fournit le port + le probe ; bakery les consomme.
+. **D-U6-2 — Deux niveaux** : contrat (bloc+labels+round-trip, sans bake, CI-friendly)
+  **puis** rendu (SVG non blanc, gaté).
+. **D-U6-3 — Pas de nouveau domaine** : réutilisation du port N0 + validateur N0 +
+  `DiagramOutputProbe` (assertion portée côté bakery).
+. **D-U7-1 — US-7 = session cheroliv.com** distincte (sa propre gouvernance/CI).
+. **D-U7-2 — Ordre** : US-6 (bakery) → US-7 (cheroliv).
+. **D-U-3 — Non-régression** : aucun changement N0 ; plantuml/document inchangés.
+
+== 5. Ordonnancement (sessions dédiées)
+
+[cols="1,2,1,3", options="header"]
+|===
+| Session | Borough | US | Livrable
+
+| S-242 | bakery-gradle | US-6a | FT « contrat » : bloc extrait + labels traduits + round-trip valide (CI)
+| S-243 | bakery-gradle | US-6b | FT « rendu » : SVG non blanc au bake (gaté toolchain)
+| S-244 | cheroliv.com | US-7 | Re-bake référence + variantes, garde `DiagramIntegrity`, contrat VERT
+|===
+
+== 6. Reste à faire (plantuml — suivi gouvernance)
+
+. [x] Cadrage US-6/US-7 (ce document) ✅ S-241.
+. [ ] US-6 bakery (S-242/243) ; US-7 cheroliv (S-244).
+. [ ] Clore `PLT-DIAGRAM-OWNERSHIP` 8/8 après US-6/US-7.
+
+== 7. Traçabilité
+
+* Cadrage racine : `.agents/CADRAGE_EPIC_PLT_DIAGRAM_OWNERSHIP.adoc` (D7 US-6, US-7).
+* Preuves : `document-gradle/…/DocumentTranslatorPlantUmlPortTest.kt`,
+`plantuml_validation.feature` ; `bakery-gradle/…/MigrateContentI18nDeploySmokeFunctionalTest.kt`,
+`CherolivComDogfoodingDryRunFunctionalTest.kt` ; `office/sites/cheroliv.com/.agents/CADRAGE_EPIC_CHE_DIAGRAM.adoc`.
