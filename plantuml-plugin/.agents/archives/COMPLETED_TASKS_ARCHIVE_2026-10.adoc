@@ -1,5 +1,18 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-10
 
+== Session 240 (2026-10-12) — FIX-BASELINE `FilePermission` (résolu : durcissement environnemental) ✅
+
+=== Fait
+- [x] Diagnostic CI : 4/4 `File permissions` PASSENT sur CI → le « FAIL S-030 » est environnemental (root/conteneur) ✅
+- [x] Correctif **test-only** : `assumeTrue` sur `should handle read permission denied gracefully` (skip si permission non imposée) ✅
+- [x] **FIX-BASELINE entièrement résolu** (cucumber S-217 + functional S-240) ✅
+- [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 241 + BACKLOG + archive ✅
+- [x] Local = Build (`compileFunctionalTestKotlin` VERT) ; **CI VERTE run `38282908466`** (commit `7778e68`, 4/4 PASSED) ; zéro secret, zéro Python ✅
+
+=== Prochaine session (241)
+- **PLT-DIAGRAM-OWNERSHIP US-6 (chaîne E2E, cross-borough → arbitrage pilote)** ; sinon US-7 ; PLT-AGENT optionnel (b)
+- **Fichier à lire en priorité** : `BACKLOG.adoc` § PLT-DIAGRAM-OWNERSHIP
+
 == Session 239 (2026-10-12) — GBL-010 G-3 : câblage des notes dans le port de traduction ✅
 
 === Fait

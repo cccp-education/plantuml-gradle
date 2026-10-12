@@ -1,0 +1,60 @@
+= Session 240 — FIX-BASELINE `FilePermission` (résolu : durcissement environnemental)
+:session: 240
+:date: 2026-10-12
+:borough: HTOWN (plantuml-gradle)
+:type: test-only (fiabilité environnementale)
+:statut: TERMINÉ
+:methode: diagnostic par logs CI (Local = Build, Tests = CI)
+
+== Mission
+
+Dette historique **FIX-BASELINE** (S-030) : `PlantumlFunctionalSuite$FilePermission`
+documenté comme « 1 FAIL préexistant ». Le backlog laissait deux issues : **traiter**
+ou **marquer CADUQUE**. La traiter proprement = rendre le test **robuste** à
+l'environnement.
+
+== Diagnostic (logs CI, pas de test local)
+
+Les **4** tests `File permissions` **PASSENT sur CI** (runs verts `38279828661` /
+`38282908466` : `read`/`write`/`directory`/`nonexistent` PASSED). Le « FAIL S-030 »
+est donc **environnemental**, pas fonctionnel : sous **root** (ou conteneur / capacités
+restreintes), `File.setReadable(false)` est un **no-op** — le fichier reste lisible,
+`validatePlantumlSyntax` réussit, et le `buildAndFail()` du test casse (faux FAIL).
+
+== Correctif (test-only)
+
+`should handle read permission denied gracefully` : après avoir retiré les droits, le test
+**vérifie que la permission est réellement imposée** (`!diagramFile.canRead()`) ; sinon
+il **restaure + supprime** le fichier et **skip** via `assumeTrue(..., "filesystem does not
+enforce read permissions …")`. Aucune modification de production ; les 3 autres tests
+(`write`, `directory`, `nonexistent`) sont déjà environment-agnostiques (assertions
+tolérantes), inchangés.
+
+== Preuve
+
+* **CI VERTE** run `38282908466` (commit `7778e68`) — les **4** `File permissions`
+  **PASSED** (non skippés sur le runner CI non-root → **couverture préservée**).
+* Local = Build : `compileFunctionalTestKotlin` VERT.
+
+== Fichier
+
+[cols="1,3"]
+|===
+| Type | Fichier
+
+| test (modifié) | `src/functionalTest/kotlin/plantuml/PlantumlFunctionalSuite.kt` (garde `assumeTrue`)
+|===
+
+== Résultat
+
+**FIX-BASELINE entièrement résolu** : cucumber (S-217) + functional `FilePermission` (S-240).
+La dette « 1 FAIL préexistant » est **soldée** (elle était environnementale).
+
+== Reste
+
+* **PLT-DIAGRAM-OWNERSHIP US-6/US-7** (cross-borough → arbitrage pilote).
+* **PLT-AGENT optionnel (b)** — vérifier qu'un modèle du pool expose la vision.
+* **PL-3** (bloqué ABIDJAN) ; **GBL-010 G-1/G-2/G-4** (hors plantuml).
+* **Fichier à lire en priorité** : `PROMPT_REPRISE.adoc` (session 241).
+
+_Score : 9/10 (diagnostic CI, correctif robuste cross-environnement, couverture CI préservée)._

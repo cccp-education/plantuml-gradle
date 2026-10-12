@@ -185,7 +185,7 @@ Il faut que la chaîne bakery → article → document délègue à plantuml
 
 '''
 
-== ✅ FIX-BASELINE — échecs cucumber préexistants (TERMINÉ en S-217)
+== ✅ FIX-BASELINE — échecs préexistants (cucumber S-217 + functional FilePermission S-240)
 
 Le périmètre cucumber est résolu (les 3 FAIL de `cucumberTest`) :
 
@@ -197,13 +197,14 @@ Le périmètre cucumber est résolu (les 3 FAIL de `cucumberTest`) :
   `generated/rag` → `build/plantuml-plugin/generated/rag` + nouveau step
   dédié avec seed checksum (`build/plantuml-plugin/checksums/rag-test.sha256`,
   même format `ChecksumStore`). `@rag` 4/4 PASSED. ✅
-* `functionalTest` — `PlantumlFunctionalSuite$FilePermission` : **HORS
-  périmètre FIX-BASELINE** (1 FAIL préexistant connu, documenté S-030) —
-  à traiter en session dédiée si le pilote le souhaite. Peut être marqué
-  CADUQUE si le pilote actualise un niveau de risque fonctionnel.
+* `functionalTest` — `PlantumlFunctionalSuite$FilePermission` : **✅ RÉSOLU S-240**.
+  Diagnostic CI : les **4** tests PASSENT sur CI — le « FAIL S-030 » était **environnemental**
+  (sous root/conteneur, `setReadable(false)` est un no-op → faux FAIL). Correctif **test-only** :
+  `assumeTrue` sur `should handle read permission denied gracefully` (skip si la permission n'est
+  pas imposée ; couverture CI préservée, 4/4 PASSED — run `38282908466`).
+* **→ FIX-BASELINE entièrement résolu** : échecs cucumber (S-217) **+** functional `FilePermission` (S-240).
 
-→ Échecs cucumber : statut ✅ (résolus). Functional `FilePermission` :
-   toujours ouvert (hors cucumber).
+→ Échecs cucumber : statut ✅ (résolus). Functional `FilePermission` : ✅ (résolu S-240).
 
 '''
 == ✅ EPIC PUB — Publication Maven Central plantuml-plugin 0.0.5 (Session 218)

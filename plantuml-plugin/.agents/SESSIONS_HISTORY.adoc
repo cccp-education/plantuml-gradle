@@ -1,5 +1,17 @@
 = Historique des Sessions
 
+== Session 240 (2026-10-12) — FIX-BASELINE `FilePermission` (résolu : durcissement environnemental) ✅
+
+Dette historique S-030 soldée. **Diagnostic par logs CI** (Local = Build, Tests = CI) : les **4**
+tests `File permissions` **PASSENT sur CI** (runs verts) — le « FAIL S-030 » est **environnemental** :
+sous **root**/conteneur, `File.setReadable(false)` est un no-op → le fichier reste lisible →
+`buildAndFail()` casse (faux FAIL). **Correctif test-only** : `should handle read permission denied
+gracefully` vérifie que la permission est réellement imposée (`!canRead()`) et **skip** via
+`assumeTrue` sinon (restaure + supprime le fichier). Aucune modification de production. **CI VERTE**
+run `38282908466` (commit `7778e68`) — **4/4 `File permissions` PASSED** (couverture CI préservée).
+**FIX-BASELINE entièrement résolu** (cucumber S-217 + functional S-240). Zéro secret, zéro Python.
+Rapport `.agents/sessions/240-fix-baseline-filepermission.adoc`.
+
 == Session 239 (2026-10-12) — GBL-010 G-3 : câblage des notes dans le port de traduction ✅
 
 `PlantumlTranslationPortAdapter` traduit désormais le **texte des notes** PlantUML in-place.
