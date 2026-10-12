@@ -25,6 +25,29 @@ jobs:
           distribution: 'temurin'
           cache: gradle
 
+      # The @rag Cucumber scenarios use a testcontainers `pgvector/pgvector:pg15`
+      # container. Cache the `docker save` tar so the image is not re-pulled on
+      # every run (~ a few hundred MB).
+      - name: Cache pgvector testcontainers image
+        uses: actions/cache@v4
+        with:
+          path: ${{ runner.temp }}/pgvector-image.tar
+          key: docker-pgvector-pg15-${{ runner.os }}
+
+      - name: Load or pull the pgvector image
+        shell: bash
+        run: |
+          set -euo pipefail
+          tar="${{ runner.temp }}/pgvector-image.tar"
+          if [ -f "$tar" ]; then
+            echo "Restoring pgvector image from cache"
+            docker load -i "$tar"
+          else
+            echo "Cache miss — pulling pgvector/pgvector:pg15"
+            docker pull pgvector/pgvector:pg15
+            docker save pgvector/pgvector:pg15 -o "$tar"
+          fi
+
       - name: Publish plugin to Maven Local
         run: ./gradlew publishToMavenLocal
 
