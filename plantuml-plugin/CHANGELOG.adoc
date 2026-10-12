@@ -5,6 +5,23 @@ Tous les changements notables apportés à ce projet seront documentés dans ce 
 Le format est basé sur link:https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 et ce projet adhère au versionnage sémantique link:https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
+== [0.0.10] — 2026-10-13
+
+=== Modifié
+
+* **PLT-MAINTAIN** — découplage de la logique de test hors du code de production :
+  nouveau seam `plantuml.runtime.RuntimeEnvironment` (consommé par `LlmService`,
+  `DiagramProcessor`, `GeneratePlantumlDiagramsTask`, `CollectPlantumlIndexTask`).
+* Purge de stubs morts : `DiagramProcessor.saveForRagTraining()`,
+  `PlantumlConfig.load()`, `LlmService.getTimeoutInSeconds()`.
+* `ConfigMerger` : helpers de précédence nommés (sémantique inchangée).
+* Réalignement documentation (README, ROADMAP) et CI (workflows cassés désactivés).
+
+=== Corrigé
+
+* `build.gradle.kts` : `timeout`/`maxParallelForks` dupliqués (valeurs écrasées) supprimés.
+* `LlmServicePrivateMethodsTest` : tests de timeout factices (property au lieu de `env`) remplacés.
+
 == [Non publié]
 
 === Ajouté

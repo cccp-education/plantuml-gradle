@@ -9,7 +9,7 @@
 [![Coverage](https://img.shields.io/static/v1?label=coverage&message=%E2%89%A575%25&color=green)]()
 [![License](https://img.shields.io/github/license/cccp-education/plantuml-gradle?label=License)](../LICENCE)
 
-- **Version**: `0.0.9` · **Group**: `education.cccp` · **Plugin ID**: `education.cccp.plantuml`
+- **Version**: `0.0.10` · **Group**: `education.cccp` · **Plugin ID**: `education.cccp.plantuml`
 - **Toolchain**: Java 25 · Kotlin 2.4.10 · Gradle 9.5.1
 - **Build**: `./gradlew build -x test` · **Tests**: `./gradlew test functionalTest cucumberTest` · **Coverage gate**: `./gradlew koverThresholdCheck` (≥75%)
 
@@ -48,7 +48,7 @@ The plugin **dogfoods itself**: the root `plantuml-gradle/build.gradle.kts` appl
 
 ## N0 contracts (from workspace-bom MEMPHIS)
 
-Consumed transitively via `implementation(platform("education.cccp:workspace-bom:0.0.78"))`:
+Consumed transitively via `implementation(platform("education.cccp:workspace-bom:0.0.87"))`:
 
 | Contract | Artifact | Provides |
 |----------|----------|----------|
@@ -189,7 +189,7 @@ POM (on **all** `MavenPublication`s) declares:
 - SCM `https://github.com/cheroliv/plantuml-gradle.git`
 - optional `<relocation>` when `relocationGroup` property is set
 
-Published artifact: `education.cccp:plantuml-plugin:0.0.9` on Maven Central.
+Published artifact: `education.cccp:plantuml-plugin:0.0.10` on Maven Central.
 
 ## EPIC status
 
@@ -210,7 +210,7 @@ Per `.agents/INDEX.adoc`:
 | 11 Article Blog KG + Tests   | ✅ TERMINÉ |
 | 12 Consolidation             | ✅ TERMINÉ |
 | 13 Multi-provider API Pool   | ✅ TERMINÉ |
-| PUB-1 Publication Maven Central | ✅ TERMINÉ (0.0.9) |
+| PUB-1 Publication Maven Central | ✅ TERMINÉ (0.0.10) |
 | PLT-I18N / PLT-BOUNDARY      | ✅ TERMINÉ |
 | Incremental Processing       | ✅ TERMINÉ |
 | PLT-CR3 (provider model + output probe) | ✅ TERMINÉ 2/2 |

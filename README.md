@@ -8,7 +8,7 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/cccp-education/plantuml-gradle/test.yml?branch=main&label=tests)](https://github.com/cccp-education/plantuml-gradle/actions/workflows/test.yml)
 [![License](https://img.shields.io/github/license/cccp-education/plantuml-gradle?label=License)](../LICENCE)
 
-- **Version**: `0.0.9` · **Group**: `education.cccp` · **Plugin ID**: `education.cccp.plantuml`
+- **Version**: `0.0.10` · **Group**: `education.cccp` · **Plugin ID**: `education.cccp.plantuml`
 - **Toolchain**: Java 25 · Kotlin 2.4.10 · Gradle 9.5.1
 - **Build**: `./gradlew build` · **Tests**: `./gradlew test` + `functionalTest` + `cucumberTest`
 - **Coverage**: ≥ 75 % (Kover `koverThresholdCheck`, wired into `check`)
@@ -32,7 +32,7 @@ prompts/*.prompt ──► generatePlantumlDiagrams ──► LLM ──► vali
 ```
 
 The plugin consumes `education.cccp.codebase` (`0.0.14`) for RAG indexing and shares
-N0 contracts via `education.cccp:workspace-bom:0.0.78`.
+N0 contracts via `education.cccp:workspace-bom:0.0.87`.
 
 ## Quick Start
 
@@ -40,7 +40,7 @@ N0 contracts via `education.cccp:workspace-bom:0.0.78`.
 
 ```gradle
 plugins {
-    id("education.cccp.plantuml") version "0.0.9"
+    id("education.cccp.plantuml") version "0.0.10"
 }
 ```
 
