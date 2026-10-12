@@ -12,6 +12,7 @@ import contracts.plantuml.PlantUmlTranslationPort
 import contracts.plantuml.PlantUmlTranslationRequest
 import contracts.plantuml.SyntaxValidationResult
 import plantuml.repair.PlantumlLabelIntegrity
+import plantuml.repair.PlantumlNoteExtractor
 
 /**
  * Implementation of the N0 [PlantUmlTranslationPort] (EPIC PLT-DIAGRAM-OWNERSHIP
@@ -51,14 +52,15 @@ class PlantumlTranslationPortAdapter(
         }
 
         val labels = block.labels()
-        if (labels.isEmpty()) {
+        val notes = PlantumlNoteExtractor.occurrences(block.raw)
+        if (labels.isEmpty() && notes.isEmpty()) {
             return PlantUmlTranslationOutcome.Preserved("no translatable label")
         }
 
         // S-073 — one batched provider call for the whole diagram (falls back to
         // per-label when the provider cannot batch). The run bottleneck was the
         // per-label round-trip: a 20-label diagram cost 20 LLM calls.
-        val translations = translateLabels(labels, request)
+        val translations = if (labels.isEmpty()) emptyMap() else translateLabels(labels, request)
 
         var raw = block.raw
         var changed = false
@@ -82,6 +84,20 @@ class PlantumlTranslationPortAdapter(
             raw = directiveReplaced
             changed = changed || quotedChanged || directiveChanged
         }
+
+        // GBL-010 G-3 — translate the note prose in place. A note is prose, so a
+        // real newline returned by the provider is KEPT (unlike a quoted label,
+        // which requires the `\n` escape): the note grammar allows line breaks.
+        for (note in notes) {
+            val resolved = translateLabel(note.text, request.sourceLanguage, request.targetLanguage) ?: continue
+            if (resolved == note.text) continue
+            val replaced = raw.replace(note.raw, resolved)
+            if (replaced != raw) {
+                raw = replaced
+                changed = true
+            }
+        }
+
         return if (changed) {
             val translated = block.copy(raw = raw)
             // US-3 — round-trip gate (D5): a translated block that no longer

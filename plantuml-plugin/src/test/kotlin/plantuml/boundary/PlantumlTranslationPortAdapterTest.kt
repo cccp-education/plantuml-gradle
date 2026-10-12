@@ -47,6 +47,43 @@ class PlantumlTranslationPortAdapterTest {
     }
 
     @Test
+    fun `translates a single-line note even when the block has no label`() {
+        val adapter = port(mapOf("Bonjour" to "Hello"))
+        val block = PlantUmlBlock("@startuml\nA -> B\nnote right of B : Bonjour\n@enduml")
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+        assertTrue(outcome is PlantUmlTranslationOutcome.Translated)
+        assertTrue((outcome as PlantUmlTranslationOutcome.Translated).block.raw.contains("note right of B : Hello"))
+    }
+
+    @Test
+    fun `translates a multi-line note body in place`() {
+        val adapter = port(mapOf("Bonjour\nMonde" to "Hello\nWorld"))
+        val block = PlantUmlBlock("@startuml\nnote right of B\n  Bonjour\n  Monde\nend note\n@enduml")
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+        val raw = (outcome as PlantUmlTranslationOutcome.Translated).block.raw
+        assertTrue(raw.contains("Hello\nWorld"), "note body must be translated in place: $raw")
+        assertTrue(raw.contains("end note"), "note structure must be preserved")
+    }
+
+    @Test
+    fun `keeps a real newline returned by the provider for a note`() {
+        val adapter = port(mapOf("Bonjour" to "Hello\nWorld"))
+        val block = PlantUmlBlock("@startuml\nnote right of B : Bonjour\n@enduml")
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+        val raw = (outcome as PlantUmlTranslationOutcome.Translated).block.raw
+        assertTrue(raw.contains("Hello\nWorld"), "a note keeps real newlines (no \\n escape): $raw")
+        assertTrue(!raw.contains("\\n"), "a note must not be escaped like a quoted label")
+    }
+
+    @Test
+    fun `a note-only block with a provider failure is preserved`() {
+        val adapter = port(emptyMap())
+        val block = PlantUmlBlock("@startuml\nA -> B\nnote right of B : Bonjour\n@enduml")
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+        assertTrue(outcome is PlantUmlTranslationOutcome.Preserved)
+    }
+
+    @Test
     fun `converts a raw newline returned by the provider back to the plantuml escape`() {
         val adapter = port(mapOf("CLI de vibe coding" to "vibe coding CLI\nOpen source, free"))
         val block = PlantUmlBlock("@startuml\nrectangle \"CLI de vibe coding\" as CLI\n@enduml")
