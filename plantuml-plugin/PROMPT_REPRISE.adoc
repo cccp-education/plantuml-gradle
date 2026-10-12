@@ -1,8 +1,8 @@
-= PROMPT_REPRISE — Plantuml — Session 229
-:session: 229
+= PROMPT_REPRISE — Plantuml — Session 230
+:session: 230
 :date: 2026-10-12
 
-== État — Release 0.0.9 (S-227) ; cadrage EPIC PLT-AGENT (S-228)
+== État — Release 0.0.9 (S-227) ; PLT-AGENT cadré + vision clarifiée (S-228/S-229)
 
 * **Release 0.0.9** (S-227) : bump `plantuml 0.0.8 → 0.0.9` + pins catalog/BOM
   `0.0.78` + dépendances (`jgit 7.8.0`, `asciidoctorj-diagram 3.2.1`,
@@ -10,8 +10,11 @@
   `dcb6d30e-fcff-45b3-a9c1-d9ba435a3cf3`, propagation repo1 HTTP 200.
 * **Cadrage EPIC `PLT-AGENT`** (S-228) : code review `docToolchain/diag-agent` +
   catalogue de portage PlantUML `DIA-01`→`DIA-07` (~20 pts, 7 US). Doc
-  `.agents/CADRAGE_EPIC_PLT_AGENT.adoc`. **Zéro code.** Rapport
-  `.agents/sessions/228-code-review-diag-agent-portage-plantuml.adoc`.
+  `.agents/CADRAGE_EPIC_PLT_AGENT.adoc`. **Zéro code.**
+* **Vision & périmètre** (S-229) : noyau portable vs coquille ; **charte de
+  non-régression HTOWN** ; audit des choix écartés (MCP/CLI/Kroki/Docker) ;
+  **verdict : Kroki REJETÉ** (oracle déjà natif, 2ᵉ version moteur = drift D1). Doc
+  `.agents/CADRAGE_EPIC_PLT_AGENT_VISION.adoc`.
 * **GBL-010 G-3** (partiel, S-226) : `PlantumlLabelIntegrity` (détection + correction
   `\n`). Reste : statut par bloc + correction IA.
 
@@ -23,10 +26,11 @@ dans l'AST AsciiDoc : port N0 `PlantUmlTranslationPort` (point d'entrée unique)
 (`PlantumlLabelIntegrity`), statut par bloc, version toolchain exposée.
 Cadrage racine : `CADRAGE_EPIC_GBL_010_ARBRE_TRADUCTION_SITE.adoc`.
 
-== Mission Session 229 — au choix pilote
+== Mission Session 230 — au choix pilote
 
 * **PLT-AGENT US-1 (`DIA-04`)** — extracteur de code LLM robuste (fences + JSON +
-  brut) ; prérequis de la boucle, faible risque, forte valeur. **Candidat par défaut.**
+  brut) ; prérequis de la boucle, faible risque, forte valeur. **Candidat par défaut**
+  (si la vision S-229 est validée pilote).
 * **GBL-010 G-3 (reste)** — statut par bloc + correction IA.
 * **US-7 PLT-DIAGRAM-OWNERSHIP** — dogfooding + non-régression (re-bake cheroliv.com).
 * **US-6 PLT-DIAGRAM-OWNERSHIP** — chaîne E2E bakery→document→port→plantuml.

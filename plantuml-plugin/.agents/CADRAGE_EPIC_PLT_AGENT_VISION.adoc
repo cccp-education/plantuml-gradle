@@ -1,0 +1,274 @@
+= CADRAGE EPIC PLT-AGENT — VISION & PÉRIMÈTRE (ce qu'on prend, ce qu'on ne prend pas)
+:session: 229
+:borough: HTOWN (plantuml-gradle)
+:date: 2026-10-12
+:toc:
+
+_Clarification de vision demandée avant toute implémentation (porte de décision).
+Complète `.agents/CADRAGE_EPIC_PLT_AGENT.adoc` (S-228) : on y sépare le **noyau
+portable** de `diag-agent` de sa **coquille non portable**, on fixe la **charte de
+non-régression** de HTOWN, on **audite chaque proposition** contre les choix déjà
+écartés (MCP, CLI, Kroki, Python/Docker) et on tranche le **bien-fondé de Kroki**.
+Gouvernance pure — zéro code modifié._
+
+== 0. La question posée
+
+Avant d'implémenter `PLT-AGENT`, quatre points doivent être tranchés :
+
+. Que **fait** réellement `diag-agent` (sa vision), au-delà du README ?
+. Qu'est-ce que HTOWN **fait déjà bien** et qu'il ne faut **pas régresser** ?
+. Que peut apporter `diag-agent` **sans réintroduire** des choix techniques déjà
+  écartés (MCP en tête) ?
+. L'introduction de **Kroki** est-elle fondée ?
+
+== 1. La vision réelle de `diag-agent`
+
+=== 1.1 Le problème résolu : la délégation à contexte minimal
+
+La douleur visée n'est **pas** « PlantUML ». C'est : *un LLM hôte* (Claude en
+`computer use`, un agent à accès bash) **brûle son contexte** à itérer sur la
+syntaxe et la mise en page d'un diagramme. `diag-agent` existe pour **déléguer**
+cette itération à un agent autonome et rendre au hôte un résultat concis.
+
+*Objectif mesuré* (ch10) : « 95 % des requêtes consomment < 3 k tokens dans la
+conversation parente » (texte d'aide + commande + chemin). Le diagramme lui-même
+ne transite **jamais** dans le contexte du parent.
+
+=== 1.2 Les objectifs qualité, ordonnés
+
+[cols="1,1,3", options="header"]
+|===
+| Prio | Objectif | Signification
+
+| 1 | **Context Efficiency** | minimiser les tokens de l'hôte (aide à la demande, URL refs, agent auto-contenu)
+| 2 | **Ease of Installation** | `pip`/`docker run`, < 5 min jusqu'au 1er diagramme
+| 3 | **Privacy & Security** | local-first, remote opt-in, zéro télémétrie
+| 4 | **Autonomy** | l'agent itère seul (pas de va-et-vient avec le parent)
+| 5 | **Extensibility** | 20+ types de diagrammes (Kroki), changement de provider LLM facile
+|===
+
+*Conséquence* : tous les choix techniques de `diag-agent` découlent de **l'objectif
+n°1** (contexte) et de la **généralité multi-types** (objectif n°5). Ce ne sont **pas**
+des objectifs de HTOWN (voir § 2).
+
+=== 1.3 Les décisions structurantes (ADR)
+
+[cols="1,3,2", options="header"]
+|===
+| ADR | Décision | Ce qu'elle sert
+
+| 001 | **Bash tool primaire** + MCP **opt-in** | Context efficiency (l'aide n'est chargée qu'à la demande)
+| 002 | **Auto-itération de l'agent** (pas de contrôle par le parent) | Context efficiency + autonomie
+| 003 | **Local-first, remote opt-in** | Privacy (Kroki Docker par défaut, `kroki.io` sur consentement)
+| 004 | **URL de diagramme rendu** (mode MCP) | Context efficiency (petite charge utile)
+| 005 | **LiteLLM** (abstraction LLM) | Multi-provider, 100+ modèles
+| 006 | **Kroki embarqué dans l'image Docker** | Installation « one-command » + offline
+| 007 | **Écriture directe dans le source `.adoc`** | Planifié V2 (non implémenté)
+| 008 | **Click CLI** | Structure de commande, aide générée
+|===
+
+=== 1.4 Le noyau portable — la boucle
+
+Le seul actif **durable et neutre** de `diag-agent` est sa **boucle**, décrite
+ch. 4 (deux volets) :
+
+. **Volet syntaxe** : génère → *valide le rendu* → réinjecte l'erreur exacte → corrige
+   (jusqu'à N itérations). Garde un historique court pour ne pas répéter une erreur.
+. **Volet design** (si vision dispo) : rend l'image → un **modèle vision** critique la
+   lisibilité (espacement, chevauchements, labels tronqués) → corrige. Sans vision : heuristiques
+   (plafonds nœuds/arêtes, layout gauche-droite, skinparams cohérents, « good defaults » par type).
+
+*Ce noyau est indépendant de la stack.* C'est lui qu'on veut importer — pas la coquille.
+
+=== 1.5 La coquille non portable (à ne PAS importer)
+
+[cols="2,3", options="header"]
+|===
+| Élément de coquille | Pourquoi il ne se transpose pas à HTOWN
+| Python / `uv` / `pyproject.toml` | HTOWN est Kotlin/JVM (Gradle plugin), stack LangChain4j
+| **LiteLLM** | HTOWN a déjà `LlmService` + `ApiKeyPool` + fallback cross-provider + tiered rotation
+| **Click CLI** | HTOWN expose des **tâches Gradle + DSL**, pas un binaire
+| **Serveur MCP** (FastMCP) | **écarté au niveau workspace** (§ 3.1) — choix architectural rejeté
+| **Kroki** (moteur/oracle) | à trancher (§ 4) — probablement non fondé
+| **Docker/Colima** pour le rendu | HTOWN rend **nativement** et hors-ligne
+| `Settings` par variables d'env | HTOWN a le pattern **4 sources** (YAML/props/env/CLI) + `ConfigMerger`
+|===
+
+'''
+== 2. HTOWN — identité & charte de non-régression
+
+=== 2.1 Identité
+
+HTOWN = **propriétaire du bloc `[plantuml]`** de l'AST AsciiDoc (EPIC `PLT-DIAGRAM-OWNERSHIP`,
+`GBL-007`). Son métier : **générer, valider, traduire, corriger** le PlantUML, dans un
+plugin **Gradle natif**, intégré à la chaîne `bakery → document → plantuml`. Ce n'est pas
+un agent généraliste : c'est le **spécialiste PlantUML** de l'écosystème, consommé par le
+build et par les autres boroughs via des **contrats N0**.
+
+=== 2.2 Charte de non-régression (à préserver à chaque US de `PLT-AGENT`)
+
+[cols="3,3,2", options="header"]
+|===
+| Capacité existante (preuve) | Valeur | Règle PLT-AGENT
+
+| Validation **native hors-ligne** (`PlantumlService.validateSyntax`, `SourceStringReader`) | rapide, déterministe, sans process | **NE PAS** la remplacer par un service de rendu (Kroki)
+| **Boucle de correction** déjà présente (`DiagramProcessor.processPrompt` + `AttemptEntry`) | fondation de la boucle | **ÉTENDRE**, jamais dupliquer (pas de 2ᵉ processor)
+| **Multi-provider** `LlmService` + `ApiKeyPool` + `CrossProviderFallbackOrchestrator` + `ProviderModelResolver` + `QuotaTracker` | robustesse LLM supérieure à LiteLLM mono-clé | **NE PAS** introduire LiteLLM ni un client HTTP direct
+| **RAG** (`RagIndexer`) + **Knowledge Graph** (`GraphifyPromptAdapter`, `DocKnowledgeBase`) | contexte augmenté structuré | **NE PAS** régresser vers des exemples seuls
+| **Incrémentalité** (`IncrementalProcessor`, `ChecksumStore`) + **Économie d'Encre** | ne pas re-brûler d'appels LLM | préserver (skip si artefact valide)
+| **Traduction/i18n** `PLT-BOUNDARY` + `PlantumlMessages` (10 langues) + round-trip + registre non-traductible | le produit est multilingue | toute chaîne utilisateur via `PlantumlMessages`
+| **Toolchain gouvernée** (`PlantUmlToolchain` + garde anti-drift) | source unique de version (fixe CHE-DIAGRAM/D1) | **NE PAS** introduire une 2ᵉ version du moteur (Kroki en embarque une)
+| **Probe anti-blanc** (`DiagramOutputProbe`) | détecte un artéfact vide/non-image | compatible avec la revue design (même rendu)
+| **Config 4 sources** (`ConfigLoader`/`ConfigMerger`) + `pushConfigIntoExtension` | override YAML/props/env/CLI | chaque option PLT-AGENT = 4 sources, défaut `false`
+| **Contrats N0** (`plantuml-contracts` : `PlantUmlSyntaxValidator`, `PlantUmlTranslationPort`) | anti N2→N2, provider-agnostique | ne pas coupler N2→N2
+| **Interface Gradle** (tâches + DSL) + conventions ABIDJAN | intégration build/IDE | **NE PAS** introduire CLI ni serveur
+| **Rigueur** DDD/TDD/BDD + publication Maven Central | qualité | baby-step, runner dédié (S-082), steps préfixés (S-088)
+|===
+
+'''
+== 3. Audit « choix écartés » — les propositions sont-elles des techniques neutres ?
+
+=== 3.1 Les choix déjà écartés au niveau workspace
+
+Le rejet de **MCP** est un choix de vision **documenté** :
+
+* `WORKSPACE_AS_PRODUCT.adoc` § « Pourquoi MCP est une Mauvaise Bonne Idée » (L.424-451) :
+  MCP = *JSON-over-stdio loosely coupled* (aucune validation à la compilation, contrat non
+  garanti, explosion silencieuse), *complexité opérationnelle* (un process de plus à
+  maintenir), aucun héritage de l'écosystème (deps, caching, IDE, Plugin Portal).
+  **Gradle = Kotlin strongly typed** : validation **avant** exécution.
+* `LLM_FEEDBACKS.adoc` § 5 : les plugins sont consommés comme « tools » **sans dépendre de
+  protocoles fermés (comme MCP)**.
+* Cohérent avec l'abandon du chantier cockpit IntelliJ (Long Island, S-001 borough) et le
+  runtime agentique (`CADRAGE_EPIC_RUNTIME_AGENTIQUE.adoc`).
+
+=== 3.2 Tableau d'audit — chaque item tient-il ses promesses sans choix écarté ?
+
+[cols="1,3,1,1,1,3", options="header"]
+|===
+| Item | Technique | Dépend de MCP ? | de CLI ? | de Kroki ? | Verdict
+
+| DIA-01 | Revue design par **vision** (rendu → modèle vision) | non | non | **non** (rendu **natif** `PlantumlService.generateImage` → PNG) | ✅ portable — réutilise le rendu natif + un `ChatModel` vision de `LlmService`
+| DIA-02 | **Pré-vol de description** (questions de clarification) | non | non | non | ✅ portable — `LlmService` existant
+| DIA-03 | **Budget mur** (`maxIterations` + `maxSeconds`) | non | non | non | ✅ portable — objet pur
+| DIA-04 | **Extracteur de code robuste** (fences/JSON/brut) | non | non | non | ✅ portable — objet pur
+| DIA-05 | **Exemples canoniques** few-shot | non | non | non | ✅ portable — ressources `.puml` (complète le RAG)
+| DIA-06 | **Détection de sous-type** | non | non | non | ✅ portable — objet pur + LLM repli
+| DIA-07 | **Garde de convergence** du feedback | non | non | non | ✅ portable — objet pur
+|===
+
+*Conclusion de l'audit* : **aucun** item du catalogue `PLT-AGENT` n'exige MCP, CLI, Kroki,
+Python ou Docker. Ce sont des **techniques** implémentables sur l'infrastructure HTOWN
+existante. La coquille `diag-agent` reste dehors.
+
+'''
+== 4. Le bien-fondé de Kroki
+
+=== 4.1 Ce qu'est Kroki
+
+Une **passerelle HTTP** qui encapsule ~20 moteurs de rendu (PlantUML, Graphviz, Mermaid,
+BPMN, Excalidraw, ERD…) et expose `POST /{type}/{format}` → PNG/SVG/PDF. Déployable en
+local (Docker) ou en service distant (`kroki.io`).
+
+=== 4.2 Ce que Kroki apporte **à `diag-agent`**
+
+. **Oracle de validation** : rendre = valider (si le moteur renvoie une erreur, le
+   diagramme est invalide). C'est la manière *généraliste* de valider 20 types sans
+   embarquer 20 moteurs.
+. **Multi-format** : PNG/SVG/PDF d'un coup.
+. **Généralité** : un seul client pour tous les types (objectif qualité n°5).
+
+=== 4.3 HTOWN a-t-il besoin de ces fonctions ?
+
+[cols="3,2,3", options="header"]
+|===
+| Fonction Kroki | Utile à HTOWN ? | Pourquoi
+| **Oracle de rendu** | **NON — déjà couvert mieux** | `PlantumlService.validateSyntax` (parse natif) + `generateImage` (rendu natif) font **déjà** office d'oracle, **hors-ligne**, sans process, plus vite.
+| **Multi-format** | **NON — déjà couvert** | PlantUML/asciidoctor-diagram produisent PNG/SVG/PDF nativement.
+| **Généralité multi-types** | **NON — hors charte** | HTOWN possède **PlantUML**, pas Mermaid/BPMN. Si un jour un autre type est requis, c'est une décision d'un **autre** moteur/borough, pas d'HTOWN.
+|===
+
+=== 4.4 Arguments pour / contre
+
+*Pour* (avocat du diable) : interface uniforme si l'on voulait un jour d'autres types ;
+délestage du rendu lourd vers un service distant.
+
+*Contre* :
+. **Fonction déjà couverte** (§ 4.3) → gain nul en sortie.
+. **Process/service de plus à maintenir** — exactement la classe d'argument qui a fait
+  rejeter **MCP** (`WORKSPACE_AS_PRODUCT.adoc`). Kroki local = un conteneur ; Kroki remote =
+  une dépendance réseau.
+. **Drift de toolchain** — Kroki **embarque sa propre version de PlantUML**, distincte de
+  `PlantUmlToolchain.reference`. L'introduire recréerait une **2ᵉ source de vérité** = la
+  classe de défaut **D1/CHE-DIAGRAM** que `PLT-DIAGRAM-OWNERSHIP` vient précisément de fixer.
+. **Privacy / déterminisme** — réseau, latence, variabilité ; à rebours de la validation
+  locale et de la reproductibilité CI.
+. **Hors DAG** — ni N0, ni N1, ni N2 ; un service tiers ne se gouverne pas comme une
+  dépendance JVM.
+
+=== 4.5 Verdict
+
+**Kroki est rejeté** comme moteur de rendu et comme oracle de validation pour HTOWN.
+Il résout un problème que HTOWN **n'a pas** (rendu polyglotte) et importe des coûts qu'il
+**évite** explicitement (process/service à maintenir, réseau, 2ᵉ version de moteur).
+C'est le **même raisonnement** que le rejet de MCP — un service externe ne vaut pas mieux
+qu'une capacité native.
+
+=== 4.6 L'exception légitime : le savoir, pas le service
+
+Une **seule** chose de Kroki/`diag-agent` mérite d'être importée : **la connaissance**, pas
+le runtime.
+
+* La **liste des types** et surtout les **« good defaults » par type** (ch. 4 : plafonds
+  nœuds/arêtes, layout gauche-droite, skinparams cohérents, collapse des groupes) sont un
+  **actif documentaire**. Côté HTOWN, cela se réduit à des **skinparams/thème PlantUML**
+  (déjà partiellement présent via `output.theme`).
+* Import **comme ressource** (constantes/templates), jamais comme dépendance runtime.
+
+'''
+== 5. Périmètre confirmé de PLT-AGENT
+
+Le catalogue est **réduit à sa part portable** — 6 techniques, toutes sur l'infra HTOWN :
+
+[cols="1,3,2,1", options="header"]
+|===
+| ID | Technique (neutre) | Infra HTOWN réutilisée | Opt-in
+
+| DIA-01 | Revue design par **vision** | rendu **natif** `PlantumlService.generateImage` + `ChatModel` vision via `LlmService` | `langchain4j.designValidation` (défaut `false`)
+| DIA-02 | **Pré-vol de description** | `LlmService` | `langchain4j.preflight` (défaut `false`)
+| DIA-03 | **Budget mur** | objet pur + `DiagramProcessor` | `langchain4j.maxSeconds` (défaut `0`)
+| DIA-04 | **Extracteur de code robuste** | objet pur + `DiagramProcessor` | (toujours actif, non intrusif)
+| DIA-05 | **Exemples canoniques** | ressources `.puml` + RAG existant | `langchain4j.examples` (défaut `false`)
+| DIA-06 | **Détection de sous-type** | objet pur + `LlmService` repli | (heuristique par défaut)
+| DIA-07 | **Garde de convergence** | objet pur (dans DIA-01) | (couplé à DIA-01)
+|===
+
+*Explicitement hors périmètre* : Kroki, MCP, CLI, Python/LiteLLM, Docker, écriture directe
+du source `.adoc` (ADR-007 V2 — HTOWN écrit déjà ses artefacts, mais pas via édition in-place).
+
+'''
+== 6. Décisions
+
+. **D-1 — Techniques, pas stack.** On importe des **techniques** de `diag-agent` ; jamais sa
+  coquille (Python/LiteLLM/Click/MCP/Kroki/Docker).
+. **D-2 — Oracle de rendu = natif.** La validation et le rendu restent `PlantumlService`
+  (hors-ligne). **Kroki est rejeté** (§ 4.5).
+. **D-3 — MCP réaffirmé écarté.** Conformément à `WORKSPACE_AS_PRODUCT.adoc` (§ 3.1) ; HTOWN
+  reste un plugin Gradle fortement typé.
+. **D-4 — Vision = modèle, pas service.** La revue design consomme un **modèle vision** via
+  le port `LlmService` existant ; opt-in et dégradable (jamais prérequis de `check`).
+4. **D-5 — « Good defaults » = ressource.** Importés comme connaissance (skinparams/templates),
+  pas comme service.
+. **D-6 — Charte de non-régression** (§ 2.2) opposable à **chaque** US de `PLT-AGENT`.
+. **D-7 — On étend, on ne duplique pas.** La boucle reste `DiagramProcessor` ; pas de
+  2ᵉ processor ni de 2ᵉ oracle.
+
+'''
+== 7. Traçabilité
+
+* `diag-agent` : `https://github.com/docToolchain/diag-agent` @ `45068441`, MIT. Arc42
+  ch. 01/04/10 + ADR-001→008. Clone de lecture seule : `/tmp/opencode/diag-agent`.
+* Rejet MCP : `WORKSPACE_AS_PRODUCT.adoc` § « Pourquoi MCP est une Mauvaise Bonne Idée » ;
+  `LLM_FEEDBACKS.adoc` § 5.
+* Identité HTOWN : `PLT-DIAGRAM-OWNERSHIP` (`GBL-007`), `PLT-BOUNDARY`, `GBL-010`.
+* Cadrage associé : `.agents/CADRAGE_EPIC_PLT_AGENT.adoc` (S-228).

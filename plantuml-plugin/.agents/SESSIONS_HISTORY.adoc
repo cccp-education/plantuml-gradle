@@ -1,5 +1,28 @@
 = Historique des Sessions
 
+== Session 229 (2026-10-12) — Clarification de vision : périmètre PLT-AGENT ✅
+
+Porte de décision avant implémentation (gouvernance pure, zéro code). **Vision réelle
+de `diag-agent`** : agent de **délégation à contexte minimal** (un LLM hôte délègue
+l'itération syntaxe+layout, < 3 k tokens côté parent) ; objectifs qualité ordonnés
+(Context Efficiency, Install, Privacy, Autonomy, Extensibility) ; **noyau portable** =
+la boucle, **coquille non portable** = Python/LiteLLM/Click/MCP/Kroki/Docker. **Charte de
+non-régression HTOWN** : 13 capacités à préserver (validation native hors-ligne, boucle
+`DiagramProcessor`, multi-provider + pool + fallback cross-provider, RAG + Knowledge Graph,
+incrémentalité + Économie d'Encre, i18n 10 langues `PLT-BOUNDARY`, toolchain gouvernée,
+probe anti-blanc, config 4 sources, contrats N0, interface Gradle, DDD/TDD/BDD).
+**Audit « choix écartés »** : MCP rejeté au niveau workspace (`WORKSPACE_AS_PRODUCT.adoc`
+§ « Pourquoi MCP est une Mauvaise Bonne Idée » ; `LLM_FEEDBACKS.adoc` § 5) ; **aucun** item
+`DIA-01`→`DIA-07` n'exige MCP/CLI/Kroki/Python/Docker. **Bien-fondé de Kroki — verdict :
+REJETÉ** (oracle de validation déjà **natif** `PlantumlService` hors-ligne ; multi-format
+déjà couvert ; généralité multi-types **hors charte** ; process/service de plus = **même
+famille que le rejet de MCP** ; **2ᵉ version du moteur PlantUML** embarquée = drift
+toolchain = classe D1/CHE-DIAGRAM ; seule exception légitime = importer la **connaissance**
+« good defaults par type » comme **ressource**, pas le service). 7 décisions D-1→D-7.
+Périmètre confirmé : 6 techniques neutres sur l'infra HTOWN. Doc
+`.agents/CADRAGE_EPIC_PLT_AGENT_VISION.adoc` (+ cross-réf `CADRAGE_EPIC_PLT_AGENT.adoc`).
+Zéro code, zéro secret, zéro Python. Rapport `.agents/sessions/229-cadrage-vision-plt-agent.adoc`.
+
 == Session 228 (2026-10-12) — Cadrage EPIC PLT-AGENT (agentic loop PlantUML) ✅
 
 Demande pilote : code review du projet OSS `docToolchain/diag-agent` et propositions

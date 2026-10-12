@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-10-12 (Session 228 — cadrage EPIC PLT-AGENT : code review `docToolchain/diag-agent` + catalogue de portage PlantUML `DIA-01`→`DIA-07`, ~20 pts).
+:last_update: 2026-10-12 (Session 229 — vision PLT-AGENT : périmètre confirmé (6 techniques neutres), charte de non-régression HTOWN, **Kroki REJETÉ**. S-228 : cadrage + catalogue `DIA-01`→`DIA-07`, ~20 pts).
 
 '''
 
@@ -14,6 +14,14 @@ vision** sur l'image rendue, **budget mur**, **extracteur de code robuste**,
 
 *Cadrage* : `.agents/CADRAGE_EPIC_PLT_AGENT.adoc` (review + catalogue + 9 décisions +
 9 options écartées). *Rapport* : `.agents/sessions/228-code-review-diag-agent-portage-plantuml.adoc`.
+
+*Vision & périmètre* : `.agents/CADRAGE_EPIC_PLT_AGENT_VISION.adoc` (S-229) — **noyau
+portable** (la boucle) vs **coquille non portable** (Python/LiteLLM/Click/MCP/Kroki/Docker) ;
+**charte de non-régression HTOWN** (13 capacités) opposable à chaque US ; **audit des choix
+écartés** (MCP réaffirmé écarté) ; **verdict : Kroki REJETÉ** (oracle déjà natif, 2ᵉ version
+moteur = drift D1) — seule exception : la **connaissance** « good defaults » importée comme
+ressource. Périmètre = **6 techniques neutres** (DIA-01→07) sur l'infra existante.
+
 *Priorité* : 🟠 HAUTE — améliore la qualité des diagrammes générés (cœur du produit).
 *Charge* : ~20 pts (7 US). *Méthode* : baby-step DDD/TDD/BDD ; tout opt-in défaut
 `false` (4 sources + `push`) ; vision **dégradable**, jamais prérequis de `check`.

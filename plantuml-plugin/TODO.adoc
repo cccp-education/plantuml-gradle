@@ -3,12 +3,17 @@
 _Voir BACKLOG.adoc section "Prochains EPICs — pistes consolidées" pour le
 détail priorisé et les sources (code review, audit code)._
 
-== EPIC PLT-AGENT (cadré S-228)
+== EPIC PLT-AGENT (cadré S-228, vision S-229)
 
-Agentic loop PlantUML — portage des techniques de `docToolchain/diag-agent` (MIT) :
+Agentic loop PlantUML — portage des **techniques** de `docToolchain/diag-agent` (MIT) :
 pré-vol de description, revue design par vision, budget mur, extracteur de code
 robuste, exemples canoniques, détection de sous-type. Domaine `plantuml.agent`.
-~20 pts, 7 US. BACKLOG § PLT-AGENT + `.agents/CADRAGE_EPIC_PLT_AGENT.adoc`.
+~20 pts, 7 US. BACKLOG § PLT-AGENT + `.agents/CADRAGE_EPIC_PLT_AGENT.adoc` +
+`.agents/CADRAGE_EPIC_PLT_AGENT_VISION.adoc`.
+
+*Ne pas régresser* : validation native hors-ligne, boucle `DiagramProcessor`, multi-provider
++ pool + fallback, RAG + KG, incrémentalité, i18n 10 langues, toolchain gouvernée, contrats N0,
+interface Gradle. *Ne pas réintroduire* : MCP, CLI, Kroki, Python/LiteLLM, Docker.
 
 . [ ] Vérifier qu'au moins un modèle du pool HTOWN expose la **vision** (sinon DIA-01 dégrade).
 . [ ] Arbitrer le périmètre (vision opt-in) et l'ordre des US.

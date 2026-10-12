@@ -9,6 +9,10 @@ porter en Kotlin / tâches Gradle pour **améliorer le support PlantUML**. **Ses
 cadrage — zéro code modifié** (pattern S-057/S-063/S-074). Le livrable est un EPIC
 actionnable ; l'implémentation relève des sessions suivantes._
 
+_VISION & PÉRIMÈTRE (porte de décision, S-229) : `.agents/CADRAGE_EPIC_PLT_AGENT_VISION.adoc`
+— noyau portable vs coquille non portable, charte de non-régression HTOWN, audit des
+choix écartés (MCP/CLI/Kroki/Docker) et **verdict sur Kroki (rejeté)**._
+
 == 0. Objet & méthode
 
 Le borough plantuml (HTOWN) génère, valide et traduit des diagrammes PlantUML via

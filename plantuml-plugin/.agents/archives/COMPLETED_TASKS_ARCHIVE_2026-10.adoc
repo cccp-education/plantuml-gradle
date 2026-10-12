@@ -1,5 +1,20 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-10
 
+== Session 229 (2026-10-12) — Clarification de vision : périmètre PLT-AGENT ✅
+
+=== Fait
+- [x] Vision réelle de `diag-agent` : délégation à contexte minimal ; noyau portable (boucle) vs coquille non portable ✅
+- [x] Charte de non-régression HTOWN (13 capacités) ✅
+- [x] Audit « choix écartés » : MCP réaffirmé écarté (workspace) ; aucun item DIA n'exige MCP/CLI/Kroki/Python/Docker ✅
+- [x] **Verdict Kroki : REJETÉ** (oracle déjà natif ; 2ᵉ version moteur = drift D1) ; exception = connaissance (« good defaults ») ✅
+- [x] Doc `.agents/CADRAGE_EPIC_PLT_AGENT_VISION.adoc` (7 décisions D-1→D-7) + cross-réf cadrage S-228 ✅
+- [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 230 + BACKLOG + TODO + archive ✅
+- [x] Zéro code modifié, zéro secret, zéro Python ✅
+
+=== Prochaine session (230)
+- **US-1 (`DIA-04`)** : extracteur de code LLM robuste (`plantuml.agent.LlmCodeExtractor`), sous réserve de validation pilote de la vision S-229
+- **Fichier à lire en priorité** : `.agents/CADRAGE_EPIC_PLT_AGENT_VISION.adoc`
+
 == Session 228 (2026-10-12) — Cadrage EPIC PLT-AGENT (agentic loop PlantUML) ✅
 
 === Fait

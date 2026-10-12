@@ -1,0 +1,81 @@
+= Session 229 — Clarification de vision : périmètre PLT-AGENT (ce qu'on prend, ce qu'on ne prend pas)
+:session: 229
+:date: 2026-10-12
+:borough: HTOWN (plantuml-gradle)
+:type: cadrage (gouvernance pure)
+:statut: TERMINÉ
+:methode: pattern S-219/S-225/S-228 (zéro code modifié)
+
+== Mission
+
+Porte de décision demandée **avant** d'implémenter `PLT-AGENT` : clarifier (1) la vision
+réelle de `diag-agent`, (2) ce que HTOWN fait déjà bien et ne doit pas régresser, (3) ce
+que `diag-agent` peut apporter **sans** réintroduire des choix écartés (MCP, CLI, Kroki,
+Python/Docker), (4) le **bien-fondé de Kroki**.
+
+== Livrable
+
+`.agents/CADRAGE_EPIC_PLT_AGENT_VISION.adoc` (nouveau) + cross-référence dans
+`.agents/CADRAGE_EPIC_PLT_AGENT.adoc`. **Zéro code modifié.**
+
+== Réponses
+
+=== 1. Vision réelle de `diag-agent`
+
+Ce n'est **pas** un outil PlantUML : c'est un **agent de délégation à contexte minimal**.
+Problème visé : *un LLM hôte brûle son contexte* à itérer sur syntaxe + mise en page ; il
+délègue à un agent autonome et reçoit un résultat concis (< 3 k tokens côté parent).
+Objectifs qualité **ordonnés** (ch. 10) : 1 Context Efficiency, 2 Ease of Installation,
+3 Privacy, 4 Autonomy, 5 Extensibility. **Tous les choix** (bash/MCP opt-in, LiteLLM, Kroki,
+Docker, Click) découlent des objectifs n°1 et n°5 — **pas** des objectifs de HTOWN.
+**Noyau portable** = la **boucle** (ch. 4) : (a) génère → valide le rendu → réinjecte
+l'erreur → corrige ; (b) si vision : rend l'image → critique lisibilité → corrige.
+**Coquille non portable** = Python/uv, LiteLLM, Click, MCP, Kroki, Docker.
+
+=== 2. Charte de non-régression HTOWN
+
+13 capacités à préserver (tableau § 2.2 de la vision) : validation **native hors-ligne**,
+boucle `DiagramProcessor` existante (étendre, pas dupliquer), multi-provider `LlmService` +
+pool + fallback cross-provider, RAG + Knowledge Graph, incrémentalité + Économie d'Encre,
+i18n 10 langues (`PLT-BOUNDARY`), toolchain gouvernée (`PlantUmlToolchain`), probe anti-blanc,
+config 4 sources, contrats N0, interface Gradle + conventions, rigueur DDD/TDD/BDD.
+
+=== 3. Audit « choix écartés »
+
+`MCP` est rejeté **au niveau workspace** : `WORKSPACE_AS_PRODUCT.adoc` § « Pourquoi MCP est
+une Mauvaise Bonne Idée » (JSON-over-stdio non typé vs Gradle strongly typed ; process de
+plus à maintenir ; zéro héritage écosystème) + `LLM_FEEDBACKS.adoc` § 5 (« sans dépendre de
+protocoles fermés comme MCP »).
+Audit item par item : **aucun** item `PLT-AGENT` (DIA-01→07) n'exige MCP, CLI, Kroki, Python
+ou Docker — tous sont des **techniques** neutres sur l'infra HTOWN existante.
+
+=== 4. Bien-fondé de Kroki — VERDICT : REJETÉ
+
+Kroki = passerelle HTTP ~20 moteurs (PlantUML/Graphviz/Mermaid/BPMN…). Dans `diag-agent` :
+oracle de validation + multi-format + généralité. **Aucune de ces fonctions n'est utile à
+HTOWN** : l'oracle est déjà **natif** (`PlantumlService`), le multi-format est déjà couvert
+(PlantUML/asciidoctor-diagram), la généralité multi-types est **hors charte** (HTOWN possède
+PlantUML, pas Mermaid/BPMN). Contre : process/service de plus à maintenir (**même famille que
+le rejet de MCP**), réseau/privacy, et surtout **2ᵉ version du moteur PlantUML embarquée par
+Kroki** = drift toolchain = la classe de défaut **D1/CHE-DIAGRAM** que `PLT-DIAGRAM-OWNERSHIP`
+vient de fixer. **Exception légitime** : importer la **connaissance** (skinparams/« good
+defaults » par type) comme **ressource**, pas le service.
+
+== Décisions
+
+D-1 techniques ≠ stack ; D-2 oracle = natif, **Kroki rejeté** ; D-3 MCP réaffirmé écarté ;
+D-4 vision = modèle via `LlmService` (opt-in/dégradable) ; D-5 good defaults = ressource ;
+D-6 charte de non-régression opposable ; D-7 étendre `DiagramProcessor`, pas de 2ᵉ processor.
+
+== Vérifications
+
+* Working tree propre ; `./gradlew compileKotlin` VERT (S-228, inchangé — zéro code).
+* Zéro secret ; zéro Python.
+
+== Reste à faire
+
+* [ ] **Arbitrage pilote** : valider la vision (verdict Kroki, périmètre 6 techniques).
+* [ ] Vérifier la capacité vision du pool de modèles HTOWN (sinon DIA-01 dégrade).
+* [ ] Session suivante : **PLT-AGENT US-1 (`DIA-04`)** — extracteur de code robuste.
+
+_Score : 8/10 (cadrage vision, zéro code)._
