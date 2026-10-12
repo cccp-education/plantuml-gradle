@@ -55,6 +55,11 @@ dependencies {
     // provides the implementation (D1/D2/D3).
     implementation("education.cccp:plantuml-contracts:0.0.1")
 
+    // N0 contracts — augmented context (EPIC PLT-CONTEXT CTX-01). The shared
+    // CompositeContext / ContextChannel / ChannelBudget seam, fed by the N1
+    // codebase; plantuml consumes the contract, never an N2 type.
+    implementation("education.cccp:codebase-contracts:0.0.2")
+
     // Testcontainers for RAG integration (CollectPlantumlIndexTask uses PostgreSQLContainer)
     implementation(libs.testcontainers.pg)
 
