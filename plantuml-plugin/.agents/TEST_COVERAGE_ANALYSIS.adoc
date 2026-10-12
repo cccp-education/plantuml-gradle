@@ -1,6 +1,22 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 235 (12 octobre 2026) — PLT-CONTEXT US-4 (CTX-04 wiring `DiagramProcessor`)
+_Dernière mise à jour_ : Session 236 (12 octobre 2026) — GBL-010 G-3b (feuille PlantUML : statut par bloc + version toolchain)
+
+=== Session 236 — GBL-010 G-3b (feuille PlantUML : statut par bloc + version toolchain)
+
+Session 236 (2026-10-12) : la feuille `[plantuml]` expose son statut + la version toolchain
+à l'arbre unifié (G-4). Baby-step DDD/TDD/BDD.
+
+* `src/test/kotlin/plantuml/repair/PlantumlBlockStatusTest.kt` — **11 unit**
+  (classifieur : blanc→MISSING, valide→TRANSLATED, invalide→PENDING, label cassé D2→BROKEN
+  qui précède l'oracle, sans validateur→PENDING ; entrée owner/ref ; rapport totaux + JSON
+  owner + version toolchain).
+* `src/test/features/32_plantuml_block_status.feature` — **BDD `@plantuml-blocks`**
+  (5 scénarios) + `PlantumlBlockStatusSteps` (glue `plantuml.scenarios`, steps préfixés S-088).
+* Domaine **pur** : pas de tâche Gradle (le parcours AST = document G-2, la fusion = cheroliv G-4),
+  donc pas de functional TestKit — le BDD couvre l'intégration du classifieur.
+* Local = Build : 3 source sets `compile*Kotlin` + `assemble` + `validatePlugins` **VERTS**.
+  **Tests = CI** (preuve = run CI).
 
 === Session 235 — PLT-CONTEXT US-4 (CTX-04 wiring `DiagramProcessor`)
 

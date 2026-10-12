@@ -1,0 +1,72 @@
+= Session 236 — GBL-010 G-3b : feuille PlantUML — statut par bloc + version toolchain exposés
+:session: 236
+:date: 2026-10-12
+:borough: HTOWN (plantuml-gradle)
+:type: feat + test (DDD/TDD/BDD)
+:statut: TERMINÉ
+:methode: baby-step DDD/TDD/BDD (unit → cucumber)
+
+== Mission
+
+EPIC transverse **GBL-010** (arbre de traduction du site), branche Data, **G-3b** :
+la feuille `[plantuml]` expose, **par bloc**, un **statut de traduction**
+(`MISSING`/`PENDING`/`TRANSLATED`/`BROKEN`) et la **version de référence du
+toolchain**, lisibles par document/cheroliv (audit d'arbre unifié G-4). Consomme
+`PLT-DIAGRAM-OWNERSHIP` (GBL-007) — ne le refait pas.
+
+== Livrable — domaine pur `plantuml.repair`
+
+* `PlantumlBlockStatus` — enum `MISSING` / `PENDING` / `TRANSLATED` / `BROKEN`
+  (vocabulaire du modèle d'arbre GBL-010).
+* `PlantumlBlockEntry` — data class `ref` + `status` + `owner` (défaut `plantuml`,
+  invariant `ref` non vide). Le **propriétaire unique** de la feuille.
+* `PlantumlBlockClassifier` — objet pur `classify(source, validator)` :
+  1. source blanche → `MISSING` ;
+  2. label quoté sur retour-ligne réel (`PlantumlLabelIntegrity.hasBrokenQuotedLabel`,
+     le défaut D2/CHE-DIAGRAM) → `BROKEN` (précède l'oracle) ;
+  3. pas de validateur → `PENDING` ;
+  4. oracle N0 `PlantUmlSyntaxValidator` valide → `TRANSLATED` ;
+  5. oracle invalide → `PENDING` (correction assistée IA = G-3, restant).
+* `PlantumlBlockReport` — data class `blocks` + `toolchain`
+  (`PlantUmlToolchainReference`, D6) + `owner` (`plantuml`) → `toJson()`
+  (Jackson `INDENT_OUTPUT`) : l'artefact lisible par G-4.
+
+*Décision de frontière* : le **domaine pur** (API + JSON) est la feuille exposée ; **pas
+de tâche Gradle** — la marche de l'AST (surface des blocs `[plantuml]`) appartient à
+document (G-2) et la fusion des 3 rapports à cheroliv (G-4). plantuml fournit le
+classifieur, jamais un moteur de parcours (DAG : un nœud, un propriétaire).
+
+== Tests (Local = Build, Tests = CI)
+
+* Unit — `PlantumlBlockStatusTest` (11) : classifieur (blank→MISSING, valide→TRANSLATED,
+  invalide→PENDING, label cassé→BROKEN, BROKEN précède l'oracle, sans validateur→PENDING),
+  entrée (owner par défaut, ref vide rejeté), rapport (totaux/counts, JSON avec owner +
+  version toolchain).
+* BDD — `32_plantuml_block_status.feature` (`@plantuml-blocks`, 5 scénarios) +
+  `PlantumlBlockStatusSteps` (glue `plantuml.scenarios`, steps préfixés S-088).
+* Local = Build : `compileKotlin`/`compileTestKotlin`/`compileFunctionalTestKotlin` +
+  `assemble` + `validatePlugins` **VERTS**. **Tests = CI.**
+
+== Fichiers
+
+[cols="1,3"]
+|===
+| Type | Fichier
+
+| prod (nouveau) | `src/main/kotlin/plantuml/repair/PlantumlBlockStatus.kt`
+| prod (nouveau) | `src/main/kotlin/plantuml/repair/PlantumlBlockEntry.kt`
+| prod (nouveau) | `src/main/kotlin/plantuml/repair/PlantumlBlockClassifier.kt`
+| prod (nouveau) | `src/main/kotlin/plantuml/repair/PlantumlBlockReport.kt`
+| test (nouveau) | `src/test/kotlin/plantuml/repair/PlantumlBlockStatusTest.kt`
+| test (nouveau) | `src/test/features/32_plantuml_block_status.feature`
+| test (nouveau) | `src/test/scenarios/plantuml/scenarios/PlantumlBlockStatusSteps.kt`
+|===
+
+== Reste (GBL-010 / PLT-DIAGRAM-OWNERSHIP)
+
+* **G-3 (reste)** — correction assistée IA des blocs `PENDING` (au-delà de
+  `PlantumlLabelIntegrity`) ; G-1/G-2 (bakery/document) + G-4 (cheroliv) hors plantuml.
+* **US-6** chaîne E2E bakery→document→port→plantuml ; **US-7** dogfooding + non-régression.
+* **Fichier à lire en priorité** : `PROMPT_REPRISE.adoc` (session 237).
+
+_Score : 9/10 (DDD/TDD/BDD, feuille pure, frontière DAG respectée, version toolchain exposée)._

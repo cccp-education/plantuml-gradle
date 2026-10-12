@@ -122,14 +122,14 @@ statut (`TRANSLATED`/`PENDING`/`BROKEN`) et **corrige** (round-trip, `\n`, notes
 assisté par IA ; réutilise `PLT-BOUNDARY` + `PlantUmlTranslationPort` (N0) +
 `DiagramOutputProbe`. BDD `@plantuml-repair`.
 | 3
-| 🟡 PARTIEL S-226 — `plantuml.repair.PlantumlLabelIntegrity` (détection `hasBrokenQuotedLabel` + correction `escapeNewlines`/`repair`, port délègue — D5) ; reste statut par bloc + correction IA
+| 🟡 PARTIEL S-226 — `plantuml.repair.PlantumlLabelIntegrity` (détection `hasBrokenQuotedLabel` + correction `escapeNewlines`/`repair`, port délègue — D5) ; statut par bloc ✅ S-236 (G-3b) ; **reste correction assistée IA** (blocs `PENDING`)
 
 | G-3b
 | **Statut + version exposés au contrat.** Le statut par bloc et la version
 toolchain de référence sont lisibles par document/cheroliv (audit d'arbre unifié) ;
 garde anti-drift local↔CI préservée.
 | 2
-| 🟡 À FAIRE
+| ✅ S-236 — domaine pur `plantuml.repair` (`PlantumlBlockStatus`/`PlantumlBlockEntry`/`PlantumlBlockClassifier`/`PlantumlBlockReport`) expose statut par bloc + version toolchain (JSON) à l'arbre unifié G-4 ; 11 unit + BDD `@plantuml-blocks` (5 scénarios)
 |===
 
 *Prérequis* : `GBL-007` US-3 (round-trip ✅) / US-4 (délégation document ✅ S-283/S-284).

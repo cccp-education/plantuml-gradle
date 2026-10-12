@@ -1,5 +1,18 @@
 = Historique des Sessions
 
+== Session 236 (2026-10-12) — GBL-010 G-3b (feuille PlantUML : statut par bloc + version toolchain) ✅
+
+Implémentation (baby-step DDD/TDD/BDD). **Domaine pur** `plantuml.repair` : `PlantumlBlockStatus`
+(enum `MISSING`/`PENDING`/`TRANSLATED`/`BROKEN`), `PlantumlBlockEntry` (`ref`+`status`+`owner=plantuml`),
+`PlantumlBlockClassifier.classify(source, validator)` (blanc→MISSING ; label cassé D2→BROKEN, précède
+l'oracle ; sans validateur→PENDING ; oracle N0 `PlantUmlSyntaxValidator` valide→TRANSLATED /
+invalide→PENDING), `PlantumlBlockReport` (`blocks`+`toolchain` D6+`owner`→`toJson` Jackson). La feuille
+est **exposée** à l'arbre unifié G-4 (lisible document/cheroliv) ; **pas de tâche Gradle** (le parcours
+AST = document G-2, la fusion = cheroliv G-4). Tests : **11 unit** (`PlantumlBlockStatusTest`) + **BDD**
+`32_plantuml_block_status.feature` (`@plantuml-blocks`, 5 scénarios) + `PlantumlBlockStatusSteps`.
+Local = Build (compile 3 source sets + `assemble` + `validatePlugins` VERT) ; preuve = CI. Zéro secret,
+zéro Python, zéro publication. Rapport `.agents/sessions/236-gbl010-g3b-plantuml-block-status.adoc`.
+
 == Session 235 (2026-10-12) — PLT-CONTEXT US-4 (CTX-04 wiring `DiagramProcessor`) — EPIC ✅ 4/4 ✅
 
 Implémentation (baby-step DDD/TDD/BDD). **Domaine pur** `plantuml.context.AugmentedContextPrompt`

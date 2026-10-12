@@ -1,5 +1,20 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-10
 
+== Session 236 (2026-10-12) — GBL-010 G-3b (feuille PlantUML : statut par bloc + version toolchain) ✅
+
+=== Fait
+- [x] **Domaine pur** `plantuml.repair` : `PlantumlBlockStatus` (enum), `PlantumlBlockEntry` (`ref`+`status`+`owner=plantuml`) ✅
+- [x] `PlantumlBlockClassifier.classify(source, validator)` (N0 `PlantUmlSyntaxValidator` ; BROKEN label cassé précède l'oracle) ✅
+- [x] `PlantumlBlockReport` (`blocks`+`toolchain` D6+`owner`→`toJson` Jackson) — exposé à l'arbre unifié G-4 ✅
+- [x] Tests : **11 unit** (`PlantumlBlockStatusTest`) + BDD `32_plantuml_block_status.feature` (`@plantuml-blocks`, 5 scénarios) ✅
+- [x] Frontière DAG : feuille pure (pas de tâche Gradle ; parcours = document G-2, fusion = cheroliv G-4) ✅
+- [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 237 + BACKLOG (G-3b ✅) + TODO + archive ✅
+- [x] Local = Build (compile 3 source sets + `assemble` + `validatePlugins` VERT) ; zéro secret, zéro Python, zéro publication ✅
+
+=== Prochaine session (237)
+- **GBL-010 `G-3` (reste : correction assistée IA des blocs `PENDING`)** ; sinon PLT-DIAGRAM-OWNERSHIP US-6/US-7
+- **Fichier à lire en priorité** : `BACKLOG.adoc` § GBL-010
+
 == Session 235 (2026-10-12) — PLT-CONTEXT US-4 (CTX-04 wiring `DiagramProcessor`) — EPIC ✅ 4/4
 
 === Fait
