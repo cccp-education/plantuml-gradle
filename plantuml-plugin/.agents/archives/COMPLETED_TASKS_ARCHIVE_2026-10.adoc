@@ -8,6 +8,7 @@
 - [x] 6 unit (`PlantumlContextBuilderTest`) + BDD `29_plantuml_context.feature` (`@context`, 3 scénarios) + `PlantumlContextSteps` ✅
 - [x] Frontière DAG : seam N0, moteur N1 ; `DocKnowledgeBase` = repli (CTX-04) ✅
 - [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 234 + BACKLOG/TODO (CTX-01/02 ✅) + archive ✅
+- [x] CI : alignement de 5 workflows sur JDK 25 (révélé par CTX-01 ; `fine_tune_test` était en JDK 24) ✅
 - [x] Local = Build (compile VERT) ; zéro secret, zéro Python ✅
 
 === Prochaine session (234)

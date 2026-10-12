@@ -47,6 +47,13 @@ augmenté, en miroir du patron capsule.
 * `DocKnowledgeBase` statique **conservé** (repli hors-ligne, CTX-04).
 * `CTX-05` **CADUQUE** (S-232) — `LlmService` non remplacé.
 
+== CI (dette révélée par CTX-01)
+
+Le changement de `build.gradle.kts` (CTX-01) a déclenché `fine_tune_test.yml`, qui
+échouait en **JDK 24** (les plugins `conventions 0.0.7` / `codebase 0.0.14` exigent
+**JVM 25**). Alignement de **5 workflows** sur JDK 25 : `fine_tune_test`, `integration_test`,
+`plantuml-processing`, `readme_action`, `readme_truth` (convention workspace).
+
 == Reste à faire
 
 * [ ] `CTX-03` — collecteur `collectPlantumlAugmentedContext` (EAGER + canaux injectés → artefact).
