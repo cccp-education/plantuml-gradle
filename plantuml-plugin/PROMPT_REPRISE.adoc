@@ -1,23 +1,22 @@
-= PROMPT_REPRISE — Plantuml — Session 239
-:session: 239
+= PROMPT_REPRISE — Plantuml — Session 240
+:session: 240
 :date: 2026-10-12
 
-== État — PLT-AGENT ✅ 7/7 (+FT preflight) ; PLT-CONTEXT ✅ 4/4 ; GBL-010 G-3/G-3b ✅ (feuille)
+== État — PLT-AGENT ✅ 7/7 (+FT) ; PLT-CONTEXT ✅ 4/4 ; GBL-010 G-3 ✅ (feuille close)
 
 * **PLT-AGENT ✅ 7/7** (S-230) ; **optionnel (a) FT `preflightPlantumlDescription` ✅ S-238**.
 * **PLT-CONTEXT ✅ 4/4 TERMINÉ** (S-235).
-* **GBL-010 G-3b ✅ S-236** (statut par bloc + version toolchain) ; **G-3 correction ✅ S-237**
-  (correcteur déterministe+IA + `ChatModelBlockRepairer`) ; **notes ✅ S-238**
-  (`PlantumlNoteExtractor` — surface ; câblage port = suivi cross-borough).
-* **Drift gouvernance** corrigé S-238 (`ROADMAP.adoc` pool ✅ TERMINÉ, `TODO.adoc` freemium ✅ S176).
+* **GBL-010 G-3 ✅** — statut par bloc (G-3b S-236) + correction déterministe+IA (S-237) +
+  notes (S-238 extracteur, **S-239 câblage port** : `PlantumlTranslationPortAdapter` traduit
+  le texte des notes in-place, newlines réelles préservées, N0 inchangé).
+* **Drift gouvernance** corrigé S-238 (`ROADMAP.adoc`, `TODO.adoc`).
 * **CI** : workflows obsolètes supprimés ; cache pgvector + cache Ollama `qwen3.5:0.8b`.
 
-== Mission Session 239 — au choix pilote
+== Mission Session 240 — au choix pilote
 
-* **PLT-DIAGRAM-OWNERSHIP US-6** — chaîne de transmission E2E bakery→document→port→plantuml
-  (rendu non blanc), cross-borough (**arbitrage pilote requis**), 3 pts. **Candidat par défaut.**
+* **PLT-DIAGRAM-OWNERSHIP US-6** — chaîne E2E bakery→document→port→plantuml (rendu non blanc),
+  cross-borough (**arbitrage pilote requis**), 3 pts. **Candidat par défaut.**
 * **PLT-DIAGRAM-OWNERSHIP US-7** — dogfooding + non-régression (re-bake cheroliv.com) (2 pts).
-* **GBL-010 G-3** — câblage des notes dans `PlantumlTranslationPortAdapter` (ou extension N0).
 * **FIX-BASELINE `FilePermission`** — traiter (1 FAIL functional S-030) ou marquer CADUQUE.
 * **PLT-AGENT optionnel (b)** — vérifier qu'un modèle du pool expose la vision.
 
@@ -35,5 +34,5 @@
 * GroupId `education.cccp` — version `plantuml = "0.0.9"` (catalog ws 0.0.78).
 * BOM `workspace-bom` **0.0.78** ; N0 `plantuml-contracts:0.0.1`, `i18n-contracts:0.0.3`,
   `codebase-contracts:0.0.2`.
-* EPICs : **PLT-AGENT ✅ 7/7**, **PLT-CONTEXT ✅ 4/4**, GBL-010 (feuille plantuml ✅ ;
-  G-1/G-2/G-4 hors plantuml), PLT-DIAGRAM-OWNERSHIP (US-6/7, cross-borough).
+* EPICs : **PLT-AGENT ✅ 7/7**, **PLT-CONTEXT ✅ 4/4**, **GBL-010 feuille plantuml ✅**
+  (G-1/G-2/G-4 hors plantuml), PLT-DIAGRAM-OWNERSHIP (US-6/7, cross-borough).

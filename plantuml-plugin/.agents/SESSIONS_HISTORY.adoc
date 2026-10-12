@@ -1,5 +1,18 @@
 = Historique des Sessions
 
+== Session 239 (2026-10-12) — GBL-010 G-3 : câblage des notes dans le port de traduction ✅
+
+`PlantumlTranslationPortAdapter` traduit désormais le **texte des notes** PlantUML in-place.
+`PlantumlNoteExtractor` enrichi (`PlantumlNote(raw, text)` + `occurrences`) : le port remplace la
+**région brute** exacte par la traduction ; un bloc **notes-only** (sans label) n'est plus
+court-circuité ; les **newlines réelles sont conservées** (une note est de la prose — pas
+d'échappement `\n`). **N0 inchangé** (plantuml-local). Tests : `PlantumlNoteExtractorTest` **+2**
+(occurrence raw/text) + `PlantumlTranslationPortAdapterTest` **+5** (note mono-ligne sans label,
+corps multi-ligne in-place, newline réelle conservée, notes-only + échec → préservé, structure
+`end note`). Local = Build (compile 3 source sets + `assemble` + `validatePlugins` VERT) ;
+preuve = CI. **GBL-010 G-3 clos côté feuille plantuml.** Zéro secret, zéro Python, zéro publication.
+Rapport `.agents/sessions/239-gbl010-g3-notes-port-wiring.adoc`.
+
 == Session 238 (2026-10-12) — Notes PlantUML + FT preflight + drift gouvernance ✅
 
 Trois items plantuml-local. **Notes (GBL-010 G-3)** : objet **pur** `plantuml.repair.PlantumlNoteExtractor`

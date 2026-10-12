@@ -1,0 +1,59 @@
+= Session 239 — GBL-010 G-3 : câblage des notes dans le port de traduction
+:session: 239
+:date: 2026-10-12
+:borough: HTOWN (plantuml-gradle)
+:type: feat + test (DDD/TDD/BDD)
+:statut: TERMINÉ
+:methode: baby-step DDD/TDD/BDD (unit → cucumber)
+
+== Mission
+
+EPIC transverse **GBL-010**, branche Data, **G-3 (reste)** : câbler la **traduction du
+texte des notes** PlantUML dans le **port de traduction** (`PlantumlTranslationPortAdapter`),
+**sans modifier le contrat N0** (`PlantUmlBlock.labels()` ne capte pas les notes).
+
+== Livré
+
+* `PlantumlNoteExtractor` enrichi : `PlantumlNote(raw, text)` + `occurrences(source)`
+  (la région **brute** exacte à remplacer in-place + le texte trimé à traduire) ;
+  `notes()` / `hasNotes()` délèguent.
+* `PlantumlTranslationPortAdapter` — le port traduit désormais aussi les **notes** :
+  * un bloc **notes-only** (sans label) n'est plus court-circuité (`labels.isEmpty() &&
+    notes.isEmpty()`) ;
+  * chaque note est traduite in-place (`raw.replace(note.raw, resolved)`) ;
+  * **les newlines réelles sont conservées** (une note est de la prose, pas un label
+    quoté : on **n'échappe pas** avec `\n`).
+* Frontière : **plantuml-local**, N0 inchangé (le N0 `labels()` reste le seam ; les notes
+  sont une surface complémentaire de la feuille).
+
+== Tests (Local = Build, Tests = CI)
+
+* Unit — `PlantumlNoteExtractorTest` **+2** (occurrence mono-ligne : `raw == text == ` texte ;
+  occurrence multi-ligne : `raw` = corps indenté exact, `text` = corps trimé).
+* Unit — `PlantumlTranslationPortAdapterTest` **+5** : note mono-ligne traduite même sans
+  label ; corps multi-ligne traduit in-place ; newline réelle conservée (non échappée) ;
+  bloc notes-only + échec provider → préservé ; structure `end note` conservée.
+* BDD — `34_plantuml_notes.feature` (`@plantuml-notes`, 3 scénarios, extracteur) inchangée.
+* Local = Build : compile 3 source sets + `assemble` + `validatePlugins` **VERTS**.
+  **Tests = CI.**
+
+== Fichiers
+
+[cols="1,3"]
+|===
+| Type | Fichier
+
+| prod (modifié) | `src/main/kotlin/plantuml/repair/PlantumlNoteExtractor.kt` (+ `PlantumlNote` + `occurrences`)
+| prod (modifié) | `src/main/kotlin/plantuml/boundary/PlantumlTranslationPortAdapter.kt` (traduction notes)
+| test (modifié) | `src/test/kotlin/plantuml/repair/PlantumlNoteExtractorTest.kt` (+2)
+| test (modifié) | `src/test/kotlin/plantuml/boundary/PlantumlTranslationPortAdapterTest.kt` (+5)
+|===
+
+== Reste
+
+* **GBL-010 G-3** — clos côté feuille plantuml (statut + correction + notes câblées).
+* **PLT-DIAGRAM-OWNERSHIP US-6/US-7** (cross-borough) ; **FIX-BASELINE FilePermission** ;
+  **PL-3** (bloqué ABIDJAN) ; **PLT-AGENT optionnel (b)**.
+* **Fichier à lire en priorité** : `PROMPT_REPRISE.adoc` (session 240).
+
+_Score : 9/10 (câblage notes in-place, N0 inchangé, newlines de note préservées, 7 tests unit)._

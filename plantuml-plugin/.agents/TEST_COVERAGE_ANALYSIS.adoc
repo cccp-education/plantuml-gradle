@@ -1,6 +1,19 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 238 (12 octobre 2026) — Notes PlantUML + FT preflight (PLT-AGENT)
+_Dernière mise à jour_ : Session 239 (12 octobre 2026) — GBL-010 G-3 (câblage des notes dans le port)
+
+=== Session 239 — GBL-010 G-3 (câblage des notes dans le port de traduction)
+
+Session 239 (2026-10-12) : le port de traduction traduit le texte des notes PlantUML.
+
+* `src/test/kotlin/plantuml/repair/PlantumlNoteExtractorTest.kt` — **+2 unit**
+  (occurrence mono-ligne `raw == text` ; occurrence multi-ligne `raw` = corps indenté exact).
+* `src/test/kotlin/plantuml/boundary/PlantumlTranslationPortAdapterTest.kt` — **+5 unit**
+  (note mono-ligne sans label, corps multi-ligne in-place, newline réelle conservée non
+  échappée, notes-only + échec provider → préservé, structure `end note` conservée).
+* N0 inchangé (plantuml-local) ; BDD `34_plantuml_notes.feature` inchangée.
+* Local = Build : 3 source sets `compile*Kotlin` + `assemble` + `validatePlugins` **VERTS**.
+  **Tests = CI** (preuve = run CI).
 
 === Session 238 — Notes PlantUML + FT preflight (PLT-AGENT) + drift
 
