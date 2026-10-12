@@ -60,6 +60,11 @@ MEMPHIS → plantuml → consommateurs).
 * `BACKLOG.adoc` : 7 dérives corrigées (PLT-VALIDATION-CONTRACT → N0, PUB complété
   0.0.9, PLT-I18N, US-I18N-7, Métadonnées, en-têtes de sections, icône PLT-BOUNDARY) +
   nouvelle section `PLT-MAINTAIN`. `TODO.adoc` : EP-2 marqué terminé.
+* **Rotation backup (étape 7)** : capteur déclenché (EAGER > 500 lignes ; N=242) →
+  vague `.agents/backup/Y2026-sessions-171-232/` (INDEX + SESSIONS_HISTORY +
+  COMPLETED_TASKS + 32 fichiers `sessions/`) ; fichiers actifs tronqués aux **10
+  dernières sessions** (233-242) ; INDEX table « 10 dernières » reconstruite + localisation
+  de vague mise à jour.
 
 === Ops — Release 0.0.10
 

@@ -1,0 +1,295 @@
+= Index des Sessions — PlantUML Gradle Plugin
+
+_Regles absolues_ : voir `AGENT.adoc` section "Regles Absolues"
+
+_Dernière mise a jour_ : 2026-10-13 — Session 242 (plantuml) — **PLT-MAINTAIN** : découplage test/prod (`plantuml.runtime.RuntimeEnvironment`), purge de stubs morts, `ConfigMerger` (helpers de précédence), README/ROADMAP/CI réalignés, 5 workflows CI cassés désactivés, backlog synchronisé. **Release 0.0.10** (DAG MEMPHIS → plantuml → consommateurs). Gate local = build VERT. Rapport `.agents/sessions/242-plt-maintain-decoupling-hygiene.adoc`.
+_Historique 241_ : Session 241 (plantuml) — **Cadrage cross-borough PLT-DIAGRAM-OWNERSHIP US-6/US-7**. Audit de la chaîne E2E (MEMPHIS N0 ✅ / plantuml ✅ / document ✅ US-4 / bakery 🟡 partiel / cheroliv 🟡) ; **US-6** = FT bakery (bloc extrait + labels traduits + round-trip + rendu non blanc, 2 niveaux) ; **US-7** = re-bake cheroliv.com. Ordonnancement : S-242/243 bakery, S-244 cheroliv. Gouvernance pure. Doc `.agents/CADRAGE_PLT_DIAGRAM_OWNERSHIP_US6_US7.adoc`. **CI VERTE run `38286521193`** (commit `99d7a56`, docs-only). Rapport `.agents/sessions/241-cadrage-us6-us7.adoc`.
+_Historique 240_ : Session 240 (plantuml) — **FIX-BASELINE `FilePermission` résolu (durcissement environnemental)**. Diagnostic CI : les 4 tests `File permissions` PASSENT sur CI ; le « FAIL S-030 » est environnemental (root/conteneur ignore `setReadable(false)`). Correctif **test-only** : `assumeTrue` sur le test `read permission denied` quand la permission n'est pas imposée (couverture CI préservée, 4/4 PASSED). **FIX-BASELINE entièrement résolu** (cucumber S-217 + functional S-240). Local = Build (compileFunctionalTestKotlin VERT) ; **CI VERTE run `38282908466`** (commit `7778e68`). Rapport `.agents/sessions/240-fix-baseline-filepermission.adoc`.
+_Historique 239_ : Session 239 (plantuml) — **GBL-010 G-3 : câblage des notes dans le port de traduction**. `PlantumlTranslationPortAdapter` traduit le **texte des notes** in-place (`PlantumlNoteExtractor.occurrences` → `PlantumlNote(raw, text)`), bloc notes-only plus court-circuité, **newlines réelles conservées** (prose, pas d'échappement `\n`) ; **N0 inchangé** (plantuml-local). `PlantumlNoteExtractorTest` +2 + `PlantumlTranslationPortAdapterTest` +5. **GBL-010 G-3 clos côté feuille plantuml.** Local = Build (compile + assemble + validatePlugins VERT) ; **CI VERTE run `38279828661`** (commit `1b79b85`). Rapport `.agents/sessions/239-gbl010-g3-notes-port-wiring.adoc`.
+_Historique 238_ : Session 238 (plantuml) — **Notes PlantUML + FT preflight (PLT-AGENT) + drift gouvernance**. `plantuml.repair.PlantumlNoteExtractor` (pur : `note … : text` + `note …`/`end note`) — surface plantuml-local complétant le N0 `labels()` sans le modifier ; `PreflightPlantumlDescriptionFunctionalTest` (TestKit + WireMock, 3 cas) ; `ROADMAP.adoc`/`TODO.adoc` dé-driftés. 7 unit + 3 functional + BDD `34_plantuml_notes.feature` (`@plantuml-notes`, 3 scénarios). Local = Build (compile + assemble + validatePlugins VERT) ; **CI VERTE run `38274390288`** (commit `d0798d8`). Rapport `.agents/sessions/238-notes-preflight-drift.adoc`.
+_Historique 237_ : Session 237 (plantuml) — **GBL-010 G-3 : correction d'un bloc PlantUML (déterministe + IA)**. Domaine pur `plantuml.repair` : `PlantumlBlockRepairer` (port), `PlantumlCorrectionStrategy` (`DETERMINISTIC`/`AI`/`PRESERVED`), `PlantumlBlockCorrection`, `PlantumlBlockCorrector` (pipeline : réparation déterministe `\n` → port IA accepté seulement si re-parse → sinon source préservée, round-trip D5) + `ChatModelBlockRepairer` (adaptateur de référence, réutilise `LlmCodeExtractor` DIA-04). 9 unit + 3 unit (`ChatModelBlockRepairerTest`) + BDD `33_plantuml_block_correction.feature` (`@plantuml-correction`, 4 scénarios). Local = Build (compile + assemble + validatePlugins VERT) ; **CI VERTE run `38270262874`** (commit `4110ea8`). Rapport `.agents/sessions/237-gbl010-g3-corrector.adoc`.
+_Historique 236_ : Session 236 (plantuml) — **GBL-010 G-3b : feuille PlantUML — statut par bloc + version toolchain exposés**. Domaine pur `plantuml.repair` : `PlantumlBlockStatus` (`MISSING`/`PENDING`/`TRANSLATED`/`BROKEN`), `PlantumlBlockEntry` (`ref`+`status`+`owner=plantuml`), `PlantumlBlockClassifier.classify(source, validator)` (N0 `PlantUmlSyntaxValidator` ; BROKEN précède l'oracle), `PlantumlBlockReport` (+ `toolchain` D6 + `toJson`). Exposé à l'arbre unifié G-4 (lisible document/cheroliv) ; pas de tâche Gradle (parcours = document G-2, fusion = cheroliv G-4). 11 unit + BDD `32_plantuml_block_status.feature` (`@plantuml-blocks`, 5 scénarios). Local = Build (compile + assemble + validatePlugins VERT) ; **CI VERTE run `38267511170`** (commit `9fbb859`). Rapport `.agents/sessions/236-gbl010-g3b-plantuml-block-status.adoc`.
+_Historique 235_ : Session 235 (plantuml) — **PLT-CONTEXT US-4 : CTX-04 wiring `DiagramProcessor`** — **EPIC PLT-CONTEXT ✅ TERMINÉ 4/4**. Domaine pur `plantuml.context.AugmentedContextPrompt` (`prepend` : prompt inchangé si contexte blanc — repli D-3) ; `DiagramProcessor` reçoit `augmentedContext: String = ""` et injecte le bloc avant `chatModel.chat(...)` ; `GeneratePlantumlDiagramsTask.resolveAugmentedContext()` lit `build/plantuml/augmented-context.txt` ; `generatePlantumlDiagrams` **dépend** de `collectPlantumlAugmentedContext` ; durcissement CTX-03 (entrée `eagerFiles` tolérante). 4 unit + 2 unit (`ArgumentCaptor`) + BDD `31_plantuml_context_wiring.feature` (`@context @wiring`, 2 scénarios) + 3 functional TestKit. Local = Build (compile + assemble + validatePlugins VERT) ; **CI VERTE run `38263864916`** (commit `d14f735`). Rapport `.agents/sessions/235-plt-context-us4-wiring.adoc`.
+_Historique 234_ : Session 234 (plantuml) — **PLT-CONTEXT US-3 : CTX-03 collecteur `collectPlantumlAugmentedContext`** + provenance `context-provenance.json` (D-6). Domaine pur `plantuml.context` (`ContextProvenance`/`ProvenanceTracker`/`ProvenanceChannel`/`ProvenanceSource`) + extension additive de `PlantumlContextBuilder.build(composite, budget, tracker)` ; tâche Gradle EAGER + canaux injectés `-Pcontext.*` → `build/plantuml/augmented-context.txt` ; enregistrée dans `PlantumlManager` ; i18n `task.context.*` (10 langues). 12 unit + 2 unit builder + 4 functional TestKit + BDD `30_plantuml_provenance.feature` (`@context @provenance`, 3 scénarios). **PLT-CONTEXT 3/4** (reste CTX-04 wiring). Local = Build (compile + assemble + validatePlugins VERT) ; **CI VERTE run `38261148871`** (commit `0bdbf25`, 11m16s). Rapport `.agents/sessions/234-plt-context-us3-collector.adoc`.
+_Historique 233_ : Session 233 (plantuml) — **PLT-CONTEXT US-1/2 : CTX-01 (`CTX-01` contrat N0) + CTX-02 (assembleur pur)**. `build.gradle.kts` adopte le **contrat N0** `education.cccp:codebase-contracts:0.0.2` (`contracts.context.*`) ; `plantuml.context.PlantumlContextBuilder` (objet **pur**, miroir de `CapsuleContextBuilder`) budgète les 5 canaux et rend le bloc sectionné prompt-ready (`PlantumlContext`). 6 unit + BDD `29_plantuml_context.feature` (`@context`, 3 scénarios) + `PlantumlContextSteps`. **PLT-CONTEXT 2/4** (reste CTX-03 collecteur + CTX-04 wiring). Local = Build (compile VERT) ; preuve = CI. Rapport `.agents/sessions/233-plt-context-us1-us2.adoc`.
+_Historique 232_ : Session 232 (plantuml) — **Arbitrage CTX-05 : CADUQUE** (`LlmService` non remplacé par le hub N1 `LlmBuildService` : superset local, hub Ollama-centré, split-brain). § 11 du cadrage. : portage des techniques `docToolChain/diag-agent` (domaine pur `plantuml.agent`) — DIA-04 `LlmCodeExtractor`, DIA-03 `GenerationBudget`, DIA-06 `DiagramSubtypeDetector`, DIA-02 `DescriptionPreflight` + tâche `preflightPlantumlDescription`, DIA-05 `DiagramExampleCatalog`, DIA-01 `DesignReview` + port/adapter `VisionDesignReviewer`, DIA-07 `DesignConvergence`. Config `langchain4j.{maxSeconds,preflight,examples,designValidation}` (4 sources, défaut off). BDD `28_agent_loop.feature` (18 scénarios). Correctif dette : drift toolchain S-227 réaligné. Rapports `.agents/sessions/230-plt-agent-implementation.adoc`.
+_Historique 229_ : Session 229 (plantuml) — **Cadrage VISION PLT-AGENT** (porte de décision) : noyau portable vs coquille non portable ; **charte de non-régression HTOWN** (13 capacités) ; audit « choix écartés » (MCP/CLI/Kroki/Docker) ; **verdict : Kroki REJETÉ** (oracle déjà natif hors-ligne ; 2ᵉ version du moteur = drift D1/CHE-DIAGRAM ; même famille que le rejet de MCP). Périmètre confirmé = 6 techniques neutres. Doc `.agents/CADRAGE_EPIC_PLT_AGENT_VISION.adoc`. Zéro code. Rapport `.agents/sessions/229-cadrage-vision-plt-agent.adoc`.
+_Historique 228_ : Session 228 (plantuml) — **Cadrage EPIC PLT-AGENT** (code review `docToolchain/diag-agent` + catalogue de portage PlantUML `DIA-01`→`DIA-07`, ~20 pts, 7 US). Domaine cible `plantuml.agent` ; on **étend** `DiagramProcessor` (pas de seconde boucle) ; aucun nouveau rendu ; vision opt-in/dégradable ; 4 sources + push ; **jamais prérequis de `check`**. Doc `.agents/CADRAGE_EPIC_PLT_AGENT.adoc`. Zéro code. Rapport `.agents/sessions/228-code-review-diag-agent-portage-plantuml.adoc`.
+_Historique 227_ : Session 227 (plantuml) — **Release 0.0.9 (bump + dépendances)**. Bump `plantuml 0.0.8 → 0.0.9`, pins catalog/BOM `0.0.71 → 0.0.78`, `jgit 7.5 → 7.8.0`, `asciidoctorj-diagram 3.2.0 → 3.2.1`, `-plantuml 1.2025.3 → 1.2026.2`. Publication Central bundle `dcb6d30e-fcff-45b3-a9c1-d9ba435a3cf3`, propagation repo1 200 ; compile 3 source sets VERT. `plantuml-engine` standalone inchangé (US-3). Rapport `.agents/sessions/227-release-0.0.9-bump-deps.adoc`.
+_Historique 226_ : Session 226 (plantuml) — **GBL-010 G-3 : intégrité de label PlantUML** (`PlantumlLabelIntegrity` — détection + correction `\n` ; port délègue). Rapport `.agents/sessions/226-gbl010-g3-plantuml-label-integrity.adoc`.
+_Historique 225_ : Session 225 (plantuml) — **Cadrage GBL-010 : arbre de traduction (feuille PlantUML)**. plantuml possède la feuille `[plantuml]` de la branche Data (article → document → AST) : traduction + débugage/correction assisté par IA (port N0 `PlantUmlTranslationPort` + `PLT-BOUNDARY` + `DiagramOutputProbe`), statut par bloc (`MISSING`/`PENDING`/`TRANSLATED`/`BROKEN`), version toolchain exposée. `BACKLOG.adoc` § EPIC GBL-010 : **G-3** + **G-3b**. Cadrage racine `CADRAGE_EPIC_GBL_010_ARBRE_TRADUCTION_SITE.adoc`. Gouvernance pure. Rapport `.agents/sessions/225-gbl010-arbre-traduction.adoc`.
+_Historique 224_ : Session 224 (plantuml) — **PLT-CR3-2** (probe de sortie diagramme, garde anti « blanc »). Domaine pur `plantuml.service.DiagramOutputProbe` (octets + port N0, sans I/O) : détecte un artéfact vide / non-image (le texte de fallback de `generateImage`) / source non re-parsable. Câblage `GeneratePlantumlDiagramsTask` (probe + warn non-fatal). BDD `@diagram-probe` (4 scénarios) + 6 unit. **EPIC PLT-CR3 TERMINÉ 2/2.** **CI VERTE run `37864982511`** (13m7s, kover 84.20 %). Suivant : US-4 (arbitrage A/B), US-7 (dogfooding).
+_Historique 223_ : Session 223 (plantuml) — **PLT-CR3-1** (modèles HuggingFace/Groq configurables). Domaine pur `plantuml.service.ProviderModelResolver` + `LlmService` délègue. BDD `@provider-model` (4 scénarios) + 4 unit. **CI VERTE run `37863016696`** (10m17s, kover 84.26 %).
+_Historique 222_ : Session 222 (plantuml) — **US-5 PLT-DIAGRAM-OWNERSHIP** (version toolchain gouvernée) + **publication 0.0.8** + **résurrection CI (6 verrous)**. Domaine pur `plantuml.toolchain` + garde anti-drift `@toolchain`. DAG MEMPHIS `0.0.71` → plantuml `0.0.8`. **CI VERTE run `37861407600`** (kover 84.23 %).
+_Historique 221_ : Session 221 (plantuml) — **US-3 PLT-DIAGRAM-OWNERSHIP** (round-trip validation). Après traduction, un bloc qui ne parse plus est **rejeté** (repli source, D5) : `PlantumlTranslationPortAdapter` reçoit un `validator: PlantUmlSyntaxValidator?` N0 optionnel ; un `PRESERVE` court-circuite avant validation. Tests : **10 unit** (3 round-trip) ; **BDD `@plantuml-roundtrip`** (`23_plantuml_roundtrip.feature`, 3 scénarios + `RoundTripSteps`) 3/3 PASSED. Pas de publication (code non distribué). Suivant : US-4 (document délègue), US-5 (version toolchain).
+_Historique 220_ : Session 220 (plantuml) — **US-2 PLT-DIAGRAM-OWNERSHIP** (implémentation + publication DAG). Le borough plantuml **implémente le port du contrat N0** : `PlantumlSyntaxValidatorAdapter` (wrappe le parser natif derrière `contracts.plantuml.PlantUmlSyntaxValidator`) + `PlantumlTranslationPortAdapter` (le domaine `boundary` riche devient le moteur unique délégué ; **D5** : retour-ligne réel re-échappé en `\n`). `SyntaxValidationResult` migré vers le N0 (fichier local supprimé, 12 imports). `TranslationStrategy` boundary = **typealias** vers `contracts.plantuml.PlantUmlStrategy` (**D4** : vocabulaire unique). **Correction de design** (préparation US-4) : le port est rendu **provider-agnostique** (`TranslationService` N0) — le glossaire borné ne traduisait pas les labels arbitraires → `plantuml 0.0.7` republié (design corrigé). Publication DAG : contrat `0.0.1` (`c9a687d3`) → BOM/catalog `0.0.66` (`c0201db7`) → `0.0.67` (`c2ce2252`) → `0.0.68` (`b9ea6d21`, plantuml 0.0.7) → plantuml-plugin `0.0.6` (`c1033b48`) + `0.0.7` (`18cf74bc`). 10 unit PASS.
+_Historique 219_ : Session 219 (plantuml) — **Cadrage EPIC PLT-DIAGRAM-OWNERSHIP** (gouvernance pure, zéro code). Audit 5 constats : C-1 split-brain (`plantuml.boundary` riche non importé par document) ; C-2 traduction casse `\n` (= D2 CHE-DIAGRAM) ; C-3 pas de contrat N0 (N2→N2) ; C-4 version toolchain non gouvernée (= D1 CHE-DIAGRAM) ; C-5 deux vocabulaires. Livrable `.agents/CADRAGE_EPIC_PLT_DIAGRAM_OWNERSHIP.adoc` (8 US ~22 pts).
+_Historique 218_ : Session 218 (plantuml) — PUB 0.0.5 TERMINÉ : le Central 0.0.4 était **périmé** (POM workspace-bom 0.0.19, code 8b75c59 pré-RENAME) → HEAD réel publié en **0.0.5** (bundle nmcp `36e2614e`, AUTOMATIC, POM importe workspace-bom 0.0.38). MEMPHIS workspace-bom/catalog 0.0.38 (bundle `e816302c`) avec plantuml-plugin = 0.0.5. Consommateur document-plugin aligné (catalogue ws 0.0.38 + BOM 0.0.38 + plantuml-plugin 0.0.5, compileKotlin VERT). Version dérivée ws = 0.0.5 (toml l.2, garde D5 OK). Gate : `:plantuml-plugin:check` VERT ; functionalTest FilePermission ROUGE restant = bug S-030 préexistant hors périmètre PUB.  
+_Session en cours_ : 242 (plantuml) — PLT-MAINTAIN : découplage test/prod + hygiène + release 0.0.10.
+_Prochaine session_ : 243 — **bakery-gradle** US-6b (FT rendu : SVG/PNG non blanc, gaté toolchain) ; puis S-244 (cheroliv.com US-7). Sinon côté plantuml : PLT-AGENT optionnel (b).
+_Session terminee_ : 242 (plantuml) — PLT-MAINTAIN : découplage test/prod + hygiène + release 0.0.10.  
+_Session terminee_ : 241 (plantuml) — Cadrage cross-borough PLT-DIAGRAM-OWNERSHIP US-6/US-7.  
+_Session terminee_ : 240 (plantuml) — FIX-BASELINE `FilePermission` (durcissement environnemental).  
+_Session terminee_ : 239 (plantuml) — GBL-010 G-3 (câblage des notes dans le port de traduction).  
+_Session terminee_ : 238 (plantuml) — Notes PlantUML + FT preflight + drift gouvernance.  
+_Session terminee_ : 237 (plantuml) — GBL-010 G-3 (correction d'un bloc PlantUML : déterministe + IA).  
+_Session terminee_ : 236 (plantuml) — GBL-010 G-3b (feuille PlantUML : statut par bloc + version toolchain).  
+_Session terminee_ : 235 (plantuml) — PLT-CONTEXT US-4 (CTX-04 wiring `DiagramProcessor`) — EPIC ✅ 4/4.  
+_Session terminee_ : 234 (plantuml) — PLT-CONTEXT US-3 (CTX-03 collecteur `collectPlantumlAugmentedContext` + provenance D-6).  
+_Session terminee_ : 224 (plantuml) — PLT-CR3-2 probe de sortie diagramme.  
+_Session terminee_ : 223 (plantuml) — PLT-CR3-1 modèles HuggingFace/Groq configurables.  
+_Session terminee_ : 222 (plantuml) — US-5 PLT-DIAGRAM-OWNERSHIP (toolchain gouvernée) + publication 0.0.8 + résurrection CI.  
+_Session terminee_ : 221 (plantuml) — US-3 PLT-DIAGRAM-OWNERSHIP (round-trip validation).  
+_Session terminee_ : 220 (plantuml) — US-2 PLT-DIAGRAM-OWNERSHIP (port N0 implémenté + publication DAG).  
+_Session terminee_ : 219 (plantuml) — Cadrage EPIC PLT-DIAGRAM-OWNERSHIP (le borough possède le bloc diagramme).  
+_Session terminee_ : 217 (plantuml) — FIX-BASELINE (3 échecs cucumber préexistants résolus).  
+_Session terminee_ : 216 (plantuml) — RENAME-5 (D6 cadrage S-215).  
+_Audit gouvernance_ : 2026-04-30 ✅ (LAZY_EAGER_ESSENTIALS, encyclopedie, backup tronque, AGENT complet, portefeuille 6 projets)
+
+'''
+
+== ⚠️ RÈGLES ABSOLUES
+
+=== 0. PUBLISH TO MAVEN LOCAL — OBLIGATOIRE APRÈS TOUTE MODIFICATION DU CODE SOURCE
+
+_Toute modification du code source du plugin DOIT être suivie de `./gradlew -q publishToMavenLocal` AVANT tout test fonctionnel ou validation via un projet consommateur._
+
+* ❌ _Interdit_ : Tester le plugin via le projet parent sans avoir republié le JAR
+* ❌ _Interdit_ : Considérer que le code source modifié = le JAR consommé par le projet parent
+* ✅ _Obligatoire_ : `./gradlew -q publishToMavenLocal` après chaque `compileKotlin` réussi si le code a changé
+* ✅ _Obligatoire_ : `./gradlew -q publishToMavenLocal` avant `./gradlew generateKnowledgeGraphDiagram` depuis le projet parent
+
+_Raison_ : Le projet parent (`plantuml-gradle/`) consomme le plugin via `mavenLocal`. Le code source corrigé ne prend effet QUE si le JAR est republié. Oublier cette étape = tester une version périmée = faux positifs.
+
+=== 1. COMMITS/GIT
+
+* Commit/push/merge autorisés (décision pilote 2026-09-17). Ne JAMAIS commiter de secret.
+
+* ✅ _Autorisé_ : `git status`, `git diff`, `git log`, `git show` (lecture seule)
+* ❌ _Interdit_ : `git add`, `git commit`, `git push`, `git merge`, `git rebase` (sauf ordre explicite)
+
+_Procédure obligatoire avant tout commit_ :
+. Montrer les modifications (`git diff --stat`)
+. Demander : "Veux-tu que je commit ces changements ?"
+. _Attendre confirmation explicite_ ("oui", "commit", "vas-y")
+. _Seulement après_ : exécuter le commit
+
+=== 1b. FICHIERS DE CONFIGURATION — RÈGLE ABSOLUE DE SÛRETÉ
+
+**PRINCIPE** : Tout fichier de configuration (YAML, JSON, XML, TOML, properties, .env) peut contenir des données sensibles non versionnées. Ne **jamais** mettre en danger l'intégrité du travail du développeur.
+
+**INTERDICTIONS** :
+
+* ❌ **NE JAMAIS écraser** un fichier config avec un `Write` complet quand un `Edit` partiel suffit
+* ❌ **NE JAMAIS remplacer** des valeurs sensibles (tokens, mots de passe, clés API, URLs prod) par des valeurs factices
+* ❌ **NE JAMAIS modifier** sans vérifier `git check-ignore` et `git ls-files` — un fichier non tracké n'a pas de `git restore`
+
+**Procédure OBLIGATOIRE** avant modification :
+
+. `git check-ignore <fichier>` + `git ls-files -- <fichier>`
+. Si non tracké : **CRÉER UNE SAUVEGARDE** (`cp <fichier> <fichier>.bak`)
+. **PRÉSERVER** les valeurs sensibles intactes
+. Privilégier l'**edit partiel** sur l'écriture complète
+. **Vérifier** après modification que les valeurs sensibles sont toujours là
+
+_Leçon Session 2 (bakery-plugin)_ : Écraser un site.yml non versionné a détruit des tokens réels. Sans sauvegarde git (fichier ignoré), restauration impossible sans fallback externe. Le développeur aurait été bloqué définitivement.
+
+=== 2. TESTS EN FIN DE SESSION — INTERDICTION FORMELLE
+
+_L'agent NE DOIT JAMAIS_ lancer de tests (`./gradlew test`, `./gradlew cucumberTest`, etc.) lors de la procédure de fin de session _SANS permission explicite de l'utilisateur_.
+
+* ✅ _Autorisé_ : Résumer les résultats des tests déjà exécutés pendant la session
+* ❌ _Interdit_ : Lancer `./gradlew cucumberTest` ou tout autre test en procédure de fin de session
+
+_Raison_ : Les tests prennent 1-3 minutes et ralentissent inutilement la clôture de session.
+
+=== 3. PROCÉDURE DE FIN DE SESSION — EXÉCUTION COMPLÈTE OBLIGATOIRE
+
+_RÈGLE ABSOLUE_ : Quand l'utilisateur déclenche la fin de session ("fin de session", "session terminée", "je quitte", "à plus tard", "on arrête là"), l'agent DOIT exécuter _TOUTES les étapes_ de la procédure _SANS EXCEPTION et SANS OMISSION_.
+
+_L'agent NE DOIT JAMAIS_ :
+* ❌ S'arrêter avant d'avoir complété les 6 étapes
+* ❌ Omettre une étape ("je ferai ça plus tard")
+* ❌ Demander "est-ce que je dois faire l'étape X ?" — la réponse est TOUJOURS oui
+* ❌ Considérer la procédure comme facultative
+
+_Les 6 étapes OBLIGATOIRES_ (dans l'ordre) :
+
+. ✅ _Créer l'archive_ `.agents/sessions/{N}-{titre}.adoc`
+. ✅ _Mettre à jour PROMPT_REPRISE.adoc_ pour la session N+1
+. ✅ _Mettre à jour SESSIONS_HISTORY.adoc_ avec la session N
+. ✅ _Mettre à jour INDEX.adoc_ (session en cours, roadmap, fichiers)
+. ✅ _Mettre à jour TEST_COVERAGE_ANALYSIS.adoc_ si des tests ont été ajoutés/modifiés
+. ✅ _Mettre à jour COMPLETED_TASKS_ARCHIVE.adoc_ `.agents/archives/COMPLETED_TASKS_ARCHIVE_{mois}.adoc` avec les tâches réalisées
+
+_Confirmation finale OBLIGATOIRE_ : Après avoir exécuté les 6 étapes, l'agent DOIT afficher :
+
+[source]
+----
+✅ Procédure de fin de session exécutée
+📋 Checklist :
+[✅] 1. Archive session N créée
+[✅] 2. PROMPT_REPRISE.adoc mis à jour pour session N+1
+[✅] 3. SESSIONS_HISTORY.adoc mis à jour
+[✅] 4. INDEX.adoc mis à jour
+[✅] 5. TEST_COVERAGE_ANALYSIS.adoc mis à jour (si applicable)
+[✅] 6. COMPLETED_TASKS_ARCHIVE.adoc mis à jour
+----
+
+_Aucune étape ne peut être marquée [✅] si le fichier n'a pas été effectivement modifié et vérifié._
+
+=== 4. FICHIERS PERSONNELS — INTERDICTION DE MODIFIER
+
+_L'agent NE DOIT JAMAIS_ modifier, écraser ou supprimer un fichier personnel de l'utilisateur (`~/.gitconfig`, `~/.bashrc`, `~/.ssh/config`, `~/.zshrc`, etc.) _SANS permission explicite de l'utilisateur_.
+
+**PRINCIPE** : Les fichiers `~/.*` appartiennent à l'utilisateur. Leur modification peut casser le workflow, les credentials, ou les préférences de l'environnement. L'environnement de travail de l'utilisateur est en dehors du scope du projet.
+
+**INTERDICTIONS** :
+
+* **NE JAMAIS** utiliser `Write` ou `Edit` sur un fichier `~/.*` ou `~/*` qui n'est pas dans le répertoire de travail du projet
+* **NE JAMAIS** exécuter de commande touchant `~/.gitconfig`, `~/.bashrc`, `~/.ssh/*`, `~/.zshrc`, etc. même avec l'intention de "réparer" ou "configurer"
+* **Toujours rester dans le working directory** du projet actuel
+
+_Leçon Session 033_ : L'agent a tenté de modifier `/home/cheroliv/.gitconfig` pour changer le `user.name` de `opencode` vers `cheroliv`. Sans permission explicite. Modifier les configs utilisateur hors projet est un comportement catastrophique qui peut corrompre l'environnement de travail.
+
+'''
+
+== 🎯 Sessions Recentes (10 dernieres)
+
+|=== 
+| # | Date | Type | Sujet | Fichier | Score
+.1+^.^| 233 | 2026-10-12 | feat + test (DDD/TDD/BDD) | **PLT-CONTEXT US-1/2** — **CTX-01** : adoption du **contrat N0** `education.cccp:codebase-contracts:0.0.2` (`contracts.context.*` : `CompositeContext`/`ContextChannel`/`ChannelBudget`). **CTX-02** : assembleur pur `plantuml.context.PlantumlContextBuilder` (miroir `CapsuleContextBuilder`) — budgète les 5 canaux (EAGER/RAG/GRAPHIFY/DOCS/RESOURCE, 40/30/20/10), jette les vides, rend le bloc sectionné `==== <header> (<name>)` → `PlantumlContext` (`rendered`, `nonEmptyCount`, `tokenEstimate`). 6 unit (`PlantumlContextBuilderTest`) + BDD `29_plantuml_context.feature` (`@context`, 3 scénarios) + `PlantumlContextSteps`. Frontière : seam **N0**, moteur **N1** ; `DocKnowledgeBase` = repli (CTX-04). Local = Build (compileKotlin/compileTestKotlin VERT). **PLT-CONTEXT 2/4.** | `233-plt-context-us1-us2.adoc` | 9/10
+.1+^.^| 232 | 2026-10-12 | arbitrage (gouvernance pure) | **Arbitrage `CTX-05` : CADUQUE** — remplacer `LlmService` (N2) par le hub N1 `LlmBuildService` ? **Non.** Audit comparatif : `LlmBuildService` = résolution **1 provider** + pool **Ollama local** (rotation de ports `OllamaPool`/`OllamaInstanceScanner`) ; `LlmService` = **7 providers** + `ApiKeyPool` (round-robin + tiered) + `QuotaTracker`/`QuotaResetManager` + **`CrossProviderFallbackOrchestrator`** + `FreemiumWeightCalculator` + `QuotaAuditLogger` + `ProviderModelResolver` → **superset** ; le remplacer = **régression**. Les adopter tous deux = **split-brain**. Gains additifs (DI `BuildService`, rotation de ports) = petits, faisables côté plantuml sans adopter le hub. `PLT-CONTEXT` → `CTX-01`→`CTX-04` (**~10 pts**). Porte ouverte : convergence LLM cross-borough = **EPIC N1 codebase**. § 11 du cadrage. | `232-arbitrage-plt-context-ctx05.adoc` | 8/10
+.1+^.^| 231 | 2026-10-12 | cadrage (gouvernance pure) | **EPIC PLT-CONTEXT cadré** — la génération PlantUML doit consommer le **contexte augmenté N1 codebase** (EAGER/RAG/Graphify/Docs) via le **contrat N0** `contracts.context.*` (`education.cccp:codebase-contracts` 0.0.2), au lieu du `DocKnowledgeBase` statique. **Audit** : plantuml applique le plugin codebase (`build.gradle.kts:26`) mais n'importe **aucun** type `codebase.*` ; contexte local statique (mots-clés) ; **aucun** `contracts.context.*` — **retardataire** cross-borough (capsule/planner/slider consomment déjà le hub N1). Patron : `CapsuleContextBuilder` (assembleur pur) + `CollectCapsuleAugmentedContextTask` (collecteur). Catalogue `CTX-01`→`CTX-05` (~13 pts) : contrat N0, assembleur pur `PlantumlContextBuilder`, collecteur `collectPlantumlAugmentedContext`, wiring `DiagramProcessor` (repli statique), option `LlmBuildService`. Frontière : contrat **N0**, moteur **N1**, jamais N2→N2. 8 décisions, 6 options écartées. **CI** (même session) : `ci.yml` obsolète supprimé (readme-plugin inexistant), cache image pgvector (`test.yml`), cache Ollama+`qwen3.5:0.8b`. Doc `.agents/CADRAGE_EPIC_PLT_CONTEXT.adoc`. | `231-cadrage-plt-context.adoc` | 8/10
+.1+^.^| 230 | 2026-10-12 | feat + test (DDD/TDD/BDD) | **EPIC PLT-AGENT TERMINÉ 7/7** — portage des techniques `docToolChain/diag-agent` sur l'infra HTOWN native (domaine pur `plantuml.agent`, **Kroki/MCP rejetés**). **DIA-04** `LlmCodeExtractor` (fences/JSON/brut, câblé `DiagramProcessor`, contrat i18n préservé) ; **DIA-03** `GenerationBudget` (temps mur + itérations, consulté avant chaque correction) ; **DIA-06** `DiagramSubtypeDetector` (déterministe) ; **DIA-02** `DescriptionPreflight` + tâche `preflightPlantumlDescription` ; **DIA-05** `DiagramExampleCatalog` (ressources) ; **DIA-01** `DesignReview` + port `DesignReviewer` + adapter `VisionDesignReviewer` (LangChain4j vision, base64 PNG) + `PlantumlService.renderPng`, boucle design opt-in ; **DIA-07** `DesignConvergence`. Config `langchain4j.{maxSeconds,preflight,examples,designValidation}` 4 sources + CLI, défaut `false`. **+45 unit + BDD `28_agent_loop.feature` (18 scénarios @agent-loop)** + `AgentLoopSteps`. **Correctif dette** : drift toolchain S-227 (`PlantUmlToolchain.reference` réaligné 3.2.1/1.2026.2, gardes `@toolchain`/`PlantUmlToolchainTest`). Local = Build (compile ×3 + validatePlugins VERT). Commits `2b1fd02`, `4462ea9`, `b93e837`, `daaf7a0`. | `230-plt-agent-implementation.adoc` | 9/10
+.1+^.^| 229 | 2026-10-12 | cadrage (gouvernance pure) | **Vision & périmètre PLT-AGENT** (porte de décision). Vision réelle de `diag-agent` = **délégation à contexte minimal** (objectifs ordonnés : Context Efficiency, Install, Privacy, Autonomy, Extensibility) ; son **noyau portable** = la boucle, sa **coquille non portable** = Python/LiteLLM/Click/MCP/Kroki/Docker. **Charte de non-régression HTOWN** (13 capacités : validation native hors-ligne, boucle `DiagramProcessor`, multi-provider + pool + fallback, RAG + KG, incrémentalité, i18n 10 langues, toolchain gouvernée, probe anti-blanc, config 4 sources, contrats N0, interface Gradle, DDD/TDD/BDD). **Audit choix écartés** : MCP rejeté au niveau workspace (`WORKSPACE_AS_PRODUCT.adoc` § MCP ; `LLM_FEEDBACKS` § 5) ; **aucun** item DIA-01→07 n'exige MCP/CLI/Kroki/Python/Docker. **Verdict Kroki : REJETÉ** (oracle déjà natif, multi-format déjà couvert, généralité hors charte, process de plus = famille MCP, 2ᵉ version moteur = drift D1) ; seule exception = importer la **connaissance** (`good defaults` → ressource). 7 décisions (D-1→D-7). Doc `.agents/CADRAGE_EPIC_PLT_AGENT_VISION.adoc`. **Zéro code.** | `229-cadrage-vision-plt-agent.adoc` | 8/10
+.1+^.^| 228 | 2026-10-12 | cadrage (gouvernance pure) | **EPIC PLT-AGENT** — code review `docToolchain/diag-agent` (MIT, Python) @ `45068441` : forces (boucle d'auto-validation ancrée sur un oracle de rendu, **pré-vol de description**, **retour design par vision**, budget borné, exemples few-shot, détection de sous-type) ; fragilités (🔴 `sys.exit(1)` qui **tue le serveur MCP**, messages **allemands hardcodés**, pas de port LLM, budget non dur, off-by-one, collision `diagram.<ext>`, **4 modules morts + 1 test fantôme**). Comparaison : infra LLM HTOWN supérieure, **6 capacités absentes**. Catalogue `DIA-01`→`DIA-07` (~20 pts, 7 US) : revue design par **vision** (+convergence), pré-vol de description, budget mur, extracteur de code robuste, exemples canoniques, détection de sous-type. Domaine `plantuml.agent` ; on étend `DiagramProcessor` ; aucun nouveau rendu ; vision opt-in/dégradable. 9 décisions, 9 options écartées. Doc `.agents/CADRAGE_EPIC_PLT_AGENT.adoc`. **Zéro code.** | `228-code-review-diag-agent-portage-plantuml.adoc` | 8/10
+.1+^.^| 227 | 2026-10-11 | ops (publication) | **Release 0.0.9** (bump `0.0.8→0.0.9` + pin catalog/BOM `0.0.78` + `jgit 7.8.0`, `asciidoctorj-diagram 3.2.1`, `-plantuml 1.2026.2`). Central bundle `dcb6d30e`, repo1 200 ; compile 3 source sets VERT. | `227-release-0.0.9-bump-deps.adoc` | 9/10
+.1+^.^| 226 | 2026-10-11 | feat (DDD/TDD/BDD) | **GBL-010 G-3** — `plantuml.repair.PlantumlLabelIntegrity` (`escapeNewlines`/`hasBrokenQuotedLabel`/`repair` ; correction `\n` label quoté, port délègue D5). 7 unit + BDD `@plantuml-repair` (3 scénarios `PlantumlRepairSteps`). | `226-gbl010-g3-plantuml-label-integrity.adoc` | 9/10
+.1+^.^| 225 | 2026-10-11 | governance | **Cadrage GBL-010** — arbre de traduction, feuille `[plantuml]` (traduction + débugage IA, statut par bloc `MISSING`/`PENDING`/`TRANSLATED`/`BROKEN`, version toolchain). BACKLOG § GBL-010 : G-3 + G-3b. Cadrage racine `CADRAGE_EPIC_GBL_010_ARBRE_TRADUCTION_SITE.adoc`. | `225-gbl010-arbre-traduction.adoc` | 9/10
+.1+^.^| 224 | 2026-10-09 | feat (DDD/TDD/BDD) | **PLT-CR3-2** — `plantuml.service.DiagramOutputProbe` (pur, octets + port N0) : détecte artéfact vide / non-image / source non re-parsable ; câblage warn non-fatal. BDD `@diagram-probe` (4 scénarios) + 6 unit. **EPIC PLT-CR3 TERMINÉ 2/2.** CI VERTE run `37864982511`. | `224-plt-cr3-2-diagram-output-probe.adoc` | 9/10
+.1+^.^| 223 | 2026-10-09 | feat (DDD/TDD/BDD) | **PLT-CR3-1** — `plantuml.service.ProviderModelResolver` (modèles HuggingFace/Groq configurables) + `LlmService` délègue. BDD `@provider-model` (4 scénarios) + 4 unit. CI VERTE run `37863016696`. | `223-plt-cr3-1-provider-model-config.adoc` | 9/10
+.1+^.^| 222 | 2026-10-09 | feat (DDD/TDD/BDD) + ops | **US-5 PLT-DIAGRAM-OWNERSHIP** (toolchain gouvernée) + **publication 0.0.8** + **résurrection CI (6 verrous)**. Domaine pur `plantuml.toolchain` (`PlantUmlToolchainReference` value object à invariants + `PlantUmlToolchain.reference`) = source unique de version (D6). BDD `@toolchain` (`24_toolchain_governance.feature`, 2 scénarios + `ToolchainSteps`). DAG : MEMPHIS `0.0.71` (`d524d0ae`) → plantuml `0.0.8` (`2c316a14`, porte US-3 round-trip), repo1 HTTP 200. **CI VERTE run `37861407600`** (10m51s, 2547 unit 0 FAIL, kover 84.23 %). | `222-plt-diagram-ownership-us5-toolchain.adoc` | 10/10
+.1+^.^| 221 | 2026-10-08 | feat (DDD/TDD/BDD) | **US-3 PLT-DIAGRAM-OWNERSHIP** (round-trip validation). Un bloc traduit qui ne parse plus est **rejeté** (repli source, D5) ; `validator: PlantUmlSyntaxValidator?` N0 optionnel ; `PRESERVE` court-circuite. 10 unit + BDD `@plantuml-roundtrip` (`23_plantuml_roundtrip.feature`, 3 scénarios) 3/3 PASSED. Pas de publication. | `221-plt-diagram-ownership-us3-roundtrip.adoc` | 9/10
+.1+^.^| 220 | 2026-10-08 | feat (DDD/TDD/BDD) + ops | **US-2 PLT-DIAGRAM-OWNERSHIP** — le borough implémente le port N0 (`PlantumlSyntaxValidatorAdapter` + `PlantumlTranslationPortAdapter`, port provider-agnostique ; D4 typealias stratégie). Publication DAG : contrat 0.0.1 → BOM 0.0.66/0.0.67 → plantuml 0.0.6 (`c1033b48`). 9 unit. | `220-plt-diagram-ownership-us2-port.adoc` | 9/10
+.1+^.^| 219 | 2026-10-08 | governance | **Cadrage EPIC PLT-DIAGRAM-OWNERSHIP** (gouvernance pure) — audit 5 constats, 10 décisions, 3 options écartées, 8 US ~22 pts. Doc `.agents/CADRAGE_EPIC_PLT_DIAGRAM_OWNERSHIP.adoc`. | `219-cadrage-epic-plt-diagram-ownership.adoc` | 9/10
+.1+^.^| 218 | 2026-09-10 | ops (publication) | PUB 0.0.5 : Central 0.0.4 **périmé** (POM workspace-bom 0.0.19, code 8b75c59 pré-RENAME) → HEAD réel publié **0.0.5**. MEMPHIS workspace-bom/catalog 0.0.38 (bundle `e816302c`) plantuml-plugin=0.0.5 ; plantuml-plugin 0.0.5 pub (bundle `36e2614e`, POM workspace-bom 0.0.38, repo1 200) ; consommateur document-plugin aligné (catalog ws 0.0.38 + BOM 0.0.38 + plantuml-plugin 0.0.5, compileKotlin VERT). Version dérivée ws = 0.0.5 (toml l.2, garde D5 OK). Gate : `check` VERT (functionalTest FilePermission S-030 préexistant hors périmètre). | `218-pub-0-0-5.adoc` | 9/10
+.1+^.^| 217 | 2026-09-10 | feat (correction fixtures, TEST-only) | FIX-BASELINE : 3 échecs cucumber **préexistants** de HEAD résolus, baseline VERTE. Attempt History (2 FAIL) : regex `"valid"` minuscule vs champ réel `"isValid"` (V majuscule) → `"(?:is)?Valid"` ×4 (`AttemptHistorySteps.kt`). RAG (1 FAIL) : fixture `generated/rag` → `build/plantuml-plugin/generated/rag` + nouveau step dédié `startPgvectorContainerWithUnchangedPromptDiagram` (seed checksum `build/plantuml-plugin/checksums/rag-test.sha256`, même format `ChecksumStore`) ; séparation fixtures scénario 2 (sans checksum) vs scénario 3. Gates : `@rag` 4/4 PASSED (log `Skipped rag-test.puml` confirmé) + `@plantuml` 3/3 (XML tests=3 failures=0). Correctifs TEST-only → zéro fichier production, zéro bump BOM. | `217-fix-baseline.adoc` | 9/10
+.1+^.^| 216 | 2026-09-08 | feat (baby-step TDD) | RENAME-5 : `"FPA"` sort du registre non-traductible `plantuml.boundary` (D6, cadrage S-215) → `QUALIOPI`. 3 fichiers (KDoc loader + 2 fixtures tests). Gate : grep `fpa|cda` zéro réel (faux positif `ofPattern`), unit boundary 13/13, `check` baseline exacte (3 FAIL cucumber + 1 FAIL functional **préexistants**, stash-confirmés), `publishToMavenLocal` VERT. Zéro bump BOM. | `216-rename5-registre-non-traductible.adoc` | 9/10
+.1+^.^| 188 | 2026-08-15 | governance + ops | Audit version + EPIC PUB publish 0.0.3 (gouvernance pure, pattern S-199 bakery / S-068 slider). plantuml-plugin `libs.versions.toml:2` = 0.0.3 (déjà bumpé S-187, commit `60a76b4`) mais Central ne publie que 0.0.1/0.0.2 → **publish 0.0.3**. EPIC PUB ajouté au BACKLOG (3 US PUB-0.0.3-1/2/3, `🟡 À FAIRE`). Zéro code modifié. Commit + push (clôture pilote). | `188-audit-version-pub-0.0.3.adoc` | 9/10
+.1+^.^| 187 | 2026-08-04 | maintenance | BOM 0.0.11→0.0.13 + conventions 0.0.2→0.0.3. compileKotlin ✅, publishToMavenLocal ✅. Zéro régression. | `187-maintenance-cross-borough.adoc` | 9/10
+.1+^.^| 186 | 2026-08-04 | governance | Clôture gouvernance — BACKLOG + INDEX mis à jour (PLT-VALIDATION-CONTRACT ✅, tous EPICs TERMINÉS). Synchronisation cross-borough document-gradle (DOC-PLANTUML-VALIDATE ✅ S040). Plugin dormant. | `186-cloture-gouvernance.adoc` | 9/10
+.1+^.^| 185 | 2026-08-03 | feat | EPIC PLT-VALIDATION-CONTRACT : Extraction SyntaxValidationResult standalone dans plantuml.validation. 4/4 US. compileKotlin ✅, test ✅, publishToMavenLocal ✅. document-gradle débloqué. | `185-plt-validation-contract.adoc` | 9/10
+.1+^.^| 184 | 2026-07-31 | feat | Alliance i18n — PlantumlTranslationServiceAdapter wrappant TranslationResolver + dépendance i18n-contracts:0.0.2. compileKotlin ✅ | `184-alliance-i18n-translation-service-adapter.adoc` | 9/10
+.1+^.^| 183 | 2026-07-25 | feat | DocKnowledgeBase PlantUML câblé dans GraphifyPromptAdapter | `183-docknowledgebase-plantuml.adoc` | 9/10
+.1+^.^| 182 | 2026-07-25 | maintenance | Backlog vide, tous les EPICs métier terminés | `182-maintenance.adoc` | 9/10
+.1+^.^| 180 | 2026-07-22 | governance | Rotation backup (multiple de 10, EAGER 3405→~800 lignes). Snapshot Y2026-sessions-165-169 (INDEX, SESSIONS_HISTORY, COMPLETED_TASKS_ARCHIVE, 6 sessions). INDEX + HISTORY tronqués → 10 sessions (171-180). PROMPT_REPRISE → S181 (QW-3). Zéro code métier modifié | `180-rotation-backup.adoc` | 9/10
+.1+^.^| 178 | 2026-07-21 | governance + polish | PL-2 KDoc exhaustif sur 43 fichiers source (4 lots, compileKotlin ✅) + PL-3 annulé (ABIDJAN sans plugin lint). Zéro code métier modifié (KDoc uniquement) | `178-pl2-kdoc-exhaustif.adoc` | 9/10
+.1+^.^| 177 | 2026-07-21 | governance + polish | PL-1 (configurationCache = true, asciidoctor retiré, timeout 120s) + PL-4 (lecture PLAN_GLOBAL.adoc → 3 EPICs cross-borough) + G-03 (7 fichiers gouvernance com.cheroliv→education.cccp) + O-07 (vérifié déjà fait) + K-06 (PLAN_GLOBAL.adoc section plantuml mise à jour). Gouvernance pure, zéro code métier modifié | `177-pl1-pl4-epic-g03-o07-k06.adoc` | 9/10
+.1+^.^| 176 | 2026-07-21 | DDD + TDD + BDD | QW-3 README_truth.adoc + CHANGELOG.adoc + PLUGIN_SELF_DOCUMENTATION.adoc. EP-2 plantuml-real-context.example.yml + LlmService.createChatModel() + RealLlmSteps.kt (~150 lignes). EP-3 FreemiumWeightCalculator (9 tests) + TieredRotationStrategy + 4 Cucumber @freemium PASS. compileKotlin ✅, test ✅, publishToMavenLocal ✅ | `176-qw3-ep2-ep3.adoc` | 9/10
+.1+^.^| 175 | 2026-07-20 | DDD + TDD + BDD | EP-1(c) RAG Reindex Incrémental dans CollectPlantumlIndexTask. shouldReindexPuml() + reindexRag() + 2 scénarios @incremental-rag. 10/10 IncrementalProcessorTest, 6/6 CollectPlantumlIndexTaskUnitTest, 2/2 Cucumber PASS. EP-1 incremental maturity 4/4 ✅ | `175-ep1c-rag-reindex-incremental.adoc` | 9/10
+.1+^.^| 174 | 2026-07-15 | DDD + TDD | QW-1 validateDiagram parsing réel (Jackson + KotlinModule + fallback gracieux, clé i18n 10 langues) + QW-2 api→implementation (8 deps migrées, API surface nettoyée) + EP-1 incremental maturity 3/4 : (d) events domaine sealed class, (b) IncrementalAuditLogger, (a) IncrementalConfig YAML. +20 tests unitaires, 0 régression, 122 Cucumber @incremental PASS | `174-quick-wins-incremental-maturity.adoc` | 9/10
+.1+^.^| 173 | 2026-07-15 | governance | Consolidation backlog + code review audit. 7 pistes priorisées (QW-1/2/3, EP-1/2/3, PL-1..4). BACKLOG.adoc + TODO.adoc mis à jour. Gouvernance seule | `173-consolidation-backlog-code-review.adoc` | 8/10
+.1+^.^| 172 | 2026-07-15 | DDD + TDD + BDD | Incremental Processing : domaine `plantuml.incremental` (ChecksumStore 7 tests + IncrementalProcessor 7 tests). Intégration GeneratePlantumlDiagramsTask (skip/cleanup/force). 5/5 @incremental PASS, 122/122 Cucumber, 2508 unitaires, Kover 83.26% | `172-incremental-processing-domain-ddd.adoc` | 9/10
+.1+^.^| 171 | 2026-07-14 | BDD | ApiKeyPoolSteps.kt créé (~330 lignes, 30+ steps) — 18/18 scénarios feature 14 PASS. getNextRoundRobin() skip quota saturé (BDD Red→Green). Timeout 15min. 108 PASS cucumber complet | `171-api-key-pool-steps-timeout.adoc` | 9/10
+|===
+
+→ _Sessions 1-170_ : `.agents/backup/Y2026-sessions-001-125/` + `.agents/backup/Y2026-sessions-126-178/` + `.agents/backup/Y2026-sessions-165-169/`
+
+== 📈 Statistiques
+
+|===
+| Période | Sessions | Types dominants | Score moyen
+| Juin 2026 | 2 | publish, governance | 9.5/10
+| Avril 2026 (semaine 4) | 2 | docs (50%), feat (50%) | 9.0/10
+| Avril 2026 (semaine 3) | 10 | test (80%), fix (20%) | 9.0/10
+| Avril 2026 (semaine 1) | 5 | debug (60%), docs (40%) | 9.0/10
+| Mars 2026 | _à compléter_ | _à compléter_ | _à compléter_
+|===
+
+'''
+
+== 🎯 Roadmap — État Actuel
+
+| EPIC PLT-DIAGRAM-OWNERSHIP (GBL-007) : le borough possède le bloc diagramme | 🟡 62% (5/8 US) | 5/8 | 🟡 EN COURS — US-0 cadrage ✅ S-219, US-1 contrat N0 ✅ S-280, US-2 port ✅ S-220, US-3 round-trip ✅ S-221, US-5 toolchain gouvernée ✅ S-222. Reste US-4 (arbitrage injection A/B), US-6 (E2E), US-7 (dogfooding). plantuml `0.0.8` publié Central S-222. |
+| EPIC PLT-VALIDATION-CONTRACT : Extraction SyntaxValidationResult standalone → débloque DOC-PLANTUML-VALIDATE (document-gradle) | ✅ 100% | 4/4 | ✅ TERMINÉ — Session 185 (SyntaxValidationResult standalone + KDoc + Cucumber non-régression). document-gradle DOC-PLANTUML-VALIDATE ✅ terminé S040 (5/5 US). |
+| EPIC Alliance i18n : PlantumlTranslationServiceAdapter wrappant TranslationResolver | ✅ 100% | — | ✅ TERMINÉ — Session 184 (dépendance i18n-contracts:0.0.2, compileKotlin ✅) |
+| EPIC RAG DocKnowledgeBase : PlantUML câblé dans GraphifyPromptAdapter | ✅ 100% | — | ✅ TERMINÉ — Session 183 (keyword matching in-memory, doc officielle PlantUML) |
+| EPIC Incremental Processing : Checksum-based skip + cleanup + force reprocess | ✅ 100% | 5/5 | ✅ TERMINÉ — Session 172 (domaine `plantuml.incremental`, 14 tests unitaires + 5 Cucumber PASS) |
+| EP-1 Maturité plantuml.incremental : events + audit log + config YAML | ✅ 100% | 4/4 | ✅ TERMINÉ — S174 (d) events, (b) audit log, (a) config YAML + S175 (c) RAG reindex |
+| EP-2 Tests production-close : workflow CI + feature @realllm | ✅ 100% | — | ✅ TERMINÉ — Session 179 (workflow `real_llm_test.yml` opt-in + feature `22_real_llm.feature` 3 scénarios + fix `AmbiguousStepDefinitionsException`) |
+| EP-3 Pool freemium ratio dynamique : FreemiumWeightCalculator | ✅ 100% | — | ✅ TERMINÉ — Session 176 (FreemiumWeightCalculator + TieredRotationStrategy + 4/4 Cucumber `@freemium` PASS) |
+| EPIC PLT-BOUNDARY : Translation Boundary (8 US, ~26 pts) | ✅ 100% | 8/8 | ✅ TERMINÉ — Session 166 (US-BND-7 Cucumber full pipeline end-to-end) |
+| EPIC rattrapage i18n : Traduction 196 lignes × 9 langues | ✅ 100% | — | ✅ TERMINÉ — 9 fichiers `Messages_*.properties` traduits, 9 tests `Messages*TranslationTest.kt` PASS |
+| Bug Feature 18 : Quoting MessageFormat `''plantuml''` vs `'plantuml'` | ✅ 100% | — | ✅ FIXÉ — Session 167 (1 ligne `I18nErrorSteps.kt`) |
+| BOM upgrade : `workspace-bom:0.0.1` → `0.0.8` | ✅ 100% | — | ✅ TERMINÉ — Session 168 (1 ligne `build.gradle.kts:25`) |
+| Kover ≥ 75% : Vérification seuil main source set | ✅ 100% | — | ✅ FIXÉ — Session 170 (koverThresholdCheck PASS 83.26%, functionalTest exclu du calcul) |
+| EPIC 13 : Multi-provider API Pool (tiers + cross-provider) | ✅ 100% | 6/6 | ✅ TERMINÉ — S161 5/6 tâches (KeyTier, TieredRotationStrategy, getNextKey descente, fallbackEnabled, YAML schema) + S162 cross-provider fallback (`CrossProviderFallbackOrchestrator`) |
+| CNV-6 : Migration conventions plugins education.cccp.build.* | ✅ 100% | — | ✅ TERMINÉ — Session 155 (build.gradle.kts 616→570, -46 lignes, variantes gardées) |
+| BKY-PUB-1 ✅ : Publication Maven Central | ✅ 100% | 9/10 | ✅ TERMINÉ — Session 147 (nmcp, 0.0.1)
+|===
+
+_Historique_ :
+
+|===
+| EPIC | Progression | Score | Priorité
+| EPIC 1 : Tests unitaires | ✅ 100% | 10/10 | ✅ TERMINÉ
+| EPIC 2 : Tests fonctionnels | ✅ 100% | 10/10 | ✅ TERMINÉ
+| EPIC 3 : Architecture | ✅ 100% | 9/10 | ✅ TERMINÉ
+| EPIC 4 : Documentation | ✅ 100% | 9/10 | ✅ TERMINÉ
+| EPIC 5 : RAG System | ✅ 100% | 9/10 | ✅ TERMINÉ
+| EPIC 6 : API Key Pool | ✅ 100% | 9/10 | ✅ TERMINÉ
+| EPIC 7 : Dogfooding Plugin | ✅ 100% | 9/10 | ✅ Phase 1 ✅, Phase 2 abandonnée (incohérence archi)
+| EPIC 8 : Migration AsciiDoc | ✅ 100% | 9/10 | ✅ TERMINÉ
+| EPIC 9 : Knowledge Graph Diagram | ✅ 100% | 9/10 | ✅ Sessions 125-130 : 380/380 tests — TERMINÉ
+| EPIC 10 : Intégration Graphify (dev cycle) | ✅ 100% | 9/10 | ✅ Session 131 : diagrammes architecture + article blog 0105 + message Discord — TERMINÉE
+| EPIC 11 : Article Blog KG + Tests | ✅ 100% | 9/10 | ✅ Sessions 133-134 : article rédigé + 15/15 func tests — TERMINÉE
+| EPIC 12 : Consolidation Gouvernance/Tests | ✅ 100% | 9/10 | ✅ Sessions 135-137 : PROCEDURES, @Ignore+raison, Kover 81.19%, Gemini/Claude robuste — TERMINÉE
+|===
+
+'''
+
+== 📁 Archives
+
+* _Sessions 1-170_ : `.agents/backup/Y2026-sessions-001-125/` + `.agents/backup/Y2026-sessions-126-178/` + `.agents/backup/Y2026-sessions-165-169/`
+* _Sessions 171-180_ : Ce fichier + `.agents/sessions/`
+* _Localisation des vagues_ : `.agents/backup/Y2026-sessions-001-125/` + `.agents/backup/Y2026-sessions-126-178/` + `.agents/backup/Y2026-sessions-165-169/`
+
+'''
+
+== 🔗 Fichiers Associés
+
+|===
+| Fichier | Rôle | Confidentialité
+| `PROMPT_REPRISE.adoc` | Contexte session actuelle | ✅ Public
+| `AGENT_SESSION_MANAGER.adoc` | Procédure d'archivage | ✅ Public
+| `.agents/sessions/` | Archives détaillées par session | ✅ Public
+| `ECOSYSTEM_OVERVIEW.adoc` | Vue d'écosystème Gradle-SaaS | 🟢 Public
+| `BYOI_MODEL.adoc` | Modèle "Bring Your Own Infrastructure" | 🔒 Interne
+| `API_KEY_POOL_CONTEXT.adoc` | Pool de clés API rotatives | ✅ Public
+| `GRAPHIFY_INTEGRATION.adoc` | Stratégie Graphify + EAGER/LAZY | ✅ Public
+| `.agents/I18N_BOUNDARY_VISION.adoc` | Vision i18n Translation Boundary (3 natures, 3 stratégies) | ✅ Public
+| `PLUGIN_SELF_DOCUMENTATION.adoc` | Dogfooding + généralisation écosystème | ✅ Public
+| `DOGFOODING_ARCHITECTURE.adoc` | Architecture Phase 1 dogfooding | ✅ Public
+| `COMPLETED_TASKS_ARCHIVE_2026-04.adoc` | Archive tâches terminées | ✅ Public
+|===
+
+'''
+
+_Note_ : Cet index est maintenu automatiquement par l'agent en fin de session.
+
+'''
+
+== 🌐 Portefeuille de Projets
+
+Projets gérant la même méthodologie opencode (EAGER/LAZY, procédure de fin de session 6 étapes, COMPLETED_TASKS_ARCHIVE) :
+
+|===
+| Projet | Répertoire | Session en cours | Étape 5 spécifique | Dernière MAJ
+| magic-stick | `~/workspace/foundry/OSS/magic-stick` | 013 | SCRIPT_VERIFICATION.adoc | 2026-04-25
+| bakery-gradle | `~/workspace/foundry/OSS/bakery-gradle/bakery-plugin` | 109 | TEST_COVERAGE_ANALYSIS.adoc | 2026-06-11
+| cheroliv.com | `~/workspace/foundry/OSS/cheroliv.com` | 4 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-25
+| plantuml-gradle | `~/workspace/foundry/OSS/plantuml-gradle/plantuml-plugin` | 148 | TEST_COVERAGE_ANALYSIS.adoc | 2026-06-11
+| jhipster-gradle-plugins | `~/workspace/foundry/OSS/jhipster-gradle-plugins` | 9 | TEST_COVERAGE_ANALYSIS.adoc | 2026-06-11
+| quizz-benchmark-gradle | `~/workspace/foundry/OSS/quizz-benchmark-gradle/quizz-benchmark-plugin` | Audit session 053 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-30
+|===
