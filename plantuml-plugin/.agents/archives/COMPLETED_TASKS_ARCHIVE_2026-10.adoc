@@ -1,5 +1,19 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-10
 
+== Session 228 (2026-10-12) — Cadrage EPIC PLT-AGENT (agentic loop PlantUML) ✅
+
+=== Fait
+- [x] Code review `docToolchain/diag-agent` @ `45068441` (MIT, Python) — forces + 15 constats (C-1→C-15) ✅
+- [x] Comparaison code HTOWN : infra LLM supérieure, 6 capacités absentes ✅
+- [x] Catalogue de portage `DIA-01`→`DIA-07` → **EPIC `PLT-AGENT`** (~20 pts, 7 US) ✅
+- [x] Doc `.agents/CADRAGE_EPIC_PLT_AGENT.adoc` : 9 décisions + 9 options écartées ✅
+- [x] Gouvernance : BACKLOG + INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 229 + TODO + archive ✅
+- [x] `compileKotlin` VERT (ouverture) ; zéro code modifié, zéro secret, zéro Python ✅
+
+=== Prochaine session (229)
+- **US-1 (`DIA-04`)** : extracteur de code LLM robuste (`plantuml.agent.LlmCodeExtractor` : fences + JSON + brut)
+- **Fichier à lire en priorité** : `.agents/CADRAGE_EPIC_PLT_AGENT.adoc`
+
 == Session 227 (2026-10-11) — Release 0.0.9 (bump + dépendances) ✅
 
 === Fait

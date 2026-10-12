@@ -1,6 +1,40 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-10-11 (Session 225 — cadrage GBL-010 Arbre de traduction, feuille PlantUML ; US-4 soldée S-283/S-284)
+:last_update: 2026-10-12 (Session 228 — cadrage EPIC PLT-AGENT : code review `docToolchain/diag-agent` + catalogue de portage PlantUML `DIA-01`→`DIA-07`, ~20 pts).
+
+'''
+
+== 🟡 EPIC PLT-AGENT — Agentic loop PlantUML (CADRÉ S-228)
+
+*Objet* : porter les techniques du projet OSS `docToolchain/diag-agent` (MIT) dans
+le borough plantuml pour **renforcer la boucle de génération LLM** au-delà de la
+seule validation syntaxique : **pré-vol de description**, **retour design par
+vision** sur l'image rendue, **budget mur**, **extracteur de code robuste**,
+**exemples canoniques**, **détection de sous-type**.
+
+*Cadrage* : `.agents/CADRAGE_EPIC_PLT_AGENT.adoc` (review + catalogue + 9 décisions +
+9 options écartées). *Rapport* : `.agents/sessions/228-code-review-diag-agent-portage-plantuml.adoc`.
+*Priorité* : 🟠 HAUTE — améliore la qualité des diagrammes générés (cœur du produit).
+*Charge* : ~20 pts (7 US). *Méthode* : baby-step DDD/TDD/BDD ; tout opt-in défaut
+`false` (4 sources + `push`) ; vision **dégradable**, jamais prérequis de `check`.
+
+[cols="1,4,1,2", options="header"]
+|===
+| US | Description | Pts | Statut
+
+| US-0 | Cadrage (audit + décisions) | 0 | ✅ S-228
+| US-1 | **DIA-04** extracteur de code LLM robuste (`plantuml.agent.LlmCodeExtractor` : fences + JSON + brut) — prérequis de la boucle | 3 | 🟡 À FAIRE
+| US-2 | **DIA-03** budget mur (`GenerationBudget` pur, `maxSeconds` + `stoppedReason`) | 2 | 🟡 À FAIRE
+| US-3 | **DIA-01** revue design par vision (`DesignReviewer` + `VisionDesignReviewer`) + **DIA-07** garde de convergence | 5 | 🟡 À FAIRE
+| US-4 | **DIA-02** pré-vol de description (`DescriptionPreflight` + tâche `preflightPlantumlDescription`) | 3 | 🟡 À FAIRE
+| US-5 | **DIA-06** détection de sous-type (`DiagramSubtypeDetector`) | 2 | 🟡 À FAIRE
+| US-6 | **DIA-05** catalogue d'exemples canoniques (`DiagramExampleCatalog`) | 3 | 🟡 À FAIRE
+| US-7 | BDD e2e + CI `full-tests` (runners dédiés, steps préfixés S-088) | 2 | 🟡 À FAIRE
+|===
+
+*Dépend de* : rien de nouveau (réutilise `LlmService`/`ChatModel` + `DiagramProcessor`).
+*Ne modifie pas* : le moteur de validation native (`PlantumlService`), le RAG, le
+toolchain (`PlantUmlToolchain`). Additif, backward compat.
 
 '''
 

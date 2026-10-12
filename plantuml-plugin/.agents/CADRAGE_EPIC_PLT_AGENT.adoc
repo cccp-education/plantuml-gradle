@@ -1,0 +1,276 @@
+= CADRAGE EPIC PLT-AGENT — Agentic loop PlantUML (portage `diag-agent`)
+:session: 228
+:borough: HTOWN (plantuml-gradle)
+:date: 2026-10-12
+:toc:
+
+_Code review du projet OSS `docToolchain/diag-agent` et catalogue des techniques à
+porter en Kotlin / tâches Gradle pour **améliorer le support PlantUML**. **Session de
+cadrage — zéro code modifié** (pattern S-057/S-063/S-074). Le livrable est un EPIC
+actionnable ; l'implémentation relève des sessions suivantes._
+
+== 0. Objet & méthode
+
+Le borough plantuml (HTOWN) génère, valide et traduit des diagrammes PlantUML via
+LLM (`DiagramProcessor` + `LlmService` + `PlantumlService` + RAG). `diag-agent`
+(docToolchain, MIT, ~107 commits) est un agent LLM de génération de diagrammes
+d'architecture dont le cœur est une **boucle d'auto-validation** (génération →
+validation → raffinement), étendue par une **validation de description** en amont et
+un **retour design par vision** en aval.
+
+*Méthode* : clone `git clone --depth 1 https://github.com/docToolchain/diag-agent`
+dans un répertoire temporaire (`/tmp/opencode/diag-agent`) — **lecture seule** ;
+HEAD `45068441bf9ea13b430168f9b81f700803ca0386` (2025-12-17). Analyse des 9 modules
+de `src/diag_agent` + ADR arc42 + `pyproject.toml` + `tests/`. Comparaison au code
+réel de HTOWN (lecture seule) pour ne proposer que des **capacités manquantes**.
+
+*Règle de lecture* : chaque item porte *objectif*, *domaine pur*, *port/adapter*,
+*tâche Gradle*, *opt-in*, *tests* (unit → functional → cucumber), *points*. Toute
+option est **opt-in (défaut `false`)**, câblée sur les **4 sources de config**
+(ENV / gradle.properties / YAML / CLI) + `pushConfigIntoExtension`, et n'est jamais un
+prérequis de `check`.
+
+'''
+== 1. `diag-agent` — fiche d'identité
+
+[cols="1,3", options="header"]
+|===
+| Attribut | Valeur
+
+| Éditeur | docToolchain (même fondateur que docToolchain ; inspiration historique de l'EPIC K `TAXONOMIE_WORKSPACE`)
+| Licence | MIT
+| Langage | Python ≥ 3.10 (`click`, `litellm`, `httpx`, `python-dotenv`, `pyyaml` ; `fastmcp` en extra)
+| Version | 0.1.0 (alpha)
+| Rôle | Agent de génération de diagrammes d'architecture avec validation de syntaxe autonome + retour design
+| Formats | PlantUML / C4-PlantUML / Mermaid / BPMN / ERD + 20 via **Kroki**
+| Interfaces | CLI `diag-agent`, serveur **MCP** (FastMCP), bibliothèque Python
+| Moteur LLM | **LiteLLM** (agnostique : Anthropic, OpenAI, Azure, Vertex, Bedrock…)
+| Rendu/validation | **Kroki** (local Docker par défaut, remote `kroki.io` opt-in)
+| Adossement | ADR arc42 (8 décisions) — auto-itération, local-first, URL refs, Docker bundling, écriture source (V2)
+|===
+
+.Arborescence fonctionnelle (9 modules)
+----
+src/diag_agent/
+├── agent/orchestrator.py   (464 L) — LA boucle : validation desc → génération → validation Kroki → design vision → écriture
+├── agent/analyzer.py       (0 L)   — MORT
+├── agent/validator.py      (0 L)   — MORT
+├── agent/prompt_builder.py (0 L)   — MORT
+├── agent/limiter.py        (0 L)   — MORT
+├── llm/client.py           (218 L) — enveloppe LiteLLM : generate / vision_analyze / validate_description + strip markdown
+├── kroki/client.py          (84 L) — POST HTTP /{type}/{format}, erreur si text/plain
+├── kroki/manager.py        (143 L) — cycle de vie conteneur Docker Kroki (run/stop/ps/health)
+├── config/settings.py      (119 L) — config par variables d'env
+├── cli/commands.py         (429 L) — Click : create / examples / kroki
+└── mcp/server.py            (69 L) — FastMCP : create_diagram
+----
+
+'''
+== 2. Code review — forces (ce qui a de la valeur)
+
+. **Boucle d'auto-validation ancrée sur un oracle de rendu.** `Orchestrator.execute`
+  (`orchestrator.py:347-403`) rend le diagramme via Kroki en SVG ; une erreur de rendu
+  (`KrokiRenderError`) est **réinjectée telle quelle** dans le prompt de correction
+  suivant (`orchestrator.py:325`). Le verdict est binaire et *extérieur* au LLM.
+. **Pré-vol de description** (`LLMClient.validate_description`, `client.py:148-218`).
+  Avant génération, un LLM vérifie complétude/cohérence/clarté et renvoie des
+  **questions de clarification**. **Fail-safe** : toute erreur → considéré valide.
+. **Retour design par vision** (`client.py:94-146` + `orchestrator.py:359-391`). Le
+  diagramme rendu en PNG est **analysé par un modèle vision** (mise en page /
+  lisibilité / espacement), jusqu'à « approved ». Seul mécanisme qui capte ce que la
+  validation de syntaxe **ne voit pas**.
+. **Budget borné** : double garde `max_iterations` et `max_time_seconds`
+  (`orchestrator.py:301-320`), avec `stopped_reason` (`success` / `max_iterations` /
+  `max_time`).
+. **Bibliothèque d'exemples few-shot** (`orchestrator.py:159-215`) : exemples
+  canoniques par type/sous-type injectés dans le prompt (au-delà du RAG).
+. **Détection de sous-type** (`orchestrator.py:129-157`) pour choisir exemplaire et
+  template (context/container/component ; sequence/activity/class…).
+. **Local-first + dégradation** (ADR-003/006) : Kroki Docker par défaut, fallback
+  remote en mode auto, mode local strict.
+. **Journal d'exécution** `generation.log` par run.
+
+'''
+== 3. Code review — constats (fragilités)
+
+[cols="1,2,7,1", options="header"]
+|===
+| # | Sévérité | Constat | Réf.
+
+| C-1 | 🔴 | **`sys.exit(1)` dans une classe d'orchestration** — couplage bibliothèque↔CLI. En mode **MCP**, `mcp/server.create_diagram` appelle `execute()` sans `skip_validation` : une description invalide **tue le serveur MCP**. Bug réel, non testé. | `orchestrator.py:286`, `mcp/server.py:53`
+| C-2 | 🔴 | **Messages utilisateur allemands codés en dur** dans la couche d'orchestration (`"Die Beschreibung enthält Unklarheiten"`). | `orchestrator.py:279-282`
+| C-3 | 🟠 | **Pas de port/adapter** : `Orchestrator` instancie `LLMClient`/`KrokiClient` en dur ; `litellm.completion`/`httpx.post` statiques → pas de seam d'injection. | `orchestrator.py:36-40`, `client.py:71`
+| C-4 | 🟠 | **Budget de temps non dur** : `max_time_seconds` testé **qu'en tête de boucle** → un appel LLM/vision lent dépasse largement le budget. | `orchestrator.py:316-320`
+| C-5 | 🟠 | **Sémantique d'itération incohérente** : boucle test-mode `while (iterations < maxIterations)` vs boucle réelle `while(true)` + `break if (> maxIterations)` → off-by-one. | `orchestrator.py:130` vs `:188`
+| C-6 | 🟠 | **Erreur PNG confondue avec « format non supporté »** : toute `KrokiRenderError` sur PNG → validation design **sautée** silencieusement, même si transitoire. | `orchestrator.py:386-391`
+| C-7 | 🟠 | **Collision de noms de sortie** : toutes les sorties `diagram.<ext>` → deux runs dans le même `--output` **s'écrasent** ; `generation.log` ouvert en `mode='w'`. | `orchestrator.py:422,431,112`
+| C-8 | 🟡 | **Détection d'erreur Kroki fragile** : heuristique `Content-Type: text/plain` ; page d'erreur HTML / 500 non couvert passe. | `kroki/client.py:69-75`
+| C-9 | 🟡 | **Race de logger** : `logger.handlers = []` sur `logging.getLogger(__name__)` (module global) → non thread-safe, contredit ADR-002 (« parallel possible »). | `orchestrator.py:108-116`
+| C-10 | 🟡 | **Extraction markdown fragile** : regex `` ^```[\w]*\n(.*?)\n```$ `` — exige `\n` avant clôture, tag sans `-`/`+`, pas de fence non fermée. | `client.py:45`
+| C-11 | 🟡 | **Pas de garde de convergence** du feedback design → appels LLM+vision brûlés jusqu'à `max_iterations`. | `orchestrator.py:379-385`
+| C-12 | 🟡 | **Archive non bornée** : un JSON `attempt-history-<ts>.json` par run, sans rotation. | `orchestrator.py:301-310`
+| C-13 | ⚪ | **Code mort** : 4 modules vides (`analyzer`/`validator`/`prompt_builder`/`limiter`) + **1 test vide** (`test_feedback_loop.py`, 0 ligne) → **test fantôme**. | `tests/integration/`
+| C-14 | ⚪ | **Config mono-source** : `Settings` lit uniquement l'env ; `max_iterations`/`validate_design` sans flag CLI malgré la doc. | `config/settings.py:39-65`
+| C-15 | ⚪ | **Docker silencieux** : `stop()` avec `check=False`, `is_running` filtre `docker ps` par sous-chaîne. | `kroki/manager.py:88-123`
+|===
+
+=== Ce qu'il ne faut PAS porter
+
+* `sys.exit` dans une couche non-CLI (C-1) — HTOWN = plugin Gradle → `GradleException`.
+* Messages hardcodés (C-2) — HTOWN a `PlantumlMessages` i18n (10 langues).
+* Sortie `diagram.<ext>` (C-7) — HTOWN **dérive déjà** le nom du prompt.
+* Logger module global muté (C-9) — préférer le logger de tâche Gradle.
+* Kroki comme oracle — HTOWN valide **nativement** (`SourceStringReader`, hors-ligne).
+
+'''
+== 4. Couverture de tests de `diag-agent`
+
+[cols="1,1,3", options="header"]
+|===
+| Fichier | Lignes | Contenu
+
+| `tests/unit/test_orchestrator.py` | 887 | Boucle, itérations, timeouts, écritures
+| `tests/unit/test_cli.py` | 407 | Commandes Click
+| `tests/unit/test_orchestrator_logging.py` | 374 | `generation.log`
+| `tests/unit/test_llm_client.py` | 370 | `generate`/`vision`/`validate_description`
+| `tests/unit/test_orchestrator_examples.py` | 315 | Chargement des exemples
+| `tests/unit/test_kroki_manager.py` | 206 | Docker lifecycle (mock subprocess)
+| `tests/unit/test_mcp_server.py` | 176 | Wrapper MCP
+| `tests/unit/test_settings.py` | 154 | Config env
+| `tests/unit/test_kroki_client.py` | 144 | HTTP client (mock httpx)
+| `tests/integration/test_orchestrator_integration.py` | 298 | Boucle e2e (LLM/Kroki mockés)
+| `tests/integration/test_feedback_loop.py` | **0** | **VIDE — test fantôme (C-13)**
+|===
+
+*Verdict* : ~3 300 lignes mais **toute la valeur est mockée** ; le seul test
+d'intégration de la boucle de feedback est vide. Aucun test ne prouve la survie du
+serveur MCP (C-1) ni le respect du budget temps (C-4).
+
+'''
+== 5. Comparaison — ce que HTOWN possède déjà
+
+[cols="2,3,3", options="header"]
+|===
+| Capacité | `diag-agent` | HTOWN (plantuml-gradle) — état réel
+
+| Boucle LLM + validation syntaxique | ✅ Kroki (online) | ✅ **native** `PlantumlService.validateSyntax` + `DiagramProcessor.processPrompt` (hors-ligne)
+| Historique des tentatives | ⚠️ `generation.log` (écrasé) | ✅ `attempt-history-*.json` structuré (`AttemptEntry`)
+| Port/adapter LLM | ❌ couplage direct | ✅ `LlmService` + rotation + `CrossProviderFallbackOrchestrator` + `ProviderModelResolver`
+| Multi-provider | ✅ LiteLLM | ✅ Ollama/OpenAI/Gemini/Mistral/Claude/HF/Groq + pool de clés
+| RAG | ❌ exemples statiques | ✅ indexeur/retriever RAG
+| Rendu de sortie | ✅ Kroki (multi-format) | ✅ asciidoctor-diagram + probe anti-blanc (`DiagramOutputProbe`)
+| Traduction/i18n | ❌ | ✅ `PLT-BOUNDARY` + 10 langues (`PlantumlMessages`)
+| Incrémentalité | ❌ | ✅ `IncrementalProcessor` + checksums
+| **Pré-vol de description** | ✅ | ❌ **manquant**
+| **Retour design par vision** | ✅ (PNG + vision) | ⚠️ `validateDiagram` lit **le texte source**, pas l'image → **manquant**
+| **Budget temps mur** | ✅ (partiel) | ❌ **manquant**
+| **Exemples canoniques few-shot** | ✅ | ⚠️ RAG seulement
+| **Détection de sous-type** | ✅ | ❌ **manquant**
+| **Extraction code robuste (fences)** | ✅ | ⚠️ JSON seulement (`extractPlantUmlFromResponse`)
+|===
+
+*Conclusion* : l'infrastructure LLM de HTOWN est **supérieure**. Les capacités
+réellement absentes : **revue design par vision**, **pré-vol de description**,
+**budget mur**, **exemples canoniques**, **détection de sous-type**, **extracteur
+robuste**.
+
+'''
+== 6. Catalogue de portage `DIA-01` → `DIA-07`
+
+_Méthode : baby-step DDD/TDD/BDD (domaine pur → port/adapter → tâche →
+unit/fonctionnel/cucumber). Toute option = opt-in, défaut `false`, 4 sources +
+`pushConfigIntoExtension`._
+
+[cols="1,4,2,1,2", options="header"]
+|===
+| ID | Objet | Domaine / cible | Pts | Tests
+
+| **DIA-01** | **Revue design par vision** — rendre le PNG produit et le soumettre à un modèle **vision** (mise en page/lisibilité) ; alimenter la boucle de raffinement. Objet pur `plantuml.agent.DesignReview` (parse `approved`/suggestions) + port `DesignReviewer` + adapter `VisionDesignReviewer` (langchain4j vision). Option `langchain4j.designValidation` (défaut `false`) ; saute si le modèle/format ne supporte pas la vision. | `plantuml.agent` + `DiagramProcessor` | 5 | 6 unit + 2 FT + 3 BDD `@design-review`
+| **DIA-02** | **Pré-vol de description** — `plantuml.agent.DescriptionPreflight` : `inspect(description, diagramType)` → `PreflightVerdict` sealed (`Valid` / `NeedsClarification(questions)`). **Fail-safe** : erreur LLM → `Valid`. Tâche `preflightPlantumlDescription` (groupe `verification`). Option `langchain4j.preflight` (défaut `false`). | `plantuml.agent` + tâche | 3 | 8 unit + 2 FT + 2 BDD `@preflight`
+| **DIA-03** | **Budget mur** — `plantuml.agent.GenerationBudget(maxIterations, maxSeconds, clock)` : `shouldContinue(iterations, elapsed)` + `reason` (`MAX_ITERATIONS`/`MAX_TIME`). Vérifier **avant chaque appel coûteux** ; exposer `stoppedReason` dans l'`attempt-history`. Option `langchain4j.maxSeconds` (défaut `0` = illimité). | `plantuml.agent` + `DiagramProcessor` | 2 | 6 unit + 1 FT + 2 BDD `@budget`
+| **DIA-04** | **Extracteur de code LLM robuste** — `plantuml.agent.LlmCodeExtractor` : fences ` ```lang … ``` ` (tag tolérant `-`/`+`, fence non fermée), JSON (`{plantuml.code}` / `{code}`) **et** PlantUML brut (`@startuml … @enduml`). Remplace l'extraction ad hoc de `DiagramProcessor`. | `plantuml.agent` + `DiagramProcessor` | 3 | 10 unit + 1 FT + 2 BDD `@extract`
+| **DIA-05** | **Catalogue d'exemples canoniques** — `plantuml.agent.DiagramExampleCatalog` + ressources `.puml` par sous-type ; `selectExample(diagramType, subtype)` injecté dans le prompt (complète le RAG : exemples **statiques** vs corpus **retrouvé**). | `plantuml.agent` + `DiagramProcessor` | 3 | 8 unit + 2 FT + 2 BDD `@examples`
+| **DIA-06** | **Détection de sous-type** — `plantuml.agent.DiagramSubtypeDetector` (heuristique mots-clés C4/UML/BPMN ; LLM en repli optionnel). | `plantuml.agent` | 2 | 6 unit + 1 FT + 2 BDD `@subtype`
+| **DIA-07** | **Garde de convergence du feedback** — intégré à DIA-01 : deux retours design identiques (ou score non croissant) → arrêt et meilleure version retenue (Économie d'Encre). | `plantuml.agent` | 2 | inclus DIA-01 + 2 BDD `@convergence`
+|===
+
+*Total proposé* : 7 items, **~20 pts** → EPIC **`PLT-AGENT`**.
+
+'''
+== 7. Décisions d'architecture
+
+. **Domaine `plantuml.agent` (nouveau, N2).** Objets purs d'abord (parsables,
+  hors I/O, unit-testables), ports/adapter ensuite. Aucune dépendance réseau dans
+  le domaine.
+. **La boucle reste dans `DiagramProcessor`.** On **étend** la boucle existante
+  (déjà correcte et couverte) plutôt que d'en écrire une seconde (anti-pattern C-5).
+. **Aucun nouveau moteur de rendu.** La validation reste **native** (hors-ligne).
+  Kroki n'est **pas** porté (seul le multi-format, déjà couvert par asciidoctor-diagram).
+4.  **Vision = opt-in et dégradable.** Un modèle sans capacité vision → revue
+  **sautée**, jamais un échec de build. La revue design ne bloque pas `check`.
+. **Réutiliser `LlmService`/`ChatModel`** (port existant) — pas de couplage direct.
+. **4 sources + `pushConfigIntoExtension`** pour chaque option (`maxSeconds`,
+  `designValidation`, `preflight`), défaut `false`/`0` (backward compat).
+. **i18n** : toute chaîne utilisateur via `PlantumlMessages` (10 langues).
+. **Économie d'Encre** : DIA-07 arrête le brûlage d'appels identiques ; DIA-01 ne
+  relance la revue que si la source a changé.
+. **English only** (code, Gherkin, tests) ; gouvernance `.adoc` en français.
+
+'''
+== 8. Options écartées
+
+[cols="2,5,2", options="header"]
+|===
+| Option | Raison de l'écart | Réf.
+
+| Porter l'oracle **Kroki** | HTOWN valide nativement et hors-ligne ; Kroki ajoute Docker + réseau pour zéro gain de validation. | C-8
+| Porter le **serveur MCP** FastMCP | HTOWN est un plugin Gradle, pas un serveur. | —
+| Porter le **CLI Click** | L'interface Gradle (tâche + DSL) remplace le CLI. | C-14
+| Porter **`max_time` tel quel** | Garde bâclée (C-4) → réécrire un budget **pur** (DIA-03). | C-4
+| Porter **`sys.exit` / messages allemands** | Violations (C-1/C-2) ; à proscrire. | C-1, C-2
+| Porter l'**auto-fallback local/remote** | HTOWN est local ; le fallback **LLM** existe déjà (CrossProviderFallback). | —
+| **Réécrire** un second processor | Anti-pattern (C-5) ; on étend `DiagramProcessor`. | C-5
+| Nouveau système de **RAG/exemples** | Le RAG existe ; DIA-05 = exemples statiques **en plus**, pas un remplacement. | —
+|===
+
+'''
+== 9. Découpage US proposé (EPIC `PLT-AGENT`)
+
+[cols="1,4,1,1", options="header"]
+|===
+| US | Objet | Pts | Ordre
+
+| US-0 | Cadrage + décisions (ce document) | 0 | 1
+| US-1 | **DIA-04** extracteur robuste (prérequis de la boucle) | 3 | 2
+| US-2 | **DIA-03** budget mur + `stoppedReason` | 2 | 3
+| US-3 | **DIA-01** revue design par vision + **DIA-07** convergence | 5 | 4
+| US-4 | **DIA-02** pré-vol de description + tâche | 3 | 5
+| US-5 | **DIA-06** détection de sous-type | 2 | 6
+| US-6 | **DIA-05** catalogue d'exemples canoniques | 3 | 7
+| US-7 | BDD e2e + CI `full-tests` (runners dédiés, steps préfixés S-088) | 2 | 8
+|===
+
+*Total* : 7 US ~20 pts. Chaque US = baby-step DDD/TDD/BDD ; Local = Build,
+Tests = CI. Une US qui modifie le code distribué se clôt par `publishToMavenLocal`.
+
+'''
+== 10. Reste à faire / inscription backlog
+
+. [ ] **BACKLOG** — section EPIC `PLT-AGENT` (faite dans la session S-228).
+. [ ] **Arbitrage pilote** — valider le périmètre (vision opt-in) et l'ordre des US ;
+  confirmer que la vision n'est **pas** un prérequis de `check`.
+. [ ] **Capacité vision du pool HTOWN** — vérifier qu'au moins un modèle expose la
+  vision ; sinon dégrader (DIA-01 saute la revue).
+. [ ] **Session suivante** — démarrer US-1 (DIA-04 extracteur robuste).
+
+'''
+== 11. Traçabilité
+
+* Source : `https://github.com/docToolchain/diag-agent` @ `45068441` (2025-12-17), MIT.
+* Clone de travail (lecture seule) : `/tmp/opencode/diag-agent` (Règle 2 — consommateur transitoire).
+* Comparaison code HTOWN : `DiagramProcessor.kt`, `PlantumlService.kt`,
+  `PlantumlSyntaxValidatorAdapter.kt`, `PlantUmlToolchain.kt`,
+  `ValidatePlantumlSyntaxTask.kt`, `GeneratePlantumlDiagramsTask.kt`, `models.kt`.
+* ADRs parcourus : ADR-002 (auto-itération), ADR-003 (local-first), ADR-004 (URL refs),
+  ADR-006 (Docker Kroki), ADR-007 (écriture source V2).
+* Pattern de session : cadrage S-219/S-225 (gouvernance pure, zéro code).

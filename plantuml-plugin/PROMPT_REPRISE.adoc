@@ -1,18 +1,19 @@
-= PROMPT_REPRISE — Plantuml — Session 228
-:session: 228
-:date: 2026-10-11
+= PROMPT_REPRISE — Plantuml — Session 229
+:session: 229
+:date: 2026-10-12
 
-== État — Release 0.0.9 publiée Central (S-227) ; GBL-010 G-3 partiel ✅
+== État — Release 0.0.9 (S-227) ; cadrage EPIC PLT-AGENT (S-228)
 
 * **Release 0.0.9** (S-227) : bump `plantuml 0.0.8 → 0.0.9` + pins catalog/BOM
   `0.0.78` + dépendances (`jgit 7.8.0`, `asciidoctorj-diagram 3.2.1`,
   `-plantuml 1.2026.2`). Publication Central bundle
   `dcb6d30e-fcff-45b3-a9c1-d9ba435a3cf3`, propagation repo1 HTTP 200.
-  `plantuml-engine` standalone **non bumpé** (1.2026.0 → US-3).
+* **Cadrage EPIC `PLT-AGENT`** (S-228) : code review `docToolchain/diag-agent` +
+  catalogue de portage PlantUML `DIA-01`→`DIA-07` (~20 pts, 7 US). Doc
+  `.agents/CADRAGE_EPIC_PLT_AGENT.adoc`. **Zéro code.** Rapport
+  `.agents/sessions/228-code-review-diag-agent-portage-plantuml.adoc`.
 * **GBL-010 G-3** (partiel, S-226) : `PlantumlLabelIntegrity` (détection + correction
   `\n`). Reste : statut par bloc + correction IA.
-* **PLT-DIAGRAM-OWNERSHIP** : US-0→5 ✅, US-4 ✅ ; reste US-6/7.
-* **CI plantuml** ✅ verte.
 
 == Vision (GBL-010)
 
@@ -22,19 +23,20 @@ dans l'AST AsciiDoc : port N0 `PlantUmlTranslationPort` (point d'entrée unique)
 (`PlantumlLabelIntegrity`), statut par bloc, version toolchain exposée.
 Cadrage racine : `CADRAGE_EPIC_GBL_010_ARBRE_TRADUCTION_SITE.adoc`.
 
-== Mission session 227 — au choix pilote
+== Mission Session 229 — au choix pilote
 
-* **G-3 (reste)** — statut par bloc (`TRANSLATED`/`PENDING`/`BROKEN`) exposé au
-  contrat + correction IA assistée (au-delà du `\n` déterministe).
-* **US-7** — dogfooding + non-régression (re-bake cheroliv.com, contrat VERT).
-  **Non bloquée** — candidat par défaut si aucun arbitrage.
-* **US-6** — chaîne E2E bakery→document→port→plantuml.
+* **PLT-AGENT US-1 (`DIA-04`)** — extracteur de code LLM robuste (fences + JSON +
+  brut) ; prérequis de la boucle, faible risque, forte valeur. **Candidat par défaut.**
+* **GBL-010 G-3 (reste)** — statut par bloc + correction IA.
+* **US-7 PLT-DIAGRAM-OWNERSHIP** — dogfooding + non-régression (re-bake cheroliv.com).
+* **US-6 PLT-DIAGRAM-OWNERSHIP** — chaîne E2E bakery→document→port→plantuml.
 
 == Reste backlog
 
 [cols="1,4,1"]
 |===
 | Priorité | Tâche | Est.
+| 🟡 PLT-AGENT | EPIC agentic loop PlantUML — 7 US ~20 pts (cadré S-228) | ~4 sessions
 | 🟡 G-3 | feuille PlantUML — statut par bloc + correction IA (GBL-010) | ~1 session
 | 🟡 US-6 | chaîne E2E bakery→document→port→plantuml | ~1 session
 | 🟡 US-7 | dogfooding + non-régression (re-bake cheroliv.com) | ~1 session
@@ -49,12 +51,13 @@ Zéro Python ; English only code/tests/features (gouvernance .adoc en français)
 
 == Rappels
 
-- GroupId: education.cccp — version `plantuml = "0.0.8"` (catalog ws 0.0.71)
-- Central: 0.0.1, 0.0.2, 0.0.4 (périmé), 0.0.5, 0.0.6, 0.0.7, **0.0.8 publié S-222**
-- BOM: `workspace-bom` platform **0.0.71** ; contrat N0 `plantuml-contracts:0.0.1`
-- Conventions: `education.cccp.build.*:0.0.7` ✅
+- GroupId: education.cccp — version `plantuml = "0.0.9"` (catalog ws 0.0.78)
+- Central: 0.0.1, 0.0.2, 0.0.4 (périmé), 0.0.5, 0.0.6, 0.0.7, 0.0.8, **0.0.9 publié S-227**
+- BOM: `workspace-bom` platform **0.0.78** ; contrat N0 `plantuml-contracts:0.0.1`
+- Conventions: `education.cccp.build.*` ✅
 - `publishToMavenLocal` obligatoire après modif code plugin (si distribution)
 - Cucumber : runner **global unique** (`CucumberTestRunner`, glue `plantuml.scenarios`,
   features `src/test/features/`) ; steps dans `src/test/scenarios/plantuml/scenarios/`
 - CI : `.github/workflows/test.yml` (`working-directory: plantuml-plugin`, JDK 25)
-- EPIC en cours : **GBL-010** (G-3) ; **PLT-DIAGRAM-OWNERSHIP** (US-6/7)
+- EPICs en cours : **PLT-AGENT** (cadré S-228), **GBL-010** (G-3),
+  **PLT-DIAGRAM-OWNERSHIP** (US-6/7)

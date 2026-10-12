@@ -1,5 +1,29 @@
 = Historique des Sessions
 
+== Session 228 (2026-10-12) — Cadrage EPIC PLT-AGENT (agentic loop PlantUML) ✅
+
+Demande pilote : code review du projet OSS `docToolchain/diag-agent` et propositions
+de techniques à porter en Kotlin/tâches Gradle pour améliorer le support PlantUML.
+**Gouvernance pure, zéro code** (pattern S-219/S-225). Review de `diag-agent` (MIT,
+Python ≥ 3.10, LiteLLM, Kroki) @ `45068441` : **forces** (boucle d'auto-validation
+ancrée sur un oracle de rendu Kroki avec réinjection de l'erreur, **pré-vol de
+description** renvoyant des questions, **retour design par vision** sur PNG, budget
+borné, exemples few-shot, détection de sous-type) ; **fragilités** (🔴 `sys.exit(1)`
+dans l'orchestrateur qui **tue le serveur MCP** sur description invalide — `C-1` ;
+🔴 messages **allemands hardcodés** `C-2` ; 🟠 pas de port LLM `C-3`, budget non dur
+`C-4`, off-by-one `C-5`, erreur PNG mal classée `C-6`, collision `diagram.<ext>` `C-7` ;
+⚪ **4 modules morts + 1 test fantôme vide** `C-13`). Comparaison : l'infra LLM de
+HTOWN est **supérieure** ; **6 capacités absentes**. Catalogue `DIA-01`→`DIA-07`
+(~20 pts, 7 US) → **EPIC `PLT-AGENT`** : DIA-01 revue design par vision (+ DIA-07
+convergence), DIA-02 pré-vol de description + tâche `preflightPlantumlDescription`,
+DIA-03 budget mur, DIA-04 extracteur de code robuste, DIA-05 exemples canoniques,
+DIA-06 détection de sous-type. Décisions : domaine pur `plantuml.agent`, on **étend**
+`DiagramProcessor` (pas de seconde boucle), aucun nouveau rendu, vision
+opt-in/dégradable, 4 sources + push, **jamais prérequis de `check`**. 9 options
+écartées (Kroki, MCP, CLI, fork de boucle…). Livrable `.agents/CADRAGE_EPIC_PLT_AGENT.adoc`.
+`compileKotlin` VERT (ouverture) ; zéro code modifié, zéro secret. Rapport
+`.agents/sessions/228-code-review-diag-agent-portage-plantuml.adoc`.
+
 == Session 227 (2026-10-11) — Release 0.0.9 (bump + dépendances) ✅
 
 Accord pilote : publication de la feuille PlantUML (S-226 `PlantumlLabelIntegrity`)

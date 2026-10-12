@@ -1,0 +1,86 @@
+= Session 228 — Code review `diag-agent` + cadrage EPIC `PLT-AGENT`
+:session: 228
+:date: 2026-10-12
+:borough: HTOWN (plantuml-gradle)
+:type: cadrage (gouvernance pure)
+:statut: TERMINÉ
+:methode: pattern S-219/S-225 (zéro code modifié)
+
+== Mission
+
+Demande pilote : **code review** du projet OSS `docToolchain/diag-agent` et
+**propositions** de techniques à porter en Kotlin/tâches Gradle pour **améliorer le
+support PlantUML** (HTOWN).
+
+== Livrable
+
+`.agents/CADRAGE_EPIC_PLT_AGENT.adoc` — code review + catalogue de portage
+`DIA-01`→`DIA-07` → **EPIC `PLT-AGENT`** (~20 pts). **Zéro code modifié.**
+
+== `diag-agent` — fiche
+
+MIT, Python ≥ 3.10 (`click`, `litellm`, `httpx`, `dotenv`, `pyyaml` ; `fastmcp`),
+0.1.0 alpha. HEAD `45068441` (2025-12-17). 9 modules ; cœur = `Orchestrator` (464 L)
+qui boucle génération LLM → validation rendu **Kroki** → retour design **vision**.
+Interfaces : CLI Click, serveur MCP (FastMCP), bibliothèque.
+
+=== Forces (à porter)
+
+. Boucle d'auto-validation ancrée sur un **oracle de rendu** (erreur Kroki réinjectée).
+. **Pré-vol de description** (questions de clarification, fail-safe).
+. **Retour design par vision** sur PNG (au-delà de la syntaxe).
+. Budget borné (`max_iterations` + `max_time_seconds`, `stopped_reason`).
+. Exemples few-shot par type/sous-type.
+. Détection de sous-type.
+
+=== Fragilités (ce qu'il ne faut PAS porter)
+
+* 🔴 `sys.exit(1)` dans l'orchestrateur → **tue le serveur MCP** sur description
+  invalide (`orchestrator.py:286`, `mcp/server.py:53`).
+* 🔴 Messages utilisateur **allemands hardcodés** dans le domaine (`orchestrator.py:279-282`).
+* 🟠 Pas de port/adapter LLM, budget temps non dur, off-by-one d'itération entre les
+  deux boucles, collision `diagram.<ext>`, erreur PNG confondue avec « format non
+  supporté », race de logger, archive non bornée.
+* ⚪ **Code mort** : 4 modules vides + **1 test vide** (`test_feedback_loop.py`, 0 ligne
+  = test fantôme). ~3 300 lignes de tests unit **toutes mockées**.
+* **Kroki comme oracle** : écarté — HTOWN valide **nativement/hors-ligne**.
+
+== Comparaison HTOWN
+
+L'infra LLM de HTOWN (`LlmService`, rotation, cross-provider fallback, pool de clés,
+RAG, i18n 10 langues, incrémentalité, `DiagramOutputProbe`) est **supérieure**. 6
+capacités réellement absentes → catalogue.
+
+== Catalogue `PLT-AGENT`
+
+[cols="1,4,1"]
+|===
+| ID | Objet | Pts
+
+| DIA-01 | Revue design par **vision** (+ DIA-07 convergence) | 5
+| DIA-02 | **Pré-vol de description** + tâche `preflightPlantumlDescription` | 3
+| DIA-03 | **Budget mur** (`maxIterations` + `maxSeconds`, `stoppedReason`) | 2
+| DIA-04 | **Extracteur de code LLM robuste** (fences + JSON + brut) | 3
+| DIA-05 | **Catalogue d'exemples canoniques** few-shot par sous-type | 3
+| DIA-06 | **Détection de sous-type** | 2
+| DIA-07 | **Garde de convergence** du feedback design | 2
+|===
+
+Total ~20 pts, 7 US. Domaine pur `plantuml.agent` ; on **étend** `DiagramProcessor`
+(pas de seconde boucle) ; aucun nouveau rendu ; vision **opt-in/dégradable** ; 4
+sources + push ; **jamais prérequis de `check`**. 9 décisions, 9 options écartées.
+
+== Vérifications
+
+* Ouverture : working tree propre ; `./gradlew compileKotlin` **VERT** (depuis
+  `plantuml-plugin/`). Cadrage = zéro code → aucun test lancé (Local = Build,
+  Tests = CI).
+* Zéro secret.
+
+== Reste à faire
+
+* [ ] Arbitrage pilote (périmètre vision, ordre des US).
+* [ ] Vérifier la capacité vision du pool de modèles HTOWN (sinon dégrader DIA-01).
+* [ ] Session suivante : US-1 (`DIA-04` extracteur robuste).
+
+_Score : 8/10 (cadrage, zéro code)._

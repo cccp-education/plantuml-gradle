@@ -3,6 +3,17 @@
 _Voir BACKLOG.adoc section "Prochains EPICs — pistes consolidées" pour le
 détail priorisé et les sources (code review, audit code)._
 
+== EPIC PLT-AGENT (cadré S-228)
+
+Agentic loop PlantUML — portage des techniques de `docToolchain/diag-agent` (MIT) :
+pré-vol de description, revue design par vision, budget mur, extracteur de code
+robuste, exemples canoniques, détection de sous-type. Domaine `plantuml.agent`.
+~20 pts, 7 US. BACKLOG § PLT-AGENT + `.agents/CADRAGE_EPIC_PLT_AGENT.adoc`.
+
+. [ ] Vérifier qu'au moins un modèle du pool HTOWN expose la **vision** (sinon DIA-01 dégrade).
+. [ ] Arbitrer le périmètre (vision opt-in) et l'ordre des US.
+. [ ] US-1 (`DIA-04` extracteur robuste) → US-2 (budget) → US-3 (vision+convergence) → US-4 → US-6 → US-5 → US-7.
+
 == EPIC PLT-DIAGRAM-OWNERSHIP (cadré S-219)
 
 Le borough plantuml doit posséder le bloc diagramme de bout en bout (modèle,
