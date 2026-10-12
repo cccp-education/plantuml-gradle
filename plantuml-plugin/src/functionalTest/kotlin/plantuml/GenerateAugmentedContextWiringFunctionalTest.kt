@@ -39,6 +39,10 @@ class GenerateAugmentedContextWiringFunctionalTest {
               images: "generated/images"
               rag: "generated/rag"
               validations: "generated/validations"
+            langchain4j:
+              model: "ollama"
+              ollama:
+                baseUrl: "http://127.0.0.1:11434"
             """.trimIndent(),
         )
     }
