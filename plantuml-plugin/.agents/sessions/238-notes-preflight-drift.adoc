@@ -48,6 +48,13 @@ forme `note … : texte`) ; (2) **PLT-AGENT optionnel** — test fonctionnel Tes
   (glue `plantuml.scenarios`, steps préfixés S-088).
 * Local = Build : compile 3 source sets + `assemble` + `validatePlugins` **VERTS**.
   **Tests = CI.**
+* **CI VERTE** run `38274390288` (commit `d0798d8`, `Check plantuml-plugin` ✓).
+  **Preuve de validité de la session.**
+* **1 itération CI rouge** (diagnostic par les logs CI) — run `38272485962` :
+  `PlantumlNoteExtractorTest` ×2 (`multi-line body`, `unterminated note`) — le corps de
+  note conservait l'indentation par ligne et une note non-terminée absorbait `@enduml`.
+  Correctif : trim par ligne + frontière `@…` ; + isolation des stubs WireMock
+  (`resetAll` en `@BeforeEach`).
 
 == Fichiers
 
