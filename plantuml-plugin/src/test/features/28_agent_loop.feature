@@ -80,3 +80,23 @@ Feature: Agentic loop hardening (EPIC PLT-AGENT)
   Scenario: An unknown subtype has no example
     Given the diagram description "just draw something"
     Then the example catalog returns no example
+
+  @agent-loop @design-review
+  Scenario: An approved design review
+    Given the vision design feedback "approved"
+    Then the design verdict is Approved
+
+  @agent-loop @design-review
+  Scenario: A design needing improvement
+    Given the vision design feedback "Nodes overlap, add spacing"
+    Then the design verdict is NeedsImprovement containing "overlap"
+
+  @agent-loop @convergence
+  Scenario: Identical feedback converges
+    Given the previous design feedback "add spacing" and the current "add spacing"
+    Then the design review has converged
+
+  @agent-loop @convergence
+  Scenario: Different feedback does not converge
+    Given the previous design feedback "add spacing" and the current "reduce labels"
+    Then the design review has not converged

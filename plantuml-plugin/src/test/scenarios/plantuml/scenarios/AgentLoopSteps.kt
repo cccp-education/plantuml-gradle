@@ -5,6 +5,9 @@ import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.assertj.core.api.Assertions.assertThat
 import plantuml.agent.DescriptionPreflight
+import plantuml.agent.DesignConvergence
+import plantuml.agent.DesignReview
+import plantuml.agent.DesignVerdict
 import plantuml.agent.DiagramExampleCatalog
 import plantuml.agent.DiagramSubtypeDetector
 import plantuml.agent.GenerationBudget
@@ -27,6 +30,8 @@ class AgentLoopSteps {
     private var stopReason: GenerationStopReason? = null
     private var subtype: DiagramSubtypeDetector.Subtype? = null
     private var preflightVerdict: PreflightVerdict? = null
+    private var designVerdict: DesignVerdict? = null
+    private var converged: Boolean? = null
 
     private fun unescape(raw: String): String = raw.replace("\\n", "\n")
 
@@ -107,5 +112,36 @@ class AgentLoopSteps {
     @Then("the example catalog returns no example")
     fun theExampleCatalogReturnsNoExample() {
         assertThat(DiagramExampleCatalog.selectExample(subtype!!)).isNull()
+    }
+
+    @Given("the vision design feedback {string}")
+    fun theVisionDesignFeedback(feedback: String) {
+        designVerdict = DesignReview.parse(feedback)
+    }
+
+    @Then("the design verdict is Approved")
+    fun theDesignVerdictIsApproved() {
+        assertThat(designVerdict).isEqualTo(DesignVerdict.Approved)
+    }
+
+    @Then("the design verdict is NeedsImprovement containing {string}")
+    fun theDesignVerdictNeedsImprovement(text: String) {
+        assertThat(designVerdict).isInstanceOf(DesignVerdict.NeedsImprovement::class.java)
+        assertThat((designVerdict as DesignVerdict.NeedsImprovement).feedback).contains(text)
+    }
+
+    @Given("the previous design feedback {string} and the current {string}")
+    fun thePreviousAndCurrentDesignFeedback(previous: String, current: String) {
+        converged = DesignConvergence.isConverged(previous, current)
+    }
+
+    @Then("the design review has converged")
+    fun theDesignReviewHasConverged() {
+        assertThat(converged).isTrue()
+    }
+
+    @Then("the design review has not converged")
+    fun theDesignReviewHasNotConverged() {
+        assertThat(converged).isFalse()
     }
 }

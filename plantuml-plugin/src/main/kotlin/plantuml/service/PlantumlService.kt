@@ -70,6 +70,22 @@ class PlantumlService {
     }
 
     /**
+     * Renders the PlantUML source to PNG bytes (EPIC PLT-AGENT, DIA-01).
+     *
+     * Unlike [generateImage], this never writes the textual fallback: on failure it
+     * returns `null`, so the design reviewer degrades instead of reviewing a non-image.
+     */
+    fun renderPng(plantumlCode: String): ByteArray? = try {
+        val reader = SourceStringReader(plantumlCode)
+        val outputStream = ByteArrayOutputStream()
+        reader.outputImage(outputStream)
+        outputStream.toByteArray().takeIf { it.isNotEmpty() }
+    } catch (e: Exception) {
+        logger.warn("PlantUML render to PNG failed: ${e.message}")
+        null
+    }
+
+    /**
      * The native parser exposed through the N0 validation port (PLT-CR3-2), so the
      * output probe can re-parse the produced diagram source.
      */

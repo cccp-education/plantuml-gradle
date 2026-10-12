@@ -11,6 +11,10 @@ import plantuml.PlantumlConfig
 import plantuml.PlantumlDiagram
 import plantuml.PlantumlMessages
 import plantuml.ValidationFeedback
+import plantuml.agent.DesignConvergence
+import plantuml.agent.DesignReview
+import plantuml.agent.DesignReviewer
+import plantuml.agent.DesignVerdict
 import plantuml.agent.DiagramExampleCatalog
 import plantuml.agent.DiagramSubtypeDetector
 import plantuml.agent.GenerationBudget
@@ -61,7 +65,8 @@ data class AttemptEntry(
 class DiagramProcessor(
     internal val plantumlService: PlantumlService,
     private val chatModel: ChatModel?,
-    private val config: PlantumlConfig?
+    private val config: PlantumlConfig?,
+    private val designReviewer: DesignReviewer? = null
 ) {
 
     private val logger: org.slf4j.Logger = org.slf4j.LoggerFactory.getLogger(DiagramProcessor::class.java)
@@ -193,6 +198,7 @@ class DiagramProcessor(
         var validationResult: SyntaxValidationResult
         val startTime = System.currentTimeMillis()
         val budget = GenerationBudget(maxIterations, maxSeconds)
+        var lastDesignFeedback: String? = null
 
         // Validate and potentially iterate
         // Loop continues while invalid AND we haven't exhausted maxIterations
@@ -247,6 +253,57 @@ class DiagramProcessor(
                     )
                 )
             } else {
+                // PLT-AGENT DIA-01/07 — optional vision design review loop. Only
+                // active when a reviewer is injected (opt-in `langchain4j.designValidation`).
+                if (designReviewer != null) {
+                    val png = plantumlService.renderPng(currentCode)
+                    val feedback = if (png != null) {
+                        try {
+                            designReviewer.review(png, currentCode)
+                        } catch (e: Exception) {
+                            logger.warn("Design review failed, skipping (degraded): ${e.message}")
+                            null
+                        }
+                    } else {
+                        null
+                    }
+
+                    if (feedback != null) {
+                        val verdict = DesignReview.parse(feedback)
+                        if (verdict is DesignVerdict.NeedsImprovement &&
+                            !DesignConvergence.isConverged(lastDesignFeedback, feedback)
+                        ) {
+                            val elapsedSeconds = (System.currentTimeMillis() - startTime) / 1000.0
+                            if (budget.stopReason(iterations, elapsedSeconds) == null) {
+                                iterations++
+                                lastDesignFeedback = feedback
+                                val designPrompt = """
+                                    Improve the following PlantUML diagram based on this design feedback:
+                                    ${verdict.feedback}
+
+                                    Return ONLY valid PlantUML code wrapped in @startuml and @enduml tags.
+                                    $currentCode
+                                """.trimIndent()
+                                currentCode = try {
+                                    extractPlantUmlFromResponse(chatModel.chat(designPrompt))
+                                } catch (e: IllegalStateException) {
+                                    logger.warn(PlantumlMessages.format("processor.invalid_correction", "en", e.message ?: ""))
+                                    "// INVALID_JSON_RESPONSE"
+                                }
+                                attemptHistory.add(
+                                    AttemptEntry(
+                                        "Design refinement #$iterations",
+                                        currentCode,
+                                        iterations,
+                                        false,
+                                        verdict.feedback
+                                    )
+                                )
+                                continue
+                            }
+                        }
+                    }
+                }
                 // Mark the successful attempt
                 attemptHistory[attemptHistory.size - 1] = attemptHistory.last().copy(isValid = true)
                 break

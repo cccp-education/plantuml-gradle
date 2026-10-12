@@ -124,7 +124,17 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         val llmService = LlmService(config)
         val chatModel = llmService.createChatModel()
         logger.lifecycle(PlantumlMessages.format("generate.debug", lang, chatModel.toString(), config.output.diagrams, System.getProperty("plantuml.test.mode") ?: "null"))
-        val diagramProcessor = DiagramProcessor(plantumlService, chatModel, config)
+        // PLT-AGENT DIA-01 — opt-in vision design review (built only when enabled and
+        // an LLM is available; the reviewer degrades if the model lacks vision).
+        val designReviewer = if (config.langchain4j.designValidation && chatModel != null) {
+            plantuml.service.VisionDesignReviewer(chatModel)
+        } else {
+            null
+        }
+        if (designReviewer != null) {
+            logger.lifecycle("Design validation enabled (vision review)")
+        }
+        val diagramProcessor = DiagramProcessor(plantumlService, chatModel, config, designReviewer)
         val resolver = TranslationResolver(
             classifier = TextClassifier(),
             glossary = IdiomaticGlossary(),
@@ -190,6 +200,7 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         val ollamaBaseUrl = project.findProperty("plantuml.langchain4j.ollama.baseUrl") as? String
         val maxIterations = project.findProperty("plantuml.langchain4j.maxIterations") as? Int
         val maxSeconds = (project.findProperty("plantuml.langchain4j.maxSeconds") as? String)?.toLongOrNull()
+        val designValidation = (project.findProperty("plantuml.langchain4j.designValidation") as? String)?.toBoolean()
         val cliLanguage = project.findProperty("plantuml.language") as? String
 
         val cliParams = mutableMapOf<String, Any?>()
@@ -198,6 +209,7 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         if (ollamaBaseUrl != null) cliParams["langchain4j.ollama.baseUrl"] = ollamaBaseUrl
         if (maxIterations != null) cliParams["langchain4j.maxIterations"] = maxIterations
         if (maxSeconds != null) cliParams["langchain4j.maxSeconds"] = maxSeconds
+        if (designValidation != null) cliParams["langchain4j.designValidation"] = designValidation
         if (cliLanguage != null) cliParams["language"] = cliLanguage
 
         // Load base configuration
@@ -233,6 +245,12 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
             config = config.copy(
                 langchain4j = config.langchain4j.copy(
                     maxSeconds = maxSeconds
+                )
+            )
+        if (designValidation != null)
+            config = config.copy(
+                langchain4j = config.langchain4j.copy(
+                    designValidation = designValidation
                 )
             )
 
