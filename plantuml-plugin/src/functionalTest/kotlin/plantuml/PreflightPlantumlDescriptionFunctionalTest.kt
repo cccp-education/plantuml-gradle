@@ -7,6 +7,7 @@ import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
@@ -60,6 +61,19 @@ class PreflightPlantumlDescriptionFunctionalTest {
                         .withBody(
                             """{"model":"smollm:135m","message":{"role":"assistant","content":"$content"},"done":true}""",
                         ),
+                ),
+        )
+    }
+
+    @BeforeEach
+    fun resetStubs() {
+        wireMock.resetAll()
+        wireMock.stubFor(
+            WireMock.get(WireMock.urlEqualTo("/api/tags"))
+                .willReturn(
+                    WireMock.aResponse().withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("""{"models":[]}"""),
                 ),
         )
     }

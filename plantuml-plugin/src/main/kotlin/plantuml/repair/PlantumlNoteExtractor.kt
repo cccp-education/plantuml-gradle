@@ -31,12 +31,17 @@ object PlantumlNoteExtractor {
 
         for (line in source.lines()) {
             if (inNote) {
-                if (END_NOTE.containsMatchIn(line)) {
+                // A note body ends at `end note` or at the diagram boundary `@…`
+                // (an unterminated note must not swallow the closing directive).
+                if (END_NOTE.containsMatchIn(line) || line.trimStart().startsWith("@")) {
                     flushInto(collected, body)
                     inNote = false
-                } else {
+                    continue
+                }
+                val trimmed = line.trim()
+                if (trimmed.isNotEmpty()) {
                     if (body.isNotEmpty()) body.append('\n')
-                    body.append(line)
+                    body.append(trimmed)
                 }
                 continue
             }
