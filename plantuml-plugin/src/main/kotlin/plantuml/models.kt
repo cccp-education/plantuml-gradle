@@ -95,6 +95,7 @@ data class OutputConfig(
  */
 data class LangchainConfig(
     val maxIterations: Int = 5,
+    val maxSeconds: Long = 0,
     val model: String = "ollama",
     val validation: Boolean = true,
     val validationPrompt: String = "Rate this diagram on clarity, completeness, and best practices. Return a JSON with 'score' (1-10) and 'feedback' (string) and 'recommendations' (array).",

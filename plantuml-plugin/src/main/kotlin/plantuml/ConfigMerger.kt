@@ -81,6 +81,7 @@ object ConfigMerger {
             ),
             langchain4j = LangchainConfig(
                 maxIterations = env["PLANTUML_MAX_ITERATIONS"]?.toIntOrNull() ?: sysProps["PLANTUML_MAX_ITERATIONS"]?.toIntOrNull() ?: 5,
+                maxSeconds = env["PLANTUML_MAX_SECONDS"]?.toLongOrNull() ?: sysProps["PLANTUML_MAX_SECONDS"]?.toLongOrNull() ?: 0,
                 model = env["PLANTUML_LLM_PROVIDER"] ?: sysProps["PLANTUML_LLM_PROVIDER"] ?: "ollama",
                 validation = env["PLANTUML_VALIDATION"]?.toBoolean() ?: sysProps["PLANTUML_VALIDATION"]?.toBoolean() ?: true,
                 validationPrompt = env["PLANTUML_VALIDATION_PROMPT"] ?: sysProps["PLANTUML_VALIDATION_PROMPT"] ?: "Rate this diagram on clarity, completeness, and best practices. Return a JSON with 'score' (1-10) and 'feedback' (string) and 'recommendations' (array).",
@@ -165,6 +166,7 @@ object ConfigMerger {
             ),
             langchain4j = LangchainConfig(
                 maxIterations = props["plantuml.langchain4j.maxIterations"]?.toIntOrNull() ?: 5,
+                maxSeconds = props["plantuml.langchain4j.maxSeconds"]?.toLongOrNull() ?: 0,
                 model = props["plantuml.langchain4j.model"] ?: "ollama",
                 validation = props["plantuml.langchain4j.validation"]?.toBoolean() ?: true,
                 validationPrompt = props["plantuml.langchain4j.validationPrompt"] ?: "Rate this diagram on clarity, completeness, and best practices. Return a JSON with 'score' (1-10) and 'feedback' (string) and 'recommendations' (array).",
@@ -258,6 +260,7 @@ object ConfigMerger {
         @Suppress("KotlinConstantConditions")
         return LangchainConfig(
             maxIterations = cli["langchain4j.maxIterations"] as? Int ?: (if (env.maxIterations != 5) env.maxIterations else (if (yaml.maxIterations != 5) yaml.maxIterations else props.maxIterations)),
+            maxSeconds = cli["langchain4j.maxSeconds"] as? Long ?: (if (env.maxSeconds != 0L) env.maxSeconds else (if (yaml.maxSeconds != 0L) yaml.maxSeconds else props.maxSeconds)),
             model = cli["langchain4j.model"]?.toString() ?: (if (env.model != "ollama") env.model else (if (yaml.model != "ollama") yaml.model else props.model)),
             validation = cli["langchain4j.validation"] as? Boolean ?: (if (!yaml.validation) yaml.validation else props.validation),
             validationPrompt = cli["langchain4j.validationPrompt"]?.toString() ?: yaml.validationPrompt,

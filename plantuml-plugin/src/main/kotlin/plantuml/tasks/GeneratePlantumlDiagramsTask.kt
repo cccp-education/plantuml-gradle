@@ -189,6 +189,7 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         val ollamaModelName = project.findProperty("plantuml.langchain4j.ollama.modelName") as? String
         val ollamaBaseUrl = project.findProperty("plantuml.langchain4j.ollama.baseUrl") as? String
         val maxIterations = project.findProperty("plantuml.langchain4j.maxIterations") as? Int
+        val maxSeconds = (project.findProperty("plantuml.langchain4j.maxSeconds") as? String)?.toLongOrNull()
         val cliLanguage = project.findProperty("plantuml.language") as? String
 
         val cliParams = mutableMapOf<String, Any?>()
@@ -196,6 +197,7 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         if (ollamaModelName != null) cliParams["langchain4j.ollama.modelName"] = ollamaModelName
         if (ollamaBaseUrl != null) cliParams["langchain4j.ollama.baseUrl"] = ollamaBaseUrl
         if (maxIterations != null) cliParams["langchain4j.maxIterations"] = maxIterations
+        if (maxSeconds != null) cliParams["langchain4j.maxSeconds"] = maxSeconds
         if (cliLanguage != null) cliParams["language"] = cliLanguage
 
         // Load base configuration
@@ -227,7 +229,13 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
                     maxIterations = maxIterations
                 )
             )
-        
+        if (maxSeconds != null)
+            config = config.copy(
+                langchain4j = config.langchain4j.copy(
+                    maxSeconds = maxSeconds
+                )
+            )
+
         return config
     }
 
@@ -262,9 +270,11 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         // Process through LLM interaction loop (max 5 iterations)
         val maxIterations = project.findProperty("plantuml.langchain4j.maxIterations") as? Int
             ?: config.langchain4j.maxIterations
+        val maxSeconds = (project.findProperty("plantuml.langchain4j.maxSeconds") as? String)?.toLongOrNull()
+            ?: config.langchain4j.maxSeconds
 
         val diagram = try {
-            diagramProcessor.processPrompt(promptContent, maxIterations, logger, resolver, language)
+            diagramProcessor.processPrompt(promptContent, maxIterations, logger, resolver, language, maxSeconds)
         } catch (e: IllegalStateException) {
             logger.lifecycle(PlantumlMessages.format("generate.error", lang, e.message ?: "Unknown error"))
             throw e

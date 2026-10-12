@@ -1,0 +1,79 @@
+package plantuml.scenarios
+
+import io.cucumber.java.en.Given
+import io.cucumber.java.en.Then
+import io.cucumber.java.en.When
+import org.assertj.core.api.Assertions.assertThat
+import plantuml.agent.DiagramSubtypeDetector
+import plantuml.agent.GenerationBudget
+import plantuml.agent.GenerationStopReason
+import plantuml.agent.LlmCodeExtractor
+
+/**
+ * Steps for `28_agent_loop.feature` (EPIC PLT-AGENT).
+ *
+ * All step names carry the `LLM code extractor` / `the LLM response` /
+ * `the extracted code` prefixes so they stay unique within the shared
+ * `plantuml.scenarios` glue package (anti-collision rule S-088).
+ */
+class AgentLoopSteps {
+
+    private var response: String = ""
+    private var extracted: String? = null
+    private var budget: GenerationBudget? = null
+    private var stopReason: GenerationStopReason? = null
+    private var subtype: DiagramSubtypeDetector.Subtype? = null
+
+    private fun unescape(raw: String): String = raw.replace("\\n", "\n")
+
+    @Given("the LLM response is {string}")
+    fun theLlmResponseIs(raw: String) {
+        response = unescape(raw)
+        extracted = null
+    }
+
+    @When("the LLM code extractor strips fences")
+    fun theExtractorStripsFences() {
+        extracted = LlmCodeExtractor.stripFences(response)
+    }
+
+    @When("the LLM code extractor cuts raw PlantUML")
+    fun theExtractorCutsRawPlantUml() {
+        extracted = LlmCodeExtractor.rawPlantUml(response)
+    }
+
+    @Then("the extracted code is {string}")
+    fun theExtractedCodeIs(raw: String) {
+        assertThat(extracted).isEqualTo(unescape(raw))
+    }
+
+    @Given("a generation budget of {string} iterations and {string} seconds")
+    fun aGenerationBudget(iterations: String, seconds: String) {
+        budget = GenerationBudget(iterations.toInt(), seconds.toLong())
+        stopReason = null
+    }
+
+    @When("{string} corrections have been done after {string} seconds")
+    fun correctionsHaveBeenDone(corrections: String, seconds: String) {
+        stopReason = budget!!.stopReason(corrections.toInt(), seconds.toDouble())
+    }
+
+    @Then("the budget stop reason is {string}")
+    fun theBudgetStopReasonIs(expected: String) {
+        if (expected == "none") {
+            assertThat(stopReason).isNull()
+        } else {
+            assertThat(stopReason?.name).isEqualTo(expected)
+        }
+    }
+
+    @Given("the diagram description {string}")
+    fun theDiagramDescription(description: String) {
+        subtype = DiagramSubtypeDetector.detect(description)
+    }
+
+    @Then("the detected subtype is {string}")
+    fun theDetectedSubtypeIs(expected: String) {
+        assertThat(subtype?.name).isEqualTo(expected)
+    }
+}

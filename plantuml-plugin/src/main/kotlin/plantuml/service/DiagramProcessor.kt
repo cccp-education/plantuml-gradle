@@ -11,6 +11,9 @@ import plantuml.PlantumlConfig
 import plantuml.PlantumlDiagram
 import plantuml.PlantumlMessages
 import plantuml.ValidationFeedback
+import plantuml.agent.DiagramSubtypeDetector
+import plantuml.agent.GenerationBudget
+import plantuml.agent.LlmCodeExtractor
 import plantuml.boundary.TranslationResolver
 import contracts.plantuml.SyntaxValidationResult
 import java.io.File
@@ -90,7 +93,8 @@ class DiagramProcessor(
         maxIterations: Int = 5,
         logger: Logger,
         resolver: TranslationResolver? = null,
-        language: String = "en"
+        language: String = "en",
+        maxSeconds: Long = 0
     ): PlantumlDiagram? {
         logger.debug("processPrompt: chatModel={}, config={}, testMode={}", chatModel, config, System.getProperty("plantuml.test.mode"))
         // Initialize attempt history
@@ -146,14 +150,18 @@ class DiagramProcessor(
             return null
         }
 
-        // Create the full prompt with instructions for generating PlantUML
-        val fullPrompt = """
-            Generate a PlantUML diagram based on the following description:
-            $prompt
-            
-            Please return ONLY valid PlantUML code wrapped in @startuml and @enduml tags.
-            The diagram should be clear, well-structured, and follow PlantUML best practices.
-        """.trimIndent()
+        // Create the full prompt with instructions for generating PlantUML.
+        // PLT-AGENT DIA-06 — a deterministic subtype hint steers the LLM when the
+        // description clearly implies a diagram kind (no hint when unknown).
+        val subtypeHint = DiagramSubtypeDetector.hint(prompt)
+        val fullPrompt = buildString {
+            appendLine("Generate a PlantUML diagram based on the following description:")
+            appendLine(prompt)
+            appendLine()
+            appendLine("Please return ONLY valid PlantUML code wrapped in @startuml and @enduml tags.")
+            append("The diagram should be clear, well-structured, and follow PlantUML best practices.")
+            if (subtypeHint != null) append("\n$subtypeHint")
+        }
 
         // Send prompt to LLM via ChatModel
         val initialResponse = chatModel.chat(fullPrompt)
@@ -174,6 +182,8 @@ class DiagramProcessor(
         var currentCode = extractedCode
         var iterations = 0
         var validationResult: SyntaxValidationResult
+        val startTime = System.currentTimeMillis()
+        val budget = GenerationBudget(maxIterations, maxSeconds)
 
         // Validate and potentially iterate
         // Loop continues while invalid AND we haven't exhausted maxIterations
@@ -182,13 +192,16 @@ class DiagramProcessor(
             validationResult = plantumlService.validateSyntax(currentCode)
 
             if (validationResult is SyntaxValidationResult.Invalid) {
-                iterations++
-                
-                // Check if we've exhausted all iterations
-                if (iterations > maxIterations) {
+                // PLT-AGENT DIA-03 — consult the hard budget before spending another
+                // LLM correction (iteration count OR wall-clock).
+                val elapsedSeconds = (System.currentTimeMillis() - startTime) / 1000.0
+                val stop = budget.stopReason(iterations, elapsedSeconds)
+                if (stop != null) {
+                    logger.info("Stopping: generation budget reached (${stop.name}) after $iterations corrections")
                     break
                 }
-                
+                iterations++
+
                 // Prepare correction prompt with previous attempt history
                 val historyContext = buildHistoryContext(attemptHistory.takeLast(3)) // Last 3 attempts for context
                 
@@ -399,7 +412,15 @@ class DiagramProcessor(
     private fun extractPlantUmlFromResponse(response: String): String {
         // If response looks like JSON (starts with { or [), it must be valid JSON
         val looksLikeJson = response.trimStart().startsWith("{") || response.trimStart().startsWith("[")
-        
+
+        // PLT-AGENT DIA-04 — strip a fenced code block or cut raw PlantUML from
+        // surrounding prose before the JSON path (diag-agent hardening). Skipped
+        // for JSON payloads so their i18n error contract stays intact.
+        if (!looksLikeJson) {
+            LlmCodeExtractor.stripFences(response)?.let { return it }
+            LlmCodeExtractor.rawPlantUml(response)?.let { return it }
+        }
+
         return try {
             // Try to parse as JSON and extract code
             val jsonNode = objectMapper.readTree(response)
