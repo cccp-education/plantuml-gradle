@@ -1,0 +1,69 @@
+= Session 235 — PLT-CONTEXT US-4 : wiring `DiagramProcessor` (CTX-04)
+:session: 235
+:date: 2026-10-12
+:borough: HTOWN (plantuml-gradle)
+:type: feat + test (DDD/TDD/BDD)
+:statut: TERMINÉ
+:methode: baby-step DDD/TDD/BDD (unit → functional → cucumber)
+
+== Mission
+
+`PLT-CONTEXT` US-4 (`CTX-04`) : le **wiring `DiagramProcessor`** — injecter le
+contexte augmenté collecté (CTX-03, artefact `build/plantuml/augmented-context.txt`)
+dans le prompt de génération LLM ; `DocKnowledgeBase` reste le **repli hors-ligne**
+(D-3). Clôt l'EPIC `PLT-CONTEXT` 4/4.
+
+== Livré
+
+=== Baby-step A — domaine pur `plantuml.context.AugmentedContextPrompt`
+
+* Objet **pur** : `prepend(augmentedContext, prompt)` → prompt inchangé si contexte
+  blanc/vide (repli D-3) ; sinon bloc préfixé par `CONTEXT_HEADER`
+  (`Augmented context (governance EAGER + retrieved RAG/Graphify/Docs):`) + contexte
+  trimmé + prompt de base. Zéro I/O.
+
+=== Baby-step B — `DiagramProcessor` consomme le contexte
+
+* Constructeur : paramètre additif `augmentedContext: String = ""` (backward
+  compatible).
+* `processPrompt` : `effectivePrompt = AugmentedContextPrompt.prepend(augmentedContext,
+  fullPrompt)` avant `chatModel.chat(...)`. Le chemin test (chatModel nul) est inchangé.
+
+=== Baby-step C — tâche de génération + câblage Gradle
+
+* `GeneratePlantumlDiagramsTask.resolveAugmentedContext()` : lit l'artefact
+  `build/plantuml/augmented-context.txt` s'il existe, sinon `""` (repli).
+  Le `DiagramProcessor` reçoit le contexte.
+* `PlantumlManager` : `generatePlantumlDiagrams` **dépend** désormais de
+  `collectPlantumlAugmentedContext` (artefact frais).
+* **Durcissement CTX-03** : l'entrée `eagerFiles` du collecteur est **tolérante**
+  (provider filtrant les fichiers existants) — la tâche devenue dépendance de
+  génération ne casse pas la validation d'input sur un projet sans `.agents/INDEX.adoc`.
+
+== Tests (3 niveaux)
+
+* Unit : `AugmentedContextPromptTest` (**4**) + `DiagramProcessorContextTest` (**2**,
+  capture du prompt LLM via `ArgumentCaptor` : contexte injecté / vide → prompt intact).
+* BDD : `31_plantuml_context_wiring.feature` (`@context @wiring`, 2 scénarios) +
+  `AugmentedContextPromptSteps` (glue `plantuml.scenarios`, steps préfixés S-088).
+* Functional (TestKit) : `GenerateAugmentedContextWiringFunctionalTest` (**3** —
+  dépendance collecteur↔génération, artefact EAGER produit, succès sans fichiers EAGER).
+* Local = Build : 3 source sets `compile*Kotlin` **VERTS** + `assemble` +
+  `validatePlugins` **VERTS**. **Tests = CI.**
+
+== Décisions / notes
+
+* **D-3** : `DocKnowledgeBase` (voie `GraphifyPromptAdapter`) **reste** le repli ; la
+  voie génération accepte le contexte augmenté en complément. Additif, backward compat.
+* Injection **opportuniste + dépendance Gradle** : le collecteur tourne avant la
+  génération (artefact frais) ; sans contexte, comportement identique à aujourd'hui.
+* Frontière DAG respectée : le domaine ne connaît que le **texte** (artefact), pas un
+  type N1/N2.
+* Publication Maven Central **non déclenchée** (hors périmètre CTX-04 ; accord pilote).
+
+== Reste à faire
+
+* [x] **PLT-CONTEXT ✅ TERMINÉ 4/4.** Prochaines pistes : GBL-010 `G-3b` (statut + version
+  exposés au contrat), PLT-DIAGRAM-OWNERSHIP US-6/US-7 (chaîne E2E + dogfooding).
+
+_Score : 9/10 (DDD/TDD/BDD 3 niveaux, patron capsule, Économie d'Encre, clôt l'EPIC)._

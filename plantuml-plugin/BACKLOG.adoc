@@ -1,10 +1,10 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-10-12 (Session 234 — **PLT-CONTEXT 3/4** : CTX-01 (contrat N0) + CTX-02 (assembleur pur) ✅ S-233, CTX-03 (collecteur `collectPlantumlAugmentedContext` + provenance D-6) ✅ S-234. Reste CTX-04 wiring. CTX-05 CADUQUE S-232. PLT-AGENT ✅ 7/7 S-230.)
+:last_update: 2026-10-12 (Session 235 — **PLT-CONTEXT ✅ TERMINÉ 4/4** : CTX-01/02 ✅ S-233, CTX-03 ✅ S-234, CTX-04 (wiring `DiagramProcessor`) ✅ S-235. CTX-05 CADUQUE S-232. PLT-AGENT ✅ 7/7 S-230.)
 
 '''
 
-== 🟡 EPIC PLT-CONTEXT — Contexte augmenté de génération via codebase (N1)
+== ✅ EPIC PLT-CONTEXT — Contexte augmenté de génération via codebase (N1) (TERMINÉ S-235, 4/4)
 
 *Objet* : confier le **contexte augmenté de génération** de plantuml au **contrat N0
 `contracts.context.*`** (`education.cccp:codebase-contracts`) alimenté par le socle
@@ -18,6 +18,11 @@ Patron de référence : capsule (`CapsuleContextBuilder` + `CollectCapsuleAugmen
 consomment déjà le hub N1).
 *Priorité* : 🟠 HAUTE. *Charge* : **~10 pts** (4 US après caducation de CTX-05). *Frontière DAG* : contrat = **N0**,
 moteur = **N1** ; **jamais** N2→N2. Repli statique conservé (hors-ligne).
+*Statut* : ✅ **TERMINÉ 4/4** (S-231 cadrage → S-233 CTX-01/02 → S-234 CTX-03 → S-235 CTX-04).
+plantuml génère désormais avec le **contexte augmenté** (EAGER + RAG/Graphify/Docs) collecté
+par `collectPlantumlAugmentedContext` et injecté par `AugmentedContextPrompt` ; `DocKnowledgeBase`
+reste le repli hors-ligne. Publications Maven Central non déclenchées (accord pilote requis).
+*Sessions de référence* : `.agents/sessions/{231,233,234,235}-*.adoc`.
 
 [cols="1,4,1,2", options="header"]
 |===
@@ -27,7 +32,7 @@ moteur = **N1** ; **jamais** N2→N2. Repli statique conservé (hors-ligne).
 | CTX-01 | **Contrat N0** `codebase-contracts` (`contracts.context.*`) : `implementation("education.cccp:codebase-contracts:0.0.2")` | 1 | ✅ S-233
 | CTX-02 | **Assembleur pur** `plantuml.context.PlantumlContextBuilder` (mirror `CapsuleContextBuilder`) | 3 | ✅ S-233
 | CTX-03 | **Collecteur** `collectPlantumlAugmentedContext` (EAGER + RAG/Graphify/Docs → `augmented-context.txt`, Économie d'Encre) | 3 | ✅ S-234
-| CTX-04 | **Wiring `DiagramProcessor`** : contexte dans le prompt ; `DocKnowledgeBase` = repli | 3 | 🟡 À FAIRE
+| CTX-04 | **Wiring `DiagramProcessor`** : contexte dans le prompt ; `DocKnowledgeBase` = repli | 3 | ✅ S-235
 | CTX-05 | *(optionnel)* hub **`LlmBuildService`** (N1) au lieu de `LlmService` local | — | ✅ **CADUQUE** (arbitrage S-232, § 11 du cadrage)
 |===
 

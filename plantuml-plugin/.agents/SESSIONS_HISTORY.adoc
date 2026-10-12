@@ -1,5 +1,22 @@
 = Historique des Sessions
 
+== Session 235 (2026-10-12) — PLT-CONTEXT US-4 (CTX-04 wiring `DiagramProcessor`) — EPIC ✅ 4/4 ✅
+
+Implémentation (baby-step DDD/TDD/BDD). **Domaine pur** `plantuml.context.AugmentedContextPrompt`
+(`prepend(augmentedContext, prompt)` : prompt inchangé si contexte blanc — repli D-3 ; sinon
+bloc préfixé `CONTEXT_HEADER` + contexte trimmé). **`DiagramProcessor`** : paramètre additif
+`augmentedContext: String = ""`, `processPrompt` compose `AugmentedContextPrompt.prepend(...)`
+avant `chatModel.chat(...)`. **Câblage Gradle** : `GeneratePlantumlDiagramsTask.resolveAugmentedContext()`
+lit `build/plantuml/augmented-context.txt` (sinon `""`) ; `generatePlantumlDiagrams` **dépend** de
+`collectPlantumlAugmentedContext` ; **durcissement CTX-03** (entrée `eagerFiles` tolérante via
+provider filtrant les fichiers existants). Tests 3 niveaux : **4 unit** (`AugmentedContextPromptTest`)
++ **2 unit** (`DiagramProcessorContextTest`, `ArgumentCaptor` capture du prompt LLM) + **BDD**
+`31_plantuml_context_wiring.feature` (`@context @wiring`, 2 scénarios) + `AugmentedContextPromptSteps`
++ **3 functional** TestKit (`GenerateAugmentedContextWiringFunctionalTest`). Frontière : le domaine
+ne connaît que le **texte** (artefact). Local = Build (3 source sets compile VERT + `assemble` +
+`validatePlugins` VERT) ; preuve = CI. **PLT-CONTEXT TERMINÉ 4/4.** Zéro secret, zéro Python, zéro
+publication. Rapport `.agents/sessions/235-plt-context-us4-wiring.adoc`.
+
 == Session 234 (2026-10-12) — PLT-CONTEXT US-3 (CTX-03 collecteur `collectPlantumlAugmentedContext`) ✅
 
 Implémentation (baby-step DDD/TDD/BDD). **Domaine pur** `plantuml.context` de provenance

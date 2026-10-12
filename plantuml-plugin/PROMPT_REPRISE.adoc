@@ -1,40 +1,39 @@
-= PROMPT_REPRISE — Plantuml — Session 235
-:session: 235
+= PROMPT_REPRISE — Plantuml — Session 236
+:session: 236
 :date: 2026-10-12
 
-== État — PLT-AGENT ✅ 7/7 ; PLT-CONTEXT 3/4 (CTX-01/02/03 ✅, CTX-05 CADUQUE)
+== État — PLT-AGENT ✅ 7/7 ; PLT-CONTEXT ✅ 4/4 (TERMINÉ S-235)
 
 * **EPIC `PLT-AGENT` ✅ 7/7** (S-230) : techniques `diag-agent` (domaine pur `plantuml.agent`).
-* **EPIC `PLT-CONTEXT`** (cadré S-231) :
+* **EPIC `PLT-CONTEXT` ✅ 4/4 TERMINÉ** :
   * **CTX-01 ✅ S-233** — contrat N0 `education.cccp:codebase-contracts:0.0.2`
     (`contracts.context.*`) adopté.
   * **CTX-02 ✅ S-233** — assembleur pur `plantuml.context.PlantumlContextBuilder`
     (+ `PlantumlContext`), miroir de `CapsuleContextBuilder`.
   * **CTX-03 ✅ S-234** — collecteur `collectPlantumlAugmentedContext` (EAGER + canaux
     RAG/Graphify/Docs injectés → `build/plantuml/augmented-context.txt`) + provenance
-    `context-provenance.json` (D-6, domaine pur `plantuml.context` + `ProvenanceTracker`).
-  * **CTX-04 🟡** — wiring `DiagramProcessor` (contexte dans le prompt ; `DocKnowledgeBase` = repli).
+    `context-provenance.json` (D-6).
+  * **CTX-04 ✅ S-235** — wiring `DiagramProcessor` : `AugmentedContextPrompt.prepend`
+    (pur) injecte l'artefact dans le prompt ; `generatePlantumlDiagrams` dépend du
+    collecteur ; `DocKnowledgeBase` = repli hors-ligne (D-3).
   * **CTX-05 ✅ CADUQUE** (S-232) — `LlmService` non remplacé par le hub N1.
 * **CI** : workflows obsolètes supprimés ; cache pgvector + cache Ollama `qwen3.5:0.8b`.
 
-== Mission Session 235 — au choix pilote
+== Mission Session 236 — au choix pilote
 
-* **PLT-CONTEXT US-4 (`CTX-04`)** — wiring `DiagramProcessor` : lire l'artefact
-  `build/plantuml/augmented-context.txt` (produit par CTX-03) et l'injecter dans le
-  prompt de génération ; `DocKnowledgeBase` devient **repli** hors-ligne (aucun contexte).
-  **Candidat par défaut — clôt PLT-CONTEXT 4/4.**
-* **GBL-010 G-3 (reste)** — statut par bloc + correction IA (feuille PlantUML).
-* **US-6/US-7 PLT-DIAGRAM-OWNERSHIP** — chaîne E2E bakery→document→port→plantuml + dogfooding.
+* **GBL-010 `G-3b`** — statut par bloc + **version toolchain** exposés au contrat
+  (audit d'arbre unifié document/cheroliv) ; garde anti-drift local↔CI. **Candidat
+  par défaut** (2 pts, périmètre borné).
+* **PLT-DIAGRAM-OWNERSHIP US-6** — chaîne de transmission E2E bakery→document→port→plantuml
+  (rendu non blanc), cross-borough (3 pts).
+* **PLT-DIAGRAM-OWNERSHIP US-7** — dogfooding + non-régression (re-bake cheroliv.com, contrat VERT) (2 pts).
+* **GBL-010 `G-3` (reste)** — statut par bloc + correction IA (feuille PlantUML).
 
 == Points d'attention
 
 * **Local = Build, Tests = CI** : ne jamais lancer `test`/`check` en local. Preuve = CI.
 * **DAG** : plantuml (N2) consomme **N0** (`contracts.*`) et **N1** (codebase) ; **jamais N2→N2**.
   Repli hors-ligne conservé. **NE PAS** remplacer `LlmService` (CTX-05 CADUQUE).
-* **CTX-04** : la source de contexte est l'**artefact** `augmented-context.txt` (Économie
-  d'Encre — ne pas rappeler le LLM ; invalidation ciblée). Si l'artefact est absent/vide →
-  repli `DocKnowledgeBase` (comportement actuel préservé). Option de wiring : `@InputFile
-  @Optional` **tolérant** (pattern CDX-CONTEXT-HARDENING) ou `ConfigurableFileCollection`.
 * Nouvelle option → config 4 sources + CLI, défaut `false`. English only ; zéro Python ;
   zéro secret ; baby-step DDD/TDD/BDD ; runner Cucumber global unique, steps préfixés (S-088).
 
@@ -43,5 +42,5 @@
 * GroupId `education.cccp` — version `plantuml = "0.0.9"` (catalog ws 0.0.78).
 * BOM `workspace-bom` **0.0.78** ; N0 `plantuml-contracts:0.0.1`, `i18n-contracts:0.0.3`,
   **`codebase-contracts:0.0.2`** (adopté S-233).
-* EPICs : **PLT-AGENT ✅ 7/7**, **PLT-CONTEXT 🟡** (CTX-01/02/03 ✅, CTX-05 CADUQUE,
-  CTX-04 restant), GBL-010 (G-3), PLT-DIAGRAM-OWNERSHIP (US-6/7).
+* EPICs : **PLT-AGENT ✅ 7/7**, **PLT-CONTEXT ✅ 4/4 (TERMINÉ S-235)**,
+  GBL-010 (`G-3` partiel / `G-3b`), PLT-DIAGRAM-OWNERSHIP (US-6/7).

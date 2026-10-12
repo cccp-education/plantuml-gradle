@@ -1,5 +1,20 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-10
 
+== Session 235 (2026-10-12) — PLT-CONTEXT US-4 (CTX-04 wiring `DiagramProcessor`) — EPIC ✅ 4/4
+
+=== Fait
+- [x] **Domaine pur** `plantuml.context.AugmentedContextPrompt.prepend` (prompt inchangé si contexte blanc — repli D-3) ✅
+- [x] `DiagramProcessor` : paramètre additif `augmentedContext` + injection avant `chatModel.chat(...)` ✅
+- [x] `GeneratePlantumlDiagramsTask.resolveAugmentedContext()` (lit `build/plantuml/augmented-context.txt`, sinon `""`) ✅
+- [x] `generatePlantumlDiagrams` **dépend** de `collectPlantumlAugmentedContext` + durcissement entrée tolérante (CTX-03) ✅
+- [x] Tests : **4 unit** (`AugmentedContextPromptTest`) + **2 unit** (`DiagramProcessorContextTest`) + BDD `31_plantuml_context_wiring.feature` (`@context @wiring`, 2 scénarios) + **3 functional** TestKit ✅
+- [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 236 + BACKLOG (CTX-04 ✅, EPIC ✅ TERMINÉ 4/4) + TODO + archive ✅
+- [x] Local = Build (3 source sets compile + `assemble` + `validatePlugins` VERT) ; zéro secret, zéro Python, zéro publication ✅
+
+=== Prochaine session (236)
+- **GBL-010 `G-3b`** (statut par bloc + version toolchain exposés au contrat) ; sinon PLT-DIAGRAM-OWNERSHIP US-6/US-7
+- **Fichier à lire en priorité** : `BACKLOG.adoc` § GBL-010 / PLT-DIAGRAM-OWNERSHIP
+
 == Session 234 (2026-10-12) — PLT-CONTEXT US-3 (CTX-03 collecteur + provenance) ✅
 
 === Fait

@@ -147,11 +147,12 @@ provenance anti-hallucination) est absorbé dans CTX-02/03/04 (scénarios `@cont
 
 == 9. Reste à faire
 
+*Statut EPIC* : ✅ **TERMINÉ 4/4** (S-235).
+
 . [x] Arbitrage **CTX-05** ✅ S-232 → **CADUQUE** (§ 11).
-. [ ] Vérifier `codebase-contracts:0.0.2` sur Central (`education.cccp`) + alignement BOM.
-. [ ] Confirmer la source des canaux RAG/Graphify (injection `-Pcontext.*` vs artefact
-  produit par codebase `prepareContext`/`CompositeContextBuilder`).
-. [ ] Session suivante : démarrer US-1/US-2.
+. [x] Vérifier `codebase-contracts:0.0.2` sur Central (`education.cccp`) + alignement BOM ✅ S-233 (BOM 0.0.78).
+. [x] Confirmer la source des canaux RAG/Graphify ✅ S-234 (injection CLI `-Pcontext.*`, patron capsule, mockable).
+. [x] US-1 (CTX-01) ✅ S-233 · US-2 (CTX-02) ✅ S-233 · US-3 (CTX-03) ✅ S-234 · US-4 (CTX-04) ✅ S-235.
 
 == 10. Traçabilité
 

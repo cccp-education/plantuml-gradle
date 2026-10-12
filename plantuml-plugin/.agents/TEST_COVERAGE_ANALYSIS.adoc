@@ -1,6 +1,25 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 234 (12 octobre 2026) — PLT-CONTEXT US-3 (CTX-03 collecteur + provenance)
+_Dernière mise à jour_ : Session 235 (12 octobre 2026) — PLT-CONTEXT US-4 (CTX-04 wiring `DiagramProcessor`)
+
+=== Session 235 — PLT-CONTEXT US-4 (CTX-04 wiring `DiagramProcessor`)
+
+Session 235 (2026-10-12) : injection du contexte augmenté dans le prompt de génération ;
+clôt l'EPIC PLT-CONTEXT 4/4. Baby-step DDD/TDD/BDD 3 niveaux.
+
+* `src/test/kotlin/plantuml/context/AugmentedContextPromptTest.kt` — **4 unit**
+  (contexte blanc → prompt intact, contexte non blanc → préfixé sous `CONTEXT_HEADER`,
+  contexte avant le prompt, contexte trimmé).
+* `src/test/kotlin/plantuml/service/DiagramProcessorContextTest.kt` — **2 unit**
+  (capture du prompt LLM via `ArgumentCaptor` : contexte injecté / vide → prompt intact).
+* `src/test/features/31_plantuml_context_wiring.feature` — **BDD `@context @wiring`**
+  (2 scénarios) + `AugmentedContextPromptSteps` (glue `plantuml.scenarios`, steps
+  préfixés S-088).
+* `src/functionalTest/kotlin/plantuml/GenerateAugmentedContextWiringFunctionalTest.kt` —
+  **3 functional** TestKit (dépendance collecteur↔génération, artefact EAGER produit,
+  succès sans fichiers EAGER — entrée tolérante).
+* Local = Build : 3 source sets `compile*Kotlin` + `assemble` + `validatePlugins`
+  **VERTS**. **Tests = CI** (preuve = run CI).
 
 === Session 234 — PLT-CONTEXT US-3 (CTX-03 collecteur `collectPlantumlAugmentedContext`)
 
