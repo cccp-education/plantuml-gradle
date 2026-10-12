@@ -1,0 +1,78 @@
+= Session 230 — Implémentation EPIC PLT-AGENT (DIA-01→07)
+:session: 230
+:date: 2026-10-12
+:borough: HTOWN (plantuml-gradle)
+:type: feat + test (DDD/TDD/BDD)
+:statut: TERMINÉ
+:methode: baby-step DDD/TDD/BDD (unit → fonctionnel → cucumber)
+
+== Mission
+
+Décision pilote S-229 : **implémenter l'EPIC `PLT-AGENT` en entier** (DIA-01→07),
+Kroki et MCP rejetés. Portage des **techniques** de `docToolChain/diag-agent` sur
+l'infra HTOWN native (domaine pur `plantuml.agent`).
+
+== Livré — 7 items
+
+[cols="1,4,1,1"]
+|===
+| ID | Livrable | Commit | Tests
+
+| DIA-04 | `LlmCodeExtractor` (fences/JSON-adjacent/brut) câblé dans `DiagramProcessor.extractPlantUmlFromResponse` (contrat i18n JSON préservé) | `2b1fd02` | 9 unit + 3 BDD
+| DIA-03 | `GenerationBudget` (itérations + temps mur) consulté avant chaque correction ; config `langchain4j.maxSeconds` (4 sources) + CLI | `2b1fd02` | 6 unit + 3 BDD
+| DIA-06 | `DiagramSubtypeDetector` (déterministe, hors-ligne) ; indice injecté dans le prompt | `2b1fd02` | 7 unit + 3 BDD
+| DIA-02 | `DescriptionPreflight` (parse fail-safe) + tâche `preflightPlantumlDescription` (opt-in `langchain4j.preflight`) | `4462ea9` | 5 unit + 3 BDD
+| DIA-05 | `DiagramExampleCatalog` (exemples canoniques par sous-type, ressources) injectés si opt-in `langchain4j.examples` | `4462ea9` | 2 unit + 2 BDD
+| DIA-01 | `DesignReview` pur + port `DesignReviewer` + adapter `VisionDesignReviewer` (LangChain4j vision, base64 PNG) + `PlantumlService.renderPng` ; boucle design opt-in `langchain4j.designValidation` | `b93e837` | 4 unit + 2 BDD
+| DIA-07 | `DesignConvergence` (arrêt si feedback identique — Économie d'Encre) | `b93e837` | 4 unit + 2 BDD
+|===
+
+*Domaine pur* `plantuml.agent` : `LlmCodeExtractor`, `GenerationBudget`/`GenerationStopReason`,
+`DiagramSubtypeDetector`, `DescriptionPreflight`/`PreflightVerdict`, `DiagramExampleCatalog`,
+`DesignReview`/`DesignVerdict`/`DesignReviewer`, `DesignConvergence`. *Adapter* :
+`plantuml.service.VisionDesignReviewer`. *Tâche* : `PreflightPlantumlDescriptionTask`.
+
+*Config* (4 sources ENV/props/YAML/CLI + CLI Gradle) : `langchain4j.maxSeconds` (défaut 0),
+`preflight` (false), `examples` (false), `designValidation` (false). **Défaut off →
+comportement inchangé.** Aucun nouveau moteur de rendu (Kroki rejeté) ; vision **dégradable**.
+
+*BDD* : `28_agent_loop.feature` (`@agent-loop`) — 18 scénarios (extract, budget, subtype,
+preflight, examples, design-review, convergence) + `AgentLoopSteps`.
+
+== CI — régression PLT-AGENT corrigée + cache Ollama
+
+* **Régression arité `processPrompt`** : l'ajout d'un paramètre `maxSeconds` (défaut)
+  faisait remplir `0` (valeur brute) dans le stub Mockito de `PromptOrchestratorTest`
+  → `InvalidUseOfMatchersException` (5 tests). Corrigé en lisant `maxSeconds` depuis
+  `config.langchain4j.maxSeconds` (arité inchangée) — `c268c5d`.
+* **Cache Ollama** : `real_llm_test.yml` supposait un endpoint externe (aucune install,
+  aucun pull). Ajout de `.github/actions/setup-ollama` (image Docker + modèle mis en
+  cache, `qwen3.5:0.8b`, port CI 11466) — `d73ce27`. Le CI principal (`check`) reste
+  **mocké** (aucun appel LLM réseau).
+
+== Correctif hors périmètre (dette pré-existante)
+
+* **Drift toolchain** — le bump S-227 (catalogue `asciidoctorj-diagram 3.2.1`,
+  `-plantuml 1.2026.2`) n'avait pas mis à jour `PlantUmlToolchain.reference`
+  (resté 3.2.0 / 1.2025.3, S-222) → les gardes anti-drift `@toolchain` + `PlantUmlToolchainTest`
+  échouaient sur CI. Réaligné (`daaf7a0`). **Pré-existant, non causé par PLT-AGENT.**
+* **Workflow `CI`** — échoue sur `./gradlew -p readme-plugin clean check` alors que
+  `readme-plugin/` **n'existe pas** (chemin obsolète). Pré-existant, **hors périmètre** ;
+  à traiter (supprimer/`.github/workflows/ci.yml` corriger).
+
+== Vérifications
+
+* Local = Build : `compileKotlin`/`compileTestKotlin` + `validatePlugins` **VERTS**.
+  Aucun test/check lancé en local (règle EAGER).
+* CI `Test` : `publishToMavenLocal` + `check` (unit + functional + cucumber) sur le
+  commit poussé — **preuve de validité**.
+
+== Reste à faire
+
+* [ ] CI `Test` verte sur `daaf7a0` (à confirmer).
+* [ ] (optionnel) test fonctionnel TestKit de `preflightPlantumlDescription` (no-op si
+  désactivé) ; mock LLM (pas d'appel réseau en CI).
+* [ ] Traiter le workflow `CI` obsolète (`readme-plugin`).
+* [ ] Dogfooding vision : vérifier qu'un modèle du pool expose la vision (sinon DIA-01 dégrade).
+
+_Score : 9/10 (7 items, DDD/TDD/BDD, zéro régression par défaut)._

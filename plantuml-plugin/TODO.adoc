@@ -3,9 +3,9 @@
 _Voir BACKLOG.adoc section "Prochains EPICs — pistes consolidées" pour le
 détail priorisé et les sources (code review, audit code)._
 
-== EPIC PLT-AGENT (cadré S-228, vision S-229)
+== ✅ EPIC PLT-AGENT (cadré S-228, vision S-229, TERMINÉ S-230)
 
-Agentic loop PlantUML — portage des **techniques** de `docToolchain/diag-agent` (MIT) :
+Agentic loop PlantUML — portage des **techniques** de `docToolChain/diag-agent` (MIT) :
 pré-vol de description, revue design par vision, budget mur, extracteur de code
 robuste, exemples canoniques, détection de sous-type. Domaine `plantuml.agent`.
 ~20 pts, 7 US. BACKLOG § PLT-AGENT + `.agents/CADRAGE_EPIC_PLT_AGENT.adoc` +
@@ -15,9 +15,15 @@ robuste, exemples canoniques, détection de sous-type. Domaine `plantuml.agent`.
 + pool + fallback, RAG + KG, incrémentalité, i18n 10 langues, toolchain gouvernée, contrats N0,
 interface Gradle. *Ne pas réintroduire* : MCP, CLI, Kroki, Python/LiteLLM, Docker.
 
+. [x] US-1 (`DIA-04` extracteur robuste) ✅ S-230.
+. [x] US-2 (`DIA-03` budget mur) ✅ S-230.
+. [x] US-3 (`DIA-01` vision + `DIA-07` convergence) ✅ S-230.
+. [x] US-4 (`DIA-02` pré-vol de description + tâche) ✅ S-230.
+. [x] US-5 (`DIA-06` détection de sous-type) ✅ S-230.
+. [x] US-6 (`DIA-05` exemples canoniques) ✅ S-230.
+. [x] US-7 (BDD `28_agent_loop.feature` 18 scénarios) ✅ S-230.
+. [ ] (optionnel) test fonctionnel TestKit `preflightPlantumlDescription` + mock LLM.
 . [ ] Vérifier qu'au moins un modèle du pool HTOWN expose la **vision** (sinon DIA-01 dégrade).
-. [ ] Arbitrer le périmètre (vision opt-in) et l'ordre des US.
-. [ ] US-1 (`DIA-04` extracteur robuste) → US-2 (budget) → US-3 (vision+convergence) → US-4 → US-6 → US-5 → US-7.
 
 == EPIC PLT-DIAGRAM-OWNERSHIP (cadré S-219)
 

@@ -1,67 +1,44 @@
-= PROMPT_REPRISE — Plantuml — Session 230
-:session: 230
+= PROMPT_REPRISE — Plantuml — Session 231
+:session: 231
 :date: 2026-10-12
 
-== État — Release 0.0.9 (S-227) ; PLT-AGENT cadré + vision clarifiée (S-228/S-229)
+== État — Release 0.0.9 (S-227) ; EPIC PLT-AGENT ✅ 7/7 (S-230)
 
-* **Release 0.0.9** (S-227) : bump `plantuml 0.0.8 → 0.0.9` + pins catalog/BOM
-  `0.0.78` + dépendances (`jgit 7.8.0`, `asciidoctorj-diagram 3.2.1`,
-  `-plantuml 1.2026.2`). Publication Central bundle
-  `dcb6d30e-fcff-45b3-a9c1-d9ba435a3cf3`, propagation repo1 HTTP 200.
-* **Cadrage EPIC `PLT-AGENT`** (S-228) : code review `docToolchain/diag-agent` +
-  catalogue de portage PlantUML `DIA-01`→`DIA-07` (~20 pts, 7 US). Doc
-  `.agents/CADRAGE_EPIC_PLT_AGENT.adoc`. **Zéro code.**
-* **Vision & périmètre** (S-229) : noyau portable vs coquille ; **charte de
-  non-régression HTOWN** ; audit des choix écartés (MCP/CLI/Kroki/Docker) ;
-  **verdict : Kroki REJETÉ** (oracle déjà natif, 2ᵉ version moteur = drift D1). Doc
-  `.agents/CADRAGE_EPIC_PLT_AGENT_VISION.adoc`.
-* **GBL-010 G-3** (partiel, S-226) : `PlantumlLabelIntegrity` (détection + correction
-  `\n`). Reste : statut par bloc + correction IA.
+* **EPIC `PLT-AGENT` TERMINÉ 7/7** (S-230) : portage des techniques de
+  `docToolChain/diag-agent` sur l'infra HTOWN native (domaine `plantuml.agent`).
+  DIA-04 extracteur, DIA-03 budget mur, DIA-06 sous-type, DIA-02 pré-vol description
+  (+ tâche `preflightPlantumlDescription`), DIA-05 exemples canoniques, DIA-01 revue
+  design par vision (+ adapter), DIA-07 convergence. Config `langchain4j.{maxSeconds,
+  preflight,examples,designValidation}` (4 sources, défaut off). BDD `28_agent_loop.feature`
+  (18 scénarios). Rapports `.agents/sessions/230-plt-agent-implementation.adoc` +
+  cadrages `.agents/CADRAGE_EPIC_PLT_AGENT.adoc` / `…_VISION.adoc`.
+* **Correctif dette** (S-230, `daaf7a0`) : drift toolchain pré-existant S-227
+  (`PlantUmlToolchain.reference` réaligné sur le catalogue 3.2.1 / 1.2026.2).
+* **Release 0.0.9** (S-227) : Central bundle `dcb6d30e`, propagation repo1 200.
 
-== Vision (GBL-010)
+== Mission Session 231 — au choix pilote
 
-plantuml gère la **traduction et le débugage/correction** de la feuille `[plantuml]`
-dans l'AST AsciiDoc : port N0 `PlantUmlTranslationPort` (point d'entrée unique),
-`PLT-BOUNDARY` (3 natures, stratégies), round-trip, **intégrité de label**
-(`PlantumlLabelIntegrity`), statut par bloc, version toolchain exposée.
-Cadrage racine : `CADRAGE_EPIC_GBL_010_ARBRE_TRADUCTION_SITE.adoc`.
+* **US-7 PLT-AGENT (optionnel)** — test fonctionnel TestKit de `preflightPlantumlDescription`
+  (no-op si désactivé, **mock LLM** — pas d'appel réseau) + dogfooding vision (vérifier
+  qu'un modèle du pool expose la vision, sinon dégradation).
+* **Dette CI** — le workflow `.github/workflows/ci.yml` échoue sur
+  `-p readme-plugin` (répertoire inexistant) : **supprimer/corriger** (hors PLT-AGENT).
+* **GBL-010 G-3 (reste)** — statut par bloc + correction IA (feuille PlantUML).
+* **US-6/US-7 PLT-DIAGRAM-OWNERSHIP** — chaîne E2E bakery→document→port→plantuml +
+  dogfooding re-bake cheroliv.com.
 
-== Mission Session 230 — au choix pilote
+== Points d'attention
 
-* **PLT-AGENT US-1 (`DIA-04`)** — extracteur de code LLM robuste (fences + JSON +
-  brut) ; prérequis de la boucle, faible risque, forte valeur. **Candidat par défaut**
-  (si la vision S-229 est validée pilote).
-* **GBL-010 G-3 (reste)** — statut par bloc + correction IA.
-* **US-7 PLT-DIAGRAM-OWNERSHIP** — dogfooding + non-régression (re-bake cheroliv.com).
-* **US-6 PLT-DIAGRAM-OWNERSHIP** — chaîne E2E bakery→document→port→plantuml.
-
-== Reste backlog
-
-[cols="1,4,1"]
-|===
-| Priorité | Tâche | Est.
-| 🟡 PLT-AGENT | EPIC agentic loop PlantUML — 7 US ~20 pts (cadré S-228) | ~4 sessions
-| 🟡 G-3 | feuille PlantUML — statut par bloc + correction IA (GBL-010) | ~1 session
-| 🟡 US-6 | chaîne E2E bakery→document→port→plantuml | ~1 session
-| 🟡 US-7 | dogfooding + non-régression (re-bake cheroliv.com) | ~1 session
-| 🟡 PL-3 | ktlint ou detekt | BLOQUÉ ABIDJAN
-|===
-
-== Méthodologie
-
-Baby-step DDD/TDD/BDD (unit → functional → cucumber). Red→Green→Refactor.
-Local = Build, Tests = CI (règle EAGER). **Pas de test/check en local.**
-Zéro Python ; English only code/tests/features (gouvernance .adoc en français).
+* **Local = Build, Tests = CI** : ne jamais lancer `test`/`check` en local. Preuve = CI.
+* Appel LLM en CI : **Ollama via Docker** + config YAML (secret si besoin) + petit
+  modèle `qwen3.5:0.8b` ; sinon **mocker** l'appel (préféré pour les tests déterministes).
+* Nouvelle option → `LangchainConfig` + `ConfigMerger` (4 sources) + CLI, défaut `false`.
+* English only ; zéro Python ; zéro secret ; baby-step DDD/TDD/BDD ; runner Cucumber
+  global unique (`CucumberTestRunner`), steps préfixés (S-088).
 
 == Rappels
 
-- GroupId: education.cccp — version `plantuml = "0.0.9"` (catalog ws 0.0.78)
-- Central: 0.0.1, 0.0.2, 0.0.4 (périmé), 0.0.5, 0.0.6, 0.0.7, 0.0.8, **0.0.9 publié S-227**
-- BOM: `workspace-bom` platform **0.0.78** ; contrat N0 `plantuml-contracts:0.0.1`
-- Conventions: `education.cccp.build.*` ✅
-- `publishToMavenLocal` obligatoire après modif code plugin (si distribution)
-- Cucumber : runner **global unique** (`CucumberTestRunner`, glue `plantuml.scenarios`,
-  features `src/test/features/`) ; steps dans `src/test/scenarios/plantuml/scenarios/`
-- CI : `.github/workflows/test.yml` (`working-directory: plantuml-plugin`, JDK 25)
-- EPICs en cours : **PLT-AGENT** (cadré S-228), **GBL-010** (G-3),
-  **PLT-DIAGRAM-OWNERSHIP** (US-6/7)
+* GroupId `education.cccp` — version `plantuml = "0.0.9"` (catalog ws 0.0.78).
+* Central : 0.0.1, 0.0.2, 0.0.4 (périmé), 0.0.5, 0.0.6, 0.0.7, 0.0.8, **0.0.9 (S-227)**.
+* BOM `workspace-bom` platform **0.0.78** ; contrat N0 `plantuml-contracts:0.0.1`.
+* EPICs : **PLT-AGENT ✅ 7/7**, GBL-010 (G-3), PLT-DIAGRAM-OWNERSHIP (US-6/7).

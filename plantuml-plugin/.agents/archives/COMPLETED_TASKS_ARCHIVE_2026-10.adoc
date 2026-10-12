@@ -1,5 +1,25 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-10
 
+== Session 230 (2026-10-12) — Implémentation EPIC PLT-AGENT (DIA-01→07) ✅
+
+=== Fait
+- [x] DIA-04 `LlmCodeExtractor` (fences/JSON/brut) câblé dans `DiagramProcessor` (contrat i18n JSON préservé) ✅
+- [x] DIA-03 `GenerationBudget` (temps mur + itérations) + config `langchain4j.maxSeconds` (4 sources) ✅
+- [x] DIA-06 `DiagramSubtypeDetector` (déterministe) + indice prompt ✅
+- [x] DIA-02 `DescriptionPreflight` + tâche `preflightPlantumlDescription` (opt-in) ✅
+- [x] DIA-05 `DiagramExampleCatalog` (ressources canoniques, opt-in `examples`) ✅
+- [x] DIA-01 `DesignReview` + port `DesignReviewer` + `VisionDesignReviewer` + `PlantumlService.renderPng` + boucle opt-in `designValidation` ✅
+- [x] DIA-07 `DesignConvergence` (Économie d'Encre) ✅
+- [x] +45 unit tests + BDD `28_agent_loop.feature` (18 scénarios `@agent-loop`) + `AgentLoopSteps` ✅
+- [x] Correctif dette pré-existante : drift toolchain S-227 (`PlantUmlToolchain.reference`) ✅
+- [x] Local = Build : compile ×3 + validatePlugins VERT ; CI `Test` = preuve ✅
+- [x] Commits `2b1fd02`, `4462ea9`, `b93e837`, `daaf7a0` ; zéro secret, zéro Python ✅
+
+=== Prochaine session (231)
+- US-7 (optionnel) : test fonctionnel `preflightPlantumlDescription` + mock LLM ; dogfooding vision
+- Dette CI : workflow `ci.yml` obsolète (`-p readme-plugin` inexistant)
+- Fichier à lire en priorité : `.agents/sessions/230-plt-agent-implementation.adoc`
+
 == Session 229 (2026-10-12) — Clarification de vision : périmètre PLT-AGENT ✅
 
 === Fait

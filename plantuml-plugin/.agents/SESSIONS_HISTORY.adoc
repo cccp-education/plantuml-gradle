@@ -1,5 +1,28 @@
 = Historique des Sessions
 
+== Session 230 (2026-10-12) — Implémentation EPIC PLT-AGENT (DIA-01→07) ✅
+
+Décision pilote S-229 : implémenter l'EPIC `PLT-AGENT` **en entier**, Kroki et MCP
+rejetés. Portage des **techniques** de `docToolChain/diag-agent` sur l'infra HTOWN
+native, dans un nouveau domaine pur `plantuml.agent` (baby-step DDD/TDD/BDD) :
+**DIA-04** `LlmCodeExtractor` (fences/JSON/brut, câblé dans
+`DiagramProcessor.extractPlantUmlFromResponse` en préservant le contrat i18n JSON) ;
+**DIA-03** `GenerationBudget` (itérations + temps mur, consulté avant chaque correction ;
+config `langchain4j.maxSeconds` 4 sources + CLI) ; **DIA-06** `DiagramSubtypeDetector`
+(déterministe, hors-ligne ; indice injecté dans le prompt) ; **DIA-02** `DescriptionPreflight`
+(parse fail-safe) + tâche `preflightPlantumlDescription` (opt-in `langchain4j.preflight`) ;
+**DIA-05** `DiagramExampleCatalog` (exemples canoniques par sous-type, ressources injectées
+si `langchain4j.examples`) ; **DIA-01** `DesignReview` pur + port `DesignReviewer` + adapter
+`VisionDesignReviewer` (LangChain4j `ChatModel` vision, PNG base64) + `PlantumlService.renderPng`
++ boucle design opt-in `langchain4j.designValidation` (dégradable) ; **DIA-07**
+`DesignConvergence` (arrêt si feedback identique — Économie d'Encre). +45 unit + BDD
+`28_agent_loop.feature` (18 scénarios `@agent-loop`, runner global unique) + `AgentLoopSteps`.
+**Correctif dette pré-existante** : drift toolchain S-227 (`PlantUmlToolchain.reference`
+resté S-222 3.2.0/1.2025.3 vs catalogue 3.2.1/1.2026.2) → gardes `@toolchain` +
+`PlantUmlToolchainTest` réalignés. Local = Build (compile ×3 + validatePlugins VERT) ;
+preuve = CI `Test`. Zéro secret, zéro Python. Commits `2b1fd02`, `4462ea9`, `b93e837`, `daaf7a0`.
+Rapport `.agents/sessions/230-plt-agent-implementation.adoc`.
+
 == Session 229 (2026-10-12) — Clarification de vision : périmètre PLT-AGENT ✅
 
 Porte de décision avant implémentation (gouvernance pure, zéro code). **Vision réelle

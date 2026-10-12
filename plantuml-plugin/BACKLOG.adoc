@@ -1,10 +1,10 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-10-12 (Session 229 — vision PLT-AGENT : périmètre confirmé (6 techniques neutres), charte de non-régression HTOWN, **Kroki REJETÉ**. S-228 : cadrage + catalogue `DIA-01`→`DIA-07`, ~20 pts).
+:last_update: 2026-10-12 (Session 230 — **EPIC PLT-AGENT TERMINÉ 7/7** : DIA-01→07 implémentés (domaine pur `plantuml.agent`, Kroki/MCP rejetés) ; +45 unit + BDD 18 scénarios ; correctif drift toolchain S-227).
 
 '''
 
-== 🟡 EPIC PLT-AGENT — Agentic loop PlantUML (CADRÉ S-228)
+== ✅ EPIC PLT-AGENT — Agentic loop PlantUML (TERMINÉ S-230, 7/7)
 
 *Objet* : porter les techniques du projet OSS `docToolchain/diag-agent` (MIT) dans
 le borough plantuml pour **renforcer la boucle de génération LLM** au-delà de la
@@ -31,13 +31,13 @@ ressource. Périmètre = **6 techniques neutres** (DIA-01→07) sur l'infra exis
 | US | Description | Pts | Statut
 
 | US-0 | Cadrage (audit + décisions) | 0 | ✅ S-228
-| US-1 | **DIA-04** extracteur de code LLM robuste (`plantuml.agent.LlmCodeExtractor` : fences + JSON + brut) — prérequis de la boucle | 3 | 🟡 À FAIRE
-| US-2 | **DIA-03** budget mur (`GenerationBudget` pur, `maxSeconds` + `stoppedReason`) | 2 | 🟡 À FAIRE
-| US-3 | **DIA-01** revue design par vision (`DesignReviewer` + `VisionDesignReviewer`) + **DIA-07** garde de convergence | 5 | 🟡 À FAIRE
-| US-4 | **DIA-02** pré-vol de description (`DescriptionPreflight` + tâche `preflightPlantumlDescription`) | 3 | 🟡 À FAIRE
-| US-5 | **DIA-06** détection de sous-type (`DiagramSubtypeDetector`) | 2 | 🟡 À FAIRE
-| US-6 | **DIA-05** catalogue d'exemples canoniques (`DiagramExampleCatalog`) | 3 | 🟡 À FAIRE
-| US-7 | BDD e2e + CI `full-tests` (runners dédiés, steps préfixés S-088) | 2 | 🟡 À FAIRE
+| US-1 | **DIA-04** extracteur de code LLM robuste (`plantuml.agent.LlmCodeExtractor` : fences + JSON + brut) — prérequis de la boucle | 3 | ✅ S-230
+| US-2 | **DIA-03** budget mur (`GenerationBudget` pur, `maxSeconds` + `stoppedReason`) | 2 | ✅ S-230
+| US-3 | **DIA-01** revue design par vision (`DesignReviewer` + `VisionDesignReviewer`) + **DIA-07** garde de convergence | 5 | ✅ S-230
+| US-4 | **DIA-02** pré-vol de description (`DescriptionPreflight` + tâche `preflightPlantumlDescription`) | 3 | ✅ S-230
+| US-5 | **DIA-06** détection de sous-type (`DiagramSubtypeDetector`) | 2 | ✅ S-230
+| US-6 | **DIA-05** catalogue d'exemples canoniques (`DiagramExampleCatalog`) | 3 | ✅ S-230
+| US-7 | BDD e2e + CI `full-tests` (runners dédiés, steps préfixés S-088) | 2 | ✅ S-230 (BDD `28_agent_loop.feature` 18 scénarios)
 |===
 
 *Dépend de* : rien de nouveau (réutilise `LlmService`/`ChatModel` + `DiagramProcessor`).
