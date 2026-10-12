@@ -134,7 +134,7 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         if (designReviewer != null) {
             logger.lifecycle("Design validation enabled (vision review)")
         }
-        val diagramProcessor = DiagramProcessor(plantumlService, chatModel, config, designReviewer)
+        val diagramProcessor = DiagramProcessor(plantumlService, chatModel, config, designReviewer, resolveAugmentedContext())
         val resolver = TranslationResolver(
             classifier = TextClassifier(),
             glossary = IdiomaticGlossary(),
@@ -177,6 +177,21 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         if (skippedCount > 0) {
             logger.lifecycle(PlantumlMessages.format("generate.skipped_summary", lang, skippedCount))
         }
+    }
+
+    /**
+     * Resolves the augmented context produced by `collectPlantumlAugmentedContext`
+     * (EPIC PLT-CONTEXT, CTX-04).
+     *
+     * Reads the rendered artefact `build/plantuml/augmented-context.txt` when it
+     * exists; returns `""` otherwise (offline fallback — the plugin behaves as
+     * today and the `DocKnowledgeBase` path stays the degradation, D-3). The
+     * generation task depends on the collector, so the artefact is fresh for the
+     * current run.
+     */
+    private fun resolveAugmentedContext(): String {
+        val artefact = project.layout.buildDirectory.file("plantuml/augmented-context.txt").get().asFile
+        return if (artefact.exists()) artefact.readText() else ""
     }
 
     /**

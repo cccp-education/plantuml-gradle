@@ -115,10 +115,17 @@ object PlantumlManager {
                 val lang = PlantumlManager.resolveLanguage(project)
                 task.group = PlantumlMessages.get("task.context.group", lang)
                 task.description = PlantumlMessages.get("task.context.description", lang)
+                // Tolerant EAGER input (CTX-04): only existing governance files are
+                // declared, so the task (now a dependency of generation) never fails
+                // validation on a project that has no `.agents/INDEX.adoc`.
                 task.eagerFiles.from(
-                    project.layout.projectDirectory.file(".agents/INDEX.adoc"),
-                    project.layout.projectDirectory.file("PROMPT_REPRISE.adoc"),
-                    project.layout.projectDirectory.file("AGENT.adoc"),
+                    project.provider {
+                        listOf(
+                            project.layout.projectDirectory.file(".agents/INDEX.adoc").asFile,
+                            project.layout.projectDirectory.file("PROMPT_REPRISE.adoc").asFile,
+                            project.layout.projectDirectory.file("AGENT.adoc").asFile,
+                        ).filter { it.exists() }
+                    },
                 )
                 task.ragContent.set(project.findProperty("context.ragContent")?.toString().orEmpty())
                 task.graphifyContent.set(project.findProperty("context.graphifyContent")?.toString().orEmpty())
@@ -129,6 +136,11 @@ object PlantumlManager {
                 )
                 task.outputFile.set(project.layout.buildDirectory.file("plantuml/augmented-context.txt"))
                 task.provenanceFile.set(project.layout.buildDirectory.file("plantuml/context-provenance.json"))
+            }
+            // CTX-04 — generation consumes the collected artefact: the collector runs
+            // first so `generatePlantumlDiagrams` reads a fresh augmented context.
+            project.tasks.named("generatePlantumlDiagrams") { generate ->
+                generate.dependsOn("collectPlantumlAugmentedContext")
             }
         }
     }

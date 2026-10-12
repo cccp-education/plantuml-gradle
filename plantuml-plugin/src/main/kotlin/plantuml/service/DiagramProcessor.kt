@@ -20,6 +20,7 @@ import plantuml.agent.DiagramSubtypeDetector
 import plantuml.agent.GenerationBudget
 import plantuml.agent.LlmCodeExtractor
 import plantuml.boundary.TranslationResolver
+import plantuml.context.AugmentedContextPrompt
 import contracts.plantuml.SyntaxValidationResult
 import java.io.File
 import java.time.LocalDateTime
@@ -66,7 +67,8 @@ class DiagramProcessor(
     internal val plantumlService: PlantumlService,
     private val chatModel: ChatModel?,
     private val config: PlantumlConfig?,
-    private val designReviewer: DesignReviewer? = null
+    private val designReviewer: DesignReviewer? = null,
+    private val augmentedContext: String = ""
 ) {
 
     private val logger: org.slf4j.Logger = org.slf4j.LoggerFactory.getLogger(DiagramProcessor::class.java)
@@ -176,8 +178,13 @@ class DiagramProcessor(
             if (example != null) append("\n\nCanonical example to follow:\n$example")
         }
 
+        // PLT-CONTEXT CTX-04 — inject the augmented context (EAGER/RAG/Graphify/Docs)
+        // collected into `build/plantuml/augmented-context.txt`. Blank/missing context
+        // leaves the prompt untouched (offline fallback, D-3). Pure composition.
+        val effectivePrompt = AugmentedContextPrompt.prepend(augmentedContext, fullPrompt)
+
         // Send prompt to LLM via ChatModel
-        val initialResponse = chatModel.chat(fullPrompt)
+        val initialResponse = chatModel.chat(effectivePrompt)
         
         // Extract PlantUML code from JSON response, catching parse errors
         var parseError: String? = null
