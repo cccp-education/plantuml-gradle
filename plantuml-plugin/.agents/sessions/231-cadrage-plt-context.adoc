@@ -39,6 +39,8 @@ planner (`PLN-LLM-HUB`), slider (SLD-8 US-8.1) consomment déjà le socle N1.
 
 * Suppression du workflow **`ci.yml`** obsolète (copie `readme-plugin` inexistant) —
   `CI` ne tourne plus.
+* Suppression de **`website.yml`** et **`generate_deck.yml`** — intégralement
+  commentés (zéro ligne active) → workflows invalides échouant en 0s à chaque push.
 * Cache de l'image testcontainers **`pgvector/pgvector:pg15`** dans `test.yml`
   (vérifié : `✓ Cache pgvector` + `✓ Load or pull` en CI).
 * (rappel S-230) cache **Ollama + `qwen3.5:0.8b`** via `.github/actions/setup-ollama`

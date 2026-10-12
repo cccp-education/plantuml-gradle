@@ -8,6 +8,7 @@
 - [x] Catalogue `CTX-01`→`CTX-05` (~13 pts) ; 8 décisions ; 6 options écartées ✅
 - [x] Doc `.agents/CADRAGE_EPIC_PLT_CONTEXT.adoc` + BACKLOG/TODO § PLT-CONTEXT ✅
 - [x] CI : suppression `ci.yml` obsolète (readme-plugin inexistant) ✅
+- [x] CI : suppression `website.yml` + `generate_deck.yml` (intégralement commentés, invalides) ✅
 - [x] CI : cache image testcontainers `pgvector/pgvector:pg15` (`test.yml`, vérifié en CI) ✅
 - [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 232 + archive ✅
 - [x] Zéro code modifié, zéro secret, zéro Python ✅
