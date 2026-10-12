@@ -1,0 +1,7 @@
+@startuml
+title Sequence
+actor User
+participant "API" as api
+User -> api : request
+api --> User : response
+@enduml

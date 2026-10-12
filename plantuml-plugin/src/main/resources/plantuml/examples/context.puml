@@ -1,0 +1,6 @@
+@startuml
+title System context
+actor User
+rectangle "My System" as sys
+User --> sys : uses
+@enduml

@@ -4,10 +4,13 @@ import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.assertj.core.api.Assertions.assertThat
+import plantuml.agent.DescriptionPreflight
+import plantuml.agent.DiagramExampleCatalog
 import plantuml.agent.DiagramSubtypeDetector
 import plantuml.agent.GenerationBudget
 import plantuml.agent.GenerationStopReason
 import plantuml.agent.LlmCodeExtractor
+import plantuml.agent.PreflightVerdict
 
 /**
  * Steps for `28_agent_loop.feature` (EPIC PLT-AGENT).
@@ -23,6 +26,7 @@ class AgentLoopSteps {
     private var budget: GenerationBudget? = null
     private var stopReason: GenerationStopReason? = null
     private var subtype: DiagramSubtypeDetector.Subtype? = null
+    private var preflightVerdict: PreflightVerdict? = null
 
     private fun unescape(raw: String): String = raw.replace("\\n", "\n")
 
@@ -75,5 +79,33 @@ class AgentLoopSteps {
     @Then("the detected subtype is {string}")
     fun theDetectedSubtypeIs(expected: String) {
         assertThat(subtype?.name).isEqualTo(expected)
+    }
+
+    @Given("the pre-flight LLM response is {string}")
+    fun thePreflightResponseIs(raw: String) {
+        preflightVerdict = DescriptionPreflight.parse(unescape(raw))
+    }
+
+    @Then("the pre-flight verdict is Valid")
+    fun thePreflightVerdictIsValid() {
+        assertThat(preflightVerdict).isEqualTo(PreflightVerdict.Valid)
+    }
+
+    @Then("the pre-flight verdict is NeedsClarification containing {string}")
+    fun thePreflightVerdictNeedsClarification(text: String) {
+        assertThat(preflightVerdict).isInstanceOf(PreflightVerdict.NeedsClarification::class.java)
+        assertThat((preflightVerdict as PreflightVerdict.NeedsClarification).questions).contains(text)
+    }
+
+    @Then("the example catalog returns a PlantUML example")
+    fun theExampleCatalogReturnsAnExample() {
+        val example = DiagramExampleCatalog.selectExample(subtype!!)
+        assertThat(example).isNotNull
+        assertThat(example).contains("@startuml")
+    }
+
+    @Then("the example catalog returns no example")
+    fun theExampleCatalogReturnsNoExample() {
+        assertThat(DiagramExampleCatalog.selectExample(subtype!!)).isNull()
     }
 }

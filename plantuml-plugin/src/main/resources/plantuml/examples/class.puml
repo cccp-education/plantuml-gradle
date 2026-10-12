@@ -1,0 +1,9 @@
+@startuml
+title Class diagram
+class Order {
+  +id: String
+  +total: Double
+}
+class Customer
+Customer "1" --> "*" Order
+@enduml

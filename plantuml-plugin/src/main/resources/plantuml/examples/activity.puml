@@ -1,0 +1,11 @@
+@startuml
+title Activity
+start
+:Receive request;
+if (valid?) then (yes)
+  :Process;
+else (no)
+  :Reject;
+endif
+stop
+@enduml

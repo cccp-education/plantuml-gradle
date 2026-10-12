@@ -55,3 +55,28 @@ Feature: Agentic loop hardening (EPIC PLT-AGENT)
   Scenario: An unknown description yields no subtype
     Given the diagram description "just draw something"
     Then the detected subtype is "UNKNOWN"
+
+  @agent-loop @preflight
+  Scenario: A VALID description passes pre-flight
+    Given the pre-flight LLM response is "VALID"
+    Then the pre-flight verdict is Valid
+
+  @agent-loop @preflight
+  Scenario: An INVALID description returns questions
+    Given the pre-flight LLM response is "INVALID\n1. Which actors?"
+    Then the pre-flight verdict is NeedsClarification containing "Which actors?"
+
+  @agent-loop @preflight
+  Scenario: An unexpected pre-flight response is fail-safe valid
+    Given the pre-flight LLM response is "maybe"
+    Then the pre-flight verdict is Valid
+
+  @agent-loop @examples
+  Scenario: A sequence subtype has a canonical example
+    Given the diagram description "Sequence diagram of the login flow"
+    Then the example catalog returns a PlantUML example
+
+  @agent-loop @examples
+  Scenario: An unknown subtype has no example
+    Given the diagram description "just draw something"
+    Then the example catalog returns no example

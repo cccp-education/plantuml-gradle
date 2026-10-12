@@ -1,0 +1,6 @@
+@startuml
+title Container diagram
+rectangle "Web App" as web
+database "Database" as db
+web --> db : reads/writes
+@enduml

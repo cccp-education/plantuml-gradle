@@ -11,6 +11,7 @@ import plantuml.PlantumlConfig
 import plantuml.PlantumlDiagram
 import plantuml.PlantumlMessages
 import plantuml.ValidationFeedback
+import plantuml.agent.DiagramExampleCatalog
 import plantuml.agent.DiagramSubtypeDetector
 import plantuml.agent.GenerationBudget
 import plantuml.agent.LlmCodeExtractor
@@ -153,7 +154,14 @@ class DiagramProcessor(
         // Create the full prompt with instructions for generating PlantUML.
         // PLT-AGENT DIA-06 — a deterministic subtype hint steers the LLM when the
         // description clearly implies a diagram kind (no hint when unknown).
+        val subtype = DiagramSubtypeDetector.detect(prompt)
         val subtypeHint = DiagramSubtypeDetector.hint(prompt)
+        // PLT-AGENT DIA-05 — inject a canonical example when opt-in (complements the RAG).
+        val example = if (config?.langchain4j?.examples == true) {
+            DiagramExampleCatalog.selectExample(subtype)
+        } else {
+            null
+        }
         val fullPrompt = buildString {
             appendLine("Generate a PlantUML diagram based on the following description:")
             appendLine(prompt)
@@ -161,6 +169,7 @@ class DiagramProcessor(
             appendLine("Please return ONLY valid PlantUML code wrapped in @startuml and @enduml tags.")
             append("The diagram should be clear, well-structured, and follow PlantUML best practices.")
             if (subtypeHint != null) append("\n$subtypeHint")
+            if (example != null) append("\n\nCanonical example to follow:\n$example")
         }
 
         // Send prompt to LLM via ChatModel

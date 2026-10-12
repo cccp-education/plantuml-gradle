@@ -10,6 +10,7 @@ import plantuml.tasks.CollectPlantumlIndexTask
 import plantuml.tasks.ValidatePlantumlSyntaxTask
 import plantuml.tasks.GenerateDiagramDocsTask
 import plantuml.tasks.GenerateKnowledgeGraphDiagramTask
+import plantuml.tasks.PreflightPlantumlDescriptionTask
 import java.io.File
 
 /**
@@ -91,6 +92,7 @@ object PlantumlManager {
             project.tasks.register("collectPlantumlIndex", CollectPlantumlIndexTask::class.java)
             project.tasks.register("generateDiagramDocs", GenerateDiagramDocsTask::class.java)
             project.tasks.register("generateKnowledgeGraphDiagram", GenerateKnowledgeGraphDiagramTask::class.java)
+            project.tasks.register("preflightPlantumlDescription", PreflightPlantumlDescriptionTask::class.java)
         }
     }
 

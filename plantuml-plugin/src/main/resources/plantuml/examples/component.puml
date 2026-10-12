@@ -1,0 +1,6 @@
+@startuml
+title Component diagram
+component "API" as api
+component "Service" as svc
+api --> svc
+@enduml
