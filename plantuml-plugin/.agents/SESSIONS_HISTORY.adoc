@@ -11,7 +11,8 @@ blanc »), **cheroliv.com 🟡** (garde `DiagramIntegrity`). **US-6** = FT baker
 bake + rendu non blanc gaté) ; **US-7** = re-bake cheroliv.com. Ordonnancement : S-242/243 bakery,
 S-244 cheroliv. Décisions D-U6/D-U7 (US-6 dans bakery, aucun N2→N2, pas de nouveau domaine). Doc
 `.agents/CADRAGE_PLT_DIAGRAM_OWNERSHIP_US6_US7.adoc` ; BACKLOG US-6/US-7 CADRÉS S-241. Zéro secret,
-zéro Python. Rapport `.agents/sessions/241-cadrage-us6-us7.adoc`.
+zéro Python. **CI VERTE run `38286521193`** (commit `99d7a56`, docs-only). Rapport
+`.agents/sessions/241-cadrage-us6-us7.adoc`.
 
 == Session 240 (2026-10-12) — FIX-BASELINE `FilePermission` (résolu : durcissement environnemental) ✅
 

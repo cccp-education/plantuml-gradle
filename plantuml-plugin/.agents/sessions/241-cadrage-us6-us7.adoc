@@ -54,6 +54,8 @@ et le **dogfooding** (US-7).
 == Notes
 
 * Gouvernance pure : zéro code, zéro test, zéro publication. Aucun changement N0.
+* **CI VERTE** run `38286521193` (commit `99d7a56`, docs-only) — `Check plantuml-plugin` ✓
+  (aucune régression : le seul delta est de la gouvernance `.adoc`).
 * plantuml-local : **tous les EPICs soldés** ; reste l'optionnel PLT-AGENT (b).
 * Zéro secret, zéro Python. Rapport archivé.
 

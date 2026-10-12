@@ -8,7 +8,7 @@
 - [x] Doc `.agents/CADRAGE_PLT_DIAGRAM_OWNERSHIP_US6_US7.adoc` + décisions D-U6/D-U7 ✅
 - [x] BACKLOG : US-6/US-7 CADRÉS S-241 (bakery S-242/243, cheroliv S-244) ; statut EPIC à jour ✅
 - [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 242 + archive ✅
-- [x] Gouvernance pure (zéro code, zéro test, zéro publication) ; zéro secret, zéro Python ✅
+- [x] Gouvernance pure (zéro code, zéro test, zéro publication) ; **CI VERTE run `38286521193`** (commit `99d7a56`, docs-only) ; zéro secret, zéro Python ✅
 
 === Prochaine session (242)
 - **bakery-gradle US-6a** (FT contrat : bloc extrait + labels traduits + round-trip valide)
