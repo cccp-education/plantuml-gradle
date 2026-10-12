@@ -9,7 +9,7 @@
 - [x] Tests : **11 unit** (`PlantumlBlockStatusTest`) + BDD `32_plantuml_block_status.feature` (`@plantuml-blocks`, 5 scénarios) ✅
 - [x] Frontière DAG : feuille pure (pas de tâche Gradle ; parcours = document G-2, fusion = cheroliv G-4) ✅
 - [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 237 + BACKLOG (G-3b ✅) + TODO + archive ✅
-- [x] Local = Build (compile 3 source sets + `assemble` + `validatePlugins` VERT) ; zéro secret, zéro Python, zéro publication ✅
+- [x] Local = Build (compile 3 source sets + `assemble` + `validatePlugins` VERT) ; **CI VERTE run `38267511170`** (commit `9fbb859`) ; zéro secret, zéro Python, zéro publication ✅
 
 === Prochaine session (237)
 - **GBL-010 `G-3` (reste : correction assistée IA des blocs `PENDING`)** ; sinon PLT-DIAGRAM-OWNERSHIP US-6/US-7

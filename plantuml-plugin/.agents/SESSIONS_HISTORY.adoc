@@ -10,7 +10,8 @@ invalide→PENDING), `PlantumlBlockReport` (`blocks`+`toolchain` D6+`owner`→`t
 est **exposée** à l'arbre unifié G-4 (lisible document/cheroliv) ; **pas de tâche Gradle** (le parcours
 AST = document G-2, la fusion = cheroliv G-4). Tests : **11 unit** (`PlantumlBlockStatusTest`) + **BDD**
 `32_plantuml_block_status.feature` (`@plantuml-blocks`, 5 scénarios) + `PlantumlBlockStatusSteps`.
-Local = Build (compile 3 source sets + `assemble` + `validatePlugins` VERT) ; preuve = CI. Zéro secret,
+Local = Build (compile 3 source sets + `assemble` + `validatePlugins` VERT) ; **CI VERTE run
+`38267511170`** (commit `9fbb859`). Zéro secret,
 zéro Python, zéro publication. Rapport `.agents/sessions/236-gbl010-g3b-plantuml-block-status.adoc`.
 
 == Session 235 (2026-10-12) — PLT-CONTEXT US-4 (CTX-04 wiring `DiagramProcessor`) — EPIC ✅ 4/4 ✅

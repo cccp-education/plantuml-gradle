@@ -46,6 +46,8 @@ classifieur, jamais un moteur de parcours (DAG : un nœud, un propriétaire).
   `PlantumlBlockStatusSteps` (glue `plantuml.scenarios`, steps préfixés S-088).
 * Local = Build : `compileKotlin`/`compileTestKotlin`/`compileFunctionalTestKotlin` +
   `assemble` + `validatePlugins` **VERTS**. **Tests = CI.**
+* **CI VERTE** run `38267511170` (commit `9fbb859`, `Check plantuml-plugin` ✓).
+  **Preuve de validité de la session.**
 
 == Fichiers
 
