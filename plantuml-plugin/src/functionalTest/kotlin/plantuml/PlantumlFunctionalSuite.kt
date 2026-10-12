@@ -930,6 +930,16 @@ class PlantumlFunctionalSuite {
             if (File.separator == "/") {
                 diagramFile.setReadable(false)
                 diagramFile.setWritable(false)
+                // Root / capability-restricted environments ignore the permission
+                // bits, so the read cannot be denied and the scenario is not
+                // exercisable. Skip instead of a false FAIL (FIX-BASELINE S-030).
+                val enforced = !diagramFile.canRead()
+                if (!enforced) {
+                    diagramFile.setReadable(true)
+                    diagramFile.setWritable(true)
+                    diagramFile.delete()
+                }
+                assumeTrue(enforced, "filesystem does not enforce read permissions — read-denied scenario skipped")
             } else {
                 diagramFile.delete()
                 diagramFile.mkdirs()
