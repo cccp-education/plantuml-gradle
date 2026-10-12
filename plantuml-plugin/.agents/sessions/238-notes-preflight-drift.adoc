@@ -1,0 +1,75 @@
+= Session 238 — Notes PlantUML (extracteur) + FT preflight (PLT-AGENT) + drift gouvernance
+:session: 238
+:date: 2026-10-12
+:borough: HTOWN (plantuml-gradle)
+:type: feat + test (DDD/TDD/BDD) + gouvernance
+:statut: TERMINÉ
+:methode: baby-step DDD/TDD/BDD (unit → functional → cucumber)
+
+== Mission
+
+Trois items plantuml-local restants : (1) **GBL-010 G-3** — surface traduisible des
+**notes** PlantUML (le N0 `PlantUmlBlock.labels()` ne capte ni les corps de note ni la
+forme `note … : texte`) ; (2) **PLT-AGENT optionnel** — test fonctionnel TestKit
+`preflightPlantumlDescription` + mock LLM ; (3) correction du **drift gouvernance**
+(`ROADMAP.adoc`, `TODO.adoc`).
+
+== Livré
+
+=== 1. GBL-010 G-3 — notes (`plantuml.repair.PlantumlNoteExtractor`)
+
+* Objet **pur** : `notes(source)` — extrait le texte des notes, formes supportées :
+  `note left of A : text` (mono-ligne) et `note …`/`end note` (multi-ligne, corps
+  trimé) ; `note over A, B`, `note as N` ; non-terminée → corps capturé ;
+  distinct, ordre de première apparition. `hasNotes(source)`.
+* Surface **plantuml-local** : complète le contrat N0 **sans le modifier** (le port /
+  l'arbre G-4 consomment l'extracteur). *Suivi* : câblage dans
+  `PlantumlTranslationPortAdapter` (traduction des notes) = cross-borough si le N0
+  `labels()` est étendu (arbitrage pilote).
+
+=== 2. PLT-AGENT optionnel — FT `preflightPlantumlDescription`
+
+* `PreflightPlantumlDescriptionFunctionalTest` (TestKit + **WireMock**) — 3 cas :
+  désactivé → no-op SUCCESS ; réponse `VALID` → SUCCESS (`description VALID`) ;
+  réponse `INVALID` → **échec** avec les questions de clarification. Exerce le chemin
+  complet tâche → config → `LlmService` → `ChatModel` → `DescriptionPreflight.parse`.
+
+=== 3. Drift gouvernance
+
+* `.agents/ROADMAP.adoc` — « EPIC Pool de Clés API Rotatives » marqué ✅ **TERMINÉ**
+  (EPIC 6/13, S161/S162) au lieu de ⚪ *À faire* (critères `[x]`).
+* `TODO.adoc` — section freemium marquée ✅ **TERMINÉ S176** (EP-3).
+
+== Tests (Local = Build, Tests = CI)
+
+* Unit — `PlantumlNoteExtractorTest` (7).
+* Functional — `PreflightPlantumlDescriptionFunctionalTest` (3, TestKit + WireMock).
+* BDD — `34_plantuml_notes.feature` (`@plantuml-notes`, 3 scénarios) + `PlantumlNoteSteps`
+  (glue `plantuml.scenarios`, steps préfixés S-088).
+* Local = Build : compile 3 source sets + `assemble` + `validatePlugins` **VERTS**.
+  **Tests = CI.**
+
+== Fichiers
+
+[cols="1,3"]
+|===
+| Type | Fichier
+
+| prod (nouveau) | `src/main/kotlin/plantuml/repair/PlantumlNoteExtractor.kt`
+| test (nouveau) | `src/test/kotlin/plantuml/repair/PlantumlNoteExtractorTest.kt`
+| test (nouveau) | `src/test/features/34_plantuml_notes.feature`
+| test (nouveau) | `src/test/scenarios/plantuml/scenarios/PlantumlNoteSteps.kt`
+| test (nouveau) | `src/functionalTest/kotlin/plantuml/PreflightPlantumlDescriptionFunctionalTest.kt`
+| doc (drift) | `.agents/ROADMAP.adoc`, `TODO.adoc`
+|===
+
+== Reste
+
+* **GBL-010 G-3** — câblage des notes dans le port (ou extension N0 `labels()` :
+  cross-borough, arbitrage pilote).
+* **PLT-AGENT optionnel (b)** — vérifier qu'un modèle du pool expose la vision.
+* **PLT-DIAGRAM-OWNERSHIP US-6/US-7** (cross-borough) ; **FIX-BASELINE FilePermission** ;
+  **PL-3** (bloqué ABIDJAN).
+* **Fichier à lire en priorité** : `PROMPT_REPRISE.adoc` (session 239).
+
+_Score : 8/10 (extracteur pur + FT WireMock + drift corrigé ; le câblage port des notes reste cross-borough)._

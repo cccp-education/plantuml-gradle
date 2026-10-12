@@ -1,5 +1,19 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-10
 
+== Session 238 (2026-10-12) — Notes PlantUML + FT preflight + drift gouvernance ✅
+
+=== Fait
+- [x] **Notes (GBL-010 G-3)** : `plantuml.repair.PlantumlNoteExtractor` (pur) — `note … : text` + `note …`/`end note` ✅
+- [x] **FT PLT-AGENT optionnel (a)** : `PreflightPlantumlDescriptionFunctionalTest` (TestKit + WireMock, 3 cas) ✅
+- [x] **Drift** : `ROADMAP.adoc` (pool de clés ✅ TERMINÉ EPIC 6/13) + `TODO.adoc` (freemium ✅ S176) corrigés ✅
+- [x] Tests : **7 unit** (`PlantumlNoteExtractorTest`) + **3 functional** + BDD `34_plantuml_notes.feature` (`@plantuml-notes`, 3 scénarios) ✅
+- [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 239 + BACKLOG + TODO + archive ✅
+- [x] Local = Build (compile 3 source sets + `assemble` + `validatePlugins` VERT) ; zéro secret, zéro Python, zéro publication ✅
+
+=== Prochaine session (239)
+- **PLT-DIAGRAM-OWNERSHIP US-6 (chaîne E2E, cross-borough → arbitrage pilote)** ; sinon US-7 ; GBL-010 G-3 (câblage notes port)
+- **Fichier à lire en priorité** : `BACKLOG.adoc` § PLT-DIAGRAM-OWNERSHIP
+
 == Session 237 (2026-10-12) — GBL-010 G-3 (correction d'un bloc PlantUML : déterministe + IA) ✅
 
 === Fait

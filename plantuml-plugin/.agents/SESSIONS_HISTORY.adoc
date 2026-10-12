@@ -1,5 +1,17 @@
 = Historique des Sessions
 
+== Session 238 (2026-10-12) — Notes PlantUML + FT preflight + drift gouvernance ✅
+
+Trois items plantuml-local. **Notes (GBL-010 G-3)** : objet **pur** `plantuml.repair.PlantumlNoteExtractor`
+(`notes(source)` : `note … : text` mono-ligne + `note …`/`end note` multi-ligne + `note over`/`note as`,
+non-terminée capturée, distinct) — surface plantuml-local qui complète le N0 `labels()` **sans le modifier** ;
+câblage port = suivi cross-borough. **FT PLT-AGENT optionnel (a)** : `PreflightPlantumlDescriptionFunctionalTest`
+(TestKit + WireMock, 3 cas : désactivé/VALID/INVALID→échec). **Drift** : `ROADMAP.adoc` (pool de clés ✅
+TERMINÉ EPIC 6/13) + `TODO.adoc` (freemium ✅ S176) corrigés. Tests : 7 unit + 3 functional + BDD
+`34_plantuml_notes.feature` (`@plantuml-notes`, 3 scénarios) + `PlantumlNoteSteps`. Local = Build (compile
+3 source sets + `assemble` + `validatePlugins` VERT) ; preuve = CI. Zéro secret, zéro Python, zéro publication.
+Rapport `.agents/sessions/238-notes-preflight-drift.adoc`.
+
 == Session 237 (2026-10-12) — GBL-010 G-3 (correction d'un bloc PlantUML : déterministe + IA) ✅
 
 Implémentation (baby-step DDD/TDD/BDD). **Domaine pur** `plantuml.repair` : `PlantumlBlockRepairer`

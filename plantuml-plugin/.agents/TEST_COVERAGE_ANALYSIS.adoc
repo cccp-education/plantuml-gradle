@@ -1,6 +1,22 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 237 (12 octobre 2026) — GBL-010 G-3 (correction d'un bloc PlantUML)
+_Dernière mise à jour_ : Session 238 (12 octobre 2026) — Notes PlantUML + FT preflight (PLT-AGENT)
+
+=== Session 238 — Notes PlantUML + FT preflight (PLT-AGENT) + drift
+
+Session 238 (2026-10-12).
+
+* `src/test/kotlin/plantuml/repair/PlantumlNoteExtractorTest.kt` — **7 unit**
+  (note mono-ligne, corps multi-ligne, plusieurs notes, sans note, non-terminée,
+  dédoublonnage, `hasNotes`).
+* `src/functionalTest/kotlin/plantuml/PreflightPlantumlDescriptionFunctionalTest.kt` —
+  **3 functional** TestKit + WireMock (désactivé no-op, `VALID`, `INVALID` → échec).
+* `src/test/features/34_plantuml_notes.feature` — **BDD `@plantuml-notes`** (3 scénarios)
+  + `PlantumlNoteSteps` (glue `plantuml.scenarios`, steps préfixés S-088).
+* Drift gouvernance : `.agents/ROADMAP.adoc` + `TODO.adoc` corrigés (EPIC pool de clés
+  rotatives ✅ TERMINÉ ; freemium ✅ S176).
+* Local = Build : 3 source sets `compile*Kotlin` + `assemble` + `validatePlugins` **VERTS**.
+  **Tests = CI** (preuve = run CI).
 
 === Session 237 — GBL-010 G-3 (correction d'un bloc PlantUML : déterministe + IA)
 

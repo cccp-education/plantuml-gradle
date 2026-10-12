@@ -34,7 +34,7 @@ interface Gradle. *Ne pas réintroduire* : MCP, CLI, Kroki, Python/LiteLLM, Dock
 . [x] US-5 (`DIA-06` détection de sous-type) ✅ S-230.
 . [x] US-6 (`DIA-05` exemples canoniques) ✅ S-230.
 . [x] US-7 (BDD `28_agent_loop.feature` 18 scénarios) ✅ S-230.
-. [ ] (optionnel) test fonctionnel TestKit `preflightPlantumlDescription` + mock LLM.
+. [x] (optionnel) test fonctionnel TestKit `preflightPlantumlDescription` + mock LLM. ✅ S-238 (`PreflightPlantumlDescriptionFunctionalTest`, WireMock).
 . [ ] Vérifier qu'au moins un modèle du pool HTOWN expose la **vision** (sinon DIA-01 dégrade).
 
 == EPIC PLT-DIAGRAM-OWNERSHIP (cadré S-219)
@@ -58,14 +58,15 @@ US-4 ✅ S-283/S-284 (document délègue, bakery injecte). Reste US-6 (chaîne E
 (`PlantumlBlockCorrector` déterministe+IA round-trip + `ChatModelBlockRepairer`). Reste **notes PlantUML** ;
 G-1/G-2/G-4 hors plantuml.
 
-== Pool de clés freemium rotatif
+== ✅ Pool de clés freemium rotatif (TERMINÉ — EP-3, S176)
 
 Integrer un pool de clé gemini/ollama.cloud/huggingface/mistral/groq rotatif
 suivant le ratio de freemium dans la configuration yaml du context du plugin
 plantuml.
 
-→ **EP-3** dans BACKLOG.adoc. EPIC 6 + EPIC 13 livrent déjà la rotation
-multi-provider. Reste : ratio freemium dynamique (poids basés sur quota réel).
+→ **EP-3** dans BACKLOG.adoc. ✅ **TERMINÉ S176** — EPIC 6 + EPIC 13 livrent la rotation
+multi-provider ; le **ratio freemium dynamique** (`FreemiumWeightCalculator`, poids basés
+sur quota réel) est livré. Voir `.agents/API_KEY_POOL_ESSENTIALS.adoc`.
 
 == Tests production-close
 

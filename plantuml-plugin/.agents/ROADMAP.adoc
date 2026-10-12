@@ -40,21 +40,25 @@ _Décision_ : Features 12-13 déplacées vers tests d'intégration dédiés
 
 == ⚪ EPICs en Attente / Futures
 
-=== EPIC Pool de Clés API Rotatives (Session 107+)
+=== ✅ EPIC Pool de Clés API Rotatives (TERMINÉ — EPIC 6 + EPIC 13, S161/S162)
 
-_Objectif_ : Gérer plusieurs clés API par provider avec rotation intelligente
+_Objectif_ : Gérer plusieurs clés API par provider avec rotation intelligente.
 
-_Priorité_ : 🟡 _MOYENNE_
+_Statut_ : ✅ **TERMINÉ**. Rotation multi-clés (round-robin / least-used / **tiered**
+Enterprise>Pro>Free), quota tracking (`QuotaTracker`/`QuotaResetManager`), fallback
+**cross-provider** (`CrossProviderFallbackOrchestrator`), audit (`QuotaAuditLogger`),
+poids freemium (`FreemiumWeightCalculator`). Détail : `BACKLOG.adoc` § EPIC 13 +
+`.agents/API_KEY_POOL_ESSENTIALS.adoc` ; code : `plantuml/apikey/`.
 
-==== Features à Implémenter
+==== Features (toutes livrées)
 
 |===
 | Feature | Description | Statut
-| _Structure YAML_ | `pool: [{identity, apiKey, quota}]` par provider | ⚪ À faire
-| _Rotation round-robin_ | Basculer entre clés selon quota | ⚪ À faire
-| _Gestion quotas_ | Suivi requêtes/minute par clé | ⚪ À faire
-| _Fallback automatique_ | Si clé X échoue → clé Y | ⚪ À faire
-| _Providers supportés_ | Gemini, Ollama, Mistral, Groq, HuggingFace | ⚪ À faire
+| _Structure YAML_ | `pool: [{identity, apiKey, quota, tier, weight}]` par provider | ✅ Livré
+| _Rotation round-robin / tiered_ | Basculer entre clés selon quota + tier | ✅ Livré
+| _Gestion quotas_ | Suivi requêtes par clé + reset | ✅ Livré
+| _Fallback automatique_ | Si clé X échoue → clé Y, puis provider suivant | ✅ Livré
+| _Providers supportés_ | Gemini, Ollama, Mistral, Groq, HuggingFace (+ OpenAI, Claude) | ✅ Livré
 |===
 
 ==== Architecture Technique
@@ -124,11 +128,11 @@ langchain4j:
 
 ==== Critères d'Acceptation
 
-* [ ] 1 provider avec 2+ clés → rotation fonctionne
-* [ ] Quota dépassé → bascule sur clé suivante
-* [ ] Clé invalide → fallback automatique
-* [ ] Logs détaillés (quelle clé utilisée, quota restant)
-* [ ] Tests unitaires + fonctionnels
+* [x] 1 provider avec 2+ clés → rotation fonctionne (S161)
+* [x] Quota dépassé → bascule sur clé suivante / tier inférieur (S161)
+* [x] Clé invalide → fallback automatique (S162, cross-provider)
+* [x] Logs détaillés (quelle clé utilisée, quota restant — `QuotaAuditLogger`)
+* [x] Tests unitaires + fonctionnels (EPIC 6/13)
 
 '''
 
