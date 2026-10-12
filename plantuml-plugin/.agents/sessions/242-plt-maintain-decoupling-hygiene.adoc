@@ -52,7 +52,8 @@ MEMPHIS → plantuml → consommateurs).
 * CI : labels « Set up JDK 23/24 » → 25 ; **5 workflows cassés désactivés**
   (`integration_test`, `plantuml-processing`, `readme_action`, `readme_truth`,
   `readme_plantuml` → `.yml.disabled`, référençaient `readme-plugin`/
-  `commitGeneratedReadme`/`processPlantumlPrompts`, inexistants).
+  `commitGeneratedReadme`/`processPlantumlPrompts`, inexistants) ; **fine-tune passé en
+  manuel** (l'auto-trigger sur `build.gradle.kts` échouait en CI — Docker/HF `exit 125`).
 
 === Gouvernance
 

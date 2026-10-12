@@ -1,12 +1,9 @@
 name: Fine-tuning — SmolLM2 pipeline validation
 
+# Auto-trigger removed (S-242): the fine-tune Docker/HF download is environment-fragile
+# (exit 125) and failed on every `build.gradle.kts` change. Kept manual via workflow_dispatch.
 on:
   workflow_dispatch:
-  push:
-    paths:
-      - 'plantuml-plugin/src/functionalTest/resources/python/**'
-      - 'plantuml-plugin/src/functionalTest/kotlin/plantuml/SmolLMFineTuneFunctionalTest.kt'
-      - 'plantuml-plugin/build.gradle.kts'
 
 permissions:
   contents: read
