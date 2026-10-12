@@ -1,7 +1,5 @@
 package plantuml
 
-import java.io.File
-
 /**
  * Main configuration model for the PlantUML plugin.
  *
@@ -28,17 +26,6 @@ data class PlantumlConfig(
 ) {
     companion object {
         val SUPPORTED_LANGS = setOf("en", "zh", "hi", "es", "fr", "ar", "bn", "pt", "ru", "ur")
-
-        /**
-         * Loads PlantUML configuration from a YAML file.
-         *
-         * @param configFile The YAML configuration file to load
-         * @return A [PlantumlConfig] instance with loaded settings
-         */
-        fun load(configFile: File): PlantumlConfig {
-            // In a real implementation, this would load from YAML
-            return PlantumlConfig()
-        }
     }
 }
 

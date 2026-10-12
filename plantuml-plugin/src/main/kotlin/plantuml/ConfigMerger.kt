@@ -9,21 +9,49 @@ import java.io.File
  */
 object ConfigMerger {
 
-    fun merge(project: Project, yamlConfig: PlantumlConfig, cliParams: Map<String, Any?>): PlantumlConfig {
-        val propertiesConfig = loadFromGradleProperties(project.projectDir)
-        val envConfig = loadFromEnvironment()
-        
-        return PlantumlConfig(
-            input = mergeInputConfig(envConfig.input, propertiesConfig.input, yamlConfig.input, cliParams),
-            output = mergeOutputConfig(envConfig.output, propertiesConfig.output, yamlConfig.output, cliParams),
-            langchain4j = mergeLangchain4jConfig(envConfig.langchain4j, propertiesConfig.langchain4j, yamlConfig.langchain4j, cliParams),
-            git = mergeGitConfig(envConfig.git, propertiesConfig.git, yamlConfig.git, cliParams),
-            rag = mergeRagConfig(envConfig.rag, propertiesConfig.rag, yamlConfig.rag, cliParams),
-            diagramDocs = mergeDiagramDocsConfig(envConfig.diagramDocs, propertiesConfig.diagramDocs, yamlConfig.diagramDocs, cliParams),
-            language = mergeLanguage(envConfig.language, propertiesConfig.language, yamlConfig.language, cliParams),
-            supportedLanguages = mergeSupportedLanguages(envConfig.supportedLanguages, propertiesConfig.supportedLanguages, yamlConfig.supportedLanguages, cliParams)
-        )
-    }
+    /**
+     * Source precedence for a scalar field: CLI > env > YAML > gradle.properties.
+     * A source whose value equals [default] is treated as "unset" (this is the
+     * historical encoding of the plugin, kept verbatim to preserve behaviour).
+     */
+    private fun <T> firstNonDefault(cli: T?, env: T, yaml: T, props: T, default: T): T =
+        cli ?: when {
+            env != default -> env
+            yaml != default -> yaml
+            else -> props
+        }
+
+    /** String variant where an empty value means "unset" (no default sentinel). */
+    private fun firstNonEmpty(cli: String?, env: String, yaml: String, props: String): String =
+        cli ?: env.ifEmpty { yaml.ifEmpty { props } }
+
+    /** Boolean enabling flags: the first `true` wins, CLI taking precedence. */
+    private fun firstEnabled(cli: Boolean?, env: Boolean, yaml: Boolean, props: Boolean): Boolean =
+        cli ?: (env || yaml || props)
+
+    /** Boolean where a `false` from env or YAML is sticky (opt-in switches). */
+    private fun firstDisabledSticky(cli: Boolean?, env: Boolean, yaml: Boolean, props: Boolean): Boolean =
+        cli ?: when {
+            !env -> env
+            !yaml -> yaml
+            else -> props
+        }
+
+    /** Precedence for one provider's API key triple (CLI > env > YAML > props). */
+    private fun apiKeyConfig(
+        cli: Map<String, Any?>,
+        provider: String,
+        env: ApiKeyConfig,
+        yaml: ApiKeyConfig,
+        props: ApiKeyConfig,
+    ): ApiKeyConfig = ApiKeyConfig(
+        apiKey = firstNonEmpty(cli["langchain4j.$provider.apiKey"]?.toString(), env.apiKey, yaml.apiKey, props.apiKey),
+        baseUrl = firstNonEmpty(cli["langchain4j.$provider.baseUrl"]?.toString(), env.baseUrl, yaml.baseUrl, props.baseUrl),
+        modelName = firstNonEmpty(cli["langchain4j.$provider.modelName"]?.toString(), env.modelName, yaml.modelName, props.modelName),
+    )
+
+    fun merge(project: Project, yamlConfig: PlantumlConfig, cliParams: Map<String, Any?>): PlantumlConfig =
+        merge(project.projectDir, yamlConfig, cliParams)
 
     fun merge(projectDir: File, yamlConfig: PlantumlConfig, cliParams: Map<String, Any?>): PlantumlConfig {
         val propertiesConfig = loadFromGradleProperties(projectDir)
@@ -246,98 +274,74 @@ object ConfigMerger {
 
     private fun mergeInputConfig(env: InputConfig, props: InputConfig, yaml: InputConfig, cli: Map<String, Any?>): InputConfig {
         return InputConfig(
-            prompts = cli["input.prompts"]?.toString() ?: (if (env.prompts != "prompts") env.prompts else (if (yaml.prompts != "prompts") yaml.prompts else props.prompts)),
-            defaultLang = cli["input.defaultLang"]?.toString() ?: (if (env.defaultLang != "en") env.defaultLang else (if (yaml.defaultLang != "en") yaml.defaultLang else props.defaultLang))
+            prompts = firstNonDefault(cli["input.prompts"]?.toString(), env.prompts, yaml.prompts, props.prompts, "prompts"),
+            defaultLang = firstNonDefault(cli["input.defaultLang"]?.toString(), env.defaultLang, yaml.defaultLang, props.defaultLang, "en")
         )
     }
 
     private fun mergeOutputConfig(env: OutputConfig, props: OutputConfig, yaml: OutputConfig, cli: Map<String, Any?>): OutputConfig {
         return OutputConfig(
-            diagrams = cli["output.diagrams"]?.toString() ?: (if (env.diagrams != "generated/diagrams") env.diagrams else (if (yaml.diagrams != "generated/diagrams") yaml.diagrams else props.diagrams)),
-            images = cli["output.images"]?.toString() ?: (if (env.images != "generated/images") env.images else (if (yaml.images != "generated/images") yaml.images else props.images)),
-            validations = cli["output.validations"]?.toString() ?: (if (env.validations != "generated/validations") env.validations else (if (yaml.validations != "generated/validations") yaml.validations else props.validations)),
-            rag = cli["output.rag"]?.toString() ?: (if (env.rag != "generated/rag") env.rag else (if (yaml.rag != "generated/rag") yaml.rag else props.rag)),
-            format = cli["output.format"]?.toString() ?: (if (env.format != "png") env.format else (if (yaml.format != "png") yaml.format else props.format)),
-            theme = cli["output.theme"]?.toString() ?: (if (env.theme != "default") env.theme else (if (yaml.theme != "default") yaml.theme else props.theme))
+            diagrams = firstNonDefault(cli["output.diagrams"]?.toString(), env.diagrams, yaml.diagrams, props.diagrams, "generated/diagrams"),
+            images = firstNonDefault(cli["output.images"]?.toString(), env.images, yaml.images, props.images, "generated/images"),
+            validations = firstNonDefault(cli["output.validations"]?.toString(), env.validations, yaml.validations, props.validations, "generated/validations"),
+            rag = firstNonDefault(cli["output.rag"]?.toString(), env.rag, yaml.rag, props.rag, "generated/rag"),
+            format = firstNonDefault(cli["output.format"]?.toString(), env.format, yaml.format, props.format, "png"),
+            theme = firstNonDefault(cli["output.theme"]?.toString(), env.theme, yaml.theme, props.theme, "default")
         )
     }
 
     private fun mergeLangchain4jConfig(env: LangchainConfig, props: LangchainConfig, yaml: LangchainConfig, cli: Map<String, Any?>): LangchainConfig {
-        @Suppress("KotlinConstantConditions")
         return LangchainConfig(
-            maxIterations = cli["langchain4j.maxIterations"] as? Int ?: (if (env.maxIterations != 5) env.maxIterations else (if (yaml.maxIterations != 5) yaml.maxIterations else props.maxIterations)),
-            maxSeconds = cli["langchain4j.maxSeconds"] as? Long ?: (if (env.maxSeconds != 0L) env.maxSeconds else (if (yaml.maxSeconds != 0L) yaml.maxSeconds else props.maxSeconds)),
-            preflight = cli["langchain4j.preflight"] as? Boolean ?: (env.preflight || yaml.preflight || props.preflight),
-            examples = cli["langchain4j.examples"] as? Boolean ?: (env.examples || yaml.examples || props.examples),
-            designValidation = cli["langchain4j.designValidation"] as? Boolean ?: (env.designValidation || yaml.designValidation || props.designValidation),
-            model = cli["langchain4j.model"]?.toString() ?: (if (env.model != "ollama") env.model else (if (yaml.model != "ollama") yaml.model else props.model)),
+            maxIterations = firstNonDefault(cli["langchain4j.maxIterations"] as? Int, env.maxIterations, yaml.maxIterations, props.maxIterations, 5),
+            maxSeconds = firstNonDefault(cli["langchain4j.maxSeconds"] as? Long, env.maxSeconds, yaml.maxSeconds, props.maxSeconds, 0L),
+            preflight = firstEnabled(cli["langchain4j.preflight"] as? Boolean, env.preflight, yaml.preflight, props.preflight),
+            examples = firstEnabled(cli["langchain4j.examples"] as? Boolean, env.examples, yaml.examples, props.examples),
+            designValidation = firstEnabled(cli["langchain4j.designValidation"] as? Boolean, env.designValidation, yaml.designValidation, props.designValidation),
+            model = firstNonDefault(cli["langchain4j.model"]?.toString(), env.model, yaml.model, props.model, "ollama"),
             validation = cli["langchain4j.validation"] as? Boolean ?: (if (!yaml.validation) yaml.validation else props.validation),
             validationPrompt = cli["langchain4j.validationPrompt"]?.toString() ?: yaml.validationPrompt,
             ollama = OllamaConfig(
-                baseUrl = cli["langchain4j.ollama.baseUrl"]?.toString() ?: (if (env.ollama.baseUrl != "http://localhost:11438") env.ollama.baseUrl else (if (yaml.ollama.baseUrl != "http://localhost:11438") yaml.ollama.baseUrl else props.ollama.baseUrl)),
-                modelName = cli["langchain4j.ollama.modelName"]?.toString() ?: (if (env.ollama.modelName != "smollm:135m") env.ollama.modelName else (if (yaml.ollama.modelName != "smollm:135m") yaml.ollama.modelName else props.ollama.modelName))
+                baseUrl = firstNonDefault(cli["langchain4j.ollama.baseUrl"]?.toString(), env.ollama.baseUrl, yaml.ollama.baseUrl, props.ollama.baseUrl, "http://localhost:11438"),
+                modelName = firstNonDefault(cli["langchain4j.ollama.modelName"]?.toString(), env.ollama.modelName, yaml.ollama.modelName, props.ollama.modelName, "smollm:135m")
             ),
-            gemini = ApiKeyConfig(
-                apiKey = cli["langchain4j.gemini.apiKey"]?.toString() ?: (if (env.gemini.apiKey.isNotEmpty()) env.gemini.apiKey else (if (yaml.gemini.apiKey.isNotEmpty()) yaml.gemini.apiKey else props.gemini.apiKey)),
-                baseUrl = cli["langchain4j.gemini.baseUrl"]?.toString() ?: (if (env.gemini.baseUrl.isNotEmpty()) env.gemini.baseUrl else (if (yaml.gemini.baseUrl.isNotEmpty()) yaml.gemini.baseUrl else props.gemini.baseUrl)),
-                modelName = cli["langchain4j.gemini.modelName"]?.toString() ?: (if (env.gemini.modelName.isNotEmpty()) env.gemini.modelName else (if (yaml.gemini.modelName.isNotEmpty()) yaml.gemini.modelName else props.gemini.modelName))
-            ),
-            mistral = ApiKeyConfig(
-                apiKey = cli["langchain4j.mistral.apiKey"]?.toString() ?: (if (env.mistral.apiKey.isNotEmpty()) env.mistral.apiKey else (if (yaml.mistral.apiKey.isNotEmpty()) yaml.mistral.apiKey else props.mistral.apiKey)),
-                baseUrl = cli["langchain4j.mistral.baseUrl"]?.toString() ?: (if (env.mistral.baseUrl.isNotEmpty()) env.mistral.baseUrl else (if (yaml.mistral.baseUrl.isNotEmpty()) yaml.mistral.baseUrl else props.mistral.baseUrl)),
-                modelName = cli["langchain4j.mistral.modelName"]?.toString() ?: (if (env.mistral.modelName.isNotEmpty()) env.mistral.modelName else (if (yaml.mistral.modelName.isNotEmpty()) yaml.mistral.modelName else props.mistral.modelName))
-            ),
-            openai = ApiKeyConfig(
-                apiKey = cli["langchain4j.openai.apiKey"]?.toString() ?: (if (env.openai.apiKey.isNotEmpty()) env.openai.apiKey else (if (yaml.openai.apiKey.isNotEmpty()) yaml.openai.apiKey else props.openai.apiKey)),
-                baseUrl = cli["langchain4j.openai.baseUrl"]?.toString() ?: (if (env.openai.baseUrl.isNotEmpty()) env.openai.baseUrl else (if (yaml.openai.baseUrl.isNotEmpty()) yaml.openai.baseUrl else props.openai.baseUrl)),
-                modelName = cli["langchain4j.openai.modelName"]?.toString() ?: (if (env.openai.modelName.isNotEmpty()) env.openai.modelName else (if (yaml.openai.modelName.isNotEmpty()) yaml.openai.modelName else props.openai.modelName))
-            ),
-            claude = ApiKeyConfig(
-                apiKey = cli["langchain4j.claude.apiKey"]?.toString() ?: (if (env.claude.apiKey.isNotEmpty()) env.claude.apiKey else (if (yaml.claude.apiKey.isNotEmpty()) yaml.claude.apiKey else props.claude.apiKey)),
-                baseUrl = cli["langchain4j.claude.baseUrl"]?.toString() ?: (if (env.claude.baseUrl.isNotEmpty()) env.claude.baseUrl else (if (yaml.claude.baseUrl.isNotEmpty()) yaml.claude.baseUrl else props.claude.baseUrl)),
-                modelName = cli["langchain4j.claude.modelName"]?.toString() ?: (if (env.claude.modelName.isNotEmpty()) env.claude.modelName else (if (yaml.claude.modelName.isNotEmpty()) yaml.claude.modelName else props.claude.modelName))
-            ),
-            huggingface = ApiKeyConfig(
-                apiKey = cli["langchain4j.huggingface.apiKey"]?.toString() ?: (if (env.huggingface.apiKey.isNotEmpty()) env.huggingface.apiKey else (if (yaml.huggingface.apiKey.isNotEmpty()) yaml.huggingface.apiKey else props.huggingface.apiKey)),
-                baseUrl = cli["langchain4j.huggingface.baseUrl"]?.toString() ?: (if (env.huggingface.baseUrl.isNotEmpty()) env.huggingface.baseUrl else (if (yaml.huggingface.baseUrl.isNotEmpty()) yaml.huggingface.baseUrl else props.huggingface.baseUrl)),
-                modelName = cli["langchain4j.huggingface.modelName"]?.toString() ?: (if (env.huggingface.modelName.isNotEmpty()) env.huggingface.modelName else (if (yaml.huggingface.modelName.isNotEmpty()) yaml.huggingface.modelName else props.huggingface.modelName))
-            ),
-            groq = ApiKeyConfig(
-                apiKey = cli["langchain4j.groq.apiKey"]?.toString() ?: (if (env.groq.apiKey.isNotEmpty()) env.groq.apiKey else (if (yaml.groq.apiKey.isNotEmpty()) yaml.groq.apiKey else props.groq.apiKey)),
-                baseUrl = cli["langchain4j.groq.baseUrl"]?.toString() ?: (if (env.groq.baseUrl.isNotEmpty()) env.groq.baseUrl else (if (yaml.groq.baseUrl.isNotEmpty()) yaml.groq.baseUrl else props.groq.baseUrl)),
-                modelName = cli["langchain4j.groq.modelName"]?.toString() ?: (if (env.groq.modelName.isNotEmpty()) env.groq.modelName else (if (yaml.groq.modelName.isNotEmpty()) yaml.groq.modelName else props.groq.modelName))
-            )
+            gemini = apiKeyConfig(cli, "gemini", env.gemini, yaml.gemini, props.gemini),
+            mistral = apiKeyConfig(cli, "mistral", env.mistral, yaml.mistral, props.mistral),
+            openai = apiKeyConfig(cli, "openai", env.openai, yaml.openai, props.openai),
+            claude = apiKeyConfig(cli, "claude", env.claude, yaml.claude, props.claude),
+            huggingface = apiKeyConfig(cli, "huggingface", env.huggingface, yaml.huggingface, props.huggingface),
+            groq = apiKeyConfig(cli, "groq", env.groq, yaml.groq, props.groq)
         )
     }
 
     private fun mergeGitConfig(env: GitConfig, props: GitConfig, yaml: GitConfig, cli: Map<String, Any?>): GitConfig {
         @Suppress("UNCHECKED_CAST")
         return GitConfig(
-            userName = cli["git.userName"]?.toString() ?: (if (env.userName != "github-actions[bot]") env.userName else (if (yaml.userName != "github-actions[bot]") yaml.userName else props.userName)),
-            userEmail = cli["git.userEmail"]?.toString() ?: (if (env.userEmail != "github-actions[bot]@users.noreply.github.com") env.userEmail else (if (yaml.userEmail != "github-actions[bot]@users.noreply.github.com") yaml.userEmail else props.userEmail)),
-            commitMessage = cli["git.commitMessage"]?.toString() ?: (if (env.commitMessage != "chore: update PlantUML diagrams [skip ci]") env.commitMessage else (if (yaml.commitMessage != "chore: update PlantUML diagrams [skip ci]") yaml.commitMessage else props.commitMessage)),
-            watchedBranches = cli["git.watchedBranches"] as? List<String> ?: (if (env.watchedBranches != listOf("main", "develop")) env.watchedBranches else (if (yaml.watchedBranches != listOf("main", "develop")) yaml.watchedBranches else props.watchedBranches))
+            userName = firstNonDefault(cli["git.userName"]?.toString(), env.userName, yaml.userName, props.userName, "github-actions[bot]"),
+            userEmail = firstNonDefault(cli["git.userEmail"]?.toString(), env.userEmail, yaml.userEmail, props.userEmail, "github-actions[bot]@users.noreply.github.com"),
+            commitMessage = firstNonDefault(cli["git.commitMessage"]?.toString(), env.commitMessage, yaml.commitMessage, props.commitMessage, "chore: update PlantUML diagrams [skip ci]"),
+            watchedBranches = firstNonDefault(cli["git.watchedBranches"] as? List<String>, env.watchedBranches, yaml.watchedBranches, props.watchedBranches, listOf("main", "develop"))
         )
     }
 
     private fun mergeRagConfig(env: RagConfig, props: RagConfig, yaml: RagConfig, cli: Map<String, Any?>): RagConfig {
         return RagConfig(
-            databaseUrl = cli["rag.databaseUrl"]?.toString() ?: (env.databaseUrl.ifEmpty { yaml.databaseUrl.ifEmpty { props.databaseUrl } }),
-            port = cli["rag.port"] as? Int ?: (if (env.port != 5432) env.port else (if (yaml.port != 5432) yaml.port else props.port)),
-            username = cli["rag.username"]?.toString() ?: (env.username.ifEmpty { yaml.username.ifEmpty { props.username } }),
-            password = cli["rag.password"]?.toString() ?: (env.password.ifEmpty { yaml.password.ifEmpty { props.password } }),
-            tableName = cli["rag.tableName"]?.toString() ?: (if (env.tableName != "embeddings") env.tableName else (if (yaml.tableName != "embeddings") yaml.tableName else props.tableName))
+            databaseUrl = firstNonEmpty(cli["rag.databaseUrl"]?.toString(), env.databaseUrl, yaml.databaseUrl, props.databaseUrl),
+            port = firstNonDefault(cli["rag.port"] as? Int, env.port, yaml.port, props.port, 5432),
+            username = firstNonEmpty(cli["rag.username"]?.toString(), env.username, yaml.username, props.username),
+            password = firstNonEmpty(cli["rag.password"]?.toString(), env.password, yaml.password, props.password),
+            tableName = firstNonDefault(cli["rag.tableName"]?.toString(), env.tableName, yaml.tableName, props.tableName, "embeddings")
         )
     }
 
     private val defaultSubgraphs = listOf("service layer", "config layer", "task layer", "model layer", "RAG")
 
     private fun mergeDiagramDocsConfig(env: DiagramDocsConfig, props: DiagramDocsConfig, yaml: DiagramDocsConfig, cli: Map<String, Any?>): DiagramDocsConfig {
+        @Suppress("UNCHECKED_CAST")
         return DiagramDocsConfig(
-            enabled = cli["diagramDocs.enabled"]?.toString()?.toBoolean() ?: (if (!env.enabled) env.enabled else (if (!yaml.enabled) yaml.enabled else props.enabled)),
-            outputDir = cli["diagramDocs.outputDir"]?.toString() ?: (if (env.outputDir != "diagrams/auto") env.outputDir else (if (yaml.outputDir != "diagrams/auto") yaml.outputDir else props.outputDir)),
-            subgraphs = (cli["diagramDocs.subgraphs"] as? List<String>) ?: (if (env.subgraphs != defaultSubgraphs) env.subgraphs else (if (yaml.subgraphs != defaultSubgraphs) yaml.subgraphs else props.subgraphs)),
-            model = cli["diagramDocs.model"]?.toString() ?: (if (env.model != "qwen3.5-cloud") env.model else (if (yaml.model != "qwen3.5-cloud") yaml.model else props.model))
+            enabled = firstDisabledSticky(cli["diagramDocs.enabled"]?.toString()?.toBoolean(), env.enabled, yaml.enabled, props.enabled),
+            outputDir = firstNonDefault(cli["diagramDocs.outputDir"]?.toString(), env.outputDir, yaml.outputDir, props.outputDir, "diagrams/auto"),
+            subgraphs = firstNonDefault(cli["diagramDocs.subgraphs"] as? List<String>, env.subgraphs, yaml.subgraphs, props.subgraphs, defaultSubgraphs),
+            model = firstNonDefault(cli["diagramDocs.model"]?.toString(), env.model, yaml.model, props.model, "qwen3.5-cloud")
         )
     }
 

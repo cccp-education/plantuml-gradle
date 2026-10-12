@@ -15,6 +15,7 @@ import plantuml.boundary.TextClassifier
 import plantuml.boundary.TranslationResolver
 import plantuml.incremental.IncrementalProcessor
 import plantuml.incremental.ProcessingDecision
+import plantuml.runtime.RuntimeEnvironment
 import plantuml.service.DiagramOutputProbe
 import plantuml.service.DiagramOutputVerdict
 import plantuml.service.DiagramProcessor
@@ -80,7 +81,8 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         }
         
         // Check for test mode disk space simulation
-        val simulateDiskFull = System.getProperty("plantuml.test.disk.full") == "true"
+        val runtime = RuntimeEnvironment.system()
+        val simulateDiskFull = runtime.isDiskFullSimulated
         if (simulateDiskFull) {
             val message = PlantumlMessages.get("generate.disk_space", lang)
             logger.error(message)
@@ -123,7 +125,7 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         val plantumlService = PlantumlService()
         val llmService = LlmService(config)
         val chatModel = llmService.createChatModel()
-        logger.lifecycle(PlantumlMessages.format("generate.debug", lang, chatModel.toString(), config.output.diagrams, System.getProperty("plantuml.test.mode") ?: "null"))
+        logger.lifecycle(PlantumlMessages.format("generate.debug", lang, chatModel.toString(), config.output.diagrams, runtime.isTestMode))
         // PLT-AGENT DIA-01 — opt-in vision design review (built only when enabled and
         // an LLM is available; the reviewer degrades if the model lacks vision).
         val designReviewer = if (config.langchain4j.designValidation && chatModel != null) {
@@ -134,7 +136,7 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         if (designReviewer != null) {
             logger.lifecycle("Design validation enabled (vision review)")
         }
-        val diagramProcessor = DiagramProcessor(plantumlService, chatModel, config, designReviewer, resolveAugmentedContext())
+        val diagramProcessor = DiagramProcessor(plantumlService, chatModel, config, designReviewer, resolveAugmentedContext(), runtime)
         val resolver = TranslationResolver(
             classifier = TextClassifier(),
             glossary = IdiomaticGlossary(),
@@ -383,11 +385,6 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
                 ragDir.mkdirs()
                 val diagramFile = File(ragDir, "${promptFile.nameWithoutExtension}.puml")
                 diagramFile.writeText(diagram.plantuml.code)
-
-                // Save validation feedback for RAG if validation is enabled
-                if (config.langchain4j.validation && validation != null) {
-                    diagramProcessor.saveForRagTraining(diagram, validation)
-                }
             } catch (e: Exception) {
                 logger.lifecycle(PlantumlMessages.format("generate.rag_warning", lang, e.message ?: "Unknown error"))
             }

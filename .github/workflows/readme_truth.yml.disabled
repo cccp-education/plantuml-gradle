@@ -1,11 +1,14 @@
+# DISABLED (S-242) — belongs to readme-gradle: no readme-plugin module nor commitGeneratedReadme task here.
+# Kept for reference. Rename back to *.yml to re-enable.
 name: Generate README from truth sources
 
 on:
   push:
     branches:
-      - '**'
+      - main
+      - master
     paths:
-      - 'README_truth*.adoc'
+      - "README_truth*.adoc"
   workflow_dispatch:
 
 jobs:
@@ -22,36 +25,21 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up JDK 23
+      - name: Set up JDK 25
         uses: actions/setup-java@v4
         with:
           java-version: '25'
           distribution: 'temurin'
-
-      - name: Cache Gradle wrapper
-        uses: actions/cache@v4
-        with:
-          path: ~/.gradle/wrapper
-          key: gradle-wrapper-${{ hashFiles('**/gradle/wrapper/gradle-wrapper.properties') }}
-          restore-keys: gradle-wrapper-
-
-      - name: Cache Gradle dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/jdks
-          key: gradle-deps-${{ hashFiles('**/libs.versions.toml', '**/*.gradle.kts') }}
-          restore-keys: gradle-deps-
+          cache: gradle
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
       - name: Inject plugin config
-        run: echo "${{ secrets.README_GRADLE_PLUGIN }}" > readme-plugin/readme.yml
+        run: echo "${{ secrets.README_GRADLE_PLUGIN }}" > readme-truth.yml
 
       - name: Generate README and commit via JGit
-        run: ./gradlew -p readme-plugin commitGeneratedReadme --no-daemon
+        run: ./gradlew -q -s commitGeneratedReadme --no-daemon
 
       - name: Summary
         if: always()

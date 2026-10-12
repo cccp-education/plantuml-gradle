@@ -2,8 +2,10 @@ package plantuml
 
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.BeforeEach
+import plantuml.runtime.RuntimeEnvironment
 import plantuml.service.LlmService
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 /**
  * Unit tests for LlmService private methods — no LangChain4j concrete class imports.
@@ -88,32 +90,18 @@ class LlmServicePrivateMethodsTest {
     }
 
     @Test
-    fun `getTimeoutInSeconds should return 5 in test environment`() {
-        val originalEnv = System.getenv("TEST_ENV")
-        System.setProperty("TEST_ENV", "true")
+    fun `createChatModel returns null in test mode when no mock endpoint is configured`() {
+        val nonMockConfig = PlantumlConfig(
+            langchain4j = LangchainConfig(
+                model = "ollama",
+                ollama = OllamaConfig(baseUrl = "http://remote:11438", modelName = "smollm:135m"),
+            )
+        )
+        val testRuntime = RuntimeEnvironment.system(
+            property = { if (it == "plantuml.test.mode") "true" else null },
+            environment = { null },
+        )
 
-        try {
-            val model = llmService.createChatModel()
-            assertNotNull(model, "Model should be created successfully in test environment")
-        } finally {
-            if (originalEnv == null) {
-                System.clearProperty("TEST_ENV")
-            }
-        }
-    }
-
-    @Test
-    fun `getTimeoutInSeconds should return 60 in production environment`() {
-        val originalEnv = System.getenv("TEST_ENV")
-        System.clearProperty("TEST_ENV")
-
-        try {
-            val model = llmService.createChatModel()
-            assertNotNull(model, "Model should be created successfully in production environment")
-        } finally {
-            if (originalEnv != null) {
-                System.setProperty("TEST_ENV", originalEnv)
-            }
-        }
+        assertNull(LlmService(nonMockConfig, runtime = testRuntime).createChatModel())
     }
 }

@@ -1,6 +1,20 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 240 (12 octobre 2026) — FIX-BASELINE `FilePermission` (durcissement environnemental)
+_Dernière mise à jour_ : Session 242 (13 octobre 2026) — PLT-MAINTAIN (découplage test/prod)
+
+=== Session 242 — PLT-MAINTAIN (découplage test/prod)
+
+Session 242 (2026-10-13) : seam `plantuml.runtime.RuntimeEnvironment` + purge de stubs morts.
+
+* **+** `src/test/kotlin/plantuml/runtime/RuntimeEnvironmentTest.kt` — 7 assertions
+  (test mode par property/env, real-llm flag, disk-full flag, précédence `projectDir`,
+  timeout 5/60).
+* **±** `src/test/kotlin/plantuml/LlmServicePrivateMethodsTest.kt` — 2 tests **factices**
+  (posaient une property `TEST_ENV` alors que la prod lit `System.getenv`) remplacés par
+  1 test réel du seam (test mode + endpoint non-localhost → `null`).
+* **−** `src/test/kotlin/plantuml/service/DiagramProcessorTest.kt` — test
+  `should save for rag training` retiré (méthode no-op `saveForRagTraining` supprimée).
+* Net unit : **+5**. Local = Build (compile ×3 VERT) ; preuve = CI.
 
 === Session 240 — FIX-BASELINE `FilePermission` (durcissement environnemental)
 

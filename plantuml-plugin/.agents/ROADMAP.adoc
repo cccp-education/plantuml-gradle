@@ -1,8 +1,17 @@
 = 🗺️ Roadmap — PlantUML Gradle Plugin
 
+[IMPORTANT]
+====
+**Ce document est HISTORIQUE et FIGÉ à la Session ~106.** Il n'est plus maintenu :
+les roadmaps sont dupliquées et divergent (anti-pattern #6). **Source de vérité
+unique** pour la roadmap et le statut des EPICs : `.agents/INDEX.adoc` (section
+« 🎯 Roadmap — État Actuel ») + `BACKLOG.adoc`. Ne pas s'appuyer sur la section
+« Prochaines Sessions » ci-dessous (sessions 107+ toutes traitées depuis).
+====
+
 ____
-_Dernière mise à jour_ : Session 106 (19 avril 2026)
-_Statut global_ : ✅ EPICs principales terminées — 240/240 tests PASS (100%)
+_Dernière mise à jour_ : Session 106 (19 avril 2026) — _gelé_
+_Statut global_ : ✅ EPICs historiques terminées
 ____
 
 '''

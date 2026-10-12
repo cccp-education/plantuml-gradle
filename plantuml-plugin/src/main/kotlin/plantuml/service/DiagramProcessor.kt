@@ -21,6 +21,7 @@ import plantuml.agent.GenerationBudget
 import plantuml.agent.LlmCodeExtractor
 import plantuml.boundary.TranslationResolver
 import plantuml.context.AugmentedContextPrompt
+import plantuml.runtime.RuntimeEnvironment
 import contracts.plantuml.SyntaxValidationResult
 import java.io.File
 import java.time.LocalDateTime
@@ -68,7 +69,8 @@ class DiagramProcessor(
     private val chatModel: ChatModel?,
     private val config: PlantumlConfig?,
     private val designReviewer: DesignReviewer? = null,
-    private val augmentedContext: String = ""
+    private val augmentedContext: String = "",
+    private val runtime: RuntimeEnvironment = RuntimeEnvironment.system(),
 ) {
 
     private val logger: org.slf4j.Logger = org.slf4j.LoggerFactory.getLogger(DiagramProcessor::class.java)
@@ -103,7 +105,7 @@ class DiagramProcessor(
         resolver: TranslationResolver? = null,
         language: String = "en"
     ): PlantumlDiagram? {
-        logger.debug("processPrompt: chatModel={}, config={}, testMode={}", chatModel, config, System.getProperty("plantuml.test.mode"))
+        logger.debug("processPrompt: chatModel={}, config={}, testMode={}", chatModel, config, runtime.isTestMode)
         // Initialize attempt history
         val attemptHistory = mutableListOf<AttemptEntry>()
         val label = { text: String -> resolver?.resolve(text, language)?.translated ?: text }
@@ -363,16 +365,15 @@ class DiagramProcessor(
      * @param history Complete list of [AttemptEntry] from prompt processing
      */
     private fun archiveAttemptHistory(history: List<AttemptEntry>, logger: Logger) {
-        logger.info(PlantumlMessages.format("processor.archive_start", "en", history.size, System.getProperty("plugin.project.dir") ?: ""))
+        logger.info(PlantumlMessages.format("processor.archive_start", "en", history.size, runtime.projectDir))
         // Always archive if there is at least one attempt
         if (history.isNotEmpty()) {
             try {
                 // Determine the output directory relative to project root
                 val diagramsPath = config?.output?.diagrams ?: "generated/diagrams"
                 
-                // Get project directory from system property (set during tests) or use current dir
-                val projectDirPath = System.getProperty("plugin.project.dir")
-                    ?: System.getProperty("user.dir")
+                // Get the project directory from the runtime environment
+                val projectDirPath = runtime.projectDir
                 
                 val projectDir = File(projectDirPath)
                 val diagramsDir = File(projectDir, diagramsPath)
@@ -603,26 +604,5 @@ class DiagramProcessor(
                 recommendations = emptyList()
             )
         }
-    }
-
-    /**
-     * Saves a validated diagram to the RAG training data directory.
-     *
-     * Stores the diagram along with its validation feedback for use in
-     * Retrieval-Augmented Generation (RAG) training. This enables the LLM
-     * to learn from high-quality examples during future diagram generation.
-     *
-     * **Note**: Current implementation is a placeholder that logs the operation.
-     * A full implementation would persist the diagram and validation to the RAG directory.
-     *
-     * @param diagram The validated [PlantumlDiagram] to save
-     * @param validation The [ValidationFeedback] with quality score and recommendations
-     */
-    fun saveForRagTraining(diagram: PlantumlDiagram, validation: ValidationFeedback) {
-        // In a real implementation, this would save the diagram and validation
-        // results to the RAG training data directory
-
-        // Placeholder implementation - we're not actually saving anything in this demo
-        logger.info(PlantumlMessages.format("processor.would_save_rag", "en", validation.score))
     }
 }

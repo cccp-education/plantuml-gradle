@@ -115,24 +115,15 @@ tasks.withType<Test> {
         if (!runRealLlm) {
             excludeTags("real-llm")
         }
-
-        // Global timeout per test — prevents GradleRunner from hanging
-        // if Ollama doesn't respond (covered by WireMock in unit tests)
-        timeout.set(Duration.ofSeconds(30))
-
-        // Parallel execution of test classes (nested classes share their state
-        // via companion object, so parallelization is at class level)
-        maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
-
     }
 
-    // OPTIMIZATION: Single JVM worker to maximize sharing
-    // Nested classes share WireMock + GradleRunner + sharedProjectDir
-    // via the PlantumlFunctionalSuite companion object
-    maxParallelForks = 1 // ← Single JVM: maximum reuse
-    forkEvery = 0 // ← Never restart the worker (0 = unlimited)
+    // Single JVM worker to maximize sharing: nested classes reuse WireMock +
+    // GradleRunner + sharedProjectDir via PlantumlFunctionalSuite companion.
+    maxParallelForks = 1
+    forkEvery = 0
 
-    // Strict timeout to prevent blocking
+    // Strict timeout to prevent blocking (GradleRunner hangs when Ollama does
+    // not respond — covered by WireMock in unit tests).
     timeout.set(Duration.ofSeconds(120))
 
     // Reuse outputs to speed up executions

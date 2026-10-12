@@ -70,13 +70,13 @@ plantuml.
 multi-provider ; le **ratio freemium dynamique** (`FreemiumWeightCalculator`, poids basés
 sur quota réel) est livré. Voir `.agents/API_KEY_POOL_ESSENTIALS.adoc`.
 
-== Tests production-close
+== ✅ Tests production-close (TERMINÉ — EP-2, S179)
 
-Passer des vrais clé et credential pour une couverture de test
-production-close, avec un context de plugin dedié aux tests réel en local et
-github action secret, juste sur demande avec un parametre dans la ligne de
-commande pour activé la condition reel a la place des mocks.
+Passer des vraies clés/credentials pour une couverture production-close, avec un
+context de plugin dédié aux tests réel en local et un GitHub Actions secret,
+juste sur demande avec un paramètre CLI activant la condition réelle à la place
+des mocks.
 
-→ **EP-2** dans BACKLOG.adoc. Les 6 tests `@real-llm` existent mais ne
-s'exécutent jamais. Parameter CLI + context dédié + CI secrets à mettre en
-place.
+→ **EP-2** ✅ TERMINÉ S179 : `plantuml.real.test` + `plantuml-real-context.yml`
+(gitignoré) + workflow `real_llm_test.yml` (secrets). Les scénarios `@real-llm` /
+`@realllm` s'exécutent sur demande (`-Ptest.tags="real-llm"`, `-Pcucumber.tags="@realllm"`).

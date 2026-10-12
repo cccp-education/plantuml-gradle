@@ -1,6 +1,28 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-10-12 (Session 235 — **PLT-CONTEXT ✅ TERMINÉ 4/4** : CTX-01/02 ✅ S-233, CTX-03 ✅ S-234, CTX-04 (wiring `DiagramProcessor`) ✅ S-235. CTX-05 CADUQUE S-232. PLT-AGENT ✅ 7/7 S-230.)
+:last_update: 2026-10-13 (Session 242 — **PLT-MAINTAIN** : découplage test/prod via `plantuml.runtime.RuntimeEnvironment`, `ConfigMerger` helpers de précédence, purge de stubs morts ; README + ROADMAP réalignés ; 5 workflows CI cassés désactivés ; synchronisation backlog. Historique : S-235 PLT-CONTEXT ✅ 4/4, S-230 PLT-AGENT ✅ 7/7.)
+
+'''
+
+== ✅ PLT-MAINTAIN — Découplage test/prod + hygiène (Session 242)
+
+*Objet* : dette technique relevée en code review S-242. Zéro changement
+fonctionnel (comportement préservé ; gate local = compile ×3 + assemble +
+validatePlugins + publishToMavenLocal VERT ; preuve = CI du borough).
+
+[cols="1,5,1", options="header"]
+|===
+| # | Livrable | Statut
+
+| M-1 | **Seam `plantuml.runtime.RuntimeEnvironment`** (interface pure + `system()` lisant les mêmes clés). `LlmService`/`DiagramProcessor`/`GeneratePlantumlDiagramsTask`/`CollectPlantumlIndexTask` consultent le seam au lieu de `System.getProperty`/`getenv` éparpillés ; contrat `-D`/`-P` des tests fonctionnels préservé. | ✅ S-242
+| M-2 | **Purge de stubs morts** : `DiagramProcessor.saveForRagTraining()` (no-op), `PlantumlConfig.load()` (« in a real implementation »), `LlmService.getTimeoutInSeconds()` (remplacé par le seam). Tests factices de `LlmServicePrivateMethodsTest` (posaient une property alors que la prod lit `getenv`) remplacés par un test réel + `RuntimeEnvironmentTest` (7 assertions). | ✅ S-242
+| M-3 | **`ConfigMerger`** : 5 helpers de précédence nommés (`firstNonDefault`/`firstNonEmpty`/`firstEnabled`/`firstDisabledSticky`/`apiKeyConfig`) remplacent les ternaires imbriqués ; surcharges `merge` dédupliquées. Sémantique identique. | ✅ S-242
+| M-4 | **Docs/CI** : README (version 0.0.9, JDK 25, Kotlin 2.4.10, codebase 0.0.14, BOM 0.0.78, contrats N0, tableau EPICs) ; ROADMAP marqué « historique — source = INDEX » ; labels JDK CI corrigés ; **5 workflows cassés désactivés** (`integration_test`, `plantuml-processing`, `readme_action`, `readme_truth`, `readme_plantuml` → `.yml.disabled` : ils référençaient `readme-plugin`/`commitGeneratedReadme`/`processPlantumlPrompts`, inexistants). | ✅ S-242
+|===
+
+*Non-régression* : validation native hors-ligne, boucle `DiagramProcessor`,
+multi-provider + pool + fallback, RAG/KG, i18n 10 langues, incrémentalité,
+contrats N0, dégradation hors-ligne.
 
 '''
 
@@ -207,7 +229,7 @@ Le périmètre cucumber est résolu (les 3 FAIL de `cucumberTest`) :
 → Échecs cucumber : statut ✅ (résolus). Functional `FilePermission` : ✅ (résolu S-240).
 
 '''
-== ✅ EPIC PUB — Publication Maven Central plantuml-plugin 0.0.5 (Session 218)
+== ✅ EPIC PUB — Publications Maven Central plantuml-plugin (S-218 → 0.0.9 courante)
 
 Réalité actée (2026-09-10, S-218 — publication complète) :
 
@@ -240,6 +262,12 @@ US (~3) :
 **RESULTAT** : 0.0.3 jamais publié (sauté), 0.0.4 Central périmé (8b75c59),
 0.0.5 = version réelle du HEAD PUBLIÉE — code ↔ Central ↔ catalogue ws
 0.0.38 ↔ consommateur aligné.
+
+.Complément — publications ultérieures (état S-242)
+* `0.0.6` / `0.0.7` — PLT-DIAGRAM-OWNERSHIP US-2 (port N0 implémenté ; port rendu provider-agnostique, S-220).
+* `0.0.8` — US-5 (toolchain gouvernée) + résurrection CI (6 verrous), S-222.
+* **`0.0.9` — version courante** (S-227) : bump + `jgit 7.8.0`, `asciidoctorj-diagram 3.2.1`, `-plantuml 1.2026.2`, pins catalog/BOM `0.0.78`.
+* Source de vérité : `gradle/libs.versions.toml` (`plantuml = "0.0.9"`) ↔ catalogue ws `0.0.78`.
 
 '''
 == ✅ EPIC 13 : Multi-provider API Pool — Rotation par tiers + Cross-provider
@@ -354,14 +382,11 @@ injecte doc avant génération.
 
 '''
 
-== 📊 État des Tests (Session 179)
+== 📊 État des Tests
 
-|===
-| Suite | Tests | Statut
-| Unitaires | 2537 | ✅ 100% PASS (0 failure)
-| Cucumber | 128 + 3 @realllm | ✅ 128 PASS / 0 FAIL / 9 SKIP + 3 @realllm SKIPPED (Ollama absent)
-| Kover | 83.26% | ✅ ≥ 75% seuil
-|===
+_Instantané historique (S-179) supprimé._ La baseline autoritaire (unit +
+functional + cucumber + Kover) vit dans `.agents/INDEX.adoc` par session ; la
+preuve de validité est le run CI vert du commit courant (Local = Build, Tests = CI).
 
 '''
 
@@ -374,9 +399,9 @@ MessageFormat). Les prompts LLM restent en anglais (prompt engineering, pas i18n
 *Charge* : ~28 pts (~6-7 sessions)
 *Priorité* : P1 — Plugin publié sur Maven Central mais monolingue (en). L'i18n est
 le prochain cap majeur pour rendre le plugin utilisable internationalement.
-*Dépend de* : `education.cccp:i18n-contracts:0.0.1` (MEM-3, workspace-bom) — artefact N0
+*Dépend de* : `education.cccp:i18n-contracts` (MEM-3, workspace-bom) — artefact N0
 fournissant `SupportedLanguage`, `LanguageCatalog`, `I18nConfig`, `MessageBundle`, `LocaleResolver`.
-Actuellement en mavenLocal seulement (MEM-3.6 publication Central pending).
+Publication Central réalisée ; version courante consommée par le plugin : `0.0.3` (`build.gradle.kts:51`).
 
 === Différence vs Bakery BKY-I18N
 
@@ -514,7 +539,7 @@ PlantumlMessages.format("key", args)  → String formaté (MessageFormat)
 | 2
 | 🟢 P3
 | ✅ Session 152 — 20 fichiers README créés (10 langues × consommateur + plugin).
-  `README_truth.adoc`, `CHANGELOG.adoc`, `PLUGIN_SELF_DOCUMENTATION.adoc` restent à faire (non bloquants).
+  `README_truth.adoc` + `CHANGELOG.adoc` + `PLUGIN_SELF_DOCUMENTATION.adoc` complétés S181 (QW-3).
 |===
 
 === Critères d'Acceptation
@@ -533,7 +558,7 @@ PlantumlMessages.format("key", args)  → String formaté (MessageFormat)
 
 '''
 
-== 🔴 EPIC PLT-BOUNDARY : Translation Boundary — Frontière de traduction i18n
+== ✅ EPIC PLT-BOUNDARY : Translation Boundary — Frontière de traduction i18n
 
 *Vision* : voir `.agents/I18N_BOUNDARY_VISION.adoc`
 *Principe* : l'i18n sert la compréhension. Toute traduction qui réduit la
@@ -662,9 +687,18 @@ EPIC PLT-I18N a livré l'infrastructure i18n (`PlantumlMessages`, `ResourceBundl
 
 '''
 
-== 🔴 EPIC PLT-VALIDATION-CONTRACT : Contrat N0 de validation syntaxique PlantUML
+== ✅ EPIC PLT-VALIDATION-CONTRACT : Contrat N0 de validation syntaxique PlantUML
 
-*Statut* : ✅ TERMINÉ — Session 185 (4/4 US)
+[IMPORTANT]
+====
+**Section historique.** Le type standalone a depuis été **migré vers le contrat N0**
+`contracts.plantuml.SyntaxValidationResult` (artefact `education.cccp:plantuml-contracts:0.0.1`,
+`build.gradle.kts:56`) lors de **PLT-DIAGRAM-OWNERSHIP US-1/US-2 (S-220)** — le package
+`plantuml.validation` **n'existe plus** dans le plugin. La « note d'extraction future »
+en fin de section est **caduque (réalisée)**.
+====
+
+*Statut* : ✅ TERMINÉ — Session 185 (4/4 US) ; extraction N0 réalisée S-220
 *Priorité* : 🔴 HAUTE — débloque l'EPIC DOC-PLANTUML-VALIDATE de document-gradle
 *Charge* : ~6 pts (1 session)
 *Dépend de* : néant (refacto interne plantuml-gradle)
@@ -740,17 +774,14 @@ standalone consommable sans couplage à `PlantumlService`.
 * [x] `publishToMavenLocal` OK
 * [x] Zéro régression (2537 unitaires + 128 Cucumber)
 
-=== Note — Extraction future en contrat N0 BOM
+=== Note — Extraction N0 RÉALISÉE (S-220)
 
-Aujourd'hui le type standalone vit dans `plantuml-plugin`. Si d'autres boroughs
-(codex, slider, bakery) ont besoin de valider du PlantUML sans dépendre du
-plugin complet, un contrat N0 `plantuml-validation-contracts` pourra être extrait
-dans le BOM avec :
-- `SyntaxValidationResult` sealed class
-- `PlantUmlSyntaxValidator` interface
-
-Le type standalone dans `plantuml.validation` est conçu pour cette extraction
-future : il ne dépend que de Kotlin stdlib, zéro dépendance Gradle ou PlantUML.
+L'extraction anticipée ici est **réalisée** : le contrat N0
+`education.cccp:plantuml-contracts:0.0.1` porte
+`contracts.plantuml.SyntaxValidationResult` + `contracts.plantuml.PlantUmlSyntaxValidator`
+(+ `PlantUmlTranslationPort`, `PlantUmlStrategy`). Le plugin **implémente** ce
+port (PLT-DIAGRAM-OWNERSHIP US-1/US-2) et ne définit plus son propre type de
+validation.
 
 '''
 
@@ -762,7 +793,7 @@ GLOBAL_CODE_REVIEW_v7 (2026-05-13), audit code actuel S172.
 *Tous les EPICs métier sont TERMINÉS.* Le plugin est en mode maintenance/dormant.
 Seul PL-3 (ktlint/detekt) reste — BLOQUÉ ABIDJAN (conventions-gradle sans plugin lint).
 
-=== 🟡 Quick wins (< 1h chacun)
+=== ✅ Quick wins (soldées)
 
 [cols="1,4,3,1"]
 |===
@@ -782,12 +813,12 @@ Seul PL-3 (ktlint/detekt) reste — BLOQUÉ ABIDJAN (conventions-gradle sans plu
 | **`README_truth.adoc` + `CHANGELOG.adoc`** — mise à jour avec i18n (10 langues,
   PLT-I18N), Translation Boundary (PLT-BOUNDARY), Incremental Processing (S172),
   EP-1 incremental maturity (S174 events + audit log + config).
-  US-I18N-7 notait "restent à faire (non bloquants)".
+  (US-I18N-7 les mentionnait comme « non bloquants ».)
 | `README_truth.adoc`, `CHANGELOG.adoc`
 | ✅ S181
 |===
 
-=== 🟡 EPICs substantiels (1-3 sessions)
+=== ✅ EPICs substantiels (soldés)
 
 [cols="1,4,3,1"]
 |===
@@ -907,7 +938,7 @@ PASS, 122/122 Cucumber PASS.
 == Métadonnées
 
 |===
-| Dernière màj | 2026-06-24 (Session 152 — US-I18N-7 README i18n)
+| Dernière màj | 2026-10-13 (Session 242 — PLT-MAINTAIN)
 | Anciennes versions | Archivées dans `.agents/backup/`
 |===
 

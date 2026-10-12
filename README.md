@@ -5,12 +5,12 @@
 
 [![Maven Central](https://img.shields.io/maven-central/v/education.cccp/plantuml-plugin.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/education.cccp/plantuml-plugin)
 [![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/education.cccp.plantuml.svg?label=Plugin%20Portal)](https://plugins.gradle.org/plugin/education.cccp.plantuml)
-[![CI](https://img.shields.io/github/actions/workflow/status/cheroliv/plantuml-gradle/test.yml?branch=main&label=tests)](https://github.com/cheroliv/plantuml-gradle/actions/workflows/test.yml)
-[![License](https://img.shields.io/github/license/cheroliv/plantuml-gradle?label=License)](../LICENCE)
+[![CI](https://img.shields.io/github/actions/workflow/status/cccp-education/plantuml-gradle/test.yml?branch=main&label=tests)](https://github.com/cccp-education/plantuml-gradle/actions/workflows/test.yml)
+[![License](https://img.shields.io/github/license/cccp-education/plantuml-gradle?label=License)](../LICENCE)
 
-- **Version**: `0.0.1` · **Group**: `education.cccp` · **Plugin ID**: `education.cccp.plantuml`
-- **Toolchain**: Java 24 · Kotlin 2.3.20 · Gradle 9.5.1
-- **Build**: `./gradlew build` · **Tests**: `./gradlew test` + `functionalTest` + `cucumberTest` (380/380 PASS)
+- **Version**: `0.0.9` · **Group**: `education.cccp` · **Plugin ID**: `education.cccp.plantuml`
+- **Toolchain**: Java 25 · Kotlin 2.4.10 · Gradle 9.5.1
+- **Build**: `./gradlew build` · **Tests**: `./gradlew test` + `functionalTest` + `cucumberTest`
 - **Coverage**: ≥ 75 % (Kover `koverThresholdCheck`, wired into `check`)
 
 🌐 Languages: **EN** | [中文](README.consommateurs/README.zh.md) | [हिन्दी](README.consommateurs/README.hi.md) | [Español](README.consommateurs/README.es.md) | [Français](README.consommateurs/README.fr.md) | [العربية](README.consommateurs/README.ar.md) | [বাংলা](README.consommateurs/README.bn.md) | [Português](README.consommateurs/README.pt.md) | [Русский](README.consommateurs/README.ru.md) | [اردو](README.consommateurs/README.ur.md)
@@ -31,8 +31,8 @@ graphify-out/graph.json ──► generateKnowledgeGraphDiagram ──► PlantU
 prompts/*.prompt ──► generatePlantumlDiagrams ──► LLM ──► validate ──► PNG + RAG index
 ```
 
-The plugin consumes `education.cccp.codebase` (`0.0.2`) for RAG indexing and shares
-N0 contracts via `education.cccp:workspace-bom:0.0.1`.
+The plugin consumes `education.cccp.codebase` (`0.0.14`) for RAG indexing and shares
+N0 contracts via `education.cccp:workspace-bom:0.0.78`.
 
 ## Quick Start
 
@@ -40,7 +40,7 @@ N0 contracts via `education.cccp:workspace-bom:0.0.1`.
 
 ```gradle
 plugins {
-    id("education.cccp.plantuml") version "0.0.1"
+    id("education.cccp.plantuml") version "0.0.9"
 }
 ```
 
@@ -94,10 +94,10 @@ plantuml {
 
 ## Prerequisites
 
-- **Java** 24+ (Kotlin 2.3.20 toolchain, JDK ordinal 24)
+- **Java** 25 (Kotlin 2.4.10 toolchain)
 - **Gradle** 9.5.1+
 - **Docker** (for Testcontainers pgvector in `collectPlantumlIndex`)
-- An **LLM endpoint** — default Ollama `http://localhost:11434`, model `smollm:135m`
+- An **LLM endpoint** — default Ollama `http://localhost:11438`, model `gpt-oss:120b-cloud`
   (ports `11434–11436` are forbidden globally; rotate over `11437–11465`)
 
 ## Build & test

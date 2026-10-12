@@ -18,6 +18,7 @@ import plantuml.PlantumlConfig
 import plantuml.PlantumlManager
 import plantuml.PlantumlMessages
 import plantuml.incremental.IncrementalProcessor
+import plantuml.runtime.RuntimeEnvironment
 import java.io.File
 
 /**
@@ -149,7 +150,7 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         }
 
         // Also load attempt history files for training data
-        val trainingDirPath = if (System.getProperty("plantuml.test.mode") == "true") {
+        val trainingDirPath = if (RuntimeEnvironment.system().isTestMode) {
             config.output.diagrams
         } else {
             config.output.rag
@@ -518,7 +519,7 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         documentSplitter: DocumentSplitter
     ) {
         // Check for test mode disk space simulation
-        val simulateDiskFull = System.getProperty("plantuml.test.disk.full") == "true"
+        val simulateDiskFull = RuntimeEnvironment.system().isDiskFullSimulated
         
         if (simulateDiskFull) {
             val message = PlantumlMessages.get("collect.disk_space_sim", lang)

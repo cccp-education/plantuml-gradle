@@ -1,5 +1,20 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-10
 
+== Session 242 (2026-10-13) — PLT-MAINTAIN : découplage test/prod + hygiène + release 0.0.10 ✅
+
+=== Fait
+- [x] Seam `plantuml.runtime.RuntimeEnvironment` (interface pure + `system()`) ; câblage LlmService/DiagramProcessor/2 tâches ; contrat `-D`/`-P` préservé ✅
+- [x] Purge stubs morts : `saveForRagTraining()`, `PlantumlConfig.load()`, `getTimeoutInSeconds()` ; tests factices remplacés par un test réel + `RuntimeEnvironmentTest` ✅
+- [x] `ConfigMerger` : 5 helpers de précédence nommés (sémantique identique) ✅
+- [x] Docs/CI : README racine + plugin, ROADMAP historique, doublon `timeout`/`maxParallelForks` supprimé, labels JDK CI, 5 workflows cassés désactivés (`.yml.disabled`) ✅
+- [x] Backlog synchronisé (7 dérives + section `PLT-MAINTAIN`) ; TODO EP-2 ✅ ✅
+- [x] Release 0.0.10 : DAG MEMPHIS catalog → plantuml toml + pins 0.0.87 → Central → consommateurs ✅
+- [x] Gate local = Build (compile ×3 + assemble + validatePlugins + publishToMavenLocal VERT) ; zéro secret, zéro Python ✅
+
+=== Prochaine session (243)
+- **US-6b (bakery-gradle)** : FT rendu SVG/PNG non blanc (gaté toolchain)
+- **Fichier à lire en priorité** : `.agents/CADRAGE_PLT_DIAGRAM_OWNERSHIP_US6_US7.adoc`
+
 == Session 241 (2026-10-12) — Cadrage cross-borough PLT-DIAGRAM-OWNERSHIP US-6/US-7 ✅
 
 === Fait

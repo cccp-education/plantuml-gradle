@@ -1,5 +1,24 @@
 = Historique des Sessions
 
+== Session 242 (2026-10-13) — PLT-MAINTAIN : découplage test/prod + hygiène + release 0.0.10 ✅
+
+Refactor iso-comportement issu d'une code review S-242. **Seam `plantuml.runtime.RuntimeEnvironment`**
+(interface pure + `system()`) : `LlmService`/`DiagramProcessor`/`GeneratePlantumlDiagramsTask`/
+`CollectPlantumlIndexTask` consultent le seam au lieu de `System.getProperty`/`getenv` éparpillés
+(contrat `-D`/`-P` des tests fonctionnels préservé). **Purge de stubs morts** :
+`DiagramProcessor.saveForRagTraining()`, `PlantumlConfig.load()`, `LlmService.getTimeoutInSeconds()` ;
+2 tests factices de `LlmServicePrivateMethodsTest` (posaient une property alors que la prod lit
+`getenv`) remplacés par 1 test réel + `RuntimeEnvironmentTest` (7 assertions). **`ConfigMerger`** :
+5 helpers de précédence nommés remplacent les ternaires imbriqués (sémantique identique). **Docs/CI** :
+README racine + plugin (version 0.0.9, JDK 25, Kotlin 2.4.10, codebase 0.0.14, BOM 0.0.78, badges
+`cccp-education`) ; ROADMAP marqué historique ; doublon `timeout`/`maxParallelForks` de `build.gradle.kts`
+supprimé ; labels JDK CI corrigés ; **5 workflows cassés désactivés** (`.yml.disabled`, référençaient
+`readme-plugin`/`commitGeneratedReadme`/`processPlantumlPrompts`). **Backlog synchronisé** (7 dérives
+corrigées + section `PLT-MAINTAIN`). **Release 0.0.10** (DAG MEMPHIS catalog → plantuml toml + pins
+`0.0.87` → Central → consommateurs). Gate local = Build : compile ×3 + assemble + validatePlugins +
+publishToMavenLocal VERT ; preuve = CI. Zéro secret, zéro Python. Rapport
+`.agents/sessions/242-plt-maintain-decoupling-hygiene.adoc`.
+
 == Session 241 (2026-10-12) — Cadrage cross-borough PLT-DIAGRAM-OWNERSHIP US-6/US-7 ✅
 
 Gouvernance pure (zéro code). Audit de la chaîne E2E : **MEMPHIS N0 ✅** (`plantuml-contracts:0.0.1`),

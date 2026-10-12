@@ -9,7 +9,6 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import plantuml.PlantumlCode
 import plantuml.PlantumlDiagram
-import plantuml.ValidationFeedback
 import contracts.plantuml.SyntaxValidationResult
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
@@ -103,29 +102,6 @@ class DiagramProcessorTest {
         assertEquals(8, result.score)
         assertNotNull(result.feedback)
         assertEquals(3, result.recommendations.size)
-    }
-
-    @Test
-    fun `should save for rag training`() {
-        // Given
-        val diagram = PlantumlDiagram(
-            conversation = listOf("Test conversation"),
-            plantuml = PlantumlCode(
-                code = "@startuml\nactor User\n@enduml",
-                description = "Test diagram"
-            )
-        )
-        val validation = ValidationFeedback(
-            score = 8,
-            feedback = "Good diagram",
-            recommendations = listOf("Add more details")
-        )
-
-        // When
-        diagramProcessor.saveForRagTraining(diagram, validation)
-
-        // Then
-        // The test passes if no exception is thrown
     }
 
     // Utility methods for mock configuration

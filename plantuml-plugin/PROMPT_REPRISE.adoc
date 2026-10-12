@@ -1,36 +1,38 @@
-= PROMPT_REPRISE — Plantuml — Session 242
-:session: 242
-:date: 2026-10-12
+= PROMPT_REPRISE — Plantuml — Session 243
+:session: 243
+:date: 2026-10-13
 
-== État — plantuml-local TOUT soldé ; reste cross-borough (cadré S-241)
+== État — plantuml-local TOUT soldé ; release 0.0.10 publiée (S-242)
 
-* **PLT-AGENT ✅ 7/7** (+ FT preflight S-238) ; **PLT-CONTEXT ✅ 4/4** (S-235).
-* **GBL-010 feuille plantuml ✅** (G-3b S-236, G-3 correction S-237, notes+câblage S-238/S-239).
-* **FIX-BASELINE ✅** (cucumber S-217 + functional FilePermission S-240).
+* **PLT-MAINTAIN ✅** (S-242) : découplage test/prod (`plantuml.runtime.RuntimeEnvironment`),
+  purge de stubs morts, `ConfigMerger` (helpers de précédence), README/ROADMAP/CI réalignés,
+  5 workflows CI cassés désactivés, backlog synchronisé.
+* **Release 0.0.10** (S-242) : DAG MEMPHIS (catalog `plantuml-plugin 0.0.10`) → plantuml
+  toml + pins `0.0.87` → Central → consommateurs (document, bakery).
+* **PLT-AGENT ✅ 7/7** ; **PLT-CONTEXT ✅ 4/4** ; **GBL-010 feuille plantuml ✅** ;
+  **FIX-BASELINE ✅** (cucumber S-217 + functional S-240).
 * **PLT-DIAGRAM-OWNERSHIP** : US-0→5 ✅ ; **US-6/US-7 CADRÉS S-241**
   (`.agents/CADRAGE_PLT_DIAGRAM_OWNERSHIP_US6_US7.adoc`).
 
-== Mission Session 242 — cross-borough (bakery-gradle)
+== Mission Session 243 — cross-borough (bakery-gradle)
 
-* **US-6a (bakery-gradle)** — FT « contrat » : `migrateContentI18n` sur l'article cheroliv
-  à `[plantuml]` → bloc extrait + labels traduits + **round-trip valide** (validator N0),
-  **sans bake** (CI-friendly). Étendre/ajouter dans
-  `MigrateContentI18nDeploySmokeFunctionalTest` / `CherolivComDogfoodingDryRunFunctionalTest`.
-  **Candidat par défaut.**
-* **US-6b (bakery-gradle, S-243)** — FT « rendu » : SVG/PNG **non blanc** au bake (gaté toolchain).
-* **US-7 (cheroliv.com, S-244)** — re-bake référence + variantes, garde `DiagramIntegrity`, contrat VERT.
-* Côté plantuml-local : **PLT-AGENT optionnel (b)** (vérifier vision d'un modèle du pool).
+* **US-6b (bakery-gradle)** — FT « rendu » : SVG/PNG **non blanc** au bake (gaté toolchain),
+  suite de US-6a (contrat sans bake).
+* **US-7 (cheroliv.com, S-244)** — re-bake référence + variantes, garde `DiagramIntegrity`,
+  contrat VERT.
+* Côté plantuml-local : **rien** (tous EPICs soldés) — sauf **PLT-AGENT optionnel (b)**
+  (vérifier qu'un modèle du pool expose la vision, sinon DIA-01 dégrade).
 
 == Points d'attention
 
 * **Local = Build, Tests = CI** : par borough. Preuve = CI du borough modifié.
 * **DAG** : N0 (MEMPHIS) → plantuml (N2) → document (N2) → bakery (N2) → cheroliv (site).
-  **Un borough par session** (gouvernance workspace) — ne pas mélanger.
+  **Un borough par session** — ne pas mélanger.
 * **US-6** vit dans **bakery-gradle** (aucun N2→N2) ; plantuml fournit le port + `DiagramOutputProbe`.
 * English only ; zéro Python ; zéro secret ; baby-step DDD/TDD/BDD ; steps préfixés (S-088).
 
 == Rappels
 
-* Plantuml `0.0.9` (catalog ws 0.0.78) ; N0 `plantuml-contracts:0.0.1`.
+* Plantuml `0.0.10` (catalog ws `0.0.87`) ; N0 `plantuml-contracts:0.0.1`.
 * Cadrage US-6/US-7 : `.agents/CADRAGE_PLT_DIAGRAM_OWNERSHIP_US6_US7.adoc`.
-* Plantuml-local : **tous les EPICs soldés** — le borough est en mode maintenance.
+* Plantuml-local : **mode maintenance** — pas de nouvel EPIC sans demande pilote.

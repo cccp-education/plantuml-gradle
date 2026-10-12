@@ -1,3 +1,5 @@
+# DISABLED (S-242) — invokes a task that does not exist in the plugin (processPlantumlPrompts).
+# Kept for reference. Rename back to *.yml to re-enable.
 name: PlantUML Processing
 
 on:

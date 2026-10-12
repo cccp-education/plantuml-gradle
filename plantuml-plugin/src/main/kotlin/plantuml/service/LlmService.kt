@@ -15,6 +15,7 @@ import plantuml.apikey.CrossProviderFallbackOrchestrator
 import plantuml.apikey.Provider
 import plantuml.apikey.QuotaAuditLogger
 import plantuml.apikey.QuotaConfig
+import plantuml.runtime.RuntimeEnvironment
 import java.time.Duration
 
 /**
@@ -35,7 +36,8 @@ import java.time.Duration
  */
 class LlmService(
     private val config: PlantumlConfig,
-    internal var auditLogger: QuotaAuditLogger = QuotaAuditLogger()
+    internal var auditLogger: QuotaAuditLogger = QuotaAuditLogger(),
+    private val runtime: RuntimeEnvironment = RuntimeEnvironment.system(),
 ) {
 
     private val apiKeyPools = mutableMapOf<String, ApiKeyPool>()
@@ -174,12 +176,10 @@ class LlmService(
         
         // Return null only in simple test mode without mock LLM server
         // If mock LLM server is configured (localhost baseUrl), use real Ollama model
-        // If plantuml.real.test=true, bypass the null guard and create a real ChatModel
-        val isTestMode = System.getProperty("plantuml.test.mode") == "true" || System.getenv("TEST_ENV") == "true"
+        // If runtime.isRealLlmTest, bypass the null guard and create a real ChatModel
         val isMockConfigured = config.langchain4j.ollama.baseUrl.contains("localhost")
-        val isRealTest = System.getProperty("plantuml.real.test") == "true"
-        
-        if (isTestMode && !isMockConfigured && !isRealTest) {
+
+        if (runtime.isTestMode && !isMockConfigured && !runtime.isRealLlmTest) {
             return null
         }
         
@@ -210,7 +210,7 @@ class LlmService(
         .baseUrl(config.langchain4j.ollama.baseUrl)
         .modelName(config.langchain4j.ollama.modelName)
         .temperature(0.7)
-        .timeout(Duration.ofSeconds(getTimeoutInSeconds()))
+        .timeout(Duration.ofSeconds(runtime.providerTimeoutSeconds))
         .build()
 
     /**
@@ -224,7 +224,7 @@ class LlmService(
             .apiKey(apiKey)
             .modelName(config.langchain4j.openai.modelName)
             .temperature(0.7)
-            .timeout(Duration.ofSeconds(getTimeoutInSeconds()))
+            .timeout(Duration.ofSeconds(runtime.providerTimeoutSeconds))
         
         if (config.langchain4j.openai.baseUrl.isNotBlank()) {
             builder.baseUrl(config.langchain4j.openai.baseUrl)
@@ -244,7 +244,7 @@ class LlmService(
             .apiKey(apiKey)
             .modelName(config.langchain4j.gemini.modelName)
             .temperature(0.7)
-            .timeout(Duration.ofSeconds(getTimeoutInSeconds()))
+            .timeout(Duration.ofSeconds(runtime.providerTimeoutSeconds))
             .build()
     }
 
@@ -259,7 +259,7 @@ class LlmService(
             .apiKey(apiKey)
             .modelName(config.langchain4j.mistral.modelName)
             .temperature(0.7)
-            .timeout(Duration.ofSeconds(getTimeoutInSeconds()))
+            .timeout(Duration.ofSeconds(runtime.providerTimeoutSeconds))
         
         if (config.langchain4j.mistral.baseUrl.isNotBlank()) {
             builder.baseUrl(config.langchain4j.mistral.baseUrl)
@@ -279,7 +279,7 @@ class LlmService(
             .apiKey(apiKey)
             .modelName(config.langchain4j.claude.modelName)
             .temperature(0.7)
-            .timeout(Duration.ofSeconds(getTimeoutInSeconds()))
+            .timeout(Duration.ofSeconds(runtime.providerTimeoutSeconds))
         
         if (config.langchain4j.claude.baseUrl.isNotBlank()) {
             builder.baseUrl(config.langchain4j.claude.baseUrl)
@@ -300,7 +300,7 @@ class LlmService(
             .baseUrl("https://api-inference.huggingface.co")
             .modelName(ProviderModelResolver.huggingFace(config.langchain4j.huggingface))
             .temperature(0.7)
-            .timeout(Duration.ofSeconds(getTimeoutInSeconds()))
+            .timeout(Duration.ofSeconds(runtime.providerTimeoutSeconds))
             .build()
     }
 
@@ -316,17 +316,8 @@ class LlmService(
             .baseUrl("https://api.groq.com/openai/v1")
             .modelName(ProviderModelResolver.groq(config.langchain4j.groq))
             .temperature(0.7)
-            .timeout(Duration.ofSeconds(getTimeoutInSeconds()))
+            .timeout(Duration.ofSeconds(runtime.providerTimeoutSeconds))
             .build()
     }
     
-    /**
-     * Returns timeout duration in seconds based on environment.
-     *
-     * @return 5 seconds in test environment (TEST_ENV=true), 60 seconds otherwise
-     */
-    private fun getTimeoutInSeconds(): Long {
-        // In test environments, use shorter timeouts to avoid hanging tests
-        return if (System.getenv("TEST_ENV") == "true") 5L else 60L
-    }
 }

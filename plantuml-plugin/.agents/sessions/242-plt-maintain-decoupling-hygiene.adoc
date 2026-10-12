@@ -1,0 +1,75 @@
+= Session 242 — PLT-MAINTAIN : découplage test/prod + hygiène + release 0.0.10
+:session: 242
+:date: 2026-10-13
+:borough: HTOWN (plantuml-gradle) — maintenance + publication
+:type: refactor (DDD/TDD) + gouvernance + ops (release)
+:statut: TERMINÉ
+:methode: baby-step DDD/TDD, comportement préservé, gate local = build
+
+== Mission
+
+Découplage de la logique de test hors du code de production, refonte `ConfigMerger`,
+purge de stubs morts, réalignement docs/CI (issus d'une code review S-242),
+synchronisation du backlog avec le code, puis release **0.0.10** (DAG cross-borough
+MEMPHIS → plantuml → consommateurs).
+
+== Livrables
+
+=== M-1 — Seam `plantuml.runtime.RuntimeEnvironment`
+
+* `src/main/kotlin/plantuml/runtime/RuntimeEnvironment.kt` (interface pure +
+  impl `system()` lisant les mêmes clés `plantuml.test.mode`, `TEST_ENV`,
+  `plantuml.real.test`, `plantuml.test.disk.full`, `plugin.project.dir`, `user.dir`).
+* Câblage : `LlmService` (null-guard + timeout), `DiagramProcessor` (debug log +
+  répertoire d'archivage), `GeneratePlantumlDiagramsTask`, `CollectPlantumlIndexTask`.
+* Contrat `-D`/`-P` des tests fonctionnels **préservé** (le pont `System.setProperty`
+  de la tâche reste).
+
+=== M-2 — Purge de stubs morts
+
+* `DiagramProcessor.saveForRagTraining()` (no-op) supprimée + appel dans la tâche + test.
+* `PlantumlConfig.load()` (« in a real implementation ») supprimée + import mort.
+* `LlmService.getTimeoutInSeconds()` remplacée par
+  `runtime.providerTimeoutSeconds`.
+* `LlmServicePrivateMethodsTest` : 2 tests **factices** (posaient une property
+  `TEST_ENV` alors que la prod lit `System.getenv`) remplacés par 1 test réel ;
+  `RuntimeEnvironmentTest` (7 assertions) créé.
+
+=== M-3 — `ConfigMerger`
+
+* 5 helpers de précédence nommés (`firstNonDefault`, `firstNonEmpty`, `firstEnabled`,
+  `firstDisabledSticky`, `apiKeyConfig`) remplacent les ternaires imbriqués ; les 6
+  providers passent de 18 à 6 appels ; surcharges `merge` dédupliquées. Sémantique
+  identique (cas `validation` / `diagramDocs.enabled` préservés).
+
+=== M-4 — Docs / CI
+
+* `README.md` racine + plugin : version `0.0.9`, JDK 25, Kotlin 2.4.10, codebase
+  `0.0.14`, BOM `0.0.78`, endpoint Ollama `11438`, badges repo `cccp-education`.
+* `.agents/ROADMAP.adoc` : bannière « historique — source de vérité = INDEX ».
+* `build.gradle.kts` : doublon `timeout`/`maxParallelForks` supprimé (30 s/cores÷2
+  étaient écrasés par 120 s/1).
+* CI : labels « Set up JDK 23/24 » → 25 ; **5 workflows cassés désactivés**
+  (`integration_test`, `plantuml-processing`, `readme_action`, `readme_truth`,
+  `readme_plantuml` → `.yml.disabled`, référençaient `readme-plugin`/
+  `commitGeneratedReadme`/`processPlantumlPrompts`, inexistants).
+
+=== Gouvernance
+
+* `BACKLOG.adoc` : 7 dérives corrigées (PLT-VALIDATION-CONTRACT → N0, PUB complété
+  0.0.9, PLT-I18N, US-I18N-7, Métadonnées, en-têtes de sections, icône PLT-BOUNDARY) +
+  nouvelle section `PLT-MAINTAIN`. `TODO.adoc` : EP-2 marqué terminé.
+
+=== Ops — Release 0.0.10
+
+* DAG : MEMPHIS `workspace-bom`/catalog (plantuml-plugin `0.0.10`) → plantuml toml +
+  pins `0.0.87` → plantuml `0.0.10` Central → consommateurs (document, bakery).
+
+== Gate
+
+* Local = Build : `compileKotlin` / `compileTestKotlin` / `compileFunctionalTestKotlin`
+  VERT, `assemble`, `validatePlugins`, `publishToMavenLocal` VERT.
+* Tests = CI (preuve = run du commit poussé).
+* Zéro secret, zéro Python.
+
+_Score : 9/10 (refactor iso-comportement, gouvernance synchronisée, release DAG)._
