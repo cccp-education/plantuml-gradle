@@ -18,7 +18,7 @@ UP-TO-DATE) ; **BDD** `30_plantuml_provenance.feature` (`@context @provenance`, 
 `PlantumlProvenanceSteps`. Frontière D-1 : domaine = N0 uniquement ; provenance dupliquée N2
 (doctrine). Local = Build (`compileKotlin`/`compileTestKotlin`/`compileFunctionalTestKotlin`
 VERT, `assemble` + `validatePlugins` VERT) ; preuve = CI. **PLT-CONTEXT 3/4** (reste CTX-04).
-Zéro secret, zéro Python, zéro publication. Rapport `.agents/sessions/234-plt-context-us3-collector.adoc`.
+**CI VERTE** run `38261148871` (commit `0bdbf25`, 11m16s). Zéro secret, zéro Python, zéro publication. Rapport `.agents/sessions/234-plt-context-us3-collector.adoc`.
 
 == Session 233 (2026-10-12) — PLT-CONTEXT US-1/2 (CTX-01 contrat N0 + CTX-02 assembleur pur) ✅
 

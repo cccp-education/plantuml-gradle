@@ -56,6 +56,8 @@ canaux RAG/Graphify/Docs injectés (`-Pcontext.*`), budgétés, rendus →
   `PlantumlProvenanceSteps` (glue `plantuml.scenarios`, steps préfixés S-088).
 * Local = Build : `compileKotlin`/`compileTestKotlin`/`compileFunctionalTestKotlin`
   **VERTS**, `assemble` + `validatePlugins` **VERTS**. **Tests = CI.**
+* **CI VERTE** run `38261148871` (commit `0bdbf25`, 11m16s — `Build & Test` / `Check plantuml-plugin`
+  VERT). **Preuve de validité de la session.**
 
 == Décisions / notes
 
