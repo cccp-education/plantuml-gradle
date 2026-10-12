@@ -46,13 +46,15 @@ class PlantumlTranslationPortAdapter(
 
     override fun translate(request: PlantUmlTranslationRequest): PlantUmlTranslationOutcome {
         val block = request.block
-        val strategy = classifier.classify(block)
-        if (strategy == PlantUmlStrategy.PRESERVE) {
-            return PlantUmlTranslationOutcome.Preserved("PRESERVE strategy — semantic identity only")
-        }
-
         val labels = block.labels()
         val notes = PlantumlNoteExtractor.occurrences(block.raw)
+        val strategy = classifier.classify(block)
+        // GBL-010 G-3 — notes are translatable prose that the N0 label classifier
+        // does not see: a notes-bearing block must not be short-circuited as
+        // PRESERVE (semantic identity only).
+        if (strategy == PlantUmlStrategy.PRESERVE && notes.isEmpty()) {
+            return PlantUmlTranslationOutcome.Preserved("PRESERVE strategy — semantic identity only")
+        }
         if (labels.isEmpty() && notes.isEmpty()) {
             return PlantUmlTranslationOutcome.Preserved("no translatable label")
         }
