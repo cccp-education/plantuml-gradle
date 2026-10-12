@@ -288,11 +288,9 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         // Process through LLM interaction loop (max 5 iterations)
         val maxIterations = project.findProperty("plantuml.langchain4j.maxIterations") as? Int
             ?: config.langchain4j.maxIterations
-        val maxSeconds = (project.findProperty("plantuml.langchain4j.maxSeconds") as? String)?.toLongOrNull()
-            ?: config.langchain4j.maxSeconds
 
         val diagram = try {
-            diagramProcessor.processPrompt(promptContent, maxIterations, logger, resolver, language, maxSeconds)
+            diagramProcessor.processPrompt(promptContent, maxIterations, logger, resolver, language)
         } catch (e: IllegalStateException) {
             logger.lifecycle(PlantumlMessages.format("generate.error", lang, e.message ?: "Unknown error"))
             throw e

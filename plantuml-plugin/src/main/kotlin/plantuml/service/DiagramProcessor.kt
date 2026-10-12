@@ -99,8 +99,7 @@ class DiagramProcessor(
         maxIterations: Int = 5,
         logger: Logger,
         resolver: TranslationResolver? = null,
-        language: String = "en",
-        maxSeconds: Long = 0
+        language: String = "en"
     ): PlantumlDiagram? {
         logger.debug("processPrompt: chatModel={}, config={}, testMode={}", chatModel, config, System.getProperty("plantuml.test.mode"))
         // Initialize attempt history
@@ -197,6 +196,7 @@ class DiagramProcessor(
         var iterations = 0
         var validationResult: SyntaxValidationResult
         val startTime = System.currentTimeMillis()
+        val maxSeconds = config?.langchain4j?.maxSeconds ?: 0L
         val budget = GenerationBudget(maxIterations, maxSeconds)
         var lastDesignFeedback: String? = null
 
