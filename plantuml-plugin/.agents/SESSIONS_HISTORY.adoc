@@ -10,7 +10,9 @@ d'échappement `\n`). **N0 inchangé** (plantuml-local). Tests : `PlantumlNoteEx
 (occurrence raw/text) + `PlantumlTranslationPortAdapterTest` **+5** (note mono-ligne sans label,
 corps multi-ligne in-place, newline réelle conservée, notes-only + échec → préservé, structure
 `end note`). Local = Build (compile 3 source sets + `assemble` + `validatePlugins` VERT) ;
-preuve = CI. **GBL-010 G-3 clos côté feuille plantuml.** Zéro secret, zéro Python, zéro publication.
+**CI VERTE run `38279828661`** (commit `1b79b85`, 1 itération rouge corrigée par les logs CI —
+bloc notes-only classé `PRESERVE` par le N0, override plantuml-local). **GBL-010 G-3 clos côté
+feuille plantuml.** Zéro secret, zéro Python, zéro publication.
 Rapport `.agents/sessions/239-gbl010-g3-notes-port-wiring.adoc`.
 
 == Session 238 (2026-10-12) — Notes PlantUML + FT preflight + drift gouvernance ✅

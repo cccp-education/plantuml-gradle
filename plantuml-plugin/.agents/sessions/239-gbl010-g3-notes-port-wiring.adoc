@@ -36,6 +36,13 @@ texte des notes** PlantUML dans le **port de traduction** (`PlantumlTranslationP
 * BDD — `34_plantuml_notes.feature` (`@plantuml-notes`, 3 scénarios, extracteur) inchangée.
 * Local = Build : compile 3 source sets + `assemble` + `validatePlugins` **VERTS**.
   **Tests = CI.**
+* **CI VERTE** run `38279828661` (commit `1b79b85`, `Check plantuml-plugin` ✓).
+  **Preuve de validité de la session.**
+* **Découverte (1 itération rouge, logs CI)** — run `38278085250` : le classifieur **N0**
+  `PlantUmlClassifier` classe un bloc **notes-only** en `PRESERVE` (`hasTranslatableLabels()`
+  = labels vides) → le port sortait précocement **avant** de traduire les notes. Correctif
+  **plantuml-local** (N0 inchangé) : le port ne court-circuite plus `PRESERVE` **quand des
+  notes existent** (les notes sont de la prose traduisible que le classifieur labels ne voit pas).
 
 == Fichiers
 

@@ -8,7 +8,7 @@
 - [x] Newlines réelles des notes conservées (prose, pas d'échappement `\n` de label quoté) ✅
 - [x] **N0 inchangé** (plantuml-local) ; Tests : `PlantumlNoteExtractorTest` +2 + `PlantumlTranslationPortAdapterTest` +5 ✅
 - [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 240 + BACKLOG (G-3) + archive ✅
-- [x] Local = Build (compile 3 source sets + `assemble` + `validatePlugins` VERT) ; zéro secret, zéro Python, zéro publication ✅
+- [x] Local = Build (compile 3 source sets + `assemble` + `validatePlugins` VERT) ; **CI VERTE run `38279828661`** (commit `1b79b85`) ; zéro secret, zéro Python, zéro publication ✅
 
 === Prochaine session (240)
 - **PLT-DIAGRAM-OWNERSHIP US-6 (chaîne E2E, cross-borough → arbitrage pilote)** ; sinon US-7 ; FIX-BASELINE `FilePermission`
