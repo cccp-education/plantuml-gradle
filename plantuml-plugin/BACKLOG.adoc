@@ -1,6 +1,39 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-10-12 (Session 230 — **EPIC PLT-AGENT TERMINÉ 7/7** : DIA-01→07 implémentés (domaine pur `plantuml.agent`, Kroki/MCP rejetés) ; +45 unit + BDD 18 scénarios ; correctif drift toolchain S-227).
+:last_update: 2026-10-12 (Session 231 — **cadrage EPIC PLT-CONTEXT** : la génération PlantUML doit consommer le **contexte augmenté N1 codebase** via le contrat N0 `contracts.context.*` (patron capsule), au lieu du `DocKnowledgeBase` statique. S-230 : PLT-AGENT ✅ 7/7.)
+
+'''
+
+== 🟡 EPIC PLT-CONTEXT — Contexte augmenté de génération via codebase (N1)
+
+*Objet* : confier le **contexte augmenté de génération** de plantuml au **contrat N0
+`contracts.context.*`** (`education.cccp:codebase-contracts`) alimenté par le socle
+**N1 codebase** — EAGER/RAG/Graphify/Docs — au lieu du `DocKnowledgeBase` statique.
+Patron de référence : capsule (`CapsuleContextBuilder` + `CollectCapsuleAugmentedContextTask`).
+
+*Cadrage* : `.agents/CADRAGE_EPIC_PLT_CONTEXT.adoc` (audit + décisions + 6 options écartées).
+*Constat* : plantuml **applique** le plugin codebase (`build.gradle.kts:26`) mais n'importe
+**aucun** type `codebase.*` ; contexte local statique (`DocKnowledgeBase`, mots-clés) ;
+**aucun** `contracts.context.*`. **Retardataire** cross-borough (capsule/planner/slider
+consomment déjà le hub N1).
+*Priorité* : 🟠 HAUTE. *Charge* : ~13 pts (5 US). *Frontière DAG* : contrat = **N0**,
+moteur = **N1** ; **jamais** N2→N2. Repli statique conservé (hors-ligne).
+
+[cols="1,4,1,2", options="header"]
+|===
+| US | Description | Pts | Statut
+
+| US-0 | Cadrage (audit + décisions) | 0 | ✅ S-231
+| CTX-01 | **Contrat N0** `codebase-contracts` (`contracts.context.*`) : `implementation(libs.codebase.contracts)` ; plugin codebase inert retiré/complété | 1 | 🟡 À FAIRE
+| CTX-02 | **Assembleur pur** `plantuml.context.PlantumlContextBuilder` (mirror `CapsuleContextBuilder`) | 3 | 🟡 À FAIRE
+| CTX-03 | **Collecteur** `collectPlantumlAugmentedContext` (EAGER + RAG/Graphify/Docs → `augmented-context.txt`, Économie d'Encre) | 3 | 🟡 À FAIRE
+| CTX-04 | **Wiring `DiagramProcessor`** : contexte dans le prompt ; `DocKnowledgeBase` = repli | 3 | 🟡 À FAIRE
+| CTX-05 | *(optionnel)* hub **`LlmBuildService`** (N1) au lieu de `LlmService` local — arbitrage pilote | 3 | 🟡 À FAIRE
+|===
+
+*Ne pas régresser* : validation native hors-ligne, boucle `DiagramProcessor` (PLT-AGENT),
+multi-provider + pool + fallback, i18n 10 langues, toolchain gouvernée, probe anti-blanc,
+incrémentalité, contrats N0 existants, dégradation hors-ligne.
 
 '''
 

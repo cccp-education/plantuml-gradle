@@ -1,5 +1,21 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-10
 
+== Session 231 (2026-10-12) — Cadrage EPIC PLT-CONTEXT + dette CI ✅
+
+=== Fait
+- [x] Audit : plantuml applique le plugin codebase mais n'importe **aucun** type `codebase.*` ; contexte local statique ; pas de `contracts.context.*` ✅
+- [x] Cadrage EPIC **PLT-CONTEXT** : contrat N0 `contracts.context.*` + moteur N1, patron capsule ✅
+- [x] Catalogue `CTX-01`→`CTX-05` (~13 pts) ; 8 décisions ; 6 options écartées ✅
+- [x] Doc `.agents/CADRAGE_EPIC_PLT_CONTEXT.adoc` + BACKLOG/TODO § PLT-CONTEXT ✅
+- [x] CI : suppression `ci.yml` obsolète (readme-plugin inexistant) ✅
+- [x] CI : cache image testcontainers `pgvector/pgvector:pg15` (`test.yml`, vérifié en CI) ✅
+- [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 232 + archive ✅
+- [x] Zéro code modifié, zéro secret, zéro Python ✅
+
+=== Prochaine session (232)
+- **PLT-CONTEXT US-1/US-2** : CTX-01 (contrat N0) puis CTX-02 (`PlantumlContextBuilder`)
+- **Fichier à lire en priorité** : `.agents/CADRAGE_EPIC_PLT_CONTEXT.adoc`
+
 == Session 230 (2026-10-12) — Implémentation EPIC PLT-AGENT (DIA-01→07) ✅
 
 === Fait

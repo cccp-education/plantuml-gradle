@@ -1,0 +1,58 @@
+= Session 231 — Cadrage EPIC PLT-CONTEXT (contexte augmenté via codebase N1)
+:session: 231
+:date: 2026-10-12
+:borough: HTOWN (plantuml-gradle)
+:type: cadrage (gouvernance pure)
+:statut: TERMINÉ
+:methode: pattern S-219/S-225/S-228 (zéro code modifié)
+
+== Question pilote
+
+« La génération PlantUML devrait être confiée à un **contrat qui travaille avec
+codebase** pour apporter un **contexte augmenté**. Sinon, cadrer et ajouter l'EPIC. »
+
+== Réponse : non, ce n'est pas le cas — EPIC `PLT-CONTEXT` cadré
+
+Audit : plantuml **applique** le plugin `education.cccp.codebase` (`build.gradle.kts:26`)
+mais **n'importe aucun type `codebase.*`** ; son contexte de génération est un
+`DocKnowledgeBase` **statique** (recherche par mots-clés sur `docs/plantuml-reference.adoc`,
+appelé par `GraphifyPromptAdapter`) ; **aucun** contrat `contracts.context.*`. Il est le
+**retardataire** cross-borough : capsule (`CapsuleContextBuilder` + `CollectCapsuleAugmentedContextTask`),
+planner (`PLN-LLM-HUB`), slider (SLD-8 US-8.1) consomment déjà le socle N1.
+
+== Livrable
+
+`.agents/CADRAGE_EPIC_PLT_CONTEXT.adoc` — audit, patron N1, catalogue `CTX-01`→`CTX-05`
+(~13 pts), 8 décisions, 6 options écartées. + BACKLOG § PLT-CONTEXT + TODO.
+
+=== Décision d'architecture
+
+* **Contrat = N0** `contracts.context.*` (`education.cccp:codebase-contracts` 0.0.2) —
+  seam provider-agnostique (`CompositeContext`/`ContextChannel`/`ChannelBudget`).
+* **Moteur = N1** codebase (`CompositeContextBuilder`, `RagVectorStore`, `LlmBuildService`).
+* **JAMAIS N2→N2.** **Repli statique conservé** (hors-ligne). **Économie d'Encre**
+  (artefact `augmented-context.txt` réutilisé).
+* Patron : **assembleur pur** (`PlantumlContextBuilder`) + **collecteur** Gradle.
+* `CTX-05` (`LlmBuildService`) = **option à arbitrer** (pool de clés local riche).
+
+== CI (hors périmètre cadrage, traité cette session)
+
+* Suppression du workflow **`ci.yml`** obsolète (copie `readme-plugin` inexistant) —
+  `CI` ne tourne plus.
+* Cache de l'image testcontainers **`pgvector/pgvector:pg15`** dans `test.yml`
+  (vérifié : `✓ Cache pgvector` + `✓ Load or pull` en CI).
+* (rappel S-230) cache **Ollama + `qwen3.5:0.8b`** via `.github/actions/setup-ollama`
+  pour les tests LLM non fakés.
+
+== Vérifications
+
+* Local = Build (aucun code modifié cette session). Preuve = CI `Test`.
+* Zéro secret, zéro Python.
+
+== Reste à faire
+
+* [ ] Arbitrage pilote : CTX-05 inclus ? ordre des US.
+* [ ] Vérifier `codebase-contracts:0.0.2` (Central) + alignement BOM.
+* [ ] Session suivante : PLT-CONTEXT US-1 (CTX-01) / US-2 (CTX-02).
+
+_Score : 8/10 (cadrage cross-borough, zéro code)._

@@ -1,44 +1,44 @@
-= PROMPT_REPRISE — Plantuml — Session 231
-:session: 231
+= PROMPT_REPRISE — Plantuml — Session 232
+:session: 232
 :date: 2026-10-12
 
-== État — Release 0.0.9 (S-227) ; EPIC PLT-AGENT ✅ 7/7 (S-230)
+== État — Release 0.0.9 (S-227) ; PLT-AGENT ✅ 7/7 (S-230) ; PLT-CONTEXT cadré (S-231)
 
-* **EPIC `PLT-AGENT` TERMINÉ 7/7** (S-230) : portage des techniques de
-  `docToolChain/diag-agent` sur l'infra HTOWN native (domaine `plantuml.agent`).
-  DIA-04 extracteur, DIA-03 budget mur, DIA-06 sous-type, DIA-02 pré-vol description
-  (+ tâche `preflightPlantumlDescription`), DIA-05 exemples canoniques, DIA-01 revue
-  design par vision (+ adapter), DIA-07 convergence. Config `langchain4j.{maxSeconds,
-  preflight,examples,designValidation}` (4 sources, défaut off). BDD `28_agent_loop.feature`
-  (18 scénarios). Rapports `.agents/sessions/230-plt-agent-implementation.adoc` +
-  cadrages `.agents/CADRAGE_EPIC_PLT_AGENT.adoc` / `…_VISION.adoc`.
-* **Correctif dette** (S-230, `daaf7a0`) : drift toolchain pré-existant S-227
-  (`PlantUmlToolchain.reference` réaligné sur le catalogue 3.2.1 / 1.2026.2).
-* **Release 0.0.9** (S-227) : Central bundle `dcb6d30e`, propagation repo1 200.
+* **EPIC `PLT-AGENT` ✅ 7/7** (S-230) : techniques `diag-agent` portées (domaine pur
+  `plantuml.agent`) — extracteur, budget mur, sous-type, pré-vol de description,
+  exemples canoniques, revue design par vision, convergence. Config
+  `langchain4j.{maxSeconds,preflight,examples,designValidation}` (4 sources, défaut off).
+  BDD `28_agent_loop.feature` (18 scénarios).
+* **EPIC `PLT-CONTEXT` cadré** (S-231) : la génération doit consommer le **contexte
+  augmenté N1 codebase** via le **contrat N0** `contracts.context.*` (patron capsule),
+  au lieu du `DocKnowledgeBase` statique. `CTX-01`→`CTX-05` (~13 pts). Doc
+  `.agents/CADRAGE_EPIC_PLT_CONTEXT.adoc`.
+* **CI** : `ci.yml` obsolète supprimé ; cache pgvector (`test.yml`) ; cache Ollama +
+  `qwen3.5:0.8b` (`.github/actions/setup-ollama`, `real_llm_test.yml`).
 
-== Mission Session 231 — au choix pilote
+== Mission Session 232 — au choix pilote
 
-* **US-7 PLT-AGENT (optionnel)** — test fonctionnel TestKit de `preflightPlantumlDescription`
-  (no-op si désactivé, **mock LLM** — pas d'appel réseau) + dogfooding vision (vérifier
-  qu'un modèle du pool expose la vision, sinon dégradation).
-* **Dette CI** — le workflow `.github/workflows/ci.yml` échoue sur
-  `-p readme-plugin` (répertoire inexistant) : **supprimer/corriger** (hors PLT-AGENT).
+* **PLT-CONTEXT US-1/US-2** — CTX-01 (contrat N0 `codebase-contracts`) puis CTX-02
+  (assembleur pur `PlantumlContextBuilder`). **Candidat par défaut.**
+* **PLT-CONTEXT arbitrage** — CTX-05 (`LlmBuildService`) inclus ?
 * **GBL-010 G-3 (reste)** — statut par bloc + correction IA (feuille PlantUML).
-* **US-6/US-7 PLT-DIAGRAM-OWNERSHIP** — chaîne E2E bakery→document→port→plantuml +
-  dogfooding re-bake cheroliv.com.
+* **US-6/US-7 PLT-DIAGRAM-OWNERSHIP** — chaîne E2E bakery→document→port→plantuml + dogfooding.
 
 == Points d'attention
 
 * **Local = Build, Tests = CI** : ne jamais lancer `test`/`check` en local. Preuve = CI.
-* Appel LLM en CI : **Ollama via Docker** + config YAML (secret si besoin) + petit
-  modèle `qwen3.5:0.8b` ; sinon **mocker** l'appel (préféré pour les tests déterministes).
-* Nouvelle option → `LangchainConfig` + `ConfigMerger` (4 sources) + CLI, défaut `false`.
-* English only ; zéro Python ; zéro secret ; baby-step DDD/TDD/BDD ; runner Cucumber
-  global unique (`CucumberTestRunner`), steps préfixés (S-088).
+* Appel LLM en CI : **Ollama caché** (`setup-ollama`, `qwen3.5:0.8b`, port 11466) ou
+  **mock** (préféré pour le déterministe).
+* Nouvelle option → `LangchainConfig`/config + 4 sources + CLI, défaut `false`.
+* **DAG** : plantuml (N2) consomme **N0** (`contracts.*`) et **N1** (codebase) ;
+  **jamais N2→N2**. Repli hors-ligne conservé.
+* English only ; zéro Python ; zéro secret ; baby-step DDD/TDD/BDD ; Cucumber runner
+  global unique, steps préfixés (S-088).
 
 == Rappels
 
 * GroupId `education.cccp` — version `plantuml = "0.0.9"` (catalog ws 0.0.78).
-* Central : 0.0.1, 0.0.2, 0.0.4 (périmé), 0.0.5, 0.0.6, 0.0.7, 0.0.8, **0.0.9 (S-227)**.
-* BOM `workspace-bom` platform **0.0.78** ; contrat N0 `plantuml-contracts:0.0.1`.
-* EPICs : **PLT-AGENT ✅ 7/7**, GBL-010 (G-3), PLT-DIAGRAM-OWNERSHIP (US-6/7).
+* BOM `workspace-bom` **0.0.78** ; N0 `plantuml-contracts:0.0.1`,
+  `i18n-contracts:0.0.4`, **`codebase-contracts:0.0.2`** (à adopter — PLT-CONTEXT).
+* EPICs : **PLT-AGENT ✅ 7/7**, **PLT-CONTEXT 🟡 cadré**, GBL-010 (G-3),
+  PLT-DIAGRAM-OWNERSHIP (US-6/7).

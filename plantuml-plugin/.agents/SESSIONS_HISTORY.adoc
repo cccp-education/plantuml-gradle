@@ -1,5 +1,25 @@
 = Historique des Sessions
 
+== Session 231 (2026-10-12) — Cadrage EPIC PLT-CONTEXT (contexte augmenté via codebase N1) ✅
+
+Question pilote : la génération PlantUML doit-elle être confiée à un **contrat qui
+travaille avec codebase** pour apporter un **contexte augmenté** ? **Audit (gouvernance
+pure, zéro code)** : **non** — plantuml **applique** le plugin `education.cccp.codebase`
+(`build.gradle.kts:26`) mais n'importe **aucun** type `codebase.*` ; son contexte est un
+`DocKnowledgeBase` **statique** (mots-clés sur `docs/plantuml-reference.adoc`, appelé par
+`GraphifyPromptAdapter`) ; **aucun** contrat `contracts.context.*`. plantuml est le
+**retardataire** cross-borough (capsule/planner/slider consomment déjà le socle N1).
+Livrable `.agents/CADRAGE_EPIC_PLT_CONTEXT.adoc` : **contrat N0** `contracts.context.*`
+(`education.cccp:codebase-contracts` 0.0.2) + **moteur N1** codebase ; patron capsule
+(`CapsuleContextBuilder` assembleur pur + `CollectCapsuleAugmentedContextTask` collecteur) ;
+catalogue `CTX-01`→`CTX-05` (~13 pts, 5 US) : contrat N0, `PlantumlContextBuilder`,
+`collectPlantumlAugmentedContext`, wiring `DiagramProcessor` (repli statique conservé),
+option `LlmBuildService` (arbitrage). Frontière DAG : contrat N0, moteur N1, **jamais
+N2→N2**. 8 décisions, 6 options écartées. + BACKLOG/TODO § PLT-CONTEXT. **CI** (même
+session) : suppression du workflow `ci.yml` obsolète (`-p readme-plugin` inexistant),
+cache de l'image testcontainers `pgvector/pgvector:pg15` (`test.yml`). Local = Build ;
+preuve = CI `Test`. Zéro secret, zéro Python. Rapport `.agents/sessions/231-cadrage-plt-context.adoc`.
+
 == Session 230 (2026-10-12) — Implémentation EPIC PLT-AGENT (DIA-01→07) ✅
 
 Décision pilote S-229 : implémenter l'EPIC `PLT-AGENT` **en entier**, Kroki et MCP

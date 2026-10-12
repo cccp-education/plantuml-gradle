@@ -1,0 +1,165 @@
+= CADRAGE EPIC PLT-CONTEXT — Contexte augmenté de génération via codebase (N1)
+:session: 231
+:borough: HTOWN (plantuml-gradle)
+:date: 2026-10-12
+:toc:
+
+_Question pilote (S-231) : la génération de diagrammes PlantUML devrait être confiée
+à un **contrat qui travaille avec codebase** pour apporter un **contexte augmenté**
+(RAG/Graphify/Docs/EAGER). Est-ce déjà le cas ? Sinon, cadrer un EPIC dans
+plantuml-plugin. **Gouvernance pure — zéro code modifié.**_
+
+== 0. Réponse courte
+
+**Non, ce n'est pas le cas.** plantuml **applique** le plugin `education.cccp.codebase`
+(`build.gradle.kts:26`) mais n'importe **aucun** type `codebase.*` ; il possède son
+propre « RAG » **statique** (`DocKnowledgeBase`, recherche par mots-clés sur une
+ressource embarquée) et n'expose/consomme **aucun** contrat de contexte
+(`contracts.context.*`). C'est le **retardataire** cross-borough : capsule, planner et
+slider consomment déjà le hub N1. → **Oui, l'EPIC `PLT-CONTEXT` est fondé.**
+
+== 1. Constat (audit S-231)
+
+[cols="2,4,2", options="header"]
+|===
+| Point | Constat | Preuve
+
+| Dépendance codebase | Le **plugin** `education.cccp.codebase` est appliqué mais **inutilisé** au niveau code (zéro `import codebase.`). | `build.gradle.kts:26` ; `grep "import codebase" src/main` = 0
+| Contexte de génération | **Statique local** : `DocKnowledgeBase` (découpe `docs/plantuml-reference.adoc`, score = nombre de termes communs) ; `GraphifyPromptAdapter` l'appelle (`queryContext`). | `plantuml/rag/DocKnowledgeBase.kt:17-34`
+| RAG | `CollectPlantumlIndexTask` (modes `simulation`/`database`) + `RagIndexer` (test) — **pas** le store N1 codebase. | `plantuml/tasks/CollectPlantumlIndexTask.kt`
+| KG / docs | `GenerateDiagramDocsTask` (graphify → `.prompt`) + `KnowledgeGraphParser/Renderer`. | `plantuml/tasks/GenerateDiagramDocsTask.kt`
+| Contrats N0 | Seuls `contracts.plantuml.*` (traduction/validation) et `contracts.i18n.*`. **Aucun** `contracts.context.*`. | `import contracts.` dans `boundary/`, `service/`
+| LLM | `LlmService` **local** (création directe des 7 providers + pool de clés + fallback cross-provider). | `plantuml/service/LlmService.kt`
+|===
+
+== 2. Le patron cross-borough (N1 codebase)
+
+Les boroughs N2 de contenu consomment déjà le socle N1 via un **contrat N0** :
+
+[cols="2,3,4", options="header"]
+|===
+| Artefact | Rôle | Contenu
+
+| **N0** `education.cccp:codebase-contracts` **0.0.2** | le **contrat** (seam provider-agnostique) | `contracts.context.CompositeContext`, `ContextChannel`, `ChannelBudget`, `CompositeContextConfig` (+ `toChannels`/`channelsWithBudget`/`estimateTokens`)
+| **N1** `codebase.rag.CompositeContextBuilder` | le **moteur** d'assemblage | `build(ragQuestion)` / `buildScoped(borough, ragQuestion)` → `CompositeContext`
+| **N1** `codebase.store.RagVectorStore` | le **store** pgvector partagé | `searchBlocking(query, topK)`, `searchWithDoubt`, `ingestWithDoubt`, `RetrieveResult`
+| **N1** `codebase.koog.llm.service.LlmBuildService` | le **hub LLM** (BuildService Gradle) | consommé par slider (SLD-8 US-8.1) et planner (PLN-LLM-HUB)
+|===
+
+*Patron N2 de référence — capsule* (`CAP-ARCH` → `CAP-DOCCONTEXT` → `CAP-GLOSSARY`,
+`CAP-PROVENANCE`) :
+* `CapsuleContextBuilder` — **objet pur** au-dessus du contrat N0 :
+  `build(composite, budget, scenarioSection, glossarySection, tracker)` →
+  `CapsuleContext` (bloc sectionné prêt pour le prompt) ;
+* `CollectCapsuleAugmentedContextTask` — tâche Gradle : EAGER (`INDEX/PROMPT_REPRISE/
+  AGENT.adoc`) + canaux **RAG/Graphify/Docs** injectés par `-Pcontext.*`, budgetés,
+  rendus → `build/capsule/augmented-context.txt` + `context-provenance.json`.
+
+plantuml est le **seul** borough de génération à ne pas consommer ce patron.
+
+== 3. Décision — EPIC `PLT-CONTEXT`
+
+*Objet* : confier le **contexte augmenté de génération** de plantuml au **contrat N0
+`contracts.context.*`** (codebase-contracts) alimenté par le socle **N1 codebase**, en
+suivant le patron capsule — au lieu du `DocKnowledgeBase` statique.
+
+*Frontière (DAG)* : le **contrat** est N0 (`codebase-contracts`, provider-agnostique) ;
+le **moteur** est N1 (codebase). plantuml **ne dépend jamais d'un autre N2** (codex).
+Le `DocKnowledgeBase` statique est **conservé en repli** (dégradation hors-ligne, quand
+aucun canal n'est fourni).
+
+*Priorité* : 🟠 HAUTE — aligne plantuml sur l'architecture « contexte augmenté » et
+remplace un RAG jouet par le socle partagé (qualité de génération + anti-hallucination).
+
+*Charge* : ~13 pts (5 items + BDD).
+
+== 4. Non-régression (charte, opposable à chaque US)
+
+* **Validation native hors-ligne** (`PlantumlService`) et **boucle** `DiagramProcessor`
+  (récemment enrichie par `PLT-AGENT`) : **inchangées**.
+* **Multi-provider + pool + fallback** (`LlmService`) : préservé (sauf arbitrage CTX-05).
+* **i18n** 10 langues (`PlantumlMessages`), **toolchain gouvernée** (`PlantUmlToolchain`),
+  **probe anti-blanc**, **incrémentalité** + **Économie d'Encre**, **contrats N0** déjà
+  consommés (`plantuml-contracts`, `i18n-contracts`) : préservés.
+* **Dégradation** : sans contexte (ou hors-ligne), la génération fonctionne comme
+  aujourd'hui (repli `DocKnowledgeBase`).
+
+== 5. Catalogue `CTX-01` → `CTX-05`
+
+[cols="1,4,2,1", options="header"]
+|===
+| ID | Objet | Cible | Pts
+
+| CTX-01 | **Adopter le contrat N0** `codebase-contracts` (`contracts.context.*`) : `implementation(libs.codebase.contracts)` ; retirer/compléter le plugin codebase inert. | `build.gradle.kts` | 1
+| CTX-02 | **Assembleur pur** `plantuml.context.PlantumlContextBuilder` (mirror `CapsuleContextBuilder`) : `build(composite, budget, ...)` → bloc sectionné prompt-ready ; canaux EAGER/RAG/GRAPHIFY/DOCS via `CompositeContext.toChannels` + `channelsWithBudget`. | `plantuml.context` | 3
+| CTX-03 | **Collecteur** `collectPlantumlAugmentedContext` (mirror `CollectCapsuleAugmentedContextTask`) : EAGER (fichiers du consommateur) + canaux RAG/Graphify/Docs injectés (`-Pcontext.*`) → `build/plantuml/augmented-context.txt` ; Économie d'Encre (artefact réutilisé, invalidation ciblée). | tâche Gradle | 3
+| CTX-04 | **Wiring `DiagramProcessor`** : injecter le contexte augmenté dans le prompt de génération (canal RAG/Docs) ; `DocKnowledgeBase` devient **repli** si aucun contexte. | `DiagramProcessor`, prompt | 3
+| CTX-05 | *(optionnel, arbitrage)* consommer `codebase.koog.llm.service.LlmBuildService` (hub N1) au lieu de `LlmService` local — alignement cross-borough (pattern slider/planner). | `LlmService` | 3
+|===
+
+*Total* : ~13 pts. `CTX-06` (BDD + provenance anti-hallucination) est absorbé dans
+CTX-02/03/04 (scénarios `@context`).
+
+== 6. Décisions
+
+. **D-1 — Contrat = N0.** Le seam est `contracts.context.*` (`codebase-contracts`),
+  provider-agnostique ; pas de type `codebase.*` importé par le domaine.
+. **D-2 — Patron capsule.** Assembleur **pur** (CTX-02) + **collecteur** Gradle (CTX-03) ;
+  réutilise `ContextChannel`/`ChannelBudget` (budget 8000, 40/30/20/10).
+. **D-3 — Repli statique conservé.** `DocKnowledgeBase` = dégradation hors-ligne.
+. **D-4 — Économie d'Encre.** L'artefact `augmented-context.txt` est réutilisé ;
+  invalidation ciblée (fichiers source changés), jamais globale.
+. **D-5 — `LlmBuildService` = option à arbitrer.** CTX-05 n'est pas un prérequis ;
+  le pool de clés local de plantuml est riche — décision pilote requise.
+. **D-6 — Provenance.** Le collecteur émet la traçabilité (anti-hallucination), comme
+  capsule (`CAP-PROVENANCE`).
+. **D-7 — English only, 4 sources, défaut off** pour toute nouvelle option.
+. **D-8 — Local = Build, Tests = CI** ; appel LLM en CI = Ollama caché (`setup-ollama`)
+  ou **mock**.
+
+== 7. Options écartées
+
+[cols="2,5", options="header"]
+|===
+| Option | Raison de l'écart
+
+| Dépendre directement de `codebase-plugin` (N1) pour **tout** | Couplage Gradle lourd ; le **contrat N0** suffit pour le seam (patron capsule). Le RAG réel reste fourni par le hub N1 côté wiring.
+| Contrat **N2→N2** (codex/diagrammes) | Violation du DAG (interdit).
+| Nouveau contrat N0 **contexte spécifique plantuml** | `codebase-contracts` (`contracts.context.*`) couvre déjà le besoin (5 canaux) ; pas de duplication.
+| Remplacer `DocKnowledgeBase` d'emblée | Perte du repli hors-ligne ; il devient simplement **primaire → repli**.
+| RAG pgvector maison dans plantuml | Le store partagé est **N1 codebase** (pattern CDX-RAG-SOCLE) ; ne pas ré-implémenter.
+|===
+
+== 8. Découpage US proposé
+
+[cols="1,4,1,1", options="header"]
+|===
+| US | Objet | Pts | Ordre
+
+| US-0 | Cadrage + décisions (ce document) | 0 | 1
+| US-1 | **CTX-01** contrat N0 `codebase-contracts` | 1 | 2
+| US-2 | **CTX-02** assembleur pur `PlantumlContextBuilder` | 3 | 3
+| US-3 | **CTX-03** collecteur `collectPlantumlAugmentedContext` | 3 | 4
+| US-4 | **CTX-04** wiring `DiagramProcessor` + repli statique | 3 | 5
+| US-5 | **CTX-05** *(optionnel)* hub `LlmBuildService` (arbitrage pilote) | 3 | 6
+|===
+
+== 9. Reste à faire
+
+. [ ] Arbitrage pilote : périmètre (CTX-05 inclus ?) et ordre.
+. [ ] Vérifier `codebase-contracts:0.0.2` sur Central (`education.cccp`) + alignement BOM.
+. [ ] Confirmer la source des canaux RAG/Graphify (injection `-Pcontext.*` vs artefact
+  produit par codebase `prepareContext`/`CompositeContextBuilder`).
+. [ ] Session suivante : démarrer US-1/US-2.
+
+== 10. Traçabilité
+
+* Audit S-231 : `build.gradle.kts:26` ; `plantuml/rag/DocKnowledgeBase.kt` ;
+  `plantuml/service/GraphifyPromptAdapter.kt` ; `plantuml/tasks/CollectPlantumlIndexTask.kt` ;
+  `plantuml/service/LlmService.kt`.
+* Patron : `capsule/context/CapsuleContextBuilder.kt`,
+  `capsule/context/CollectCapsuleAugmentedContextTask.kt`.
+* N0 : `workspace-bom/codebase-contracts/src/main/kotlin/contracts/context/*` (0.0.2).
+* N1 : `codebase-gradle/codebase-plugin/src/main/kotlin/codebase/rag/CompositeContextBuilder.kt`,
+  `codebase/store/RagVectorStore.kt`, `codebase/koog/llm/service/LlmBuildService.kt`.
+* Cadrages liés : `PLT-AGENT` (S-228/S-229/S-230), `PLT-DIAGRAM-OWNERSHIP`, `GBL-010`.
