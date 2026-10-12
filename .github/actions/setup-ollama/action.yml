@@ -1,0 +1,99 @@
+name: Setup Ollama (cached image + model)
+description: >-
+  Restore the Ollama Docker image and its model weights from the GitHub Actions
+  cache, start the server, and pull the model only when it is missing — so the
+  image (~1.6 GB) and the model are never re-downloaded on each run. Used by the
+  non-faked LLM test workflow (`real_llm_test.yml`).
+
+inputs:
+  image:
+    description: Ollama Docker image tag.
+    required: false
+    default: ollama/ollama:latest
+  model:
+    description: Model to make available (small CI model by default).
+    required: false
+    default: qwen3.5:0.8b
+  port:
+    description: >-
+      Host port mapped to the container's 11434. 11466 is the dedicated CI port
+      (governance: CI integration ports 11466-11467, outside the 11437-11462 rotation).
+    required: false
+    default: "11466"
+
+runs:
+  using: composite
+  steps:
+    # ── Docker image cache ───────────────────────────────────────────────
+    # Hosted runners are re-provisioned on every run; `docker pull` would fetch
+    # ~1.6 GB each time. We cache a `docker save` tar instead.
+    - name: Restore cached Ollama image
+      id: image-cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ runner.temp }}/ollama-image.tar
+        key: ollama-image-${{ runner.os }}-${{ inputs.image }}
+
+    - name: Load or pull the Ollama image
+      shell: bash
+      run: |
+        set -euo pipefail
+        tar="${{ runner.temp }}/ollama-image.tar"
+        if [ -f "$tar" ]; then
+          echo "Restoring Ollama image from cache"
+          docker load -i "$tar"
+        else
+          echo "Cache miss — pulling ${{ inputs.image }}"
+          docker pull "${{ inputs.image }}"
+          docker save "${{ inputs.image }}" -o "$tar"
+        fi
+
+    # ── Model weights cache ──────────────────────────────────────────────
+    # `ollama pull` downloads the weights. The models live under ~/.ollama/models
+    # and are archived between runs.
+    - name: Restore cached Ollama models
+      id: model-cache
+      uses: actions/cache@v4
+      with:
+        path: ~/.ollama/models
+        key: ollama-models-${{ runner.os }}-${{ inputs.model }}
+
+    - name: Start Ollama
+      shell: bash
+      run: |
+        set -euo pipefail
+        mkdir -p ~/.ollama
+        docker rm -f ollama >/dev/null 2>&1 || true
+        docker run -d --name ollama \
+          -p ${{ inputs.port }}:11434 \
+          -v "$HOME/.ollama:/root/.ollama" \
+          ${{ inputs.image }}
+        echo "Waiting for the Ollama API…"
+        for _ in $(seq 1 30); do
+          if curl -sf "http://localhost:${{ inputs.port }}/api/tags" >/dev/null; then
+            echo "Ollama is up"
+            exit 0
+          fi
+          sleep 2
+        done
+        echo "Ollama did not become ready in time" >&2
+        docker logs ollama >&2 || true
+        exit 1
+
+    - name: Pull the model if missing
+      shell: bash
+      run: |
+        set -euo pipefail
+        if curl -sf "http://localhost:${{ inputs.port }}/api/tags" | grep -q "${{ inputs.model }}"; then
+          echo "Model ${{ inputs.model }} already present in cache"
+        else
+          echo "Pulling model ${{ inputs.model }}"
+          docker exec ollama ollama pull "${{ inputs.model }}"
+        fi
+
+    # The container writes the model store as root; hand it back to the runner
+    # user so actions/cache can archive it on the next run.
+    - name: Hand model store back to the runner user
+      if: always()
+      shell: bash
+      run: sudo chown -R "$(id -u):$(id -g)" "$HOME/.ollama" || true

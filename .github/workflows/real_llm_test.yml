@@ -8,9 +8,10 @@ name: Real LLM Test
 #   PLANTUML_REAL_CONTEXT_YML  — full plantuml-real-context.yml content
 #                                (copy plantuml-real-context.example.yml,
 #                                 fill in real API keys, base64-encode not needed)
-#   Optional env overrides:
-#   OLLAMA_BASE_URL           — Ollama endpoint (default http://localhost:11438)
-#   OLLAMA_MODEL              — Ollama model (default smollm:135m)
+#   The workflow starts a cached Ollama container (image + model cached via
+#   `.github/actions/setup-ollama`) on the dedicated CI port 11466 with the small
+#   model qwen3.5:0.8b, and points the plugin at it with PLANTUML_OLLAMA_BASE_URL /
+#   PLANTUML_OLLAMA_MODEL_NAME (override via env to use another endpoint/model).
 #
 # Trigger manually from Actions tab:
 #   ./gradlew functionalTest -Ptest.tags="real-llm"
@@ -37,6 +38,9 @@ jobs:
     env:
       PLANTUML_TEST_MODE: "true"
       PLANTUML_REAL_TEST: "true"
+      # Non-faked LLM calls go to the cached Ollama server started below (CI port 11466).
+      PLANTUML_OLLAMA_BASE_URL: "http://localhost:11466"
+      PLANTUML_OLLAMA_MODEL_NAME: "qwen3.5:0.8b"
 
     steps:
       - name: Checkout repository
@@ -71,6 +75,14 @@ jobs:
 
       - name: Publish plugin to local Maven
         run: ./gradlew -p plantuml-plugin publishToMavenLocal --no-daemon
+
+      # Ollama image + model are cached (docker save/load + ~/.ollama/models) so the
+      # ~1.6 GB image and the model weights are never re-downloaded on each run.
+      - name: Setup Ollama (cached image + model)
+        uses: ./.github/actions/setup-ollama
+        with:
+          model: qwen3.5:0.8b
+          port: "11466"
 
       - name: Inject real context from secret
         run: |
