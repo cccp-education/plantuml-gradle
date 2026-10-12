@@ -69,4 +69,22 @@ class PlantumlContextBuilderTest {
     fun `default budget is the N0 budget`() {
         assertThat(PlantumlContextBuilder.defaultBudget()).isEqualTo(ChannelBudget())
     }
+
+    @Test
+    fun `the builder prunes the tracker to the surviving channels`() {
+        val tracker = ProvenanceTracker()
+        tracker.trackChannel("EAGER", listOf(ProvenanceSource("INDEX.adoc", chars = 10, tokens = 2)))
+        tracker.trackChannel("RAG", listOf(ProvenanceSource("rag-injected", chars = 20, tokens = 5)))
+        tracker.trackChannel("GRAPHIFY", listOf(ProvenanceSource("graphify-injected", chars = 30, tokens = 8)))
+
+        PlantumlContextBuilder.build(composite(rag = "only-rag"), tracker = tracker)
+
+        assertThat(tracker.build().channels.map { it.channel }).containsExactly("RAG")
+    }
+
+    @Test
+    fun `a null tracker leaves the build untracked`() {
+        val context = PlantumlContextBuilder.build(composite(eager = "rules"))
+        assertThat(context.nonEmptyCount).isEqualTo(1)
+    }
 }

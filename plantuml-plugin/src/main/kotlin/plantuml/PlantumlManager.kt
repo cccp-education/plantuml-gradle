@@ -3,8 +3,10 @@ package plantuml
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import contracts.context.ContextChannel
 import org.gradle.api.Project
 import plantuml.PlantumlPlugin.PlantumlExtension
+import plantuml.tasks.CollectPlantumlAugmentedContextTask
 import plantuml.tasks.GeneratePlantumlDiagramsTask
 import plantuml.tasks.CollectPlantumlIndexTask
 import plantuml.tasks.ValidatePlantumlSyntaxTask
@@ -93,6 +95,41 @@ object PlantumlManager {
             project.tasks.register("generateDiagramDocs", GenerateDiagramDocsTask::class.java)
             project.tasks.register("generateKnowledgeGraphDiagram", GenerateKnowledgeGraphDiagramTask::class.java)
             project.tasks.register("preflightPlantumlDescription", PreflightPlantumlDescriptionTask::class.java)
+            registerCollectAugmentedContextTask(project)
+        }
+
+        /**
+         * Registers `collectPlantumlAugmentedContext` (EPIC PLT-CONTEXT, CTX-03).
+         *
+         * EAGER governance files come from the consumer project root; the
+         * RAG/Graphify/Docs channels are injected via `-Pcontext.*` properties
+         * (CTX-04 will consume the rendered artefact). Outputs live under
+         * `build/plantuml/` — declared Gradle-native, so the task is UP-TO-DATE
+         * when nothing changed (law of economy of ink).
+         */
+        private fun registerCollectAugmentedContextTask(project: Project) {
+            project.tasks.register(
+                "collectPlantumlAugmentedContext",
+                CollectPlantumlAugmentedContextTask::class.java,
+            ) { task ->
+                val lang = PlantumlManager.resolveLanguage(project)
+                task.group = PlantumlMessages.get("task.context.group", lang)
+                task.description = PlantumlMessages.get("task.context.description", lang)
+                task.eagerFiles.from(
+                    project.layout.projectDirectory.file(".agents/INDEX.adoc"),
+                    project.layout.projectDirectory.file("PROMPT_REPRISE.adoc"),
+                    project.layout.projectDirectory.file("AGENT.adoc"),
+                )
+                task.ragContent.set(project.findProperty("context.ragContent")?.toString().orEmpty())
+                task.graphifyContent.set(project.findProperty("context.graphifyContent")?.toString().orEmpty())
+                task.docsContent.set(project.findProperty("context.docsContent")?.toString().orEmpty())
+                task.tokenBudget.set(
+                    project.findProperty("context.tokenBudget")?.toString()?.toIntOrNull()
+                        ?: ContextChannel.DEFAULT_TOKEN_BUDGET,
+                )
+                task.outputFile.set(project.layout.buildDirectory.file("plantuml/augmented-context.txt"))
+                task.provenanceFile.set(project.layout.buildDirectory.file("plantuml/context-provenance.json"))
+            }
         }
     }
 

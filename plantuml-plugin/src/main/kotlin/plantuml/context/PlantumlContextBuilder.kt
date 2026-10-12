@@ -61,12 +61,23 @@ object PlantumlContextBuilder {
     /**
      * Assembles the augmented context for a PlantUML generation: budgets the composite
      * channels via [channelsWithBudget], drops the empty ones and renders the survivors.
+     *
+     * When [tracker] is non-null (decision D-6, CTX-03), it is pruned to the channels
+     * that survived the budget. The collector tracks the sources per channel before
+     * calling this method, and the builder signals which channel names are still alive
+     * via [ProvenanceTracker.retainOnly]. The builder does NOT compute sources — it only
+     * validates the surviving channel names (the collector owns the source [java.io.File]
+     * objects). Backward compatible: a null [tracker] (default) performs no tracking.
      */
     fun build(
         composite: CompositeContext,
         budget: ChannelBudget = defaultBudget(),
+        tracker: ProvenanceTracker? = null,
     ): PlantumlContext {
         val channels = composite.channelsWithBudget(budget).filter { it.isNotEmpty() }
+        if (tracker != null) {
+            tracker.retainOnly(channels.map { it.type.name }.toSet())
+        }
         return PlantumlContext(channels = channels, rendered = merge(channels))
     }
 
