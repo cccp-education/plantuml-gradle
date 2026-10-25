@@ -66,13 +66,23 @@ class PlantumlTranslationPortAdapterTest {
     }
 
     @Test
-    fun `keeps a real newline returned by the provider for a note`() {
+    fun `escapes a real newline returned by the provider for a single-line note`() {
         val adapter = port(mapOf("Bonjour" to "Hello\nWorld"))
         val block = PlantUmlBlock("@startuml\nnote right of B : Bonjour\n@enduml")
         val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
         val raw = (outcome as PlantUmlTranslationOutcome.Translated).block.raw
-        assertTrue(raw.contains("Hello\nWorld"), "a note keeps real newlines (no \\n escape): $raw")
-        assertTrue(!raw.contains("\\n"), "a note must not be escaped like a quoted label")
+        assertTrue(raw.contains("Hello\\nWorld"), "a single-line note must escape the newline: $raw")
+        assertTrue(!raw.contains("Hello\nWorld"), "a raw line break must not survive in a single-line note")
+    }
+
+    @Test
+    fun `keeps a real newline returned by the provider for a multi-line note body`() {
+        val adapter = port(mapOf("Bonjour" to "Hello\nWorld"))
+        val block = PlantUmlBlock("@startuml\nnote right of B\n  Bonjour\nend note\n@enduml")
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+        val raw = (outcome as PlantUmlTranslationOutcome.Translated).block.raw
+        assertTrue(raw.contains("Hello\nWorld"), "a note body keeps real newlines: $raw")
+        assertTrue(!raw.contains("Hello\\nWorld"), "a multi-line note body must not be escaped")
     }
 
     @Test

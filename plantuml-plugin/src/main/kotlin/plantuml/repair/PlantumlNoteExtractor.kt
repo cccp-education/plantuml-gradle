@@ -3,10 +3,16 @@ package plantuml.repair
 /**
  * A PlantUML `note` occurrence: the [raw] substring as it appears in the source
  * (the in-place region to replace) and its trimmed [text] (the translatable prose).
+ *
+ * [singleLine] is the grammar discriminator: the colon form `note right: text`
+ * is one physical line (a real newline breaks the diagram), while the block form
+ * `note right … end note` legitimately spans lines. The translation port must
+ * escape newlines for the former and keep them for the latter.
  */
 data class PlantumlNote(
     val raw: String,
     val text: String,
+    val singleLine: Boolean,
 )
 
 /**
@@ -66,7 +72,7 @@ object PlantumlNoteExtractor {
             if (separator >= 0) {
                 rest.substring(separator + 1).trim()
                     .takeIf { it.isNotEmpty() }
-                    ?.let { collected.add(PlantumlNote(raw = it, text = it)) }
+                    ?.let { collected.add(PlantumlNote(raw = it, text = it, singleLine = true)) }
             } else {
                 inNote = true
                 rawBody.clear()
@@ -90,7 +96,7 @@ object PlantumlNoteExtractor {
     ) {
         val text = textBody.toString()
         if (text.isNotEmpty()) {
-            collected.add(PlantumlNote(raw = rawBody.toString(), text = text))
+            collected.add(PlantumlNote(raw = rawBody.toString(), text = text, singleLine = false))
         }
         rawBody.clear()
         textBody.clear()

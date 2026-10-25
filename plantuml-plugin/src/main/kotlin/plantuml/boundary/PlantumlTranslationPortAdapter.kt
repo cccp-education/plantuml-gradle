@@ -87,13 +87,16 @@ class PlantumlTranslationPortAdapter(
             changed = changed || quotedChanged || directiveChanged
         }
 
-        // GBL-010 G-3 — translate the note prose in place. A note is prose, so a
-        // real newline returned by the provider is KEPT (unlike a quoted label,
-        // which requires the `\n` escape): the note grammar allows line breaks.
+        // GBL-010 G-3 — translate the note prose in place. The colon form
+        // (`note right: text`) is ONE physical line in PlantUML: a real newline
+        // returned by the provider breaks the diagram (`Syntax Error?`). Only the
+        // block form (`note right … end note`) allows real line breaks. This is
+        // the CHE-DIAGRAM variant corruption (S-076).
         for (note in notes) {
             val resolved = translateLabel(note.text, request.sourceLanguage, request.targetLanguage) ?: continue
             if (resolved == note.text) continue
-            val replaced = raw.replace(note.raw, resolved)
+            val replacement = if (note.singleLine) PlantumlLabelIntegrity.escapeNewlines(resolved) else resolved
+            val replaced = raw.replace(note.raw, replacement)
             if (replaced != raw) {
                 raw = replaced
                 changed = true

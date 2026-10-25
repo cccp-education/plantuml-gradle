@@ -68,6 +68,7 @@ class PlantumlNoteExtractorTest {
         val occurrence = PlantumlNoteExtractor.occurrences(source).single()
         assertEquals("This is a note", occurrence.raw)
         assertEquals("This is a note", occurrence.text)
+        assertTrue(occurrence.singleLine)
     }
 
     @Test
@@ -77,5 +78,6 @@ class PlantumlNoteExtractorTest {
         assertEquals("  line one\n  line two", occurrence.raw)
         assertEquals("line one\nline two", occurrence.text)
         assertTrue(source.contains(occurrence.raw), "the raw region must be an exact substring of the source")
+        assertFalse(occurrence.singleLine)
     }
 }
