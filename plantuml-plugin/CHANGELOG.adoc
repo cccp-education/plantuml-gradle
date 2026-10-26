@@ -5,6 +5,27 @@ Tous les changements notables apportés à ce projet seront documentés dans ce 
 Le format est basé sur link:https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 et ce projet adhère au versionnage sémantique link:https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
+== [0.0.11] — 2026-10-26
+
+=== Ajouté
+
+* **PLT-TERM-PROTECTION** — `PlantumlTermShield` : les types primitifs
+  (`integer`, `String`, `boolean`…), les jetons de code (fichiers, chemins,
+  options Gradle, identifiants, versions, couleurs, spans backtickés) et les
+  termes client enregistrés sont remplacés par `__PLTn__` avant la traduction,
+  puis restaurés. Un placeholder perdu préserve le label source (jamais de
+  corruption).
+* `PlantumlProseLabelExtractor` : surface les labels non quotés que le N0
+  `PlantUmlBlock.labels()` ne voit pas — messages de séquence (`A -> B : …`),
+  activités (`:…;`), descriptions d'état (`state X : …`).
+* `PlantumlTranslationPortAdapter` : labels, notes et prose passent par le
+  bouclier ; le batching `PlantumlLabelBatch` est conservé.
+
+=== Corrigé
+
+* Les labels `note … :` mono-ligne échappent désormais les retours à la ligne
+  réels (`\n`) ; seuls les corps de notes multi-lignes les conservent.
+
 == [0.0.10] — 2026-10-13
 
 === Modifié
