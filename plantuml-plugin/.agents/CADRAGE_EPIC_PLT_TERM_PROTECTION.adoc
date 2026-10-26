@@ -75,22 +75,22 @@ non traduisible.
 | US-1
 | `PlantumlTermShield` (protection/restauration, placeholders, fallback)
 | 2
-| 🟡 S-244
+| ✅ S-244
 
 | US-2
 | `PlantumlProseLabelExtractor` (séquence/activité/état)
 | 2
-| 🟡 S-244
+| ✅ S-244
 
 | US-3
 | Câblage `PlantumlTranslationPortAdapter` (labels + notes + prose, batching)
 | 2
-| 🟡 S-244
+| ✅ S-244
 
 | US-4
 | Tests BDD `@plantuml-term-protection` + fonctionnel validateur
 | 1
-| 🟡 S-244
+| ✅ S-244
 
 | US-5
 | cheroliv.com : détecteur de diagrammes incomplets + re-traduction ciblée (session ultérieure)
@@ -109,3 +109,33 @@ non traduisible.
 * `src/functionalTest/kotlin/plantuml/PlantumlTermProtectionFunctionalTest.kt` (nouveau)
 * `src/test/features/35_plantuml_term_protection.feature` (nouveau)
 * `src/test/scenarios/plantuml/scenarios/PlantumlTermProtectionSteps.kt` (nouveau)
+
+== Analyse `bakery-plugin/.agents/i18n_review.adoc` (S-244) — prise en compte
+
+L'audit pilote confirme le diagnostic et **déplace la priorité** : le problème
+n'est pas la traduction (le `PlantumlTermShield` est jugé « le meilleur morceau
+du dispositif ») mais le **contrat de sortie** — `reportConvergence` mesure le
+store (`0 PENDING / 0 cassé`), pas l'artefact publié. C'est un faux vert
+(S-269/S-243). Les défauts mesurés au live : sentinelles LLM (30 fichiers),
+`toc::[]` traduite (142), `options="header"` perdu (0/21), duplication (4 EN
+> 150 %, jusqu'à 9 HI), diagrammes bruts (0108 EN = 9, JA = 17), résidus FR
+dans les diagrammes (alt/labels), SEO localisé non câblé, RTL absent.
+
+Décision de séquencement (révisée) :
+
+. **P0.3 — gate rendu diagramme** : zéro `@startuml` brut dans les variantes
+  bakées (hors `[source,plantuml]`), σ>0 sur les SVG. Prérequis de toute
+  re-traduction (sinon nouveau faux vert).
+. **P0.2 — gate langue + sentinelle + preserve-rule** : refus LLM, placeholders
+  `__PLT`, macros `toc::`/`include::`/`image::`, `options="header"`.
+. **P0.1 — gate intégrité structurelle AST** : squelette variante vs FR
+  (tables, macros, ids de diagrammes, sections, ratio de duplication).
+. **P2 — contrat N0 `PreserveRule`/`TranslatableRegion`** : convergence
+  `SwitcherBlockMask` (bakery), `TextTranslatableClassifier` (document),
+  `PlantumlTermShield` (plantuml) sur un seul contrat (seuil à 2).
+. **US-5 — re-traduction cheroliv** : release plantuml 0.0.11 → BOM/catalog
+  → run delta ciblé, **uniquement après P0.3/P0.2**, et vérifiée par les gates.
+
+Conséquence immédiate : **aucun run LLM metered dans cette session** ; US-5
+reste ⏳ et sera exécutée dans une session dédiée (release + gates).
+
