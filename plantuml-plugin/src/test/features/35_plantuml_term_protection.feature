@@ -26,3 +26,19 @@ Feature: PlantUML term protection (EPIC PLT-TERM-PROTECTION)
     And the term translator maps "Le type __PLT0__ est utilisé" to "The type is used"
     When the block is translated with term protection
     Then the block translation is preserved
+
+  @plantuml-term-protection
+  Scenario: A use-case actor and use case are translated
+    Given a protected use-case block ":Utilisateur: --> (Rédiger documentation)"
+    And the term translator maps "Utilisateur" to "User"
+    And the term translator maps "Rédiger documentation" to "Write documentation"
+    When the block is translated with term protection
+    Then the protected block contains ":User: --> (Write documentation)"
+
+  @plantuml-term-protection
+  Scenario: A mindmap node is translated and a product name is preserved
+    Given a protected mindmap block
+    And the term translator maps "Syntaxe" to "Syntax"
+    When the block is translated with term protection
+    Then the protected block contains "* Syntax"
+    Then the protected block contains "** PlantUML"

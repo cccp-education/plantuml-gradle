@@ -5,6 +5,18 @@ Tous les changements notables apportés à ce projet seront documentés dans ce 
 Le format est basé sur link:https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 et ce projet adhère au versionnage sémantique link:https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
+== [0.0.12] — 2026-10-26
+
+=== Ajouté
+
+* `PlantumlProseLabelExtractor` couvre les **use cases** (`:Utilisateur: -->
+  (Rédiger documentation)`, `(A) ..> (B) : inclut`) et les **mindmaps/WBS**
+  (`* Syntaxe`, `** PlantUML`). Les noms d'acteurs, de cas d'utilisation et de
+  nœuds sont traduits ; les noms produits/code restent protégés.
+* `PlantumlTermShield` protège aussi les appels de fonction (`getUser()`,
+  `call(x)`) — un message de séquence purement code n'est jamais envoyé au
+  provider.
+
 == [0.0.11] — 2026-10-26
 
 === Ajouté

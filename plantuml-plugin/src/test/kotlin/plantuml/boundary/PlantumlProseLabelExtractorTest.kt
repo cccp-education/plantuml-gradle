@@ -77,4 +77,35 @@ class PlantumlProseLabelExtractorTest {
 
         assertEquals(listOf("getUser()"), PlantumlProseLabelExtractor.texts(source))
     }
+
+    @Test
+    fun `extracts the actor and use cases of a use-case diagram`() {
+        val source = "@startuml\n:Utilisateur: --> (Rédiger documentation)\n@enduml"
+
+        assertEquals(listOf("Utilisateur", "Rédiger documentation"), PlantumlProseLabelExtractor.texts(source))
+    }
+
+    @Test
+    fun `extracts both use cases of a use-case relation`() {
+        val source = "@startuml\n(Rédiger documentation) ..> (Générer PDF) : inclut\n@enduml"
+
+        assertEquals(
+            listOf("Rédiger documentation", "Générer PDF", "inclut"),
+            PlantumlProseLabelExtractor.texts(source),
+        )
+    }
+
+    @Test
+    fun `extracts mindmap node labels`() {
+        val source = "@startmindmap\n* AsciiDoc\n** Syntaxe\n*** Titres\n@endmindmap"
+
+        assertEquals(listOf("AsciiDoc", "Syntaxe", "Titres"), PlantumlProseLabelExtractor.texts(source))
+    }
+
+    @Test
+    fun `a sequence message with parentheses is not mistaken for a use case`() {
+        val source = "@startuml\nA -> B : call(x)\n@enduml"
+
+        assertEquals(listOf("call(x)"), PlantumlProseLabelExtractor.texts(source))
+    }
 }

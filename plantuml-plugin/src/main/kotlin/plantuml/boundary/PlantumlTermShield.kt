@@ -188,6 +188,8 @@ class PlantumlTermShield(
                 Regex("""\b[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)+\b"""),
                 // generic types
                 Regex("""\b[A-Z]\w*<[^<>\n]+>"""),
+                // function/method calls (`getUser()`, `call(x)`)
+                Regex("""\b[A-Za-z_]\w*\([^()\n]*\)"""),
                 // SCREAMING_SNAKE constants
                 Regex("""\b[A-Z][A-Z0-9_]{2,}\b"""),
                 // snake_case identifiers

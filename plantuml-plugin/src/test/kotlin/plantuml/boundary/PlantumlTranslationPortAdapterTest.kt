@@ -168,6 +168,35 @@ class PlantumlTranslationPortAdapterTest {
     }
 
     @Test
+    fun `translates the actor and use case of a use-case diagram`() {
+        val adapter =
+            port(
+                mapOf(
+                    "Utilisateur" to "User",
+                    "Rédiger documentation" to "Write documentation",
+                ),
+            )
+        val block = PlantUmlBlock("@startuml\n:Utilisateur: --> (Rédiger documentation)\n@enduml")
+
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+
+        val raw = (outcome as PlantUmlTranslationOutcome.Translated).block.raw
+        assertTrue(raw.contains(":User: --> (Write documentation)"), raw)
+    }
+
+    @Test
+    fun `translates a mindmap node and preserves a protected product name`() {
+        val adapter = port(mapOf("Syntaxe" to "Syntax"))
+        val block = PlantUmlBlock("@startmindmap\n* Syntaxe\n** PlantUML\n@endmindmap")
+
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+
+        val raw = (outcome as PlantUmlTranslationOutcome.Translated).block.raw
+        assertTrue(raw.contains("* Syntax"), raw)
+        assertTrue(raw.contains("** PlantUML"), raw)
+    }
+
+    @Test
     fun `empty block is preserved`() {
         val adapter = port(emptyMap())
         val outcome = adapter.translate(PlantUmlTranslationRequest(PlantUmlBlock(""), "fr", "en"))

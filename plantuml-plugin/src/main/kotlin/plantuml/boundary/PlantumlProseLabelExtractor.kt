@@ -22,6 +22,8 @@ data class PlantumlProseLabel(
  *  - sequence message: `A -> B : Lance le terminal`
  *  - activity label:   `:Créer le fichier;`
  *  - state description: `state Ready : Prêt`
+ *  - use case:         `:Utilisateur: --> (Rédiger documentation)`
+ *  - mindmap node:     `* Syntaxe`
  *
  * Deliberately conservative: quoted labels, directives (`title`…), notes and
  * `legend … endlegend` blocks are not returned (they have their own owner). A
@@ -40,6 +42,20 @@ object PlantumlProseLabelExtractor {
     /** `state X : description` */
     private val STATE_DESCRIPTION = Regex("""^\s*state\s+\S+\s*:\s*(?<text>.+?)\s*$""")
 
+    /** `:Actor: --> (Use case)` — the actor and the parenthesized use cases. */
+    private val USE_CASE_ACTOR_LINE =
+        Regex("""^\s*:\s*(?<actor>[^:\n]+?)\s*:\s*(?:-->|->|\.\.>).*""")
+
+    /** `(Use case) ..> (Other case)` — the parenthesized use cases. */
+    private val USE_CASE_LINE = Regex("""^\s*\([^)\n]+\)\s*(?:-->|->|\.\.>).*""")
+
+    private val PARENTHESIZED = Regex("""\((?<name>[^)\n]+)\)""")
+
+    /** Mindmap/WBS node line (`*`, `**`, `***`…). */
+    private val MINDMAP_NODE = Regex("""^\s*\*+\s*(?<text>.+?)\s*$""")
+    private val MINDMAP_START = Regex("""^\s*@start(?:mindmap|wbs)\b""")
+    private val MINDMAP_END = Regex("""^\s*@end(?:mindmap|wbs)\b""")
+
     /** Lines that belong to another construct (quoted labels, directives, notes…). */
     private val SKIP_PREFIX =
         Regex(
@@ -56,9 +72,24 @@ object PlantumlProseLabelExtractor {
     fun occurrences(source: String): List<PlantumlProseLabel> {
         val found = mutableListOf<PlantumlProseLabel>()
         var inLegend = false
+        var inMindmap = false
 
         for (line in source.lines()) {
             val trimmed = line.trim()
+            if (MINDMAP_START.containsMatchIn(trimmed)) {
+                inMindmap = true
+                continue
+            }
+            if (inMindmap) {
+                if (MINDMAP_END.containsMatchIn(trimmed)) {
+                    inMindmap = false
+                } else {
+                    MINDMAP_NODE.find(line)?.groups?.get("text")?.value?.trim()?.takeIf { it.isNotEmpty() }?.let {
+                        found += PlantumlProseLabel(line, it)
+                    }
+                }
+                continue
+            }
             if (trimmed.startsWith("legend")) {
                 inLegend = true
                 continue
@@ -66,6 +97,19 @@ object PlantumlProseLabelExtractor {
             if (inLegend) {
                 if (trimmed.startsWith("endlegend")) inLegend = false
                 continue
+            }
+
+            val actor = USE_CASE_ACTOR_LINE.find(line)
+            if (actor != null) {
+                actor.groups["actor"]?.value?.trim()?.takeIf { it.isNotEmpty() }?.let {
+                    found += PlantumlProseLabel(line, it)
+                }
+                addParenthesized(line, found)
+                continue
+            }
+            if (USE_CASE_LINE.containsMatchIn(trimmed)) {
+                addParenthesized(line, found)
+                // The relation label (`… : inclut`) is handled by the sequence path below.
             }
 
             val state = STATE_DESCRIPTION.find(line)
@@ -95,6 +139,17 @@ object PlantumlProseLabelExtractor {
             }
         }
         return found.distinctBy { it.line to it.text }
+    }
+
+    private fun addParenthesized(
+        line: String,
+        found: MutableList<PlantumlProseLabel>,
+    ) {
+        PARENTHESIZED.findAll(line).forEach { match ->
+            match.groups["name"]?.value?.trim()?.takeIf { it.isNotEmpty() }?.let {
+                found += PlantumlProseLabel(line, it)
+            }
+        }
     }
 
     /** The prose texts of [source], distinct and in document order. */

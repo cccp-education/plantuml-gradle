@@ -268,8 +268,9 @@ US (~3) :
 * `0.0.8` — US-5 (toolchain gouvernée) + résurrection CI (6 verrous), S-222.
 * `0.0.9` — S-227 : bump + `jgit 7.8.0`, `asciidoctorj-diagram 3.2.1`, `-plantuml 1.2026.2`, pins catalog/BOM `0.0.78`.
 * `0.0.10` — S-242 : PLT-MAINTAIN (découplage test/prod + hygiène) ; pins catalog/BOM `0.0.87`.
-* **`0.0.11` — version courante** (S-244) : PLT-TERM-PROTECTION (term shield + labels de prose non quotés) ; pins catalog/BOM `0.0.102`.
-* Source de vérité : `gradle/libs.versions.toml` (`plantuml = "0.0.11"`) ↔ catalogue ws `0.0.102`.
+* `0.0.11` — S-244 : PLT-TERM-PROTECTION (term shield + prose non quotée) ; pins catalog/BOM `0.0.102`.
+* **`0.0.12` — version courante** (S-244) : use cases + mindmaps + appels de fonction dans le bouclier ; pins catalog/BOM `0.0.104`.
+* Source de vérité : `gradle/libs.versions.toml` (`plantuml = "0.0.12"`) ↔ catalogue ws `0.0.104`.
 
 '''
 == ✅ EPIC 13 : Multi-provider API Pool — Rotation par tiers + Cross-provider

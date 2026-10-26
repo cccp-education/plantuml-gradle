@@ -20,18 +20,28 @@ import plantuml.boundary.PlantumlTranslationPortAdapter
  */
 class PlantumlTermProtectionSteps {
 
-    private var line: String = ""
+    private var source: String = ""
     private var translations: Map<String, String> = emptyMap()
     private var outcome: PlantUmlTranslationOutcome? = null
 
     @Given("a protected sequence message {string}")
     fun aProtectedSequenceMessage(value: String) {
-        line = value
+        source = "@startuml\n$value\n@enduml"
     }
 
     @Given("a protected activity label {string}")
     fun aProtectedActivityLabel(value: String) {
-        line = value
+        source = "@startuml\n$value\n@enduml"
+    }
+
+    @Given("a protected use-case block {string}")
+    fun aProtectedUseCaseBlock(value: String) {
+        source = "@startuml\n$value\n@enduml"
+    }
+
+    @Given("a protected mindmap block")
+    fun aProtectedMindmapBlock() {
+        source = "@startmindmap\n* Syntaxe\n** PlantUML\n@endmindmap"
     }
 
     @Given("the term translator maps {string} to {string}")
@@ -52,7 +62,7 @@ class PlantumlTermProtectionSteps {
             }
         outcome =
             PlantumlTranslationPortAdapter(translator)
-                .translate(PlantUmlTranslationRequest(PlantUmlBlock("@startuml\n$line\n@enduml"), "fr", "en"))
+                .translate(PlantUmlTranslationRequest(PlantUmlBlock(source), "fr", "en"))
     }
 
     @Then("the protected block contains {string}")

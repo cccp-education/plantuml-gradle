@@ -109,4 +109,12 @@ class PlantumlTermShieldTest {
         assertEquals(listOf("`./gradlew serve`"), shielded.terms)
         assertEquals("Run __PLT0__ now", shielded.text)
     }
+
+    @Test
+    fun `protects a function call`() {
+        val shielded = shield.shield("Call getUser() and call(x)")
+
+        assertEquals(listOf("getUser()", "call(x)"), shielded.terms)
+        assertEquals("Call __PLT0__ and __PLT1__", shielded.text)
+    }
 }
