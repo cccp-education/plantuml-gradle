@@ -158,6 +158,62 @@ garde anti-drift local↔CI préservée.
 *Dépend de* : `plantuml-contracts` (N0 ✅ 0.0.1). *Relie* : `PLT-DIAGRAM-OWNERSHIP`,
 `PLT-CR3-2` (`DiagramOutputProbe` ✅).
 
+== 🟡 EPIC PLT-I18N-OUTPUT — Le validateur de syntaxe devient une gate de corpus (CADRÉ S-077, revue i18n S-263)
+
+*Source* : revue externe `foundry/public/bakery-gradle/bakery-plugin/.agents/i18n_review.adoc`
+(S-263) ; mesure cheroliv.com S-077 (`diagram-count-drift` 125, 69 blocs EN
+résiduels mesurés S-076).
+
+*Constat* : plantuml est le **meilleur maillon** du dispositif
+(`PlantumlTermShield`, `TextClassifier`, `TranslationStrategy`,
+`PlantumlSyntaxValidator`), mais :
+. `PlantumlSyntaxValidatorAdapter` reste une **garde unitaire** — il n'est pas
+  une gate bloquante sur le **corpus réel** (les 464 diagrammes cassés de S-073
+  n'ont été vus qu'après coup) ;
+. les **notes non quotées** ne sont pas toutes corrigées *avant* écriture ;
+. le modèle préserve parfois un label court malgré le shield — un retry borné ou
+  une gate de langue manque, jamais un faux `TRANSLATED`.
+
+*Boundary* : plantuml possède la feuille `[plantuml]` (traduction + correction +
+validation + version). document/bakery ne réimplémentent rien.
+
+*DAG* : prolonge `GBL-010` G-3 (`PLT-DIAGRAM-OWNERSHIP` ✅), ne le remplace pas.
+
+[cols="1,4,1,2", options="header"]
+|===
+| US | Description | Pts | Statut
+
+| PLT-OUT-1
+| **Gate de corpus** — tâche `validatePlantumlCorpus` : chaque bloc `[plantuml]`
+  de chaque variante passe `PlantumlSyntaxValidator` ; rapport déterministe
+  (langue + article + id + raison) + baseline nommée ; BDD `@plantuml-corpus`
+| 3
+| 🟡 À FAIRE
+
+| PLT-OUT-2
+| **Notes non quotées corrigées avant écriture** — `PlantumlNoteExtractor` couvre
+  les notes multi-lignes/non quotées ; round-trip `\n` et échappements prouvés ;
+  un bloc non corrigeable est `PRESERVE` (jamais publié cassé)
+| 2
+| 🟡 À FAIRE
+
+| PLT-OUT-3
+| **Shield + langue** — un placeholder `__PLT<n>__` perdu déclenche le repli
+  PRESERVE ; un label court resté français est détecté (pas de faux `TRANSLATED`) ;
+  retry borné, jamais infini
+| 2
+| 🟡 À FAIRE
+
+| PLT-OUT-4
+| **Preuve corpus** — reprise ciblée des blocs résiduels S-076 (69 EN) pilotée par
+  la gate ; zéro `@startuml` brut dans le HTML baké (hors `[source,plantuml]`)
+| 2
+| 🟡 À FAIRE
+|===
+
+*Total* : 4 US ~9 pts. *Dépend de* : `plantuml-contracts` (N0 ✅), `PLT-DIAGRAM-OWNERSHIP`
+(✅). *Doc* : `.agents/i18n_review.adoc` (S-263), `CADRAGE_EPIC_GBL_010_ARBRE_TRADUCTION_SITE.adoc`.
+
 == 🟡 EPIC PLT-DIAGRAM-OWNERSHIP — Le borough plantuml possède le bloc diagramme (CADRÉ S-219, US-1→US-3 + US-5 ✅)
 
 *GBL* : EPIC transverse **GBL-007** (BACKLOG racine workspace) — propriété du pipeline PlantUML.
