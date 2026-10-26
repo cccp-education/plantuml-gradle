@@ -107,15 +107,29 @@ class PlantumlTranslationPortAdapter(
         }
 
         // PLT-TERM-PROTECTION — translate the unquoted prose labels the N0 label
-        // surface misses (sequence messages, activities, state descriptions). Code
-        // and business tokens are shielded; a lost placeholder preserves the source.
-        for (label in proseLabels) {
-            val resolved = translateProtected(label.text, request) ?: continue
-            if (resolved == label.text) continue
-            val escaped = PlantumlLabelIntegrity.escapeNewlines(resolved)
-            val newLine = label.line.replace(label.text, escaped)
-            if (newLine != label.line) {
-                val replaced = raw.replace(label.line, newLine)
+        // surface misses (sequence messages, activities, state descriptions, use
+        // cases, mindmap nodes). Code and business tokens are shielded; a lost
+        // placeholder preserves the source.
+        //
+        // S-244 — several labels may share ONE physical line (`:Actor: --> (Use
+        // case)` carries the actor and the use case). Grouping by line and
+        // rewriting the line once after every label is essential: replacing the
+        // original line after the first label would silently drop the others.
+        proseLabels.groupBy { it.line }.forEach { (line, labels) ->
+            var translatedLine = line
+            var lineChanged = false
+            for (label in labels) {
+                val resolved = translateProtected(label.text, request) ?: continue
+                if (resolved == label.text) continue
+                val escaped = PlantumlLabelIntegrity.escapeNewlines(resolved)
+                val replaced = translatedLine.replace(label.text, escaped)
+                if (replaced != translatedLine) {
+                    translatedLine = replaced
+                    lineChanged = true
+                }
+            }
+            if (lineChanged) {
+                val replaced = raw.replace(line, translatedLine)
                 if (replaced != raw) {
                     raw = replaced
                     changed = true

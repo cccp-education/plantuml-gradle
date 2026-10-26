@@ -9,7 +9,7 @@
 [![Coverage](https://img.shields.io/static/v1?label=coverage&message=%E2%89%A575%25&color=green)]()
 [![License](https://img.shields.io/github/license/cccp-education/plantuml-gradle?label=License)](../LICENCE)
 
-- **Version**: `0.0.12` · **Group**: `education.cccp` · **Plugin ID**: `education.cccp.plantuml`
+- **Version**: `0.0.13` · **Group**: `education.cccp` · **Plugin ID**: `education.cccp.plantuml`
 - **Toolchain**: Java 25 · Kotlin 2.4.10 · Gradle 9.5.1
 - **Build**: `./gradlew build -x test` · **Tests**: `./gradlew test functionalTest cucumberTest` · **Coverage gate**: `./gradlew koverThresholdCheck` (≥75%)
 
@@ -189,7 +189,7 @@ POM (on **all** `MavenPublication`s) declares:
 - SCM `https://github.com/cheroliv/plantuml-gradle.git`
 - optional `<relocation>` when `relocationGroup` property is set
 
-Published artifact: `education.cccp:plantuml-plugin:0.0.12` on Maven Central.
+Published artifact: `education.cccp:plantuml-plugin:0.0.13` on Maven Central.
 
 ## EPIC status
 
@@ -210,7 +210,7 @@ Per `.agents/INDEX.adoc`:
 | 11 Article Blog KG + Tests   | ✅ TERMINÉ |
 | 12 Consolidation             | ✅ TERMINÉ |
 | 13 Multi-provider API Pool   | ✅ TERMINÉ |
-| PUB-1 Publication Maven Central | ✅ TERMINÉ (0.0.12) |
+| PUB-1 Publication Maven Central | ✅ TERMINÉ (0.0.13) |
 | PLT-I18N / PLT-BOUNDARY      | ✅ TERMINÉ |
 | Incremental Processing       | ✅ TERMINÉ |
 | PLT-CR3 (provider model + output probe) | ✅ TERMINÉ 2/2 |

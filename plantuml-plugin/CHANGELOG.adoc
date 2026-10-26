@@ -5,6 +5,16 @@ Tous les changements notables apportés à ce projet seront documentés dans ce 
 Le format est basé sur link:https://keepachangelog.com/en/1.0.0/[Keep a Changelog],
 et ce projet adhère au versionnage sémantique link:https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
+== [0.0.13] — 2026-10-26
+
+=== Corrigé
+
+* `PlantumlTranslationPortAdapter` : plusieurs labels de prose partageant une
+  même ligne (`:Actor: --> (Use case)` porte l'acteur **et** le cas
+  d'utilisation) sont désormais traduits ensemble avant la réécriture de la
+  ligne. L'ancien remplacement ligne-par-ligne ignorait silencieusement le
+  second label.
+
 == [0.0.12] — 2026-10-26
 
 === Ajouté
