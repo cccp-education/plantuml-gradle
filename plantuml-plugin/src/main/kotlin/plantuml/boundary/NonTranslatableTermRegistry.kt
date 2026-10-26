@@ -35,4 +35,11 @@ class NonTranslatableTermRegistry {
      * @return true if the term must be preserved
      */
     fun contains(term: String): Boolean = terms.contains(term)
+
+    /**
+     * A snapshot of the registered terms (read-only use by the term shield).
+     *
+     * @return the registered terms
+     */
+    fun terms(): Set<String> = terms.toSet()
 }

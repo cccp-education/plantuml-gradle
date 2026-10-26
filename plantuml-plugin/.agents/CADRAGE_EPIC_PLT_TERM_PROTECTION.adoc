@@ -1,0 +1,111 @@
+= Cadrage — EPIC PLT-TERM-PROTECTION
+:session: 244
+:date: 2026-10-26
+:statut: 🟡 EN COURS
+
+== Demande pilote
+
+Les diagrammes PlantUML des articles cheroliv.com ne sont **pas complètement
+traduits** : les labels hors guillemets (messages de séquence, activités,
+descriptions d'état) restent en français. À l'inverse, quand la traduction
+s'applique, elle peut traduire des **termes métier / de code** qui ne doivent
+pas l'être (`integer`, `String`, `opencode.json`, `AGENT.adoc`, identifiants,
+chemins, options Gradle…). Le but est de conserver l'**idiomaticité** : traduire
+quand c'est traduisible, laisser verbatim quand c'est du code ou un terme métier
+non traduisible.
+
+== Audit (S-244)
+
+. `contracts.plantuml.PlantUmlBlock.labels()` (N0) ne surface que les labels
+  **entre guillemets** et les directives `title/header/footer/caption`. Les
+  labels non quotés sont invisibles : `A -> B : texte`, `:texte;`,
+  `state X : texte`.
+. `PlantumlNoteExtractor` couvre les `note`, pas les messages/activités.
+. `PlantumlTranslationPortAdapter` envoie les labels au `TranslationService`
+  N0 **sans aucune protection de termes** : le LLM peut traduire `integer` ou
+  un identifiant.
+. `TextClassifier`/`IdiomaticGlossary`/`NonTranslatableTermRegistry` existent
+  côté `plantuml.boundary` riche, mais ne sont **pas** dans le chemin des
+  articles (port N0 alimenté par le LLM de l'article).
+. Résultat observé : diagrammes partiellement français (messages de séquence,
+  activités) et traductions de types/identifiants dans certaines langues.
+
+== Décisions
+
+* **D1 — Périmètre des termes protégés.** Sont protégés : types primitifs et
+  types courants (`integer`, `String`, `boolean`, `List<V>`, `Map<K,V>`…),
+  jetons de code (fichiers, chemins, URLs, options Gradle, annotations,
+  constantes, `snake_case`, identifiants multi-humps, versions, couleurs,
+  texte entre backticks), et les termes **enregistrés** (`NonTranslatableTermRegistry`)
+  ou **empruntés** (`PlantUmlBlock.borrowedVocabulary`). Les mots de prose
+  courants (même `class`/`object` en anglais) restent traduisibles.
+* **D2 — Bouclier de termes.** `PlantumlTermShield` remplace chaque terme par
+  un placeholder stable `__PLTn__`, puis restaure après traduction. Si le
+  traducteur perd un placeholder, le label source est **préservé** (jamais de
+  corruption).
+* **D3 — Labels non quotés.** `PlantumlProseLabelExtractor` extrait les labels
+  de prose non quotés : messages de séquence (`A -> B : texte`), activités
+  (`:texte;`), descriptions d'état (`state X : texte`). Les légendes
+  (`legend … endlegend`) sont différées (US ultérieure).
+* **D4 — Intégration.** `PlantumlTranslationPortAdapter` applique le bouclier
+  à chaque label, note et label de prose. Le batching `PlantumlLabelBatch` est
+  conservé (les placeholders voyagent dans le texte groupé).
+* **D5 — Frontière.** Aucune modification N0 : tout vit dans
+  `plantuml.boundary` / `plantuml.repair` (pure domain). Aucun nouveau contrat
+  MEMPHIS.
+* **D6 — Tests.** Baby-step DDD/TDD/BDD : unit (`PlantumlTermShield`,
+  `PlantumlProseLabelExtractor`, port), fonctionnel (port + validateur réel),
+  Cucumber (`@plantuml-term-protection`). Local = Build, Tests = CI.
+* **D7 — Reprise cheroliv.com.** La re-traduction des diagrammes incomplets est
+  une session ultérieure : release plantuml → BOM/catalog → exécution du delta
+  ciblé (détecteur de blocs incomplets à ajouter côté site). Aucun run LLM
+  metered dans cette session.
+
+== User Stories
+
+[cols="1,4,1,1"]
+|===
+| US | Contenu | Points | Statut
+
+| US-0
+| Cadrage + audit
+| 0
+| ✅ S-244
+
+| US-1
+| `PlantumlTermShield` (protection/restauration, placeholders, fallback)
+| 2
+| 🟡 S-244
+
+| US-2
+| `PlantumlProseLabelExtractor` (séquence/activité/état)
+| 2
+| 🟡 S-244
+
+| US-3
+| Câblage `PlantumlTranslationPortAdapter` (labels + notes + prose, batching)
+| 2
+| 🟡 S-244
+
+| US-4
+| Tests BDD `@plantuml-term-protection` + fonctionnel validateur
+| 1
+| 🟡 S-244
+
+| US-5
+| cheroliv.com : détecteur de diagrammes incomplets + re-traduction ciblée (session ultérieure)
+| 3
+| ⏳ À PLANIFIER
+|===
+
+== Fichiers cibles
+
+* `src/main/kotlin/plantuml/boundary/PlantumlTermShield.kt` (nouveau)
+* `src/main/kotlin/plantuml/boundary/PlantumlProseLabelExtractor.kt` (nouveau)
+* `src/main/kotlin/plantuml/boundary/PlantumlTranslationPortAdapter.kt`
+* `src/test/kotlin/plantuml/boundary/PlantumlTermShieldTest.kt` (nouveau)
+* `src/test/kotlin/plantuml/boundary/PlantumlProseLabelExtractorTest.kt` (nouveau)
+* `src/test/kotlin/plantuml/boundary/PlantumlTranslationPortAdapterTest.kt`
+* `src/functionalTest/kotlin/plantuml/PlantumlTermProtectionFunctionalTest.kt` (nouveau)
+* `src/test/features/35_plantuml_term_protection.feature` (nouveau)
+* `src/test/scenarios/plantuml/scenarios/PlantumlTermProtectionSteps.kt` (nouveau)

@@ -183,6 +183,10 @@ dependencies {
     // CORRECTION: Add dependency to main source code to access plugin classes
     add(functionalTest.implementationConfigurationName, sourceSets.main.get().output)
 
+    // N0 contracts used by the PlantUML translation port (PLT-TERM-PROTECTION FT).
+    add(functionalTest.implementationConfigurationName, "education.cccp:i18n-contracts:0.0.3")
+    add(functionalTest.implementationConfigurationName, "education.cccp:plantuml-contracts:0.0.1")
+
     // Add testcontainers for RAG integration tests
     add(functionalTest.implementationConfigurationName, libs.testcontainers.pg)
     add(functionalTest.implementationConfigurationName, "org.testcontainers:testcontainers")

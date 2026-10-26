@@ -42,20 +42,23 @@ class PlantumlTranslationPortAdapter(
     private val translator: TranslationService,
     private val classifier: PlantUmlClassifier = PlantUmlClassifier(),
     private val validator: PlantUmlSyntaxValidator? = null,
+    private val termShield: PlantumlTermShield = PlantumlTermShield(),
 ) : PlantUmlTranslationPort {
 
     override fun translate(request: PlantUmlTranslationRequest): PlantUmlTranslationOutcome {
         val block = request.block
         val labels = block.labels()
         val notes = PlantumlNoteExtractor.occurrences(block.raw)
+        val proseLabels = PlantumlProseLabelExtractor.occurrences(block.raw)
         val strategy = classifier.classify(block)
         // GBL-010 G-3 — notes are translatable prose that the N0 label classifier
         // does not see: a notes-bearing block must not be short-circuited as
-        // PRESERVE (semantic identity only).
-        if (strategy == PlantUmlStrategy.PRESERVE && notes.isEmpty()) {
+        // PRESERVE (semantic identity only). PLT-TERM-PROTECTION adds the unquoted
+        // prose labels (sequence messages, activities, state descriptions).
+        if (strategy == PlantUmlStrategy.PRESERVE && notes.isEmpty() && proseLabels.isEmpty()) {
             return PlantUmlTranslationOutcome.Preserved("PRESERVE strategy — semantic identity only")
         }
-        if (labels.isEmpty() && notes.isEmpty()) {
+        if (labels.isEmpty() && notes.isEmpty() && proseLabels.isEmpty()) {
             return PlantUmlTranslationOutcome.Preserved("no translatable label")
         }
 
@@ -93,13 +96,30 @@ class PlantumlTranslationPortAdapter(
         // block form (`note right … end note`) allows real line breaks. This is
         // the CHE-DIAGRAM variant corruption (S-076).
         for (note in notes) {
-            val resolved = translateLabel(note.text, request.sourceLanguage, request.targetLanguage) ?: continue
+            val resolved = translateProtected(note.text, request) ?: continue
             if (resolved == note.text) continue
             val replacement = if (note.singleLine) PlantumlLabelIntegrity.escapeNewlines(resolved) else resolved
             val replaced = raw.replace(note.raw, replacement)
             if (replaced != raw) {
                 raw = replaced
                 changed = true
+            }
+        }
+
+        // PLT-TERM-PROTECTION — translate the unquoted prose labels the N0 label
+        // surface misses (sequence messages, activities, state descriptions). Code
+        // and business tokens are shielded; a lost placeholder preserves the source.
+        for (label in proseLabels) {
+            val resolved = translateProtected(label.text, request) ?: continue
+            if (resolved == label.text) continue
+            val escaped = PlantumlLabelIntegrity.escapeNewlines(resolved)
+            val newLine = label.line.replace(label.text, escaped)
+            if (newLine != label.line) {
+                val replaced = raw.replace(label.line, newLine)
+                if (replaced != raw) {
+                    raw = replaced
+                    changed = true
+                }
             }
         }
 
@@ -127,21 +147,48 @@ class PlantumlTranslationPortAdapter(
         labels: List<String>,
         request: PlantUmlTranslationRequest,
     ): Map<String, String> {
-        if (labels.size == 1) {
-            return translateLabel(labels[0], request.sourceLanguage, request.targetLanguage)
-                ?.let { mapOf(labels[0] to it) }
-                ?: emptyMap()
+        val shields = labels.associateWith { termShield.shield(it) }
+        val translatable = labels.filter { label -> !shields.getValue(label).isFullyShielded }
+        if (translatable.isEmpty()) return emptyMap()
+
+        if (translatable.size == 1) {
+            val label = translatable.single()
+            return translateProtected(label, request)?.let { mapOf(label to it) } ?: emptyMap()
         }
-        val joined = PlantumlLabelBatch.join(labels)
+
+        val joined = PlantumlLabelBatch.join(translatable.map { shields.getValue(it).text })
         val result = translator.translate(TranslationRequest(joined, request.sourceLanguage, request.targetLanguage))
         if (result is TranslationResult.Success) {
-            val parts = PlantumlLabelBatch.split(result.translatedText, labels.size)
-            if (parts != null) return labels.zip(parts).toMap()
+            val parts = PlantumlLabelBatch.split(result.translatedText, translatable.size)
+            if (parts != null) {
+                val restored =
+                    translatable.zip(parts).mapNotNull { (label, part) ->
+                        termShield.restore(part, shields.getValue(label))?.let { label to it }
+                    }.toMap()
+                if (restored.size == translatable.size) return restored
+            }
         }
-        return labels
+        return translatable
             .mapNotNull { label ->
-                translateLabel(label, request.sourceLanguage, request.targetLanguage)?.let { label to it }
+                translateProtected(label, request)?.let { label to it }
             }.toMap()
+    }
+
+    /**
+     * Shields the protected tokens of [text], translates the remaining prose, and
+     * restores the tokens. A fully shielded text (code only) is returned as-is —
+     * no provider call, no metered cost. A lost placeholder returns `null` so the
+     * caller preserves the source label (never a corrupted diagram).
+     */
+    private fun translateProtected(
+        text: String,
+        request: PlantUmlTranslationRequest,
+    ): String? {
+        if (text.isBlank()) return null
+        val shield = termShield.shield(text)
+        if (shield.isFullyShielded) return text
+        val translated = translateLabel(shield.text, request.sourceLanguage, request.targetLanguage) ?: return null
+        return termShield.restore(translated, shield)
     }
 
     private fun translateLabel(text: String, sourceLanguage: String, targetLanguage: String): String? {

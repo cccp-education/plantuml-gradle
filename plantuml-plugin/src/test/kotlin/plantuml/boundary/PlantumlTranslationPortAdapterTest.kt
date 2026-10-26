@@ -95,12 +95,76 @@ class PlantumlTranslationPortAdapterTest {
 
     @Test
     fun `converts a raw newline returned by the provider back to the plantuml escape`() {
-        val adapter = port(mapOf("CLI de vibe coding" to "vibe coding CLI\nOpen source, free"))
-        val block = PlantUmlBlock("@startuml\nrectangle \"CLI de vibe coding\" as CLI\n@enduml")
+        val adapter = port(mapOf("Outil de vibe coding" to "vibe coding CLI\nOpen source, free"))
+        val block = PlantUmlBlock("@startuml\nrectangle \"Outil de vibe coding\" as TOOL\n@enduml")
         val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
         val raw = (outcome as PlantUmlTranslationOutcome.Translated).block.raw
         assertTrue(raw.contains("\\n"), "newline must be escaped: $raw")
         assertTrue(!raw.contains("vibe coding CLI\nOpen"), "raw line break must not survive")
+    }
+
+    // ── EPIC PLT-TERM-PROTECTION — code/business terms survive the translation ──
+
+    @Test
+    fun `translates a sequence message and protects a primitive type`() {
+        val adapter = port(mapOf("Le type __PLT0__ est utilisé" to "The type __PLT0__ is used"))
+        val block = PlantUmlBlock("@startuml\nA -> B : Le type integer est utilisé\n@enduml")
+
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+
+        val raw = (outcome as PlantUmlTranslationOutcome.Translated).block.raw
+        assertEquals("A -> B : The type integer is used", raw.lines()[1])
+    }
+
+    @Test
+    fun `translates an activity label and protects a file name`() {
+        val adapter = port(mapOf("Créer __PLT0__" to "Create __PLT0__"))
+        val block = PlantUmlBlock("@startuml\nstart\n:Créer opencode.json;\nstop\n@enduml")
+
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+
+        val raw = (outcome as PlantUmlTranslationOutcome.Translated).block.raw
+        assertTrue(raw.contains(":Create opencode.json;"), raw)
+    }
+
+    @Test
+    fun `translates a quoted label and protects a type inside it`() {
+        val adapter = port(mapOf("Le type __PLT0__" to "The type __PLT0__"))
+        val block = PlantUmlBlock("@startuml\nclass \"Le type integer\"\n@enduml")
+
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+
+        assertTrue((outcome as PlantUmlTranslationOutcome.Translated).block.raw.contains("\"The type integer\""))
+    }
+
+    @Test
+    fun `translates a note and protects a file name`() {
+        val adapter = port(mapOf("Voir __PLT0__" to "See __PLT0__"))
+        val block = PlantUmlBlock("@startuml\nnote right: Voir opencode.json\n@enduml")
+
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+
+        assertTrue((outcome as PlantUmlTranslationOutcome.Translated).block.raw.contains("note right: See opencode.json"))
+    }
+
+    @Test
+    fun `a fully shielded prose label is not sent to the provider`() {
+        val adapter = port(emptyMap())
+        val block = PlantUmlBlock("@startuml\nA -> B : getUser()\n@enduml")
+
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+
+        assertTrue(outcome is PlantUmlTranslationOutcome.Preserved)
+    }
+
+    @Test
+    fun `a provider that drops a placeholder preserves the source label`() {
+        val adapter = port(mapOf("Le type __PLT0__ est utilisé" to "The type is used"))
+        val block = PlantUmlBlock("@startuml\nA -> B : Le type integer est utilisé\n@enduml")
+
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+
+        assertTrue(outcome is PlantUmlTranslationOutcome.Preserved)
     }
 
     @Test
