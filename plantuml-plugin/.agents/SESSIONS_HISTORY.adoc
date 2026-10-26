@@ -1,5 +1,17 @@
 = Historique des Sessions
 
+== Session 243 (2026-10-26) — PLT-TERM-PROTECTION + releases 0.0.11→0.0.13 ✅
+
+Traduction PlantUML des articles : bouclier `PlantumlTermShield` (`__PLTn__`,
+types/code/identifiants/appels protégés, fallback si placeholder perdu),
+`PlantumlProseLabelExtractor` (messages de séquence, activités, états, use cases,
+mindmaps/WBS), port labels + notes + prose avec batching et multi-label par ligne.
+Tests unit + functional + BDD `@plantuml-term-protection`. Releases Central
+`0.0.11` (`8c771e74`), `0.0.12` (`68096e17`), `0.0.13` (`cc5330d8`) ; DAG
+MEMPHIS `0.0.105` / bakery `0.0.29` / runner `0.0.105`. CI `40284555439` ✅.
+Analyse `i18n_review.adoc` intégrée : prochain chantier = P0 gates du contrat de
+sortie. Rapport `.agents/sessions/243-plt-term-protection.adoc`.
+
 == Session 242 (2026-10-13) — PLT-MAINTAIN : découplage test/prod + hygiène + release 0.0.10 ✅
 
 Refactor iso-comportement issu d'une code review S-242. **Seam `plantuml.runtime.RuntimeEnvironment`**

@@ -1,38 +1,37 @@
-= PROMPT_REPRISE — Plantuml — Session 243
-:session: 243
-:date: 2026-10-13
+= PROMPT_REPRISE — Plantuml — Session 244
+:session: 244
+:date: 2026-10-26
 
-== État — plantuml-local TOUT soldé ; release 0.0.10 publiée (S-242)
+== État — PLT-TERM-PROTECTION livré ; releases 0.0.11→0.0.13
 
-* **PLT-MAINTAIN ✅** (S-242) : découplage test/prod (`plantuml.runtime.RuntimeEnvironment`),
-  purge de stubs morts, `ConfigMerger` (helpers de précédence), README/ROADMAP/CI réalignés,
-  5 workflows CI cassés désactivés, backlog synchronisé.
-* **Release 0.0.10** (S-242) : DAG MEMPHIS (catalog `plantuml-plugin 0.0.10`) → plantuml
-  toml + pins `0.0.87` → Central → consommateurs (document, bakery).
-* **PLT-AGENT ✅ 7/7** ; **PLT-CONTEXT ✅ 4/4** ; **GBL-010 feuille plantuml ✅** ;
-  **FIX-BASELINE ✅** (cucumber S-217 + functional S-240).
-* **PLT-DIAGRAM-OWNERSHIP** : US-0→5 ✅ ; **US-6/US-7 CADRÉS S-241**
-  (`.agents/CADRAGE_PLT_DIAGRAM_OWNERSHIP_US6_US7.adoc`).
+* `PlantumlTermShield` (types/code/identifiants protégés, `__PLTn__`, fallback),
+  `PlantumlProseLabelExtractor` (séquence, activité, état, use case, mindmap),
+  `PlantumlTranslationPortAdapter` (labels + notes + prose, batching, multi-label
+  par ligne).
+* Tests unit + functional + BDD `@plantuml-term-protection` ; CI `40284555439` ✅.
+* Releases Central : `0.0.11` (`8c771e74`), `0.0.12` (`68096e17`),
+  `0.0.13` (`cc5330d8`).
+* DAG consommateurs : MEMPHIS BOM/catalog `0.0.105`, bakery `0.0.29`, runner
+  `0.0.105`, document/bakery pins `0.0.105`. CI vertes.
+* Audit pilote `bakery-plugin/.agents/i18n_review.adoc` intégré : le prochain
+  chantier est le **contrat de sortie** (mesurer l'artefact, pas le store).
 
-== Mission Session 243 — cross-borough (bakery-gradle)
+== Mission Session 244 — P0.3 gate rendu diagramme (cross-borough)
 
-* **US-6b (bakery-gradle)** — FT « rendu » : SVG/PNG **non blanc** au bake (gaté toolchain),
-  suite de US-6a (contrat sans bake).
-* **US-7 (cheroliv.com, S-244)** — re-bake référence + variantes, garde `DiagramIntegrity`,
-  contrat VERT.
-* Côté plantuml-local : **rien** (tous EPICs soldés) — sauf **PLT-AGENT optionnel (b)**
-  (vérifier qu'un modèle du pool expose la vision, sinon DIA-01 dégrade).
+* Définir la mesure : zéro `@startuml` brut dans les variantes bakées hors
+  `[source,plantuml]`, SVG non blancs (σ>0), ids de diagrammes conservés.
+* Cible : cheroliv.com (rendu réel) + document/plantuml (validateur bloquant).
+* Ne pas relancer de run LLM global avant P0.3/P0.2.
+* Puis P0.2 (langue + sentinelles + preserve-rule) et P0.1 (intégrité AST).
 
-== Points d'attention
+== Résiduel
 
-* **Local = Build, Tests = CI** : par borough. Preuve = CI du borough modifié.
-* **DAG** : N0 (MEMPHIS) → plantuml (N2) → document (N2) → bakery (N2) → cheroliv (site).
-  **Un borough par session** — ne pas mélanger.
-* **US-6** vit dans **bakery-gradle** (aucun N2→N2) ; plantuml fournit le port + `DiagramOutputProbe`.
-* English only ; zéro Python ; zéro secret ; baby-step DDD/TDD/BDD ; steps préfixés (S-088).
+* Site cheroliv.com : 69 blocs EN détectés (0108 duplication, mindmap 0077,
+  prose 0119) ; 20 autres langues non re-traduites.
+* Le modèle `deepseek-v4.1-flash` préserve parfois un label court : prévoir un
+  retry borné ou un gate de langue, jamais un faux `TRANSLATED`.
 
 == Rappels
 
-* Plantuml `0.0.10` (catalog ws `0.0.87`) ; N0 `plantuml-contracts:0.0.1`.
-* Cadrage US-6/US-7 : `.agents/CADRAGE_PLT_DIAGRAM_OWNERSHIP_US6_US7.adoc`.
-* Plantuml-local : **mode maintenance** — pas de nouvel EPIC sans demande pilote.
+* Plantuml `0.0.13` (catalog ws `0.0.105`), N0 `plantuml-contracts:0.0.1`.
+* Local = Build, Tests = CI ; un borough par session ; zéro Python ; zéro secret.

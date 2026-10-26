@@ -1,0 +1,53 @@
+= Session 243 — PLT-TERM-PROTECTION (term shield + prose labels)
+:toc:
+
+== Mission
+
+Le pilote constate que les diagrammes PlantUML des articles cheroliv.com ne sont
+pas complètement traduits et que les termes métier/code (`integer`, identifiants,
+fichiers) ne doivent jamais être traduits. Demande : améliorer le borough plantuml
+puis reprendre les diagrammes incomplets. Méthode baby-step DDD/TDD/BDD.
+
+== Cadrage
+
+`.agents/CADRAGE_EPIC_PLT_TERM_PROTECTION.adoc` — US-1→4 ✅, US-5 (re-traduction
+site) ⏳. Décisions : bouclier `__PLTn__`, prose non quotée, use cases/mindmaps,
+fallback si placeholder perdu, N0 inchangé, tests unit/functional/BDD.
+
+== Livré
+
+* `PlantumlTermShield` : types primitifs, fichiers, chemins, options Gradle,
+  identifiants, versions, couleurs, backticks, appels de fonction ; restauration
+  ou label source préservé.
+* `PlantumlProseLabelExtractor` : messages de séquence, activités, états, acteurs
+  et cas d'usage, nœuds mindmap/WBS.
+* `PlantumlTranslationPortAdapter` : labels + notes + prose, batching conservé,
+  multi-label par ligne.
+* Tests : `PlantumlTermShieldTest`, `PlantumlProseLabelExtractorTest`,
+  `PlantumlTranslationPortAdapterTest`, FT `PlantumlTermProtectionFunctionalTest`,
+  BDD `35_plantuml_term_protection.feature` (`@plantuml-term-protection`).
+
+== Releases
+
+* `0.0.11` — term shield + prose non quotée (Central `8c771e74`).
+* `0.0.12` — use cases + mindmaps + function calls (Central `68096e17`).
+* `0.0.13` — multi-label par ligne (Central `cc5330d8`).
+* DAG consommateurs : MEMPHIS BOM/catalog `0.0.102`→`0.0.105`, bakery `0.0.29`
+  (recompilé contre plantuml 0.0.11 pour le contrat binaire), runner
+  `0.0.103`→`0.0.105`, document/bakery pins `0.0.105`.
+* CI plantuml `0.0.13` : run `40284555439` ✅.
+
+== Analyse `i18n_review.adoc` intégrée
+
+Le problème restant est le **contrat de sortie** (le store dit TRANSLATED, le
+rendu peut rester français). Séquence actée : P0.3 rendu diagramme → P0.2
+langue/sentinelle/preserve-rule → P0.1 intégrité AST → P2 contrat N0
+`PreserveRule`/`TranslatableRegion` → reprise ciblée cheroliv (US-5).
+
+== Preuves
+
+* Local = Build : `compileKotlin` / `compileTestKotlin` /
+  `compileFunctionalTestKotlin` VERTS, `assemble`, `publishToMavenLocal`.
+* Tests = CI : plantuml `40284555439` ✅ ; consommateurs bakery/runner/document
+  ✅ ; site `40292584403` ✅ et deploy `40292584493` ✅.
+* Zéro secret, zéro Python.

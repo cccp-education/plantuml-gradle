@@ -1,6 +1,21 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 242 (13 octobre 2026) — PLT-MAINTAIN (découplage test/prod)
+_Dernière mise à jour_ : Session 243 (26 octobre 2026) — PLT-TERM-PROTECTION
+
+=== Session 243 — PLT-TERM-PROTECTION (term shield + prose)
+
+* **+** `PlantumlTermShieldTest` (13 unit : types, fichiers, chemins, options,
+  identifiants, versions, couleurs, backticks, appels, registre, restauration,
+  placeholder perdu).
+* **+** `PlantumlProseLabelExtractorTest` (9 unit : séquence, activité, état,
+  use case, relation, mindmap, note/directive exclues, code-only).
+* **+** `PlantumlTranslationPortAdapterTest` (+8 unit : séquence protégée,
+  activité/fichier, use case, mindmap, placeholder perdu, label code-only).
+* **+** `PlantumlTermProtectionFunctionalTest` (1 FT : bloc activité + note +
+  validateur structurel).
+* **+** BDD `35_plantuml_term_protection.feature` (5 scénarios
+  `@plantuml-term-protection`) + `PlantumlTermProtectionSteps`.
+* Local = Build (compile ×3 VERT) ; preuve = CI `40284555439` ✅.
 
 === Session 242 — PLT-MAINTAIN (découplage test/prod)
 
