@@ -1,0 +1,15 @@
+# MEM-I18N-PRESERVE — shared vectors (id	fully-preserved	text)
+# Replayed byte-identically by document (TextTranslatableClassifier) and plantuml
+# (PlantumlTermShield). A divergence between the two boroughs is a drift.
+macro	true	toc::[]
+macro-with-target	true	image::schema.png[]
+inline-code	true	`gradle build`
+anchor	true	[[page-10]]
+attribute-reference	true	{site_host}
+url	true	https://example.com/x
+block-attribute	true	[cols="1,1",options="header"]
+fence	true	----
+prose-with-macro	false	Voir toc::[] pour la table des matières
+prose	false	Bonjour le monde
+disk-size	false	128 Go
+technology	false	Spring Boot
