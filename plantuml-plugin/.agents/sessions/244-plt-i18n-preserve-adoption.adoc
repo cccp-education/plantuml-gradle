@@ -1,0 +1,27 @@
+= Session 244 — PLT-I18N-PRESERVE : le bouclier consomme le contrat N0
+:session: 244
+:date: 2026-10-31
+:statut: ✅ CODE LIVRÉ — release 0.0.14 à publier
+
+== Contexte
+
+MEMPHIS S-312 a livré `contracts.i18n.PreserveRule` + `PreserveCatalog`
+(`i18n-contracts 0.0.5`). Le bouclier de plantuml protégeait les types, fichiers,
+identifiants et appels, mais un label pouvait citer du markup AsciiDoc (macro,
+ancre, URL) qui partait au modèle.
+
+== Livré
+
+* `PlantumlTermShield.shield` ajoute les marqueurs de `PreserveRule.entries`
+  (`findRanges` ↔ `findAll`) comme candidats : macro `toc::[]`, ancre
+  `[[page-10]]`, référence d'attribut, URL, code inline, fence, attribut de bloc.
+  Les placeholders `__PLTn__` sont **conservés** (contrat de rendu : restauration
+  nulle = label non écrit).
+* Dépendance `i18n-contracts 0.0.3 → 0.0.5`.
+* **2 UT** ajoutés (macro ; ancre + URL) — 11/11 verts.
+
+== Reste
+
+* **Release `plantuml 0.0.14`** (bump + DAG MEMPHIS-first) : le code est livré, pas
+  publié. Adopter via catalogue n'a de sens qu'après.
+* BDD `@preserve` + vecteurs partagés document ↔ plantuml (PRESERVE-2 MEMPHIS).

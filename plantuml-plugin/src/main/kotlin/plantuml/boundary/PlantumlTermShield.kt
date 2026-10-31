@@ -1,5 +1,7 @@
 package plantuml.boundary
 
+import contracts.i18n.PreserveRule
+
 /**
  * EPIC PLT-TERM-PROTECTION — the pure **term shield** of the PlantUML translation.
  *
@@ -43,6 +45,15 @@ class PlantumlTermShield(
         TERM_PATTERNS.forEach { pattern ->
             pattern.findAll(text).forEach { match ->
                 candidates += Candidate(match.range.first, match.range.last + 1, match.value)
+            }
+        }
+        // MEM-I18N-PRESERVE (N0) — the shared "never translate" catalog. A diagram
+        // label may carry AsciiDoc markup (a macro, an anchor, an attribute
+        // reference, a URL): the same markers document protects, so the two
+        // boroughs can no longer drift.
+        PreserveRule.entries.forEach { rule ->
+            rule.findRanges(text).zip(rule.findAll(text)).forEach { (range, value) ->
+                candidates += Candidate(range.first, range.last + 1, value)
             }
         }
 

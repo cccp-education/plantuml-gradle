@@ -48,6 +48,20 @@ class PlantumlTermShieldTest {
     }
 
     @Test
+    fun `protects an asciidoc macro from the shared catalog`() {
+        val shielded = shield.shield("Voir toc::[] pour la table")
+
+        assertEquals(listOf("toc::[]"), shielded.terms)
+    }
+
+    @Test
+    fun `protects an anchor and a url from the shared catalog`() {
+        val shielded = shield.shield("Page [[page-10]] see https://example.com/x")
+
+        assertEquals(listOf("[[page-10]]", "https://example.com/x"), shielded.terms)
+    }
+
+    @Test
     fun `protects a registered client term`() {
         val registry = NonTranslatableTermRegistry().apply { registerAll(listOf("pipeline", "saga")) }
         val shielded = PlantumlTermShield(registry).shield("The pipeline and the saga are fast")

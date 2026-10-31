@@ -1,6 +1,13 @@
 = PROMPT_REPRISE — Plantuml — Session 244
-:session: 244
+:session: 245
 :date: 2026-10-26
+
+== État S-244 — PLT-I18N-PRESERVE (code)
+
+* `PlantumlTermShield` consomme `contracts.i18n.PreserveRule` (i18n-contracts
+  0.0.5) : macro, ancre, URL, code inline, fence, référence d'attribut protégés par
+  le catalogue N0 ; placeholders `__PLTn__` conservés (restauration nulle = label
+  non écrit). 2 UT (11/11). **Release 0.0.14 à publier.**
 
 == État — PLT-TERM-PROTECTION livré ; releases 0.0.11→0.0.13
 

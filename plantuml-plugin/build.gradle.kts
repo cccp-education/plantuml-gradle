@@ -48,7 +48,7 @@ dependencies {
     implementation(libs.bundles.plantuml.ai)
 
     // N0 contracts — i18n (cross-borough translation alliance)
-    implementation("education.cccp:i18n-contracts:0.0.3")
+    implementation("education.cccp:i18n-contracts:0.0.5")
 
     // N0 contracts — PlantUML diagram block (EPIC PLT-DIAGRAM-OWNERSHIP US-2).
     // The port + model + validation types live in the contract; this borough
@@ -184,7 +184,7 @@ dependencies {
     add(functionalTest.implementationConfigurationName, sourceSets.main.get().output)
 
     // N0 contracts used by the PlantUML translation port (PLT-TERM-PROTECTION FT).
-    add(functionalTest.implementationConfigurationName, "education.cccp:i18n-contracts:0.0.3")
+    add(functionalTest.implementationConfigurationName, "education.cccp:i18n-contracts:0.0.5")
     add(functionalTest.implementationConfigurationName, "education.cccp:plantuml-contracts:0.0.1")
 
     // Add testcontainers for RAG integration tests
