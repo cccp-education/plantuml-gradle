@@ -9,7 +9,6 @@ import kotlin.test.assertTrue
  * misses.
  */
 class PlantumlProseLabelExtractorTest {
-
     @Test
     fun `extracts a sequence message`() {
         val source = "@startuml\nA -> B : Lance le terminal\n@enduml"

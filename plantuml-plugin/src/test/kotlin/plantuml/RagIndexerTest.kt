@@ -17,7 +17,6 @@ import kotlin.test.assertTrue
  * and only visible via GradleRunner text output.
  */
 class RagIndexerTest {
-
     @TempDir
     lateinit var tempDir: File
 

@@ -9,16 +9,17 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.TaskContainer
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.*
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.`when`
 import plantuml.PlantumlPlugin.PlantumlExtension
-import plantuml.tasks.GeneratePlantumlDiagramsTask
 import plantuml.tasks.CollectPlantumlIndexTask
+import plantuml.tasks.GeneratePlantumlDiagramsTask
 import plantuml.tasks.ValidatePlantumlSyntaxTask
-import kotlin.test.assertNotNull
 import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
 
 class PlantumlPluginUnitTest {
-
     private lateinit var project: Project
     private lateinit var plugin: PlantumlPlugin
     private lateinit var extensions: ExtensionContainer
@@ -69,8 +70,10 @@ class PlantumlPluginUnitTest {
     fun `should create plantuml extension with configurable properties`() {
         // Given
         val objects = mock(ObjectFactory::class.java)
+
         @Suppress("UNCHECKED_CAST")
         val property = mock(Property::class.java) as Property<String>
+
         @Suppress("UNCHECKED_CAST")
         val listProperty = mock(ListProperty::class.java) as ListProperty<String>
 

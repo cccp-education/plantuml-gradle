@@ -7,7 +7,6 @@ import org.gradle.work.DisableCachingByDefault
 import plantuml.PlantumlManager
 import plantuml.PlantumlMessages
 import plantuml.service.GraphifyPromptAdapter
-import java.io.File
 
 /**
  * Gradle task: `generateDiagramDocs`
@@ -27,7 +26,6 @@ import java.io.File
  */
 @DisableCachingByDefault(because = "Depends on Graphify output which may change")
 abstract class GenerateDiagramDocsTask : DefaultTask() {
-
     private val lang: String = PlantumlManager.resolveLanguage(project)
 
     init {
@@ -46,7 +44,7 @@ abstract class GenerateDiagramDocsTask : DefaultTask() {
 
         if (!graphFile.exists()) {
             throw GradleException(
-                PlantumlMessages.get("diagramdocs.graph_not_found", lang)
+                PlantumlMessages.get("diagramdocs.graph_not_found", lang),
             )
         }
 
@@ -58,30 +56,32 @@ abstract class GenerateDiagramDocsTask : DefaultTask() {
         val promptsDir = project.file("prompts")
         promptsDir.mkdirs()
 
-        val outputDir = project.findProperty("plantuml.diagram.outputDir")?.toString()
-            ?: "diagrams/auto"
+        val outputDir =
+            project.findProperty("plantuml.diagram.outputDir")?.toString()
+                ?: "diagrams/auto"
         val autoOutputDir = project.file(outputDir)
         autoOutputDir.mkdirs()
 
         val adapter = GraphifyPromptAdapter(graphFile, promptsDir)
 
-        val results = if (generateAll) {
-            logger.lifecycle(PlantumlMessages.get("diagramdocs.all_communities", lang))
-            adapter.generateAllPrompts()
-        } else {
-            val targetSubgraph = subgraph ?: "service layer"
-            logger.lifecycle(PlantumlMessages.format("diagramdocs.subgraph", lang, targetSubgraph))
-            listOf(adapter.generatePrompt(targetSubgraph))
-        }
+        val results =
+            if (generateAll) {
+                logger.lifecycle(PlantumlMessages.get("diagramdocs.all_communities", lang))
+                adapter.generateAllPrompts()
+            } else {
+                val targetSubgraph = subgraph ?: "service layer"
+                logger.lifecycle(PlantumlMessages.format("diagramdocs.subgraph", lang, targetSubgraph))
+                listOf(adapter.generatePrompt(targetSubgraph))
+            }
 
         results.forEach { result ->
             logger.lifecycle(
-                PlantumlMessages.format("diagramdocs.generated_prompt", lang, result.promptFile.name, result.nodes.size, result.edges.size)
+                PlantumlMessages.format("diagramdocs.generated_prompt", lang, result.promptFile.name, result.nodes.size, result.edges.size),
             )
         }
 
         logger.lifecycle(
-            PlantumlMessages.format("diagramdocs.summary", lang, results.size)
+            PlantumlMessages.format("diagramdocs.summary", lang, results.size),
         )
     }
 }

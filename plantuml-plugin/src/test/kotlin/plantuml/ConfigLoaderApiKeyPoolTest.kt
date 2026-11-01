@@ -1,23 +1,22 @@
 package plantuml
 
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Test
 import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 /**
  * Unit tests for ConfigLoader with API Key Pool YAML parsing support.
  */
 class ConfigLoaderApiKeyPoolTest {
-
     @Test
     @DisplayName("should parse pool configuration for OpenAI")
     fun `should parse pool configuration for OpenAI`() {
         // Given
         val tempFile = File.createTempFile("test-config-pool", ".yml")
-        tempFile.writeText("""
+        tempFile.writeText(
+            """
             langchain4j:
               model: openai
               openai:
@@ -42,7 +41,8 @@ class ConfigLoaderApiKeyPoolTest {
                     quota:
                       limitValue: 2000
                       thresholdPercent: 75
-        """.trimIndent())
+            """.trimIndent(),
+        )
         tempFile.deleteOnExit()
 
         // When
@@ -51,8 +51,16 @@ class ConfigLoaderApiKeyPoolTest {
         // Then
         assertNotNull(config.langchain4j.openai.pool)
         assertEquals(2, config.langchain4j.openai.pool.size)
-        assertEquals("openai-key-1", config.langchain4j.openai.pool[0].id)
-        assertEquals("openai-key-2", config.langchain4j.openai.pool[1].id)
+        assertEquals(
+            "openai-key-1",
+            config.langchain4j.openai.pool[0]
+                .id,
+        )
+        assertEquals(
+            "openai-key-2",
+            config.langchain4j.openai.pool[1]
+                .id,
+        )
     }
 
     @Test
@@ -60,7 +68,8 @@ class ConfigLoaderApiKeyPoolTest {
     fun `should parse pool configuration for Gemini`() {
         // Given
         val tempFile = File.createTempFile("test-config-gemini-pool", ".yml")
-        tempFile.writeText("""
+        tempFile.writeText(
+            """
             langchain4j:
               model: gemini
               gemini:
@@ -75,7 +84,8 @@ class ConfigLoaderApiKeyPoolTest {
                     quota:
                       limitValue: 500
                       thresholdPercent: 90
-        """.trimIndent())
+            """.trimIndent(),
+        )
         tempFile.deleteOnExit()
 
         // When
@@ -84,8 +94,16 @@ class ConfigLoaderApiKeyPoolTest {
         // Then
         assertNotNull(config.langchain4j.gemini.pool)
         assertEquals(1, config.langchain4j.gemini.pool.size)
-        assertEquals("gemini-key-1", config.langchain4j.gemini.pool[0].id)
-        assertEquals("google@example.com", config.langchain4j.gemini.pool[0].email)
+        assertEquals(
+            "gemini-key-1",
+            config.langchain4j.gemini.pool[0]
+                .id,
+        )
+        assertEquals(
+            "google@example.com",
+            config.langchain4j.gemini.pool[0]
+                .email,
+        )
     }
 
     @Test
@@ -93,7 +111,8 @@ class ConfigLoaderApiKeyPoolTest {
     fun `should parse pool configuration for Mistral`() {
         // Given
         val tempFile = File.createTempFile("test-config-mistral-pool", ".yml")
-        tempFile.writeText("""
+        tempFile.writeText(
+            """
             langchain4j:
               model: mistral
               mistral:
@@ -108,7 +127,8 @@ class ConfigLoaderApiKeyPoolTest {
                     quota:
                       limitValue: 750
                       thresholdPercent: 85
-        """.trimIndent())
+            """.trimIndent(),
+        )
         tempFile.deleteOnExit()
 
         // When
@@ -117,7 +137,11 @@ class ConfigLoaderApiKeyPoolTest {
         // Then
         assertNotNull(config.langchain4j.mistral.pool)
         assertEquals(1, config.langchain4j.mistral.pool.size)
-        assertEquals("mistral-key-1", config.langchain4j.mistral.pool[0].id)
+        assertEquals(
+            "mistral-key-1",
+            config.langchain4j.mistral.pool[0]
+                .id,
+        )
     }
 
     @Test
@@ -125,7 +149,8 @@ class ConfigLoaderApiKeyPoolTest {
     fun `should parse pool configuration for Claude`() {
         // Given
         val tempFile = File.createTempFile("test-config-claude-pool", ".yml")
-        tempFile.writeText("""
+        tempFile.writeText(
+            """
             langchain4j:
               model: claude
               claude:
@@ -140,7 +165,8 @@ class ConfigLoaderApiKeyPoolTest {
                     quota:
                       limitValue: 1500
                       thresholdPercent: 70
-        """.trimIndent())
+            """.trimIndent(),
+        )
         tempFile.deleteOnExit()
 
         // When
@@ -149,7 +175,11 @@ class ConfigLoaderApiKeyPoolTest {
         // Then
         assertNotNull(config.langchain4j.claude.pool)
         assertEquals(1, config.langchain4j.claude.pool.size)
-        assertEquals("claude-key-1", config.langchain4j.claude.pool[0].id)
+        assertEquals(
+            "claude-key-1",
+            config.langchain4j.claude.pool[0]
+                .id,
+        )
     }
 
     @Test
@@ -157,7 +187,8 @@ class ConfigLoaderApiKeyPoolTest {
     fun `should parse pool configuration for HuggingFace`() {
         // Given
         val tempFile = File.createTempFile("test-config-hf-pool", ".yml")
-        tempFile.writeText("""
+        tempFile.writeText(
+            """
             langchain4j:
               model: huggingface
               huggingface:
@@ -172,7 +203,8 @@ class ConfigLoaderApiKeyPoolTest {
                     quota:
                       limitValue: 300
                       thresholdPercent: 80
-        """.trimIndent())
+            """.trimIndent(),
+        )
         tempFile.deleteOnExit()
 
         // When
@@ -181,7 +213,11 @@ class ConfigLoaderApiKeyPoolTest {
         // Then
         assertNotNull(config.langchain4j.huggingface.pool)
         assertEquals(1, config.langchain4j.huggingface.pool.size)
-        assertEquals("hf-key-1", config.langchain4j.huggingface.pool[0].id)
+        assertEquals(
+            "hf-key-1",
+            config.langchain4j.huggingface.pool[0]
+                .id,
+        )
     }
 
     @Test
@@ -189,7 +225,8 @@ class ConfigLoaderApiKeyPoolTest {
     fun `should parse pool configuration for Groq`() {
         // Given
         val tempFile = File.createTempFile("test-config-groq-pool", ".yml")
-        tempFile.writeText("""
+        tempFile.writeText(
+            """
             langchain4j:
               model: groq
               groq:
@@ -204,7 +241,8 @@ class ConfigLoaderApiKeyPoolTest {
                     quota:
                       limitValue: 1000
                       thresholdPercent: 80
-        """.trimIndent())
+            """.trimIndent(),
+        )
         tempFile.deleteOnExit()
 
         // When
@@ -213,7 +251,11 @@ class ConfigLoaderApiKeyPoolTest {
         // Then
         assertNotNull(config.langchain4j.groq.pool)
         assertEquals(1, config.langchain4j.groq.pool.size)
-        assertEquals("groq-key-1", config.langchain4j.groq.pool[0].id)
+        assertEquals(
+            "groq-key-1",
+            config.langchain4j.groq.pool[0]
+                .id,
+        )
     }
 
     @Test
@@ -221,7 +263,8 @@ class ConfigLoaderApiKeyPoolTest {
     fun `should parse multiple provider pools`() {
         // Given
         val tempFile = File.createTempFile("test-config-multi-pool", ".yml")
-        tempFile.writeText("""
+        tempFile.writeText(
+            """
             langchain4j:
               model: openai
               openai:
@@ -248,7 +291,8 @@ class ConfigLoaderApiKeyPoolTest {
                     quota:
                       limitValue: 500
                       thresholdPercent: 90
-        """.trimIndent())
+            """.trimIndent(),
+        )
         tempFile.deleteOnExit()
 
         // When
@@ -257,8 +301,16 @@ class ConfigLoaderApiKeyPoolTest {
         // Then
         assertEquals(1, config.langchain4j.openai.pool.size)
         assertEquals(1, config.langchain4j.gemini.pool.size)
-        assertEquals("openai-key-1", config.langchain4j.openai.pool[0].id)
-        assertEquals("gemini-key-1", config.langchain4j.gemini.pool[0].id)
+        assertEquals(
+            "openai-key-1",
+            config.langchain4j.openai.pool[0]
+                .id,
+        )
+        assertEquals(
+            "gemini-key-1",
+            config.langchain4j.gemini.pool[0]
+                .id,
+        )
     }
 
     @Test
@@ -266,12 +318,14 @@ class ConfigLoaderApiKeyPoolTest {
     fun `should parse empty pool as empty list`() {
         // Given
         val tempFile = File.createTempFile("test-config-empty-pool", ".yml")
-        tempFile.writeText("""
+        tempFile.writeText(
+            """
             langchain4j:
               model: openai
               openai:
                 pool: []
-        """.trimIndent())
+            """.trimIndent(),
+        )
         tempFile.deleteOnExit()
 
         // When
@@ -286,7 +340,8 @@ class ConfigLoaderApiKeyPoolTest {
     @DisplayName("should parse pool with baseUrl")
     fun `should parse pool with baseUrl`() {
         val tempFile = File.createTempFile("test-config-baseurl-pool", ".yml")
-        tempFile.writeText("""
+        tempFile.writeText(
+            """
             langchain4j:
               model: openai
               openai:
@@ -303,21 +358,27 @@ class ConfigLoaderApiKeyPoolTest {
                     quota:
                       limitValue: 1000
                       thresholdPercent: 80
-        """.trimIndent())
+            """.trimIndent(),
+        )
         tempFile.deleteOnExit()
 
         val config = ConfigLoader.load(tempFile)
 
         assertNotNull(config.langchain4j.openai.pool)
         assertEquals(1, config.langchain4j.openai.pool.size)
-        assertEquals("https://custom.openai.api", config.langchain4j.openai.pool[0].baseUrl)
+        assertEquals(
+            "https://custom.openai.api",
+            config.langchain4j.openai.pool[0]
+                .baseUrl,
+        )
     }
 
     @Test
     @DisplayName("should parse tier and weight from pool entries")
     fun `should parse tier and weight from pool entries`() {
         val tempFile = File.createTempFile("test-config-tier-pool", ".yml")
-        tempFile.writeText("""
+        tempFile.writeText(
+            """
             langchain4j:
               model: openai
               openai:
@@ -344,7 +405,8 @@ class ConfigLoaderApiKeyPoolTest {
                     quota:
                       limitValue: 100
                       thresholdPercent: 80
-        """.trimIndent())
+            """.trimIndent(),
+        )
         tempFile.deleteOnExit()
 
         val config = ConfigLoader.load(tempFile)
@@ -362,7 +424,8 @@ class ConfigLoaderApiKeyPoolTest {
     @DisplayName("should parse tiered rotation strategy at langchain4j level")
     fun `should parse tiered rotation strategy at langchain4j level`() {
         val tempFile = File.createTempFile("test-config-rotation", ".yml")
-        tempFile.writeText("""
+        tempFile.writeText(
+            """
             langchain4j:
               model: openai
               rotationStrategy: "TIERED"
@@ -376,7 +439,8 @@ class ConfigLoaderApiKeyPoolTest {
                     provider: "OPENAI"
                     services:
                       - "CHAT_COMPLETION"
-        """.trimIndent())
+            """.trimIndent(),
+        )
         tempFile.deleteOnExit()
 
         val config = ConfigLoader.load(tempFile)

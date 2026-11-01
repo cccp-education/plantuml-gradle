@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class NonTranslatableTermRegistryLoaderTest {
-
     private val loader = NonTranslatableTermRegistryLoader()
 
     @Test
@@ -19,12 +18,13 @@ class NonTranslatableTermRegistryLoaderTest {
 
     @Test
     fun `should parse multiple terms`() {
-        val yaml = """
+        val yaml =
+            """
             terms:
               - RFC
               - ISO
               - RFC
-        """.trimIndent() + "\n"
+            """.trimIndent() + "\n"
 
         val registry = loader.load(yaml)
 

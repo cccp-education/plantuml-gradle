@@ -18,12 +18,14 @@ import plantuml.context.ProvenanceTracker
  * shared `plantuml.scenarios` glue package (anti-collision rule S-088).
  */
 class PlantumlProvenanceSteps {
-
     private var tracker: ProvenanceTracker? = null
     private var provenance: ContextProvenance? = null
 
     @Given("a provenance tracker with EAGER source {string} and RAG source {string}")
-    fun aTrackerWithEagerAndRagSources(eagerSource: String, ragSource: String) {
+    fun aTrackerWithEagerAndRagSources(
+        eagerSource: String,
+        ragSource: String,
+    ) {
         val tracker = ProvenanceTracker()
         tracker.trackChannel(Channel.EAGER, listOf(source(eagerSource)))
         tracker.trackChannel(Channel.RAG, listOf(source(ragSource)))
@@ -32,13 +34,14 @@ class PlantumlProvenanceSteps {
 
     @When("the plantuml context is assembled from RAG {string} with the provenance tracker")
     fun theContextIsAssembledFromRag(rag: String) {
-        val composite = CompositeContext(
-            eagerSection = "",
-            ragSection = rag,
-            graphifySection = "",
-            docsSection = "",
-            config = CompositeContextConfig(),
-        )
+        val composite =
+            CompositeContext(
+                eagerSection = "",
+                ragSection = rag,
+                graphifySection = "",
+                docsSection = "",
+                config = CompositeContextConfig(),
+            )
         PlantumlContextBuilder.build(composite = composite, tracker = tracker)
         provenance = tracker!!.build()
     }
@@ -63,8 +66,7 @@ class PlantumlProvenanceSteps {
         assertThat(provenance!!.toJson()).contains(fragment)
     }
 
-    private fun source(fileName: String): ProvenanceSource =
-        ProvenanceSource(fileName = fileName, chars = fileName.length, tokens = 1)
+    private fun source(fileName: String): ProvenanceSource = ProvenanceSource(fileName = fileName, chars = fileName.length, tokens = 1)
 
     private object Channel {
         const val EAGER = "EAGER"

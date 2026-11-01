@@ -1,5 +1,6 @@
 package plantuml.tasks
 
+import contracts.plantuml.SyntaxValidationResult
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.TaskAction
@@ -14,7 +15,6 @@ import plantuml.boundary.TranslationResolver
 import plantuml.service.KnowledgeGraphParser
 import plantuml.service.KnowledgeGraphRenderer
 import plantuml.service.PlantumlService
-import contracts.plantuml.SyntaxValidationResult
 import java.io.File
 
 /**
@@ -39,7 +39,6 @@ import java.io.File
  */
 @DisableCachingByDefault(because = "Depends on graph.json which may change")
 abstract class GenerateKnowledgeGraphDiagramTask : DefaultTask() {
-
     private val lang: String = PlantumlManager.resolveLanguage(project)
 
     init {
@@ -58,7 +57,7 @@ abstract class GenerateKnowledgeGraphDiagramTask : DefaultTask() {
 
         if (!graphFile.exists()) {
             throw GradleException(
-                PlantumlMessages.format("kgparser.file_not_found", lang, graphFile.absolutePath)
+                PlantumlMessages.format("kgparser.file_not_found", lang, graphFile.absolutePath),
             )
         }
 
@@ -71,54 +70,59 @@ abstract class GenerateKnowledgeGraphDiagramTask : DefaultTask() {
         val outputDirStr = project.findProperty("plantuml.kg.outputDir")?.toString() ?: "diagrams/knowledge-graph"
 
         val nodeTypesStr = project.findProperty("plantuml.kg.nodeTypes")?.toString()
-        val edgeTypes = if (edgeTypesStr != null) {
-            edgeTypesStr.split(",").map { parseEdgeType(it.trim()) }.toSet()
-        } else {
-            EdgeType.entries.toSet()
-        }
+        val edgeTypes =
+            if (edgeTypesStr != null) {
+                edgeTypesStr.split(",").map { parseEdgeType(it.trim()) }.toSet()
+            } else {
+                EdgeType.entries.toSet()
+            }
 
         val minConfidence = minConfidenceStr?.toDoubleOrNull() ?: 0.0
         val maxNodes = maxNodesStr?.toIntOrNull() ?: Int.MAX_VALUE
-        val nodeTypes = if (nodeTypesStr != null) {
-            nodeTypesStr.split(",").map { it.trim().lowercase() }.toSet()
-        } else {
-            null
-        }
+        val nodeTypes =
+            if (nodeTypesStr != null) {
+                nodeTypesStr.split(",").map { it.trim().lowercase() }.toSet()
+            } else {
+                null
+            }
 
         val parser = KnowledgeGraphParser(graphFile)
         val graph = parser.parse()
 
         logger.lifecycle(
-            PlantumlMessages.format("kg.stats", lang, graph.nodes.size, graph.edges.size, graph.communities.size)
+            PlantumlMessages.format("kg.stats", lang, graph.nodes.size, graph.edges.size, graph.communities.size),
         )
 
         val renderer = KnowledgeGraphRenderer()
-        val resolver = TranslationResolver(
-            classifier = TextClassifier(),
-            glossary = IdiomaticGlossary(),
-            messageResolver = { key, l -> runCatching { PlantumlMessages.get(key, l) }.getOrNull() },
-            nonTranslatableRegistry = NonTranslatableTermRegistry()
-        )
-        val plantumlCode = renderer.render(
-            graph,
-            communityFilter = communityFilter,
-            edgeTypes = edgeTypes,
-            minConfidence = minConfidence,
-            maxNodes = maxNodes,
-            nodeTypes = nodeTypes,
-            resolver = resolver,
-            language = lang
-        )
+        val resolver =
+            TranslationResolver(
+                classifier = TextClassifier(),
+                glossary = IdiomaticGlossary(),
+                messageResolver = { key, l -> runCatching { PlantumlMessages.get(key, l) }.getOrNull() },
+                nonTranslatableRegistry = NonTranslatableTermRegistry(),
+            )
+        val plantumlCode =
+            renderer.render(
+                graph,
+                communityFilter = communityFilter,
+                edgeTypes = edgeTypes,
+                minConfidence = minConfidence,
+                maxNodes = maxNodes,
+                nodeTypes = nodeTypes,
+                resolver = resolver,
+                language = lang,
+            )
 
         val outputDir = project.file(outputDirStr)
         outputDir.mkdirs()
 
-        val fileNameSuffix = if (communityFilter != null) {
-            "-${communityFilter.replace(" ", "-")}"
-        } else {
-            "-full"
-        }
-        val pumlFile = File(outputDir, "knowledge-graph${fileNameSuffix}.puml")
+        val fileNameSuffix =
+            if (communityFilter != null) {
+                "-${communityFilter.replace(" ", "-")}"
+            } else {
+                "-full"
+            }
+        val pumlFile = File(outputDir, "knowledge-graph$fileNameSuffix.puml")
         pumlFile.writeText(plantumlCode)
         logger.lifecycle(PlantumlMessages.format("kg.generated_puml", lang, pumlFile.absolutePath))
 
@@ -128,18 +132,18 @@ abstract class GenerateKnowledgeGraphDiagramTask : DefaultTask() {
             logger.warn(PlantumlMessages.format("kg.validation_issues", lang, validationResult.errorMessage))
             logger.lifecycle(PlantumlMessages.format("kg.saved_despite_issues", lang, pumlFile.absolutePath))
         } else {
-            val imageFile = File(outputDir, "knowledge-graph${fileNameSuffix}.png")
+            val imageFile = File(outputDir, "knowledge-graph$fileNameSuffix.png")
             plantumlService.generateImage(plantumlCode, imageFile)
             logger.lifecycle(PlantumlMessages.format("kg.generated_png", lang, imageFile.absolutePath))
         }
 
         logger.lifecycle(
-            PlantumlMessages.format("kg.success", lang, graph.nodes.size, graph.edges.size, graph.communities.size)
+            PlantumlMessages.format("kg.success", lang, graph.nodes.size, graph.edges.size, graph.communities.size),
         )
     }
 
-    private fun parseEdgeType(typeStr: String): EdgeType {
-        return when (typeStr.uppercase()) {
+    private fun parseEdgeType(typeStr: String): EdgeType =
+        when (typeStr.uppercase()) {
             "EXTRACTED" -> EdgeType.EXTRACTED
             "INFERRED" -> EdgeType.INFERRED
             "AMBIGUOUS" -> EdgeType.AMBIGUOUS
@@ -148,5 +152,4 @@ abstract class GenerateKnowledgeGraphDiagramTask : DefaultTask() {
                 EdgeType.EXTRACTED
             }
         }
-    }
 }

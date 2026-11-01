@@ -3,7 +3,6 @@ package plantuml.boundary
 import contracts.i18n.TranslationRequest
 import contracts.i18n.TranslationResult
 import contracts.i18n.TranslationService
-import contracts.plantuml.PlantUmlBlock
 import contracts.plantuml.PlantUmlClassifier
 import contracts.plantuml.PlantUmlStrategy
 import contracts.plantuml.PlantUmlSyntaxValidator
@@ -44,7 +43,6 @@ class PlantumlTranslationPortAdapter(
     private val validator: PlantUmlSyntaxValidator? = null,
     private val termShield: PlantumlTermShield = PlantumlTermShield(),
 ) : PlantUmlTranslationPort {
-
     override fun translate(request: PlantUmlTranslationRequest): PlantUmlTranslationOutcome {
         val block = request.block
         val labels = block.labels()
@@ -176,9 +174,11 @@ class PlantumlTranslationPortAdapter(
             val parts = PlantumlLabelBatch.split(result.translatedText, translatable.size)
             if (parts != null) {
                 val restored =
-                    translatable.zip(parts).mapNotNull { (label, part) ->
-                        termShield.restore(part, shields.getValue(label))?.let { label to it }
-                    }.toMap()
+                    translatable
+                        .zip(parts)
+                        .mapNotNull { (label, part) ->
+                            termShield.restore(part, shields.getValue(label))?.let { label to it }
+                        }.toMap()
                 if (restored.size == translatable.size) return restored
             }
         }
@@ -205,7 +205,11 @@ class PlantumlTranslationPortAdapter(
         return termShield.restore(translated, shield)
     }
 
-    private fun translateLabel(text: String, sourceLanguage: String, targetLanguage: String): String? {
+    private fun translateLabel(
+        text: String,
+        sourceLanguage: String,
+        targetLanguage: String,
+    ): String? {
         if (text.isBlank()) return null
         return when (val result = translator.translate(TranslationRequest(text, sourceLanguage, targetLanguage))) {
             is TranslationResult.Success -> result.translatedText

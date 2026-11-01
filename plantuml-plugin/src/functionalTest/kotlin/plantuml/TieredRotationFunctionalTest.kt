@@ -20,31 +20,32 @@ import plantuml.apikey.ServiceType
  * with audit logging, quota tracking, and tier descent semantics.
  */
 class TieredRotationFunctionalTest {
-
     private fun entry(
         id: String,
         tier: KeyTier,
         weight: Int = 1,
-        quota: QuotaConfig = QuotaConfig()
-    ): ApiKeyEntry = ApiKeyEntry(
-        id = id,
-        email = "t@e.com",
-        name = "Test $id",
-        keyRef = "REF_$id",
-        provider = Provider.GOOGLE,
-        services = listOf(ServiceType.CHAT_COMPLETION),
-        tier = tier,
-        weight = weight,
-        quota = quota
-    )
+        quota: QuotaConfig = QuotaConfig(),
+    ): ApiKeyEntry =
+        ApiKeyEntry(
+            id = id,
+            email = "t@e.com",
+            name = "Test $id",
+            keyRef = "REF_$id",
+            provider = Provider.GOOGLE,
+            services = listOf(ServiceType.CHAT_COMPLETION),
+            tier = tier,
+            weight = weight,
+            quota = quota,
+        )
 
     @Test
     fun `tiered pool selects ENTERPRISE key first`() {
-        val entries = listOf(
-            entry("free-1", KeyTier.FREE),
-            entry("ent-1", KeyTier.ENTERPRISE),
-            entry("pro-1", KeyTier.PRO)
-        )
+        val entries =
+            listOf(
+                entry("free-1", KeyTier.FREE),
+                entry("ent-1", KeyTier.ENTERPRISE),
+                entry("pro-1", KeyTier.PRO),
+            )
         val pool = ApiKeyPool(entries, RotationStrategy.TIERED, auditEnabled = true)
 
         val selected = pool.getNextKey()
@@ -62,11 +63,12 @@ class TieredRotationFunctionalTest {
         val entQuota = QuotaConfig(limitValue = 4, thresholdPercent = 50, resetPolicy = ResetPolicy.MANUAL)
         val proQuota = QuotaConfig(limitValue = 4, thresholdPercent = 50, resetPolicy = ResetPolicy.MANUAL)
         val freeQuota = QuotaConfig(limitValue = 10, thresholdPercent = 50, resetPolicy = ResetPolicy.MANUAL)
-        val entries = listOf(
-            entry("ent-1", KeyTier.ENTERPRISE, quota = entQuota),
-            entry("pro-1", KeyTier.PRO, quota = proQuota),
-            entry("free-1", KeyTier.FREE, quota = freeQuota)
-        )
+        val entries =
+            listOf(
+                entry("ent-1", KeyTier.ENTERPRISE, quota = entQuota),
+                entry("pro-1", KeyTier.PRO, quota = proQuota),
+                entry("free-1", KeyTier.FREE, quota = freeQuota),
+            )
         val pool = ApiKeyPool(entries, RotationStrategy.TIERED, autoResetEnabled = false)
 
         val first = pool.getNextKey()
@@ -84,11 +86,12 @@ class TieredRotationFunctionalTest {
 
     @Test
     fun `tiered pool respects weight within same tier`() {
-        val entries = listOf(
-            entry("ent-low", KeyTier.ENTERPRISE, weight = 1),
-            entry("ent-mid", KeyTier.ENTERPRISE, weight = 3),
-            entry("ent-high", KeyTier.ENTERPRISE, weight = 10)
-        )
+        val entries =
+            listOf(
+                entry("ent-low", KeyTier.ENTERPRISE, weight = 1),
+                entry("ent-mid", KeyTier.ENTERPRISE, weight = 3),
+                entry("ent-high", KeyTier.ENTERPRISE, weight = 10),
+            )
         val pool = ApiKeyPool(entries, RotationStrategy.TIERED, autoResetEnabled = false)
 
         val selected = pool.getNextKey()
@@ -101,10 +104,11 @@ class TieredRotationFunctionalTest {
     fun `tiered pool logs quota exceeded when descending tiers`() {
         val entQuota = QuotaConfig(limitValue = 2, thresholdPercent = 50, resetPolicy = ResetPolicy.MANUAL)
         val proQuota = QuotaConfig(limitValue = 10, thresholdPercent = 50, resetPolicy = ResetPolicy.MANUAL)
-        val entries = listOf(
-            entry("ent-1", KeyTier.ENTERPRISE, quota = entQuota),
-            entry("pro-1", KeyTier.PRO, quota = proQuota)
-        )
+        val entries =
+            listOf(
+                entry("ent-1", KeyTier.ENTERPRISE, quota = entQuota),
+                entry("pro-1", KeyTier.PRO, quota = proQuota),
+            )
         val pool = ApiKeyPool(entries, RotationStrategy.TIERED, autoResetEnabled = false, auditEnabled = true)
 
         pool.getNextKey()
@@ -117,14 +121,16 @@ class TieredRotationFunctionalTest {
     @Test
     fun `tiered pool returns a key even when all entries are saturated`() {
         val quota = QuotaConfig(limitValue = 2, thresholdPercent = 50, resetPolicy = ResetPolicy.MANUAL)
-        val entries = listOf(
-            entry("ent-1", KeyTier.ENTERPRISE, quota = quota)
-        )
-        val pool = ApiKeyPool(
-            entries = entries,
-            rotationStrategy = RotationStrategy.TIERED,
-            autoResetEnabled = false
-        )
+        val entries =
+            listOf(
+                entry("ent-1", KeyTier.ENTERPRISE, quota = quota),
+            )
+        val pool =
+            ApiKeyPool(
+                entries = entries,
+                rotationStrategy = RotationStrategy.TIERED,
+                autoResetEnabled = false,
+            )
 
         val first = pool.getNextKey()
         val second = pool.getNextKey()

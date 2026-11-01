@@ -3,6 +3,7 @@ package plantuml.tasks
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import contracts.plantuml.SyntaxValidationResult
 import org.gradle.api.DefaultTask
 import org.gradle.api.tasks.TaskAction
 import org.gradle.work.DisableCachingByDefault
@@ -21,7 +22,6 @@ import plantuml.service.DiagramOutputVerdict
 import plantuml.service.DiagramProcessor
 import plantuml.service.LlmService
 import plantuml.service.PlantumlService
-import contracts.plantuml.SyntaxValidationResult
 import java.io.File
 
 /**
@@ -51,10 +51,10 @@ import java.io.File
  */
 @DisableCachingByDefault(because = "PlantUML generation involves randomness and AI interaction")
 abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
-
-    private val objectMapper: ObjectMapper = ObjectMapper()
-        .registerModule(JavaTimeModule())
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+    private val objectMapper: ObjectMapper =
+        ObjectMapper()
+            .registerModule(JavaTimeModule())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
     private val lang: String = PlantumlManager.resolveLanguage(project)
 
@@ -73,13 +73,13 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
     fun processPrompts() {
         // Set project directory for DiagramProcessor to use when archiving history
         System.setProperty("plugin.project.dir", project.projectDir.absolutePath)
-        
+
         // Set test mode flag if provided as Gradle property
         val testMode = project.findProperty("plantuml.test.mode") as? String
         if (testMode == "true") {
             System.setProperty("plantuml.test.mode", "true")
         }
-        
+
         // Check for test mode disk space simulation
         val runtime = RuntimeEnvironment.system()
         val simulateDiskFull = runtime.isDiskFullSimulated
@@ -89,12 +89,13 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
             cleanupPartialOutputs()
             throw RuntimeException(message)
         }
-        
+
         // Load configuration
         val config = loadConfiguration()
         logger.lifecycle("Resolved language: ${config.language}")
-        val promptsDir = project.findProperty("plantuml.prompts.dir") as? String
-            ?: config.input.prompts
+        val promptsDir =
+            project.findProperty("plantuml.prompts.dir") as? String
+                ?: config.input.prompts
 
         logger.debug("DEBUG: promptsDir from config: ${config.input.prompts}")
         logger.debug("DEBUG: promptsDir from property: {}", project.findProperty("plantuml.prompts.dir"))
@@ -110,9 +111,10 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
             return
         }
 
-        val promptFiles = promptsDirectory.listFiles { file ->
-            file.extension == "prompt"
-        } ?: emptyArray()
+        val promptFiles =
+            promptsDirectory.listFiles { file ->
+                file.extension == "prompt"
+            } ?: emptyArray()
 
         if (promptFiles.isEmpty()) {
             logger.lifecycle(PlantumlMessages.format("generate.no_prompt_files", lang, promptsDirectory.absolutePath))
@@ -128,21 +130,23 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         logger.lifecycle(PlantumlMessages.format("generate.debug", lang, chatModel.toString(), config.output.diagrams, runtime.isTestMode))
         // PLT-AGENT DIA-01 — opt-in vision design review (built only when enabled and
         // an LLM is available; the reviewer degrades if the model lacks vision).
-        val designReviewer = if (config.langchain4j.designValidation && chatModel != null) {
-            plantuml.service.VisionDesignReviewer(chatModel)
-        } else {
-            null
-        }
+        val designReviewer =
+            if (config.langchain4j.designValidation && chatModel != null) {
+                plantuml.service.VisionDesignReviewer(chatModel)
+            } else {
+                null
+            }
         if (designReviewer != null) {
             logger.lifecycle("Design validation enabled (vision review)")
         }
         val diagramProcessor = DiagramProcessor(plantumlService, chatModel, config, designReviewer, resolveAugmentedContext(), runtime)
-        val resolver = TranslationResolver(
-            classifier = TextClassifier(),
-            glossary = IdiomaticGlossary(),
-            messageResolver = { key, l -> runCatching { PlantumlMessages.get(key, l) }.getOrNull() },
-            nonTranslatableRegistry = NonTranslatableTermRegistry()
-        )
+        val resolver =
+            TranslationResolver(
+                classifier = TextClassifier(),
+                glossary = IdiomaticGlossary(),
+                messageResolver = { key, l -> runCatching { PlantumlMessages.get(key, l) }.getOrNull() },
+                nonTranslatableRegistry = NonTranslatableTermRegistry(),
+            )
 
         // Incremental processing: checksum-based skip + orphan cleanup
         val checksumsDir = File(project.buildDir, config.incremental.checksumsDir.removePrefix("build/"))
@@ -192,7 +196,11 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
      * current run.
      */
     private fun resolveAugmentedContext(): String {
-        val artefact = project.layout.buildDirectory.file("plantuml/augmented-context.txt").get().asFile
+        val artefact =
+            project.layout.buildDirectory
+                .file("plantuml/augmented-context.txt")
+                .get()
+                .asFile
         return if (artefact.exists()) artefact.readText() else ""
     }
 
@@ -234,42 +242,60 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
 
         // Apply CLI parameter overrides
         var config = baseConfig
-        if (llmModel != null)
+        if (llmModel != null) {
             config = config.copy(langchain4j = config.langchain4j.copy(model = llmModel))
-        if (ollamaModelName != null)
-            config = config.copy(
-                langchain4j = config.langchain4j.copy(
-                    ollama = config.langchain4j.ollama.copy(
-                        modelName = ollamaModelName
-                    )
+        }
+        if (ollamaModelName != null) {
+            config =
+                config.copy(
+                    langchain4j =
+                        config.langchain4j.copy(
+                            ollama =
+                                config.langchain4j.ollama.copy(
+                                    modelName = ollamaModelName,
+                                ),
+                        ),
                 )
-            )
-        if (ollamaBaseUrl != null)
-            config = config.copy(
-                langchain4j = config.langchain4j.copy(
-                    ollama = config.langchain4j.ollama.copy(
-                        baseUrl = ollamaBaseUrl
-                    )
+        }
+        if (ollamaBaseUrl != null) {
+            config =
+                config.copy(
+                    langchain4j =
+                        config.langchain4j.copy(
+                            ollama =
+                                config.langchain4j.ollama.copy(
+                                    baseUrl = ollamaBaseUrl,
+                                ),
+                        ),
                 )
-            )
-        if (maxIterations != null)
-            config = config.copy(
-                langchain4j = config.langchain4j.copy(
-                    maxIterations = maxIterations
+        }
+        if (maxIterations != null) {
+            config =
+                config.copy(
+                    langchain4j =
+                        config.langchain4j.copy(
+                            maxIterations = maxIterations,
+                        ),
                 )
-            )
-        if (maxSeconds != null)
-            config = config.copy(
-                langchain4j = config.langchain4j.copy(
-                    maxSeconds = maxSeconds
+        }
+        if (maxSeconds != null) {
+            config =
+                config.copy(
+                    langchain4j =
+                        config.langchain4j.copy(
+                            maxSeconds = maxSeconds,
+                        ),
                 )
-            )
-        if (designValidation != null)
-            config = config.copy(
-                langchain4j = config.langchain4j.copy(
-                    designValidation = designValidation
+        }
+        if (designValidation != null) {
+            config =
+                config.copy(
+                    langchain4j =
+                        config.langchain4j.copy(
+                            designValidation = designValidation,
+                        ),
                 )
-            )
+        }
 
         return config
     }
@@ -295,7 +321,7 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         config: plantuml.PlantumlConfig,
         diagramProcessor: DiagramProcessor,
         resolver: TranslationResolver,
-        language: String
+        language: String,
     ) {
         logger.lifecycle(PlantumlMessages.format("generate.processing_prompt", lang, promptFile.name))
 
@@ -303,15 +329,17 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
         val promptContent = promptFile.readText()
 
         // Process through LLM interaction loop (max 5 iterations)
-        val maxIterations = project.findProperty("plantuml.langchain4j.maxIterations") as? Int
-            ?: config.langchain4j.maxIterations
+        val maxIterations =
+            project.findProperty("plantuml.langchain4j.maxIterations") as? Int
+                ?: config.langchain4j.maxIterations
 
-        val diagram = try {
-            diagramProcessor.processPrompt(promptContent, maxIterations, logger, resolver, language)
-        } catch (e: IllegalStateException) {
-            logger.lifecycle(PlantumlMessages.format("generate.error", lang, e.message ?: "Unknown error"))
-            throw e
-        }
+        val diagram =
+            try {
+                diagramProcessor.processPrompt(promptContent, maxIterations, logger, resolver, language)
+            } catch (e: IllegalStateException) {
+                logger.lifecycle(PlantumlMessages.format("generate.error", lang, e.message ?: "Unknown error"))
+                throw e
+            }
 
         if (diagram != null) {
             // Validate PlantUML syntax
@@ -339,18 +367,20 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
                 // PLT-CR3-2 — probe the produced artifact: generateImage silently
                 // writes its textual fallback into the image on failure (a non-empty
                 // file that is not an image = a "white" diagram). Surface it.
-                val verdict = DiagramOutputProbe.probe(
-                    imageFile.readBytes(),
-                    diagram.plantuml.code,
-                    diagramProcessor.plantumlService.syntaxValidator(),
-                )
+                val verdict =
+                    DiagramOutputProbe.probe(
+                        imageFile.readBytes(),
+                        diagram.plantuml.code,
+                        diagramProcessor.plantumlService.syntaxValidator(),
+                    )
                 if (verdict !is DiagramOutputVerdict.Rendered) {
-                    val reason = when (verdict) {
-                        is DiagramOutputVerdict.EmptyImage -> "empty image"
-                        is DiagramOutputVerdict.NotAnImage -> verdict.message
-                        is DiagramOutputVerdict.InvalidSyntax -> verdict.message
-                        is DiagramOutputVerdict.Rendered -> ""
-                    }
+                    val reason =
+                        when (verdict) {
+                            is DiagramOutputVerdict.EmptyImage -> "empty image"
+                            is DiagramOutputVerdict.NotAnImage -> verdict.message
+                            is DiagramOutputVerdict.InvalidSyntax -> verdict.message
+                            is DiagramOutputVerdict.Rendered -> ""
+                        }
                     logger.lifecycle("[plantuml] Diagram output probe failed for ${imageFile.name}: $reason")
                 }
             } catch (e: Exception) {
@@ -367,14 +397,15 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
                 val validationsDir = project.file(config.output.validations)
                 validationsDir.mkdirs()
                 val validationFile = File(validationsDir, "${promptFile.nameWithoutExtension}.json")
-                val validationData = mapOf(
-                    "prompt" to promptFile.name,
-                    "score" to validation.score,
-                    "feedback" to validation.feedback,
-                    "recommendations" to validation.recommendations
-                )
+                val validationData =
+                    mapOf(
+                        "prompt" to promptFile.name,
+                        "score" to validation.score,
+                        "feedback" to validation.feedback,
+                        "recommendations" to validation.recommendations,
+                    )
                 validationFile.writeText(
-                    objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(validationData)
+                    objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(validationData),
                 )
             }
 
@@ -395,15 +426,17 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
                 diagDir.mkdirs()
                 val sanitized = promptFile.nameWithoutExtension.replace("[^a-zA-Z0-9._-]".toRegex(), "_")
                 val diagYamlFile = File(diagDir, "$sanitized.yml")
-                val diagData = mapOf(
-                    "plantuml" to mapOf(
-                        "code" to diagram.plantuml.code,
-                        "description" to diagram.plantuml.description
-                    ),
-                    "status" to "success"
-                )
+                val diagData =
+                    mapOf(
+                        "plantuml" to
+                            mapOf(
+                                "code" to diagram.plantuml.code,
+                                "description" to diagram.plantuml.description,
+                            ),
+                        "status" to "success",
+                    )
                 diagYamlFile.writeText(
-                    objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(diagData)
+                    objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(diagData),
                 )
             } catch (e: Exception) {
                 logger.lifecycle(PlantumlMessages.format("generate.rag_warning", lang, e.message ?: "Unknown error"))

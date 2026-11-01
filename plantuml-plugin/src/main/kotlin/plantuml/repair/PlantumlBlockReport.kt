@@ -27,7 +27,6 @@ data class PlantumlBlockReport(
     val toolchain: PlantUmlToolchainReference = PlantUmlToolchain.reference,
     val owner: String = PlantumlBlockEntry.OWNER,
 ) {
-
     /** Total number of audited blocks. */
     @get:JsonProperty("total")
     val total: Int get() = blocks.size

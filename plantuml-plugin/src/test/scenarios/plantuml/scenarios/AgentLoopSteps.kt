@@ -23,7 +23,6 @@ import plantuml.agent.PreflightVerdict
  * `plantuml.scenarios` glue package (anti-collision rule S-088).
  */
 class AgentLoopSteps {
-
     private var response: String = ""
     private var extracted: String? = null
     private var budget: GenerationBudget? = null
@@ -57,13 +56,19 @@ class AgentLoopSteps {
     }
 
     @Given("a generation budget of {string} iterations and {string} seconds")
-    fun aGenerationBudget(iterations: String, seconds: String) {
+    fun aGenerationBudget(
+        iterations: String,
+        seconds: String,
+    ) {
         budget = GenerationBudget(iterations.toInt(), seconds.toLong())
         stopReason = null
     }
 
     @When("{string} corrections have been done after {string} seconds")
-    fun correctionsHaveBeenDone(corrections: String, seconds: String) {
+    fun correctionsHaveBeenDone(
+        corrections: String,
+        seconds: String,
+    ) {
         stopReason = budget!!.stopReason(corrections.toInt(), seconds.toDouble())
     }
 
@@ -131,7 +136,10 @@ class AgentLoopSteps {
     }
 
     @Given("the previous design feedback {string} and the current {string}")
-    fun thePreviousAndCurrentDesignFeedback(previous: String, current: String) {
+    fun thePreviousAndCurrentDesignFeedback(
+        previous: String,
+        current: String,
+    ) {
         converged = DesignConvergence.isConverged(previous, current)
     }
 

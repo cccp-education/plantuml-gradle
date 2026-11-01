@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test
  * DIA-03 — hard generation budget (iterations + wall-clock).
  */
 class GenerationBudgetTest {
-
     @Test
     fun `continues while under both limits`() {
         val budget = GenerationBudget(maxIterations = 5, maxSeconds = 60)

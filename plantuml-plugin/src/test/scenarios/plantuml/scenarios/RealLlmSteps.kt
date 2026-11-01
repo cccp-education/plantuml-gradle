@@ -8,100 +8,107 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import java.io.File
 
-class RealLlmSteps(private val world: PlantumlWorld) {
-
+class RealLlmSteps(
+    private val world: PlantumlWorld,
+) {
     @Given("a real Ollama instance is running with {word} model")
     fun realOllamaInstanceIsRunningWithModel(modelName: String) {
         world.ensureOllama()
         assumeTrue(
             world.ollamaBaseUrl != null,
-            "Real Ollama instance not available — skipping @realllm test"
+            "Real Ollama instance not available — skipping @realllm test",
         )
     }
 
     @Given("a real-llm prompt file {string} with content:")
-    fun createPromptFileWithMultilineContent(fileName: String, content: String) {
+    fun createPromptFileWithMultilineContent(
+        fileName: String,
+        content: String,
+    ) {
         world.createGradleProject()
         world.createPromptFile(fileName, content.trimIndent())
     }
 
     @When("I run generatePlantumlDiagrams task with real provider {string}")
-    fun runGeneratePlantumlDiagramsTaskWithProvider(provider: String) = runBlocking {
-        val properties = mutableMapOf<String, String>()
-        properties["plantuml.langchain4j.model"] = provider
-        world.ollamaBaseUrl?.let {
-            properties["plantuml.langchain4j.ollama.baseUrl"] = it
-            properties["plantuml.langchain4j.ollama.modelName"] = "smollm:135m"
-        }
-        properties["plantuml.real.test"] = "true"
-        properties["plantuml.test.mode"] = "true"
+    fun runGeneratePlantumlDiagramsTaskWithProvider(provider: String) =
+        runBlocking {
+            val properties = mutableMapOf<String, String>()
+            properties["plantuml.langchain4j.model"] = provider
+            world.ollamaBaseUrl?.let {
+                properties["plantuml.langchain4j.ollama.baseUrl"] = it
+                properties["plantuml.langchain4j.ollama.modelName"] = "smollm:135m"
+            }
+            properties["plantuml.real.test"] = "true"
+            properties["plantuml.test.mode"] = "true"
 
-        val systemProperties = mutableMapOf<String, String>()
-        world.projectDir?.let {
-            systemProperties["plugin.project.dir"] = it.absolutePath
-        }
+            val systemProperties = mutableMapOf<String, String>()
+            world.projectDir?.let {
+                systemProperties["plugin.project.dir"] = it.absolutePath
+            }
 
-        try {
-            world.executeGradle(
-                "generatePlantumlDiagrams",
-                properties = properties,
-                systemProperties = systemProperties
-            )
-        } catch (e: Exception) {
-            world.exception = e
+            try {
+                world.executeGradle(
+                    "generatePlantumlDiagrams",
+                    properties = properties,
+                    systemProperties = systemProperties,
+                )
+            } catch (e: Exception) {
+                world.exception = e
+            }
         }
-    }
 
     @When("I run validatePlantumlSyntax task with real LLM")
-    fun runValidatePlantumlSyntaxTask() = runBlocking {
-        val properties = mutableMapOf<String, String>()
-        properties["plantuml.real.test"] = "true"
-        properties["plantuml.test.mode"] = "true"
+    fun runValidatePlantumlSyntaxTask() =
+        runBlocking {
+            val properties = mutableMapOf<String, String>()
+            properties["plantuml.real.test"] = "true"
+            properties["plantuml.test.mode"] = "true"
 
-        val systemProperties = mutableMapOf<String, String>()
-        world.projectDir?.let {
-            systemProperties["plugin.project.dir"] = it.absolutePath
-        }
+            val systemProperties = mutableMapOf<String, String>()
+            world.projectDir?.let {
+                systemProperties["plugin.project.dir"] = it.absolutePath
+            }
 
-        try {
-            world.executeGradle(
-                "validatePlantumlSyntax",
-                properties = properties,
-                systemProperties = systemProperties
-            )
-        } catch (e: Exception) {
-            world.exception = e
+            try {
+                world.executeGradle(
+                    "validatePlantumlSyntax",
+                    properties = properties,
+                    systemProperties = systemProperties,
+                )
+            } catch (e: Exception) {
+                world.exception = e
+            }
         }
-    }
 
     @When("I run collectPlantumlIndex task with real LLM")
-    fun runCollectPlantumlIndexTask() = runBlocking {
-        val properties = mutableMapOf<String, String>()
-        properties["plantuml.real.test"] = "true"
-        properties["plantuml.test.mode"] = "true"
+    fun runCollectPlantumlIndexTask() =
+        runBlocking {
+            val properties = mutableMapOf<String, String>()
+            properties["plantuml.real.test"] = "true"
+            properties["plantuml.test.mode"] = "true"
 
-        val systemProperties = mutableMapOf<String, String>()
-        world.projectDir?.let {
-            systemProperties["plugin.project.dir"] = it.absolutePath
-        }
+            val systemProperties = mutableMapOf<String, String>()
+            world.projectDir?.let {
+                systemProperties["plugin.project.dir"] = it.absolutePath
+            }
 
-        try {
-            world.executeGradle(
-                "collectPlantumlIndex",
-                properties = properties,
-                systemProperties = systemProperties
-            )
-        } catch (e: Exception) {
-            world.exception = e
+            try {
+                world.executeGradle(
+                    "collectPlantumlIndex",
+                    properties = properties,
+                    systemProperties = systemProperties,
+                )
+            } catch (e: Exception) {
+                world.exception = e
+            }
         }
-    }
 
     @Then("a valid PlantUML diagram should be generated by real LLM")
     fun validPlantUmlDiagramShouldBeGenerated() {
         world.verifyDirectoryContainsFiles(
             "generated/diagrams",
             "yml",
-            "A valid PlantUML diagram should be generated"
+            "A valid PlantUML diagram should be generated",
         )
     }
 
@@ -110,7 +117,7 @@ class RealLlmSteps(private val world: PlantumlWorld) {
         world.verifyDirectoryContainsFiles(
             "generated/images",
             "png",
-            "A PNG image should be created"
+            "A PNG image should be created",
         )
     }
 

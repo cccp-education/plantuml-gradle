@@ -6,13 +6,13 @@ import io.cucumber.java.en.When
 import org.assertj.core.api.Assertions.assertThat
 import plantuml.PlantumlMessages
 import plantuml.apikey.ApiKeyPool
-import plantuml.service.KnowledgeGraphParser
 import plantuml.service.GraphifyPromptAdapter
+import plantuml.service.KnowledgeGraphParser
 import java.io.File
-import kotlin.test.assertFailsWith
 
-class I18nErrorSteps(private val world: PlantumlWorld) {
-
+class I18nErrorSteps(
+    private val world: PlantumlWorld,
+) {
     @Given("an empty API key pool")
     fun anEmptyApiKeyPool() {
         world.i18nErrorPool = ApiKeyPool(emptyList())
@@ -85,9 +85,11 @@ class I18nErrorSteps(private val world: PlantumlWorld) {
     @When("the configuration is loaded")
     fun theConfigurationIsLoaded() {
         try {
-            val project = org.gradle.testfixtures.ProjectBuilder.builder()
-                .withProjectDir(world.projectDir ?: error("no project dir"))
-                .build()
+            val project =
+                org.gradle.testfixtures.ProjectBuilder
+                    .builder()
+                    .withProjectDir(world.projectDir ?: error("no project dir"))
+                    .build()
             plantuml.PlantumlManager.Configuration.load(project)
         } catch (e: Exception) {
             world.exception = e
@@ -107,13 +109,15 @@ class I18nErrorSteps(private val world: PlantumlWorld) {
     @When("extractPlantUmlFromResponse is invoked")
     fun extractPlantUmlFromResponseIsInvoked() {
         try {
-            val processor = plantuml.service.DiagramProcessor(
-                plantumlService = plantuml.service.PlantumlService(),
-                chatModel = null,
-                config = plantuml.PlantumlConfig()
-            )
-            val method = plantuml.service.DiagramProcessor::class.java
-                .getDeclaredMethod("extractPlantUmlFromResponse", String::class.java)
+            val processor =
+                plantuml.service.DiagramProcessor(
+                    plantumlService = plantuml.service.PlantumlService(),
+                    chatModel = null,
+                    config = plantuml.PlantumlConfig(),
+                )
+            val method =
+                plantuml.service.DiagramProcessor::class.java
+                    .getDeclaredMethod("extractPlantUmlFromResponse", String::class.java)
             method.isAccessible = true
             method.invoke(processor, world.i18nErrorResponse)
         } catch (e: java.lang.reflect.InvocationTargetException) {
@@ -124,28 +128,41 @@ class I18nErrorSteps(private val world: PlantumlWorld) {
     }
 
     @Then("the exception message should match the i18n key {string} in language {string}")
-    fun exceptionMessageShouldMatchI18nKey(key: String, language: String) {
+    fun exceptionMessageShouldMatchI18nKey(
+        key: String,
+        language: String,
+    ) {
         assertThat(world.exception).isNotNull
         val expected = PlantumlMessages.get(key, language)
         assertThat(world.exception!!.message).isEqualTo(expected)
     }
 
     @Then("the exception message should match the i18n format key {string} with args in language {string}")
-    fun exceptionMessageShouldMatchI18nFormatKey(key: String, language: String) {
+    fun exceptionMessageShouldMatchI18nFormatKey(
+        key: String,
+        language: String,
+    ) {
         assertThat(world.exception).isNotNull
         val expected = PlantumlMessages.format(key, language, "")
         assertThat(world.exception!!.message).contains(expected.substringBefore("{"))
     }
 
     @Then("the exception message should match the i18n format key {string} with args {string} in language {string}")
-    fun exceptionMessageShouldMatchI18nFormatKeyWithArgs(key: String, args: String, language: String) {
+    fun exceptionMessageShouldMatchI18nFormatKeyWithArgs(
+        key: String,
+        args: String,
+        language: String,
+    ) {
         assertThat(world.exception).isNotNull
         val expected = PlantumlMessages.format(key, language, args)
         assertThat(world.exception!!.message).isEqualTo(expected)
     }
 
     @Then("the exception message should contain the i18n key prefix {string} in language {string}")
-    fun exceptionMessageShouldContainI18nKeyPrefix(prefix: String, language: String) {
+    fun exceptionMessageShouldContainI18nKeyPrefix(
+        prefix: String,
+        language: String,
+    ) {
         assertThat(world.exception).isNotNull
         assertThat(world.exception!!.message).contains(prefix)
     }

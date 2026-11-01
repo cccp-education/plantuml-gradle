@@ -24,7 +24,6 @@ import contracts.plantuml.SyntaxValidationResult
  * LLM, no rendering — the oracle is the N0 [PlantUmlSyntaxValidator] port.
  */
 object PlantumlBlockCorrector {
-
     /**
      * Corrects [source], using [validator] as the syntax oracle and [repairer] as
      * the optional AI correction provider.

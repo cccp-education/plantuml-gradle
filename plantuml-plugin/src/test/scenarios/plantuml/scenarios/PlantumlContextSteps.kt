@@ -17,12 +17,14 @@ import plantuml.context.PlantumlContextBuilder
  * package (anti-collision rule S-088).
  */
 class PlantumlContextSteps {
-
     private var composite: CompositeContext? = null
     private var context: PlantumlContext? = null
 
     @Given("a composite context with EAGER {string} and RAG {string}")
-    fun aCompositeWithEagerAndRag(eager: String, rag: String) {
+    fun aCompositeWithEagerAndRag(
+        eager: String,
+        rag: String,
+    ) {
         composite = CompositeContext(eager, rag, "", "", CompositeContextConfig())
     }
 

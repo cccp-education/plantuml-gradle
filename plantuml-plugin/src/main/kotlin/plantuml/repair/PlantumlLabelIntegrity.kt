@@ -20,15 +20,13 @@ package plantuml.repair
  * Pure domain: no I/O, no LLM, no rendering.
  */
 object PlantumlLabelIntegrity {
-
     /**
      * Converts a raw line break produced by a translator back to the PlantUML
      * escape `\n`. Without this, `rectangle "a\nb"` becomes two lines and PlantUML
      * fails. Windows (`\r\n`) and classic-Mac (`\r`) line endings are normalised
      * first so an already-escaped label is left untouched.
      */
-    fun escapeNewlines(text: String): String =
-        text.replace("\r\n", "\\n").replace("\n", "\\n").replace("\r", "\\n")
+    fun escapeNewlines(text: String): String = text.replace("\r\n", "\\n").replace("\n", "\\n").replace("\r", "\\n")
 
     /**
      * True when a quoted label spans a raw newline — the exact D2 break. Escaped

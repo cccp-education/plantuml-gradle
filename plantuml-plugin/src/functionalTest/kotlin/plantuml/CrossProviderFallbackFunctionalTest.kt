@@ -22,46 +22,48 @@ import plantuml.apikey.ServiceType
  * logging, and null return when every pool is saturated.
  */
 class CrossProviderFallbackFunctionalTest {
-
     private fun entry(
         id: String,
         provider: Provider,
         tier: KeyTier = KeyTier.FREE,
-        quota: QuotaConfig = QuotaConfig()
-    ): ApiKeyEntry = ApiKeyEntry(
-        id = id,
-        email = "t@e.com",
-        name = "Test $id",
-        keyRef = "REF_$id",
-        provider = provider,
-        services = listOf(ServiceType.CHAT_COMPLETION),
-        tier = tier,
-        quota = quota
-    )
+        quota: QuotaConfig = QuotaConfig(),
+    ): ApiKeyEntry =
+        ApiKeyEntry(
+            id = id,
+            email = "t@e.com",
+            name = "Test $id",
+            keyRef = "REF_$id",
+            provider = provider,
+            services = listOf(ServiceType.CHAT_COMPLETION),
+            tier = tier,
+            quota = quota,
+        )
 
-    private fun saturatingQuota(): QuotaConfig = QuotaConfig(
-        limitValue = 2,
-        thresholdPercent = 50,
-        resetPolicy = ResetPolicy.MANUAL
-    )
+    private fun saturatingQuota(): QuotaConfig =
+        QuotaConfig(
+            limitValue = 2,
+            thresholdPercent = 50,
+            resetPolicy = ResetPolicy.MANUAL,
+        )
 
-    private fun largeQuota(): QuotaConfig = QuotaConfig(
-        limitValue = 100,
-        thresholdPercent = 50
-    )
+    private fun largeQuota(): QuotaConfig =
+        QuotaConfig(
+            limitValue = 100,
+            thresholdPercent = 50,
+        )
 
-    private fun pool(vararg entries: ApiKeyEntry): ApiKeyPool =
-        ApiKeyPool(entries.toList(), RotationStrategy.TIERED, autoResetEnabled = false)
+    private fun pool(vararg entries: ApiKeyEntry): ApiKeyPool = ApiKeyPool(entries.toList(), RotationStrategy.TIERED, autoResetEnabled = false)
 
     @Test
     fun `orchestrator returns Gemini key when Gemini pool is not saturated`() {
         val gemini = pool(entry("gemini-1", Provider.GOOGLE, KeyTier.PRO, largeQuota()))
         val mistral = pool(entry("mistral-1", Provider.MISTRAL, KeyTier.FREE, largeQuota()))
         val ollama = pool(entry("ollama-1", Provider.OLLAMA, KeyTier.FREE, largeQuota()))
-        val orchestrator = CrossProviderFallbackOrchestrator(
-            mapOf("gemini" to gemini, "mistral" to mistral, "ollama" to ollama),
-            fallbackOrder = listOf("gemini", "mistral", "ollama")
-        )
+        val orchestrator =
+            CrossProviderFallbackOrchestrator(
+                mapOf("gemini" to gemini, "mistral" to mistral, "ollama" to ollama),
+                fallbackOrder = listOf("gemini", "mistral", "ollama"),
+            )
 
         val selected = orchestrator.selectKey()
 
@@ -75,10 +77,11 @@ class CrossProviderFallbackFunctionalTest {
         val gemini = pool(entry("gemini-1", Provider.GOOGLE, KeyTier.PRO, saturatingQuota()))
         val mistral = pool(entry("mistral-1", Provider.MISTRAL, KeyTier.FREE, largeQuota()))
         val ollama = pool(entry("ollama-1", Provider.OLLAMA, KeyTier.FREE, largeQuota()))
-        val orchestrator = CrossProviderFallbackOrchestrator(
-            mapOf("gemini" to gemini, "mistral" to mistral, "ollama" to ollama),
-            fallbackOrder = listOf("gemini", "mistral", "ollama")
-        )
+        val orchestrator =
+            CrossProviderFallbackOrchestrator(
+                mapOf("gemini" to gemini, "mistral" to mistral, "ollama" to ollama),
+                fallbackOrder = listOf("gemini", "mistral", "ollama"),
+            )
 
         gemini.getNextKey()
         gemini.getNextKey()
@@ -95,10 +98,11 @@ class CrossProviderFallbackFunctionalTest {
         val gemini = pool(entry("gemini-1", Provider.GOOGLE, KeyTier.PRO, saturatingQuota()))
         val mistral = pool(entry("mistral-1", Provider.MISTRAL, KeyTier.FREE, saturatingQuota()))
         val ollama = pool(entry("ollama-1", Provider.OLLAMA, KeyTier.FREE, largeQuota()))
-        val orchestrator = CrossProviderFallbackOrchestrator(
-            mapOf("gemini" to gemini, "mistral" to mistral, "ollama" to ollama),
-            fallbackOrder = listOf("gemini", "mistral", "ollama")
-        )
+        val orchestrator =
+            CrossProviderFallbackOrchestrator(
+                mapOf("gemini" to gemini, "mistral" to mistral, "ollama" to ollama),
+                fallbackOrder = listOf("gemini", "mistral", "ollama"),
+            )
 
         gemini.getNextKey()
         gemini.getNextKey()
@@ -117,10 +121,11 @@ class CrossProviderFallbackFunctionalTest {
         val gemini = pool(entry("gemini-1", Provider.GOOGLE, KeyTier.PRO, saturatingQuota()))
         val mistral = pool(entry("mistral-1", Provider.MISTRAL, KeyTier.FREE, saturatingQuota()))
         val ollama = pool(entry("ollama-1", Provider.OLLAMA, KeyTier.FREE, saturatingQuota()))
-        val orchestrator = CrossProviderFallbackOrchestrator(
-            mapOf("gemini" to gemini, "mistral" to mistral, "ollama" to ollama),
-            fallbackOrder = listOf("gemini", "mistral", "ollama")
-        )
+        val orchestrator =
+            CrossProviderFallbackOrchestrator(
+                mapOf("gemini" to gemini, "mistral" to mistral, "ollama" to ollama),
+                fallbackOrder = listOf("gemini", "mistral", "ollama"),
+            )
 
         gemini.getNextKey()
         gemini.getNextKey()
@@ -137,10 +142,11 @@ class CrossProviderFallbackFunctionalTest {
     @Test
     fun `orchestrator skips providers absent from the pools map`() {
         val ollama = pool(entry("ollama-1", Provider.OLLAMA, KeyTier.FREE, largeQuota()))
-        val orchestrator = CrossProviderFallbackOrchestrator(
-            mapOf("ollama" to ollama),
-            fallbackOrder = listOf("gemini", "mistral", "ollama")
-        )
+        val orchestrator =
+            CrossProviderFallbackOrchestrator(
+                mapOf("ollama" to ollama),
+                fallbackOrder = listOf("gemini", "mistral", "ollama"),
+            )
 
         val selected = orchestrator.selectKey()
 

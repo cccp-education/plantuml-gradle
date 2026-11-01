@@ -14,7 +14,6 @@ import plantuml.context.AugmentedContextPrompt
  * (anti-collision rule S-088).
  */
 class AugmentedContextPromptSteps {
-
     private var augmentedContext: String = ""
     private var composed: String = ""
 
@@ -44,7 +43,10 @@ class AugmentedContextPromptSteps {
     }
 
     @Then("the composed prompt contains {string} before {string}")
-    fun theComposedPromptContainsBefore(first: String, second: String) {
+    fun theComposedPromptContainsBefore(
+        first: String,
+        second: String,
+    ) {
         assertThat(composed).contains(first)
         assertThat(composed).contains(second)
         assertThat(composed.indexOf(first)).isLessThan(composed.indexOf(second))

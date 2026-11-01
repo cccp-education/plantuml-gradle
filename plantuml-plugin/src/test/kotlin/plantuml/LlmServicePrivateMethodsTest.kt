@@ -1,7 +1,7 @@
 package plantuml
 
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import plantuml.runtime.RuntimeEnvironment
 import plantuml.service.LlmService
 import kotlin.test.assertNotNull
@@ -12,32 +12,34 @@ import kotlin.test.assertNull
  * Tests verify createChatModel() returns non-null for each provider.
  */
 class LlmServicePrivateMethodsTest {
-
     private lateinit var config: PlantumlConfig
     private lateinit var llmService: LlmService
 
     @BeforeEach
     fun setup() {
-        config = PlantumlConfig(
-            input = InputConfig(),
-            output = OutputConfig(),
-            langchain4j = LangchainConfig(
-                model = "ollama",
-                maxIterations = 1,
-                validation = false,
-                ollama = OllamaConfig(
-                    baseUrl = "http://localhost:11438",
-                    modelName = "smollm:135m"
-                ),
-                openai = ApiKeyConfig(apiKey = "sk-test-openai"),
-                gemini = ApiKeyConfig(apiKey = "sk-test-gemini"),
-                mistral = ApiKeyConfig(apiKey = "sk-test-mistral"),
-                claude = ApiKeyConfig(apiKey = "sk-test-claude"),
-                huggingface = ApiKeyConfig(apiKey = "sk-test-huggingface")
-            ),
-            git = GitConfig(),
-            rag = RagConfig()
-        )
+        config =
+            PlantumlConfig(
+                input = InputConfig(),
+                output = OutputConfig(),
+                langchain4j =
+                    LangchainConfig(
+                        model = "ollama",
+                        maxIterations = 1,
+                        validation = false,
+                        ollama =
+                            OllamaConfig(
+                                baseUrl = "http://localhost:11438",
+                                modelName = "smollm:135m",
+                            ),
+                        openai = ApiKeyConfig(apiKey = "sk-test-openai"),
+                        gemini = ApiKeyConfig(apiKey = "sk-test-gemini"),
+                        mistral = ApiKeyConfig(apiKey = "sk-test-mistral"),
+                        claude = ApiKeyConfig(apiKey = "sk-test-claude"),
+                        huggingface = ApiKeyConfig(apiKey = "sk-test-huggingface"),
+                    ),
+                git = GitConfig(),
+                rag = RagConfig(),
+            )
         llmService = LlmService(config)
     }
 
@@ -91,16 +93,19 @@ class LlmServicePrivateMethodsTest {
 
     @Test
     fun `createChatModel returns null in test mode when no mock endpoint is configured`() {
-        val nonMockConfig = PlantumlConfig(
-            langchain4j = LangchainConfig(
-                model = "ollama",
-                ollama = OllamaConfig(baseUrl = "http://remote:11438", modelName = "smollm:135m"),
+        val nonMockConfig =
+            PlantumlConfig(
+                langchain4j =
+                    LangchainConfig(
+                        model = "ollama",
+                        ollama = OllamaConfig(baseUrl = "http://remote:11438", modelName = "smollm:135m"),
+                    ),
             )
-        )
-        val testRuntime = RuntimeEnvironment.system(
-            property = { if (it == "plantuml.test.mode") "true" else null },
-            environment = { null },
-        )
+        val testRuntime =
+            RuntimeEnvironment.system(
+                property = { if (it == "plantuml.test.mode") "true" else null },
+                environment = { null },
+            )
 
         assertNull(LlmService(nonMockConfig, runtime = testRuntime).createChatModel())
     }

@@ -32,9 +32,13 @@ data class GenerationBudget(
      * returns the reason to stop, or `null` to continue. The iteration limit takes
      * precedence (deterministic, checked first).
      */
-    fun stopReason(corrections: Int, elapsedSeconds: Double): GenerationStopReason? = when {
-        corrections >= maxIterations -> GenerationStopReason.MAX_ITERATIONS
-        maxSeconds > 0 && elapsedSeconds >= maxSeconds -> GenerationStopReason.MAX_TIME
-        else -> null
-    }
+    fun stopReason(
+        corrections: Int,
+        elapsedSeconds: Double,
+    ): GenerationStopReason? =
+        when {
+            corrections >= maxIterations -> GenerationStopReason.MAX_ITERATIONS
+            maxSeconds > 0 && elapsedSeconds >= maxSeconds -> GenerationStopReason.MAX_TIME
+            else -> null
+        }
 }

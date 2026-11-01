@@ -9,7 +9,6 @@ import java.io.File
 import kotlin.test.assertEquals
 
 class LlmConfigurationTest {
-
     companion object {
         private val mapper = ObjectMapper(YAMLFactory()).registerKotlinModule()
     }
@@ -21,13 +20,15 @@ class LlmConfigurationTest {
     fun `should load Ollama configuration correctly`() {
         // Given
         val configFile = File(tempDir, "plantuml-context.yml")
-        configFile.writeText("""
+        configFile.writeText(
+            """
             langchain4j:
               model: "ollama"
               ollama:
                 baseUrl: "http://localhost:11438"
                 modelName: "llama3:8b"
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
         // When
         val config = mapper.readValue(configFile, PlantumlConfig::class.java)
@@ -42,12 +43,14 @@ class LlmConfigurationTest {
     fun `should load Gemini configuration correctly`() {
         // Given
         val configFile = File(tempDir, "plantuml-context.yml")
-        configFile.writeText("""
+        configFile.writeText(
+            """
             langchain4j:
               model: "gemini"
               gemini:
                 apiKey: "fake-gemini-key"
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
         // When
         val config = mapper.readValue(configFile, PlantumlConfig::class.java)
@@ -61,12 +64,14 @@ class LlmConfigurationTest {
     fun `should load Mistral configuration correctly`() {
         // Given
         val configFile = File(tempDir, "plantuml-context.yml")
-        configFile.writeText("""
+        configFile.writeText(
+            """
             langchain4j:
               model: "mistral"
               mistral:
                 apiKey: "fake-mistral-key"
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
         // When
         val config = mapper.readValue(configFile, PlantumlConfig::class.java)
@@ -80,12 +85,14 @@ class LlmConfigurationTest {
     fun `should load OpenAI configuration correctly`() {
         // Given
         val configFile = File(tempDir, "plantuml-context.yml")
-        configFile.writeText("""
+        configFile.writeText(
+            """
             langchain4j:
               model: "openai"
               openai:
                 apiKey: "fake-openai-key"
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
         // When
         val config = mapper.readValue(configFile, PlantumlConfig::class.java)
@@ -99,12 +106,14 @@ class LlmConfigurationTest {
     fun `should load Claude configuration correctly`() {
         // Given
         val configFile = File(tempDir, "plantuml-context.yml")
-        configFile.writeText("""
+        configFile.writeText(
+            """
             langchain4j:
               model: "claude"
               claude:
                 apiKey: "fake-claude-key"
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
         // When
         val config = mapper.readValue(configFile, PlantumlConfig::class.java)
@@ -118,12 +127,14 @@ class LlmConfigurationTest {
     fun `should load HuggingFace configuration correctly`() {
         // Given
         val configFile = File(tempDir, "plantuml-context.yml")
-        configFile.writeText("""
+        configFile.writeText(
+            """
             langchain4j:
               model: "huggingface"
               huggingface:
                 apiKey: "fake-huggingface-key"
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
         // When
         val config = mapper.readValue(configFile, PlantumlConfig::class.java)
@@ -137,12 +148,14 @@ class LlmConfigurationTest {
     fun `should load Groq configuration correctly`() {
         // Given
         val configFile = File(tempDir, "plantuml-context.yml")
-        configFile.writeText("""
+        configFile.writeText(
+            """
             langchain4j:
               model: "groq"
               groq:
                 apiKey: "fake-groq-key"
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
         // When
         val config = mapper.readValue(configFile, PlantumlConfig::class.java)
@@ -156,7 +169,8 @@ class LlmConfigurationTest {
     fun `should handle mixed provider configurations`() {
         // Given
         val configFile = File(tempDir, "plantuml-context.yml")
-        configFile.writeText("""
+        configFile.writeText(
+            """
             langchain4j:
               model: "ollama"
               ollama:
@@ -174,7 +188,8 @@ class LlmConfigurationTest {
                 apiKey: "fake-huggingface-key"
               groq:
                 apiKey: "fake-groq-key"
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
         // When
         val config = mapper.readValue(configFile, PlantumlConfig::class.java)

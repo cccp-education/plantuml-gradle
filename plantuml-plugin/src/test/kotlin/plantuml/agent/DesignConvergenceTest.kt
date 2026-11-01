@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test
  * DIA-07 — design feedback convergence guard.
  */
 class DesignConvergenceTest {
-
     @Test
     fun `no previous feedback is not converged`() {
         assertThat(DesignConvergence.isConverged(null, "add spacing")).isFalse()

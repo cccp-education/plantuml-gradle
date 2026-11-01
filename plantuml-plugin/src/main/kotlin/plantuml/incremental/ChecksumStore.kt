@@ -11,8 +11,9 @@ import java.security.MessageDigest
  *
  * @property checksumsDir Directory where checksum files are stored
  */
-class ChecksumStore(private val checksumsDir: File) {
-
+class ChecksumStore(
+    private val checksumsDir: File,
+) {
     init {
         if (!checksumsDir.exists()) {
             checksumsDir.mkdirs()
@@ -63,6 +64,5 @@ class ChecksumStore(private val checksumsDir: File) {
         return stored != computeChecksum(promptFile)
     }
 
-    private fun checksumFile(promptFile: File): File =
-        File(checksumsDir, "${promptFile.nameWithoutExtension}.sha256")
+    private fun checksumFile(promptFile: File): File = File(checksumsDir, "${promptFile.nameWithoutExtension}.sha256")
 }

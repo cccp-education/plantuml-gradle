@@ -16,7 +16,6 @@ import plantuml.ApiKeyConfig
  * Pure function (no LangChain4j, no I/O) — unit-testable in isolation (DDD).
  */
 object ProviderModelResolver {
-
     /** HuggingFace default model when the config does not override it. */
     const val HUGGING_FACE_DEFAULT = "gpt2"
 
@@ -27,13 +26,11 @@ object ProviderModelResolver {
      * Effective HuggingFace model: the configured `modelName` when non-blank,
      * otherwise [HUGGING_FACE_DEFAULT].
      */
-    fun huggingFace(config: ApiKeyConfig): String =
-        config.modelName.trim().ifBlank { HUGGING_FACE_DEFAULT }
+    fun huggingFace(config: ApiKeyConfig): String = config.modelName.trim().ifBlank { HUGGING_FACE_DEFAULT }
 
     /**
      * Effective Groq model: the configured `modelName` when non-blank,
      * otherwise [GROQ_DEFAULT].
      */
-    fun groq(config: ApiKeyConfig): String =
-        config.modelName.trim().ifBlank { GROQ_DEFAULT }
+    fun groq(config: ApiKeyConfig): String = config.modelName.trim().ifBlank { GROQ_DEFAULT }
 }

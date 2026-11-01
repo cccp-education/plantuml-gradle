@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test
  * CHE-DIAGRAM D2 (S-073) — the label batching sentinel.
  */
 class PlantumlLabelBatchTest {
-
     @Test
     fun `join then split round-trips`() {
         val labels = listOf("A", "B", "C")

@@ -24,7 +24,6 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 data class ContextProvenance(
     val channels: List<ProvenanceChannel> = emptyList(),
 ) {
-
     /** Sum of the [ProvenanceChannel.totalChars] of all [channels]. */
     @get:JsonProperty("totalChars")
     val totalChars: Int get() = channels.sumOf { it.totalChars() }

@@ -18,14 +18,16 @@ package plantuml.context
  * and ignores an empty source list (a channel with no source is not recorded).
  */
 class ProvenanceTracker {
-
     private val tracked = LinkedHashMap<String, ProvenanceChannel>()
 
     /**
      * Records [sources] for [channel], replacing any previous sources of the
      * same channel. An empty [sources] list is ignored.
      */
-    fun trackChannel(channel: String, sources: List<ProvenanceSource>) {
+    fun trackChannel(
+        channel: String,
+        sources: List<ProvenanceSource>,
+    ) {
         if (sources.isEmpty()) return
         tracked[channel] = ProvenanceChannel(channel = channel, sources = sources.toList())
     }

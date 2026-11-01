@@ -6,7 +6,6 @@ import org.junit.jupiter.api.io.TempDir
 import java.io.File
 
 class IncrementalProcessorTest {
-
     @TempDir
     lateinit var tempDir: File
 
@@ -128,10 +127,11 @@ class IncrementalProcessorTest {
         store.storeChecksum(promptFile)
         promptFile.writeText("Create a different diagram")
 
-        val pumlFile = File(projectDir, "rag/test.puml").apply {
-            parentFile.mkdirs()
-            writeText("@startuml\nactor User\n@enduml")
-        }
+        val pumlFile =
+            File(projectDir, "rag/test.puml").apply {
+                parentFile.mkdirs()
+                writeText("@startuml\nactor User\n@enduml")
+            }
 
         val processor = IncrementalProcessor(checksumsDir)
         assertThat(processor.shouldReindexPuml(pumlFile, promptsDir)).isTrue()
@@ -146,10 +146,11 @@ class IncrementalProcessorTest {
         val promptFile = File(promptsDir, "test.prompt")
         store.storeChecksum(promptFile)
 
-        val pumlFile = File(projectDir, "rag/test.puml").apply {
-            parentFile.mkdirs()
-            writeText("@startuml\nactor User\n@enduml")
-        }
+        val pumlFile =
+            File(projectDir, "rag/test.puml").apply {
+                parentFile.mkdirs()
+                writeText("@startuml\nactor User\n@enduml")
+            }
 
         val processor = IncrementalProcessor(checksumsDir)
         assertThat(processor.shouldReindexPuml(pumlFile, promptsDir)).isFalse()
@@ -161,10 +162,11 @@ class IncrementalProcessorTest {
         val promptsDir = File(projectDir, "prompts")
         val checksumsDir = File(projectDir, "build/plantuml-plugin/checksums")
 
-        val pumlFile = File(projectDir, "rag/orphan.puml").apply {
-            parentFile.mkdirs()
-            writeText("@startuml\nactor User\n@enduml")
-        }
+        val pumlFile =
+            File(projectDir, "rag/orphan.puml").apply {
+                parentFile.mkdirs()
+                writeText("@startuml\nactor User\n@enduml")
+            }
 
         val processor = IncrementalProcessor(checksumsDir)
         assertThat(processor.shouldReindexPuml(pumlFile, promptsDir)).isTrue()

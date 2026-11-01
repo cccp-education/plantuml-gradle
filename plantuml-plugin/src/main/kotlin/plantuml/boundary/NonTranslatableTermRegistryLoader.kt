@@ -16,7 +16,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
  * ```
  */
 class NonTranslatableTermRegistryLoader {
-
     private val mapper = ObjectMapper(YAMLFactory())
 
     /**

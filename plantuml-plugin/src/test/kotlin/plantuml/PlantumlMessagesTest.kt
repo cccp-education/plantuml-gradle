@@ -10,7 +10,6 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class PlantumlMessagesTest {
-
     @Test
     fun `should return English bundle for en code`() {
         val bundle = PlantumlMessages.forLanguage("en")

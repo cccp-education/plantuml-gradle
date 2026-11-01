@@ -27,7 +27,7 @@ data class ApiKeyEntry(
     val weight: Int = 1,
     val expirationDate: LocalDateTime? = null,
     val quota: QuotaConfig = QuotaConfig(),
-    val metadata: Map<String, String> = emptyMap()
+    val metadata: Map<String, String> = emptyMap(),
 )
 
 /**
@@ -52,7 +52,7 @@ data class QuotaConfig(
     val periodStart: LocalDateTime? = null,
     val periodEnd: LocalDateTime? = null,
     val resetPolicy: ResetPolicy = ResetPolicy.DAILY,
-    val lastManualSync: LocalDateTime? = null
+    val lastManualSync: LocalDateTime? = null,
 )
 
 /**
@@ -71,7 +71,7 @@ data class ApiKeyPoolConfig(
     val rotationStrategy: RotationStrategy = RotationStrategy.ROUND_ROBIN,
     val fallbackEnabled: Boolean = true,
     val auditEnabled: Boolean = true,
-    val providers: Map<Provider, List<ApiKeyEntry>> = emptyMap()
+    val providers: Map<Provider, List<ApiKeyEntry>> = emptyMap(),
 )
 
 /**
@@ -85,7 +85,7 @@ enum class QuotaType {
     MINUTE,
     MONTHLY,
     WEEKLY,
-    CUSTOM
+    CUSTOM,
 }
 
 /**
@@ -96,5 +96,5 @@ enum class ResetPolicy {
     WEEKLY,
     MONTHLY,
     NEVER,
-    MANUAL
+    MANUAL,
 }

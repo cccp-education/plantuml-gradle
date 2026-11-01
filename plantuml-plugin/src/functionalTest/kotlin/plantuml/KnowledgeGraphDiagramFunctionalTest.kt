@@ -5,7 +5,13 @@ package plantuml
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome.FAILED
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.MethodOrderer
+import org.junit.jupiter.api.Order
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestMethodOrder
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.assertFalse
@@ -13,7 +19,6 @@ import kotlin.test.assertTrue
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class KnowledgeGraphDiagramFunctionalTest {
-
     companion object {
         @TempDir
         @JvmStatic
@@ -58,7 +63,8 @@ class KnowledgeGraphDiagramFunctionalTest {
         }
 
         private fun runner(vararg args: String): GradleRunner =
-            GradleRunner.create()
+            GradleRunner
+                .create()
                 .withProjectDir(projectDir)
                 .withArguments(*args)
                 .withPluginClasspath()
@@ -67,7 +73,8 @@ class KnowledgeGraphDiagramFunctionalTest {
             File(graphifyOutDir, "graph.json").writeText(json)
         }
 
-        private val graphifyNativeJson = """
+        private val graphifyNativeJson =
+            """
             {
               "nodes": [
                 {"id": "0", "label": "LlmService", "file_type": "class", "community": 0},
@@ -80,9 +87,10 @@ class KnowledgeGraphDiagramFunctionalTest {
                 {"source": "2", "target": "3", "relation": "creates", "confidence_score": 0.75}
               ]
             }
-        """.trimIndent()
+            """.trimIndent()
 
-        private val graphifyWithConfidenceString = """
+        private val graphifyWithConfidenceString =
+            """
             {
               "nodes": [
                 {"id": "0", "label": "ServiceA", "file_type": "class", "community": 0},
@@ -94,9 +102,10 @@ class KnowledgeGraphDiagramFunctionalTest {
                 {"source": "1", "target": "2", "relation": "depends", "confidence": "EXTRACTED", "weight": 1.0}
               ]
             }
-        """.trimIndent()
+            """.trimIndent()
 
-        private val graphifyLegacyFormat = """
+        private val graphifyLegacyFormat =
+            """
             {
               "communities": [
                 {
@@ -115,14 +124,15 @@ class KnowledgeGraphDiagramFunctionalTest {
                 }
               ]
             }
-        """.trimIndent()
+            """.trimIndent()
 
-        private val emptyGraphJson = """
+        private val emptyGraphJson =
+            """
             {
               "nodes": [],
               "links": []
             }
-        """.trimIndent()
+            """.trimIndent()
 
         private val corruptedGraphJson = "{{invalid json!!!"
 
@@ -132,8 +142,7 @@ class KnowledgeGraphDiagramFunctionalTest {
         private fun pumlExists(suffixedName: String = "knowledge-graph-full"): Boolean =
             File(projectDir, "diagrams/knowledge-graph/$suffixedName.puml").exists()
 
-        private fun pngExists(suffixedName: String = "knowledge-graph-full"): Boolean =
-            File(projectDir, "diagrams/knowledge-graph/$suffixedName.png").exists()
+        private fun pngExists(suffixedName: String = "knowledge-graph-full"): Boolean = File(projectDir, "diagrams/knowledge-graph/$suffixedName.png").exists()
     }
 
     @Test
@@ -175,12 +184,18 @@ class KnowledgeGraphDiagramFunctionalTest {
         runner("generateKnowledgeGraphDiagram").build()
 
         val puml = pumlContent()
-        assertFalse(puml.contains("KnowledgeGraphNode("),
-            "Node labels must be clean, not toString() like 'KnowledgeGraphNode(name=..., type=...)'")
-        assertFalse(puml.contains(").name"),
-            "No Kotlin interpolation artifacts like ').name' from \$node.name without braces")
-        assertFalse(puml.contains("attributes=[]"),
-            "No data class internals like 'attributes=[]'")
+        assertFalse(
+            puml.contains("KnowledgeGraphNode("),
+            "Node labels must be clean, not toString() like 'KnowledgeGraphNode(name=..., type=...)'",
+        )
+        assertFalse(
+            puml.contains(").name"),
+            "No Kotlin interpolation artifacts like ').name' from \$node.name without braces",
+        )
+        assertFalse(
+            puml.contains("attributes=[]"),
+            "No data class internals like 'attributes=[]'",
+        )
     }
 
     @Test

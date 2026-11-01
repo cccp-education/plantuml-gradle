@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test
  * CTX-02 — pure assembler of the plantuml augmented context (N0 contract).
  */
 class PlantumlContextBuilderTest {
-
     private fun composite(
         eager: String = "",
         rag: String = "",
@@ -50,9 +49,10 @@ class PlantumlContextBuilderTest {
 
     @Test
     fun `channels follow the contract order EAGER RAG GRAPHIFY DOCS`() {
-        val context = PlantumlContextBuilder.build(
-            composite(eager = "e", rag = "r", graphify = "g", docs = "d"),
-        )
+        val context =
+            PlantumlContextBuilder.build(
+                composite(eager = "e", rag = "r", graphify = "g", docs = "d"),
+            )
         assertThat(context.channels.map { it.type.name })
             .containsExactly("EAGER", "RAG", "GRAPHIFY", "DOCS")
     }

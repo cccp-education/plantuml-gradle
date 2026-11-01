@@ -10,8 +10,9 @@ import org.assertj.core.api.Assertions.assertThat
 import java.io.File
 import java.net.InetSocketAddress
 
-class ErrorHandlingSteps(private val world: PlantumlWorld) {
-
+class ErrorHandlingSteps(
+    private val world: PlantumlWorld,
+) {
     private var slowMockServer: HttpServer? = null
 
     @Given("a mock LLM that responds after {int} seconds")
@@ -21,13 +22,14 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
 
         server.createContext("/api/chat") { exchange ->
             Thread.sleep(delaySeconds * 1000L)
-            val ollamaResponse = """
+            val ollamaResponse =
+                """
                 {
                   "model": "smollm:135m",
                   "message": { "role": "assistant", "content": "{\"plantuml\": {\"code\": \"@startuml\\n@enduml\", \"description\": \"Delayed response\"}}" },
                   "done": true
                 }
-            """.trimIndent().toByteArray()
+                """.trimIndent().toByteArray()
 
             exchange.sendResponseHeaders(200, ollamaResponse.size.toLong())
             exchange.responseBody.use { it.write(ollamaResponse) }
@@ -35,7 +37,8 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
 
         server.createContext("/v1/chat/completions") { exchange ->
             Thread.sleep(delaySeconds * 1000L)
-            val openaiResponse = """
+            val openaiResponse =
+                """
                 {
                   "id": "chatcmpl-mock",
                   "object": "chat.completion",
@@ -50,7 +53,7 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
                     "finish_reason": "stop"
                   }]
                 }
-            """.trimIndent().toByteArray()
+                """.trimIndent().toByteArray()
 
             exchange.sendResponseHeaders(200, openaiResponse.size.toLong())
             exchange.responseBody.use { it.write(openaiResponse) }
@@ -73,7 +76,8 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
         server.createContext("/api/chat") { exchange ->
             callCount++
             if (callCount <= 2) {
-                val errorResponse = """
+                val errorResponse =
+                    """
                     {
                       "error": {
                         "message": "Rate limit exceeded. Please retry after 60 seconds.",
@@ -81,18 +85,19 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
                         "code": 429
                       }
                     }
-                """.trimIndent().toByteArray()
+                    """.trimIndent().toByteArray()
 
                 exchange.sendResponseHeaders(429, errorResponse.size.toLong())
                 exchange.responseBody.use { it.write(errorResponse) }
             } else {
-                val successResponse = """
+                val successResponse =
+                    """
                     {
                       "model": "smollm:135m",
                       "message": { "role": "assistant", "content": "{\"plantuml\": {\"code\": \"@startuml\\nclass Success\\n@enduml\", \"description\": \"Success after retry\"}}" },
                       "done": true
                     }
-                """.trimIndent().toByteArray()
+                    """.trimIndent().toByteArray()
 
                 exchange.sendResponseHeaders(200, successResponse.size.toLong())
                 exchange.responseBody.use { it.write(successResponse) }
@@ -102,19 +107,21 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
         server.createContext("/v1/chat/completions") { exchange ->
             callCount++
             if (callCount <= 2) {
-                val errorResponse = """
+                val errorResponse =
+                    """
                     {
                       "error": {
                         "message": "Rate limit exceeded",
                         "type": "rate_limit_error"
                       }
                     }
-                """.trimIndent().toByteArray()
+                    """.trimIndent().toByteArray()
 
                 exchange.sendResponseHeaders(429, errorResponse.size.toLong())
                 exchange.responseBody.use { it.write(errorResponse) }
             } else {
-                val successResponse = """
+                val successResponse =
+                    """
                     {
                       "id": "chatcmpl-mock",
                       "object": "chat.completion",
@@ -129,7 +136,7 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
                         "finish_reason": "stop"
                       }]
                     }
-                """.trimIndent().toByteArray()
+                    """.trimIndent().toByteArray()
 
                 exchange.sendResponseHeaders(200, successResponse.size.toLong())
                 exchange.responseBody.use { it.write(successResponse) }
@@ -154,12 +161,13 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
         val port = server.address.port
 
         server.createContext("/api/chat") { exchange ->
-            val malformedJson = """
+            val malformedJson =
+                """
                 {
                   "model": "smollm:135m",
                   "message": { "role": "assistant", "content": "{\"plantuml\": {\"code\": \"@startuml\\n@enduml\", \"description\": \"Missing closing brace" }
                 }
-            """.trimIndent()
+                """.trimIndent()
             val response = malformedJson.toByteArray()
             exchange.sendResponseHeaders(200, response.size.toLong())
             exchange.responseBody.use { it.write(response) }
@@ -183,7 +191,7 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
                 plantuml.test.simulate.port.conflict=true
                 plantuml.test.mode=true
                 
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
     }
@@ -204,73 +212,77 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
         // Create a fresh project and write invalid YAML
         world.createGradleProject()
         val configFile = File(world.projectDir, "plantuml-context.yml")
-        val invalidYaml = """
+        val invalidYaml =
+            """
             input:
               prompts: "prompts
             output:
               images: "test"
-        """.trimIndent()
+            """.trimIndent()
         configFile.writeText(invalidYaml)
     }
 
     @When("I run generatePlantumlDiagrams task with timeout {int} seconds")
-    fun runGeneratePlantumlDiagramsTaskWithTimeout(timeoutSeconds: Int) = runBlocking {
-        val properties = mutableMapOf<String, String>()
-        properties["plantuml.langchain4j.model"] = "ollama"
-        properties["plantuml.langchain4j.ollama.baseUrl"] = "http://localhost:9999"
-        properties["plantuml.langchain4j.ollama.modelName"] = "smollm:135m"
-        properties["plantuml.langchain4j.timeout"] = "${timeoutSeconds}s"
-        properties["plantuml.test.mode"] = "true"
-        val systemProperties = mutableMapOf<String, String>()
-        world.projectDir?.let {
-            systemProperties["plugin.project.dir"] = it.absolutePath
-        }
+    fun runGeneratePlantumlDiagramsTaskWithTimeout(timeoutSeconds: Int) =
+        runBlocking {
+            val properties = mutableMapOf<String, String>()
+            properties["plantuml.langchain4j.model"] = "ollama"
+            properties["plantuml.langchain4j.ollama.baseUrl"] = "http://localhost:9999"
+            properties["plantuml.langchain4j.ollama.modelName"] = "smollm:135m"
+            properties["plantuml.langchain4j.timeout"] = "${timeoutSeconds}s"
+            properties["plantuml.test.mode"] = "true"
+            val systemProperties = mutableMapOf<String, String>()
+            world.projectDir?.let {
+                systemProperties["plugin.project.dir"] = it.absolutePath
+            }
 
-        try {
-            world.executeGradle("generatePlantumlDiagrams", properties = properties, systemProperties = systemProperties)
-        } catch (e: Exception) {
-            world.exception = e
+            try {
+                world.executeGradle("generatePlantumlDiagrams", properties = properties, systemProperties = systemProperties)
+            } catch (e: Exception) {
+                world.exception = e
+            }
         }
-    }
 
     @When("I run collectPlantumlIndex task with port conflict simulation")
-    fun runCollectPlantumlIndexTaskWithPortConflict() = runBlocking {
-        val properties = mutableMapOf<String, String>()
-        val systemProperties = mutableMapOf<String, String>()
-        world.projectDir?.let {
-            properties["plugin.project.dir"] = it.absolutePath
-        }
-        properties["plantuml.test.mode"] = "true"
-        properties["rag.mode"] = "testcontainers"
-        systemProperties["plantuml.test.simulate.port.conflict"] = "true"
+    fun runCollectPlantumlIndexTaskWithPortConflict() =
+        runBlocking {
+            val properties = mutableMapOf<String, String>()
+            val systemProperties = mutableMapOf<String, String>()
+            world.projectDir?.let {
+                properties["plugin.project.dir"] = it.absolutePath
+            }
+            properties["plantuml.test.mode"] = "true"
+            properties["rag.mode"] = "testcontainers"
+            systemProperties["plantuml.test.simulate.port.conflict"] = "true"
 
-        try {
-            world.executeGradle("collectPlantumlIndex", properties = properties, systemProperties = systemProperties)
-        } catch (e: Exception) {
-            world.exception = e
+            try {
+                world.executeGradle("collectPlantumlIndex", properties = properties, systemProperties = systemProperties)
+            } catch (e: Exception) {
+                world.exception = e
+            }
         }
-    }
 
     @When("I run generatePlantumlDiagrams task with invalid config")
-    fun runGeneratePlantumlDiagramsTaskWithInvalidConfig() = runBlocking {
-        val properties = mutableMapOf<String, String>()
-        properties["plantuml.test.mode"] = "true"
-        val systemProperties = mutableMapOf<String, String>()
-        world.projectDir?.let {
-            systemProperties["plugin.project.dir"] = it.absolutePath
-        }
-        if (world.mockServerPort != null) {
-            properties["plantuml.langchain4j.model"] = "ollama"
-            properties["plantuml.langchain4j.ollama.baseUrl"] = "http://localhost:${world.mockServerPort}"
-            properties["plantuml.langchain4j.ollama.modelName"] = "smollm:135m"
-        }
+    fun runGeneratePlantumlDiagramsTaskWithInvalidConfig() =
+        runBlocking {
+            val properties = mutableMapOf<String, String>()
+            properties["plantuml.test.mode"] = "true"
+            val systemProperties = mutableMapOf<String, String>()
+            world.projectDir?.let {
+                systemProperties["plugin.project.dir"] = it.absolutePath
+            }
+            if (world.mockServerPort != null) {
+                properties["plantuml.langchain4j.model"] = "ollama"
+                properties["plantuml.langchain4j.ollama.baseUrl"] = "http://localhost:${world.mockServerPort}"
+                properties["plantuml.langchain4j.ollama.modelName"] = "smollm:135m"
+            }
 
-        try {
-            world.executeGradle("generatePlantumlDiagrams", properties = properties, systemProperties = systemProperties)
-        } catch (e: Exception) {
-            world.exception = e
+            try {
+                world.executeGradle("generatePlantumlDiagrams", properties = properties, systemProperties = systemProperties)
+            } catch (e: Exception) {
+                world.exception = e
+            }
         }
-    }
 
     @Then("the task should fail with timeout error")
     fun taskShouldFailWithTimeoutError() {
@@ -280,7 +292,7 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
             "Timeout",
             "TIMEOUT",
             "timed out",
-            "Time out"
+            "Time out",
         )
     }
 
@@ -291,7 +303,7 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
             "Retry",
             "RETRY",
             "attempt",
-            "Attempting"
+            "Attempting",
         )
     }
 
@@ -308,7 +320,7 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
             "timeout",
             "Timeout",
             "Timed out",
-            "attempt"
+            "attempt",
         )
     }
 
@@ -318,7 +330,7 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
             "backoff",
             "retry",
             "waiting",
-            "delay"
+            "delay",
         )
     }
 
@@ -328,7 +340,7 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
             "retry",
             "Retry",
             "wait",
-            "seconds"
+            "seconds",
         )
     }
 
@@ -341,7 +353,7 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
             "error",
             "Error",
             "failed",
-            "Failed"
+            "Failed",
         )
     }
 
@@ -353,7 +365,7 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
             "Connection",
             "unreachable",
             "refused",
-            "connect"
+            "connect",
         )
     }
 
@@ -364,7 +376,7 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
             "Network",
             "connectivity",
             "connection",
-            "check"
+            "check",
         )
     }
 
@@ -381,7 +393,7 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
             "format",
             "Failed to generate",
             "failed after",
-            "iterations"
+            "iterations",
         )
     }
 
@@ -391,7 +403,7 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
             "correction",
             "retry",
             "re-request",
-            "attempt"
+            "attempt",
         )
     }
 
@@ -401,7 +413,7 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
             "max attempts",
             "maximum attempts",
             "failed after",
-            "exhausted"
+            "exhausted",
         )
     }
 
@@ -412,7 +424,7 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
             "5432",
             "in use",
             "conflict",
-            "bind"
+            "bind",
         )
     }
 
@@ -423,7 +435,7 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
             "alternate port",
             "stopping",
             "PostgreSQL",
-            "pgvector"
+            "pgvector",
         )
     }
 
@@ -433,7 +445,7 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
             "disk",
             "space",
             "storage",
-            "insufficient"
+            "insufficient",
         )
     }
 
@@ -442,7 +454,8 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
         // Verify no partial files left behind
         world.projectDir?.let {
             val buildDir = File(it, "build/plantuml-plugin")
-            assertThat(buildDir.exists()).isFalse()
+            assertThat(buildDir.exists())
+                .isFalse()
                 .withFailMessage("Partial outputs should have been cleaned up")
         }
     }
@@ -462,7 +475,7 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
             "Warning",
             "default",
             "Default",
-            "using defaults"
+            "using defaults",
         )
     }
 
@@ -474,7 +487,7 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
             "yaml",
             "parse",
             "syntax",
-            "invalid"
+            "invalid",
         )
     }
 
@@ -485,7 +498,7 @@ class ErrorHandlingSteps(private val world: PlantumlWorld) {
             "Line",
             "position",
             "column",
-            "at"
+            "at",
         )
     }
 }

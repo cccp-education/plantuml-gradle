@@ -31,7 +31,6 @@ data class PlantumlProseLabel(
  * and skips the provider call. Pure: no I/O, no LLM, no rendering.
  */
 object PlantumlProseLabelExtractor {
-
     /** `prefix -> suffix : message` (prefix without a colon, so notes are excluded). */
     private val SEQUENCE_MESSAGE =
         Regex("""^\s*(?<prefix>[^:]*?(?:->|<-|--|\.\.|==)[^:]*?)\s*:\s*(?<text>.+?)\s*$""")
@@ -124,7 +123,11 @@ object PlantumlProseLabelExtractor {
 
             val sequence = SEQUENCE_MESSAGE.find(line)
             if (sequence != null) {
-                val text = sequence.groups["text"]?.value?.trim().orEmpty()
+                val text =
+                    sequence.groups["text"]
+                        ?.value
+                        ?.trim()
+                        .orEmpty()
                 if (text.isNotEmpty() && !text.startsWith("\"")) {
                     found += PlantumlProseLabel(line, text)
                 }

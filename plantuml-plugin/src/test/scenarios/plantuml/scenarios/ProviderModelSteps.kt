@@ -13,7 +13,6 @@ import plantuml.service.ProviderModelResolver
  * S-088 — the shared `plantuml.scenarios` glue package).
  */
 class ProviderModelSteps {
-
     private var huggingFaceConfig: ApiKeyConfig? = null
     private var groqConfig: ApiKeyConfig? = null
 

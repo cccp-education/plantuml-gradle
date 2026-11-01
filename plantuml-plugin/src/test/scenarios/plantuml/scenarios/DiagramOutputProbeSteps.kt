@@ -16,7 +16,6 @@ import plantuml.service.DiagramOutputVerdict
  * S-088 — the shared `plantuml.scenarios` glue package).
  */
 class DiagramOutputProbeSteps {
-
     private var bytes: ByteArray? = null
     private var source: String = ""
     private var parses: Boolean = true

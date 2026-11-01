@@ -37,7 +37,6 @@ data class PlantumlNote(
  * Distinct, in first-seen order. Pure: no I/O, no LLM, no rendering.
  */
 object PlantumlNoteExtractor {
-
     private val NOTE_START = Regex("""^\s*note\b(.*)$""")
     private val END_NOTE = Regex("""^\s*end\s*note\b""")
 
@@ -70,7 +69,9 @@ object PlantumlNoteExtractor {
             val rest = match.groupValues[1]
             val separator = rest.indexOf(':')
             if (separator >= 0) {
-                rest.substring(separator + 1).trim()
+                rest
+                    .substring(separator + 1)
+                    .trim()
                     .takeIf { it.isNotEmpty() }
                     ?.let { collected.add(PlantumlNote(raw = it, text = it, singleLine = true)) }
             } else {

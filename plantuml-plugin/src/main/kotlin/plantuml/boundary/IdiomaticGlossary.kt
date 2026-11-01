@@ -7,7 +7,6 @@ package plantuml.boundary
  * [TranslationStrategy.TRANSLATE] and [TranslationStrategy.BORROW] strategies.
  */
 class IdiomaticGlossary {
-
     private val entries: MutableMap<String, MutableMap<String, GlossaryEntry>> = mutableMapOf()
 
     /**
@@ -17,7 +16,11 @@ class IdiomaticGlossary {
      * @param language Language code (e.g., "fr", "zh")
      * @param entry The [GlossaryEntry] with translation and strategy
      */
-    fun register(term: String, language: String, entry: GlossaryEntry) {
+    fun register(
+        term: String,
+        language: String,
+        entry: GlossaryEntry,
+    ) {
         entries.getOrPut(term) { mutableMapOf() }[language] = entry
     }
 
@@ -41,8 +44,10 @@ class IdiomaticGlossary {
      * @param language Language code
      * @return The matching [GlossaryEntry], or null if not found
      */
-    fun lookup(term: String, language: String): GlossaryEntry? =
-        entries[term]?.get(language)
+    fun lookup(
+        term: String,
+        language: String,
+    ): GlossaryEntry? = entries[term]?.get(language)
 
     /**
      * Checks whether a glossary entry exists for the given term and language.
@@ -51,6 +56,8 @@ class IdiomaticGlossary {
      * @param language Language code
      * @return true if an entry exists
      */
-    fun contains(term: String, language: String): Boolean =
-        entries[term]?.containsKey(language) == true
+    fun contains(
+        term: String,
+        language: String,
+    ): Boolean = entries[term]?.containsKey(language) == true
 }

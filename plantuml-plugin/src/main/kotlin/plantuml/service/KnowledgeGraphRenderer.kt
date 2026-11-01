@@ -18,24 +18,50 @@ import plantuml.boundary.TranslationResolver
  * - Optional i18n via [TranslationResolver]
  */
 class KnowledgeGraphRenderer {
+    private val communityColors =
+        listOf(
+            "#E8F4FD",
+            "#FFF3CD",
+            "#D4EDDA",
+            "#F8D7DA",
+            "#D6D8DB",
+            "#CCE5FF",
+            "#FFF0F0",
+            "#E8F5E9",
+            "#F3E5F5",
+            "#FFFACD",
+            "#E0F7FA",
+            "#FBE9E7",
+            "#F1F8E9",
+            "#EDE7F6",
+            "#E1F5FE",
+        )
 
-    private val communityColors = listOf(
-        "#E8F4FD", "#FFF3CD", "#D4EDDA", "#F8D7DA", "#D6D8DB",
-        "#CCE5FF", "#FFF0F0", "#E8F5E9", "#F3E5F5", "#FFFACD",
-        "#E0F7FA", "#FBE9E7", "#F1F8E9", "#EDE7F6", "#E1F5FE"
-    )
+    private val communityBorderColors =
+        listOf(
+            "#3B82F6",
+            "#F59E0B",
+            "#10B981",
+            "#EF4444",
+            "#6B7280",
+            "#2563EB",
+            "#DC2626",
+            "#059669",
+            "#8B5CF6",
+            "#D97706",
+            "#0891B2",
+            "#EA580C",
+            "#65A30D",
+            "#7C3AED",
+            "#0284C7",
+        )
 
-    private val communityBorderColors = listOf(
-        "#3B82F6", "#F59E0B", "#10B981", "#EF4444", "#6B7280",
-        "#2563EB", "#DC2626", "#059669", "#8B5CF6", "#D97706",
-        "#0891B2", "#EA580C", "#65A30D", "#7C3AED", "#0284C7"
-    )
-
-    private val methodPatterns = listOf(
-        Regex(".*\\(\\)$"),
-        Regex("^\\..+"),
-        Regex(".*`.*`.*")
-    )
+    private val methodPatterns =
+        listOf(
+            Regex(".*\\(\\)$"),
+            Regex("^\\..+"),
+            Regex(".*`.*`.*"),
+        )
 
     /**
      * Renders a knowledge graph as PlantUML source code.
@@ -58,7 +84,7 @@ class KnowledgeGraphRenderer {
         maxNodes: Int = Int.MAX_VALUE,
         nodeTypes: Set<String>? = null,
         resolver: TranslationResolver? = null,
-        language: String = "en"
+        language: String = "en",
     ): String {
         val label = { text: String ->
             resolver?.resolve(text, language)?.translated ?: text
@@ -89,25 +115,27 @@ class KnowledgeGraphRenderer {
         val nodesByCommunity = filteredGraph.nodes.groupBy { it.community }
         val communityIdx = mutableMapOf<String, Int>()
 
-        val communitiesToRender = if (filteredGraph.communities.isNotEmpty()) {
-            filteredGraph.communities
-        } else {
-            nodesByCommunity.keys.map { communityName ->
-                val commNodes = nodesByCommunity[communityName] ?: emptyList()
-                KnowledgeGraphCommunity(
-                    name = communityName,
-                    nodes = commNodes.map { it.name },
-                    edges = filteredGraph.edges.filter { it.source in commNodes.map { n -> n.name } || it.target in commNodes.map { n -> n.name } }
-                )
+        val communitiesToRender =
+            if (filteredGraph.communities.isNotEmpty()) {
+                filteredGraph.communities
+            } else {
+                nodesByCommunity.keys.map { communityName ->
+                    val commNodes = nodesByCommunity[communityName] ?: emptyList()
+                    KnowledgeGraphCommunity(
+                        name = communityName,
+                        nodes = commNodes.map { it.name },
+                        edges = filteredGraph.edges.filter { it.source in commNodes.map { n -> n.name } || it.target in commNodes.map { n -> n.name } },
+                    )
+                }
             }
-        }
 
         for ((idx, community) in communitiesToRender.withIndex()) {
-            val colorPair = if (community.color.isNotBlank()) {
-                community.color to community.color
-            } else {
-                communityColors[idx % communityColors.size] to communityBorderColors[idx % communityBorderColors.size]
-            }
+            val colorPair =
+                if (community.color.isNotBlank()) {
+                    community.color to community.color
+                } else {
+                    communityColors[idx % communityColors.size] to communityBorderColors[idx % communityBorderColors.size]
+                }
 
             communityIdx[community.name] = idx
             val bgColor = colorPair.first
@@ -117,13 +145,17 @@ class KnowledgeGraphRenderer {
             sb.appendLine("    skinparam packageBackgroundColor $bgColor")
             sb.appendLine("    skinparam packageBorderColor $borderColor")
 
-            val communityNodeNames = (community.nodes.ifEmpty {
-                nodesByCommunity[community.name]?.map { it.name } ?: emptyList()
-            }).filter { it in filteredNodeNames }
+            val communityNodeNames =
+                (
+                    community.nodes.ifEmpty {
+                        nodesByCommunity[community.name]?.map { it.name } ?: emptyList()
+                    }
+                ).filter { it in filteredNodeNames }
 
-            val nodesByType = communityNodeNames
-                .mapNotNull { name -> filteredGraph.nodes.find { it.name == name } }
-                .groupBy { it.type }
+            val nodesByType =
+                communityNodeNames
+                    .mapNotNull { name -> filteredGraph.nodes.find { it.name == name } }
+                    .groupBy { it.type }
 
             val classNodeNames = (nodesByType["class"] ?: emptyList()).map { it.name }
             val fileNodeNames = (nodesByType["code"] ?: emptyList()).map { it.name }
@@ -133,8 +165,11 @@ class KnowledgeGraphRenderer {
                 sb.appendLine("    folder \"${label("Classes")}\" {")
                 for (nodeName in classNodeNames) {
                     val nodeInfo = filteredGraph.nodes.find { it.name == nodeName }
-                    if (nodeInfo != null) renderNode(sb, nodeInfo, indent = 8)
-                    else sb.appendLine("        class \"${cleanLabel(nodeName)}\" as ${sanitizeId(nodeName)}")
+                    if (nodeInfo != null) {
+                        renderNode(sb, nodeInfo, indent = 8)
+                    } else {
+                        sb.appendLine("        class \"${cleanLabel(nodeName)}\" as ${sanitizeId(nodeName)}")
+                    }
                 }
                 sb.appendLine("    }")
             }
@@ -143,8 +178,11 @@ class KnowledgeGraphRenderer {
                 sb.appendLine("    folder \"${label("Files")}\" {")
                 for (nodeName in fileNodeNames) {
                     val nodeInfo = filteredGraph.nodes.find { it.name == nodeName }
-                    if (nodeInfo != null) renderNode(sb, nodeInfo, indent = 8)
-                    else sb.appendLine("        node \"${cleanLabel(nodeName)}\" as ${sanitizeId(nodeName)}")
+                    if (nodeInfo != null) {
+                        renderNode(sb, nodeInfo, indent = 8)
+                    } else {
+                        sb.appendLine("        node \"${cleanLabel(nodeName)}\" as ${sanitizeId(nodeName)}")
+                    }
                 }
                 sb.appendLine("    }")
             }
@@ -152,8 +190,11 @@ class KnowledgeGraphRenderer {
             if (otherNodes.isNotEmpty()) {
                 for (nodeName in otherNodes) {
                     val nodeInfo = filteredGraph.nodes.find { it.name == nodeName }
-                    if (nodeInfo != null) renderNode(sb, nodeInfo, indent = 4)
-                    else sb.appendLine("    node \"${cleanLabel(nodeName)}\" as ${sanitizeId(nodeName)}")
+                    if (nodeInfo != null) {
+                        renderNode(sb, nodeInfo, indent = 4)
+                    } else {
+                        sb.appendLine("    node \"${cleanLabel(nodeName)}\" as ${sanitizeId(nodeName)}")
+                    }
                 }
             }
 
@@ -161,30 +202,34 @@ class KnowledgeGraphRenderer {
             sb.appendLine()
         }
 
-        val allRenderedNodes = communitiesToRender
-            .flatMap { c ->
-                c.nodes.ifEmpty {
-                    nodesByCommunity[c.name]?.map { it.name } ?: emptyList()
-                }
-            }
-            .take(maxNodes)
-            .toSet()
+        val allRenderedNodes =
+            communitiesToRender
+                .flatMap { c ->
+                    c.nodes.ifEmpty {
+                        nodesByCommunity[c.name]?.map { it.name } ?: emptyList()
+                    }
+                }.take(maxNodes)
+                .toSet()
 
-        val renderedEdges = filteredGraph.edges.filter {
-            it.source in allRenderedNodes && it.target in allRenderedNodes
-        }
+        val renderedEdges =
+            filteredGraph.edges.filter {
+                it.source in allRenderedNodes && it.target in allRenderedNodes
+            }
 
-        val crossCommunityEdges = renderedEdges.filter { edge ->
-            val sourceCommunity = communitiesToRender.find { c ->
-                val cnodes = c.nodes.ifEmpty { nodesByCommunity[c.name]?.map { it.name } ?: emptyList() }
-                edge.source in cnodes
+        val crossCommunityEdges =
+            renderedEdges.filter { edge ->
+                val sourceCommunity =
+                    communitiesToRender.find { c ->
+                        val cnodes = c.nodes.ifEmpty { nodesByCommunity[c.name]?.map { it.name } ?: emptyList() }
+                        edge.source in cnodes
+                    }
+                val targetCommunity =
+                    communitiesToRender.find { c ->
+                        val cnodes = c.nodes.ifEmpty { nodesByCommunity[c.name]?.map { it.name } ?: emptyList() }
+                        edge.target in cnodes
+                    }
+                sourceCommunity != null && targetCommunity != null && sourceCommunity != targetCommunity
             }
-            val targetCommunity = communitiesToRender.find { c ->
-                val cnodes = c.nodes.ifEmpty { nodesByCommunity[c.name]?.map { it.name } ?: emptyList() }
-                edge.target in cnodes
-            }
-            sourceCommunity != null && targetCommunity != null && sourceCommunity != targetCommunity
-        }
 
         if (crossCommunityEdges.isNotEmpty()) {
             sb.appendLine("' ${label("Cross-community edges")}")
@@ -194,9 +239,10 @@ class KnowledgeGraphRenderer {
             sb.appendLine()
         }
 
-        val intraCommunityEdges = renderedEdges.filter { edge ->
-            edge !in crossCommunityEdges
-        }
+        val intraCommunityEdges =
+            renderedEdges.filter { edge ->
+                edge !in crossCommunityEdges
+            }
 
         if (intraCommunityEdges.isNotEmpty()) {
             sb.appendLine("' ${label("Intra-community edges")}")
@@ -225,24 +271,26 @@ class KnowledgeGraphRenderer {
         edgeTypes: Set<EdgeType>,
         minConfidence: Double,
         maxNodes: Int,
-        nodeTypes: Set<String>?
+        nodeTypes: Set<String>?,
     ): KnowledgeGraph {
-        val filteredCommunities = if (communityFilter != null) {
-            graph.communities.filter {
-                it.name.contains(communityFilter, ignoreCase = true)
+        val filteredCommunities =
+            if (communityFilter != null) {
+                graph.communities.filter {
+                    it.name.contains(communityFilter, ignoreCase = true)
+                }
+            } else {
+                graph.communities
             }
-        } else {
-            graph.communities
-        }
 
         val communityNames = filteredCommunities.map { it.name }.toSet()
 
-        var filteredNodes = if (communityFilter != null) {
-            val communityNodes = filteredCommunities.flatMap { it.nodes }.toSet()
-            graph.nodes.filter { it.name in communityNodes || it.community in communityNames }
-        } else {
-            graph.nodes
-        }
+        var filteredNodes =
+            if (communityFilter != null) {
+                val communityNodes = filteredCommunities.flatMap { it.nodes }.toSet()
+                graph.nodes.filter { it.name in communityNodes || it.community in communityNames }
+            } else {
+                graph.nodes
+            }
 
         if (nodeTypes != null) {
             filteredNodes = filteredNodes.filter { it.type in nodeTypes }
@@ -251,26 +299,31 @@ class KnowledgeGraphRenderer {
         val limitedNodes = filteredNodes.take(maxNodes)
         val nodeNames = limitedNodes.map { it.name }.toSet()
 
-        val filteredEdges = graph.edges
-            .filter { it.type in edgeTypes }
-            .filter { it.confidence >= minConfidence }
-            .filter { it.source in nodeNames || it.target in nodeNames }
+        val filteredEdges =
+            graph.edges
+                .filter { it.type in edgeTypes }
+                .filter { it.confidence >= minConfidence }
+                .filter { it.source in nodeNames || it.target in nodeNames }
 
         return KnowledgeGraph(
             nodes = limitedNodes,
             edges = filteredEdges,
-            communities = filteredCommunities
+            communities = filteredCommunities,
         )
     }
 
-    private fun renderNode(sb: StringBuilder, node: KnowledgeGraphNode, indent: Int = 4) {
+    private fun renderNode(
+        sb: StringBuilder,
+        node: KnowledgeGraphNode,
+        indent: Int = 4,
+    ) {
         val pad = " ".repeat(indent)
         val id = sanitizeId(node.name)
         val label = cleanLabel(node.name)
         if (node.attributes.isNotEmpty()) {
             sb.appendLine("${pad}node \"$label\" as $id {")
             for (attr in node.attributes.take(5)) {
-                sb.appendLine("${pad}    $attr")
+                sb.appendLine("$pad    $attr")
             }
             sb.appendLine("$pad}")
         } else {
@@ -278,13 +331,19 @@ class KnowledgeGraphRenderer {
         }
     }
 
-    private fun renderEdge(sb: StringBuilder, edge: KnowledgeGraphEdge) {
+    private fun renderEdge(
+        sb: StringBuilder,
+        edge: KnowledgeGraphEdge,
+    ) {
         val sourceId = sanitizeId(edge.source)
         val targetId = sanitizeId(edge.target)
         val label = if (edge.label.isNotBlank()) " : ${edge.label}" else ""
-        val confidenceLabel = if (edge.type == EdgeType.INFERRED && edge.confidence < 1.0) {
-            " (${String.format("%.0f%%", edge.confidence * 100)})"
-        } else ""
+        val confidenceLabel =
+            if (edge.type == EdgeType.INFERRED && edge.confidence < 1.0) {
+                " (${String.format("%.0f%%", edge.confidence * 100)})"
+            } else {
+                ""
+            }
 
         when (edge.type) {
             EdgeType.EXTRACTED -> sb.appendLine("$sourceId --> $targetId$label$confidenceLabel")
@@ -298,7 +357,7 @@ class KnowledgeGraphRenderer {
         edgeTypes: Set<EdgeType>,
         communityFilter: String?,
         nodeTypes: Set<String>?,
-        label: (String) -> String = { it }
+        label: (String) -> String = { it },
     ) {
         sb.appendLine("legend right")
         sb.appendLine("  | Type | Arrow |")
@@ -332,27 +391,29 @@ class KnowledgeGraphRenderer {
      * @return A valid PlantUML identifier
      */
     fun sanitizeId(name: String): String {
-        val sanitized = cleanLabel(name).replace(" ", "_")
-            .replace(".", "_")
-            .replace("(", "")
-            .replace(")", "")
-            .replace("[", "_")
-            .replace("]", "")
-            .replace("/", "_")
-            .replace("\\", "_")
-            .replace("-", "_")
-            .replace("\"", "")
-            .replace("'", "")
-            .replace("`", "")
-            .replace(",", "_")
+        val sanitized =
+            cleanLabel(name)
+                .replace(" ", "_")
+                .replace(".", "_")
+                .replace("(", "")
+                .replace(")", "")
+                .replace("[", "_")
+                .replace("]", "")
+                .replace("/", "_")
+                .replace("\\", "_")
+                .replace("-", "_")
+                .replace("\"", "")
+                .replace("'", "")
+                .replace("`", "")
+                .replace(",", "_")
         return if (sanitized.first().isDigit()) "_$sanitized" else sanitized
     }
 
-    private fun cleanLabel(name: String): String {
-        return name.replace(Regex("^\\.+"), "")
+    private fun cleanLabel(name: String): String =
+        name
+            .replace(Regex("^\\.+"), "")
             .replace(Regex("`"), "")
             .trim()
-    }
 
     /**
      * Checks whether a node represents a method (ends with `()`, starts with `.`, or contains backticks).
@@ -360,7 +421,5 @@ class KnowledgeGraphRenderer {
      * @param node The node to check
      * @return true if the node matches method naming patterns
      */
-    fun isMethodNode(node: KnowledgeGraphNode): Boolean {
-        return methodPatterns.any { it.matches(node.name) }
-    }
+    fun isMethodNode(node: KnowledgeGraphNode): Boolean = methodPatterns.any { it.matches(node.name) }
 }

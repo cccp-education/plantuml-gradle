@@ -1,10 +1,10 @@
 package plantuml.scenarios
 
+import contracts.plantuml.SyntaxValidationResult
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
 import io.cucumber.java.en.When
 import org.assertj.core.api.Assertions.assertThat
-import plantuml.EdgeType
 import plantuml.KnowledgeGraph
 import plantuml.KnowledgeGraphCommunity
 import plantuml.KnowledgeGraphNode
@@ -18,85 +18,101 @@ import plantuml.boundary.TranslationStrategy
 import plantuml.service.DiagramProcessor
 import plantuml.service.KnowledgeGraphRenderer
 import plantuml.service.PlantumlService
-import contracts.plantuml.SyntaxValidationResult
 
-class BoundarySteps(private val world: PlantumlWorld) {
-
+class BoundarySteps(
+    private val world: PlantumlWorld,
+) {
     private val logger = org.slf4j.LoggerFactory.getLogger(BoundarySteps::class.java)
 
     @Given("a translation resolver with a FR glossary")
     fun aTranslationResolverWithFrGlossary() {
-        val glossary = IdiomaticGlossary().apply {
-            register("pipeline", "fr", GlossaryEntry("pipeline", TranslationStrategy.BORROW))
-            register("rollback", "fr", GlossaryEntry("rollback", TranslationStrategy.BORROW))
-            register("dependency injection", "fr", GlossaryEntry("injection de dépendances", TranslationStrategy.TRANSLATE))
-        }
-        world.boundaryResolver = TranslationResolver(
-            classifier = TextClassifier(),
-            glossary = glossary,
-            messageResolver = { key, language -> runCatching { PlantumlMessages.get(key, language) }.getOrNull() }
-        )
+        val glossary =
+            IdiomaticGlossary().apply {
+                register("pipeline", "fr", GlossaryEntry("pipeline", TranslationStrategy.BORROW))
+                register("rollback", "fr", GlossaryEntry("rollback", TranslationStrategy.BORROW))
+                register("dependency injection", "fr", GlossaryEntry("injection de dépendances", TranslationStrategy.TRANSLATE))
+            }
+        world.boundaryResolver =
+            TranslationResolver(
+                classifier = TextClassifier(),
+                glossary = glossary,
+                messageResolver = { key, language -> runCatching { PlantumlMessages.get(key, language) }.getOrNull() },
+            )
     }
 
     @Given("a translation resolver with a FR glossary and non-translatable term {string}")
     fun aTranslationResolverWithFrGlossaryAndNonTranslatableTerm(term: String) {
-        val glossary = IdiomaticGlossary().apply {
-            register("pipeline", "fr", GlossaryEntry("pipeline", TranslationStrategy.BORROW))
-            register("rollback", "fr", GlossaryEntry("rollback", TranslationStrategy.BORROW))
-            register("dependency injection", "fr", GlossaryEntry("injection de dépendances", TranslationStrategy.TRANSLATE))
-        }
+        val glossary =
+            IdiomaticGlossary().apply {
+                register("pipeline", "fr", GlossaryEntry("pipeline", TranslationStrategy.BORROW))
+                register("rollback", "fr", GlossaryEntry("rollback", TranslationStrategy.BORROW))
+                register("dependency injection", "fr", GlossaryEntry("injection de dépendances", TranslationStrategy.TRANSLATE))
+            }
         val registry = NonTranslatableTermRegistry().apply { register(term) }
-        world.boundaryResolver = TranslationResolver(
-            classifier = TextClassifier(),
-            glossary = glossary,
-            messageResolver = { key, language -> runCatching { PlantumlMessages.get(key, language) }.getOrNull() },
-            nonTranslatableRegistry = registry
-        )
+        world.boundaryResolver =
+            TranslationResolver(
+                classifier = TextClassifier(),
+                glossary = glossary,
+                messageResolver = { key, language -> runCatching { PlantumlMessages.get(key, language) }.getOrNull() },
+                nonTranslatableRegistry = registry,
+            )
     }
 
     @Given("a translation resolver with a FR glossary registering {string} as BORROW and non-translatable term {string}")
-    fun aTranslationResolverWithFrGlossaryRegisteringBorrowAndNonTranslatableTerm(glossaryTerm: String, nonTranslatableTerm: String) {
-        val glossary = IdiomaticGlossary().apply {
-            register("pipeline", "fr", GlossaryEntry("pipeline", TranslationStrategy.BORROW))
-            register("rollback", "fr", GlossaryEntry("rollback", TranslationStrategy.BORROW))
-            register("dependency injection", "fr", GlossaryEntry("injection de dépendances", TranslationStrategy.TRANSLATE))
-            register(glossaryTerm, "fr", GlossaryEntry("$glossaryTerm-emprunt", TranslationStrategy.BORROW))
-        }
+    fun aTranslationResolverWithFrGlossaryRegisteringBorrowAndNonTranslatableTerm(
+        glossaryTerm: String,
+        nonTranslatableTerm: String,
+    ) {
+        val glossary =
+            IdiomaticGlossary().apply {
+                register("pipeline", "fr", GlossaryEntry("pipeline", TranslationStrategy.BORROW))
+                register("rollback", "fr", GlossaryEntry("rollback", TranslationStrategy.BORROW))
+                register("dependency injection", "fr", GlossaryEntry("injection de dépendances", TranslationStrategy.TRANSLATE))
+                register(glossaryTerm, "fr", GlossaryEntry("$glossaryTerm-emprunt", TranslationStrategy.BORROW))
+            }
         val registry = NonTranslatableTermRegistry().apply { register(nonTranslatableTerm) }
-        world.boundaryResolver = TranslationResolver(
-            classifier = TextClassifier(),
-            glossary = glossary,
-            messageResolver = { key, language -> runCatching { PlantumlMessages.get(key, language) }.getOrNull() },
-            nonTranslatableRegistry = registry
-        )
+        world.boundaryResolver =
+            TranslationResolver(
+                classifier = TextClassifier(),
+                glossary = glossary,
+                messageResolver = { key, language -> runCatching { PlantumlMessages.get(key, language) }.getOrNull() },
+                nonTranslatableRegistry = registry,
+            )
     }
 
     @Given("a diagram processor in test mode with a FR resolver")
     fun aDiagramProcessorInTestModeWithFrResolver() {
         val plantumlService = org.mockito.Mockito.mock(PlantumlService::class.java)
-        org.mockito.Mockito.`when`(plantumlService.validateSyntax(org.mockito.Mockito.anyString()))
+        org.mockito.Mockito
+            .`when`(plantumlService.validateSyntax(org.mockito.Mockito.anyString()))
             .thenReturn(SyntaxValidationResult.Valid)
-        world.boundaryResolver = TranslationResolver(
-            classifier = TextClassifier(),
-            glossary = IdiomaticGlossary(),
-            messageResolver = { key, language -> runCatching { PlantumlMessages.get(key, language) }.getOrNull() }
-        )
+        world.boundaryResolver =
+            TranslationResolver(
+                classifier = TextClassifier(),
+                glossary = IdiomaticGlossary(),
+                messageResolver = { key, language -> runCatching { PlantumlMessages.get(key, language) }.getOrNull() },
+            )
         world.boundaryDiagram = null
         world.i18nErrorPromptsDir = null
     }
 
     @When("the diagram processor processes prompt {string} in language {string}")
-    fun theDiagramProcessorProcessesPrompt(prompt: String, language: String) {
+    fun theDiagramProcessorProcessesPrompt(
+        prompt: String,
+        language: String,
+    ) {
         val plantumlService = org.mockito.Mockito.mock(PlantumlService::class.java)
-        org.mockito.Mockito.`when`(plantumlService.validateSyntax(org.mockito.Mockito.anyString()))
+        org.mockito.Mockito
+            .`when`(plantumlService.validateSyntax(org.mockito.Mockito.anyString()))
             .thenReturn(SyntaxValidationResult.Valid)
         val processor = DiagramProcessor(plantumlService, null, null)
-        world.boundaryDiagram = processor.processPrompt(
-            prompt = prompt,
-            logger = logger,
-            resolver = world.boundaryResolver,
-            language = language
-        )
+        world.boundaryDiagram =
+            processor.processPrompt(
+                prompt = prompt,
+                logger = logger,
+                resolver = world.boundaryResolver,
+                language = language,
+            )
     }
 
     @Then("the generated diagram title should be translated to {string} in FR")
@@ -121,7 +137,10 @@ class BoundarySteps(private val world: PlantumlWorld) {
     }
 
     @When("the resolver resolves {string} in language {string}")
-    fun theResolverResolves(text: String, language: String) {
+    fun theResolverResolves(
+        text: String,
+        language: String,
+    ) {
         world.boundaryResult = world.boundaryResolver!!.resolve(text, language)
     }
 
@@ -149,43 +168,53 @@ class BoundarySteps(private val world: PlantumlWorld) {
 
     @Given("a full pipeline translation resolver with a FR glossary and a non-translatable registry containing {string}")
     fun aFullPipelineResolverWithFrGlossaryAndRegistry(term: String) {
-        val glossary = IdiomaticGlossary().apply {
-            register("pipeline", "fr", GlossaryEntry("pipeline", TranslationStrategy.BORROW))
-            register("rollback", "fr", GlossaryEntry("rollback", TranslationStrategy.BORROW))
-            register("dependency injection", "fr", GlossaryEntry("injection de dépendances", TranslationStrategy.TRANSLATE))
-        }
+        val glossary =
+            IdiomaticGlossary().apply {
+                register("pipeline", "fr", GlossaryEntry("pipeline", TranslationStrategy.BORROW))
+                register("rollback", "fr", GlossaryEntry("rollback", TranslationStrategy.BORROW))
+                register("dependency injection", "fr", GlossaryEntry("injection de dépendances", TranslationStrategy.TRANSLATE))
+            }
         val registry = NonTranslatableTermRegistry().apply { register(term) }
-        world.boundaryResolver = TranslationResolver(
-            classifier = TextClassifier(),
-            glossary = glossary,
-            messageResolver = { key, language -> runCatching { PlantumlMessages.get(key, language) }.getOrNull() },
-            nonTranslatableRegistry = registry
-        )
+        world.boundaryResolver =
+            TranslationResolver(
+                classifier = TextClassifier(),
+                glossary = glossary,
+                messageResolver = { key, language -> runCatching { PlantumlMessages.get(key, language) }.getOrNull() },
+                nonTranslatableRegistry = registry,
+            )
     }
 
     @Given("a knowledge graph with nodes {string}, {string} and a community {string}")
-    fun aKnowledgeGraphWithNodesAndCommunity(node1: String, node2: String, community: String) {
-        val graph = KnowledgeGraph(
-            nodes = listOf(
-                KnowledgeGraphNode(name = node1, type = "class", community = community),
-                KnowledgeGraphNode(name = node2, type = "class", community = community)
-            ),
-            edges = emptyList(),
-            communities = listOf(
-                KnowledgeGraphCommunity(name = community, nodes = listOf(node1, node2))
+    fun aKnowledgeGraphWithNodesAndCommunity(
+        node1: String,
+        node2: String,
+        community: String,
+    ) {
+        val graph =
+            KnowledgeGraph(
+                nodes =
+                    listOf(
+                        KnowledgeGraphNode(name = node1, type = "class", community = community),
+                        KnowledgeGraphNode(name = node2, type = "class", community = community),
+                    ),
+                edges = emptyList(),
+                communities =
+                    listOf(
+                        KnowledgeGraphCommunity(name = community, nodes = listOf(node1, node2)),
+                    ),
             )
-        )
         world.boundaryGraph = graph
     }
 
     @When("the knowledge graph renderer renders the graph in language {string}")
     fun theKnowledgeGraphRendererRendersTheGraph(language: String) {
         val renderer = KnowledgeGraphRenderer()
-        world.boundaryRenderedDiagram = renderer.render(
-            graph = world.boundaryGraph!!,
-            resolver = world.boundaryResolver,
-            language = language
-        )
+        world.boundaryRenderedDiagram =
+            renderer.render(
+                graph = world.boundaryGraph!!,
+                resolver = world.boundaryResolver,
+                language = language,
+            )
     }
 
     @Then("the rendered diagram should translate the {string} folder label via messages")

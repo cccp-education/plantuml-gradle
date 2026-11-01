@@ -15,7 +15,6 @@ import javax.inject.Inject
  * syntax, and produces images from valid diagrams.
  */
 class PlantumlPlugin : Plugin<Project> {
-
     /** Applies the plugin by registering tasks and configuring extensions. */
     override fun apply(project: Project) {
         with(project) {
@@ -45,10 +44,13 @@ class PlantumlPlugin : Plugin<Project> {
      * }
      * ```
      */
-    open class PlantumlExtension @Inject constructor(objects: ObjectFactory) {
-        val configPath: Property<String> = objects.property(String::class.java)
-        val language: Property<String> = objects.property(String::class.java)
-        val supportedLanguages: ListProperty<String> = objects.listProperty(String::class.java)
-    }
+    open class PlantumlExtension
+        @Inject
+        constructor(
+            objects: ObjectFactory,
+        ) {
+            val configPath: Property<String> = objects.property(String::class.java)
+            val language: Property<String> = objects.property(String::class.java)
+            val supportedLanguages: ListProperty<String> = objects.listProperty(String::class.java)
+        }
 }
-

@@ -13,7 +13,6 @@ package plantuml.runtime
  * functional tests is preserved.
  */
 interface RuntimeEnvironment {
-
     /** `plantuml.test.mode=true` or `TEST_ENV=true`. */
     val isTestMode: Boolean
 
@@ -48,7 +47,6 @@ private class SystemRuntimeEnvironment(
     private val property: (String) -> String?,
     private val environment: (String) -> String?,
 ) : RuntimeEnvironment {
-
     override val isTestMode: Boolean
         get() = property(TEST_MODE_PROPERTY) == "true" || environment(TEST_ENV_VARIABLE) == "true"
 

@@ -6,30 +6,32 @@ import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import java.io.File
 
-class PlantUmlProcessingSteps(private val world: PlantumlWorld) {
-
+class PlantUmlProcessingSteps(
+    private val world: PlantumlWorld,
+) {
     @When("I run generatePlantumlDiagrams task with max {int} iterations")
-    fun runGeneratePlantumlDiagramsTaskWithMaxIterations(maxIterations: Int) = runBlocking {
-        val properties = mutableMapOf<String, String>()
-        world.mockServerPort?.let {
-            properties["plantuml.langchain4j.model"] = "ollama"
-            properties["plantuml.langchain4j.ollama.baseUrl"] = "http://localhost:$it"
-            properties["plantuml.langchain4j.ollama.modelName"] = "smollm:135m"
-        }
-        properties["plantuml.langchain4j.maxIterations"] = maxIterations.toString()
-        properties["plantuml.test.mode"] = "true"
+    fun runGeneratePlantumlDiagramsTaskWithMaxIterations(maxIterations: Int) =
+        runBlocking {
+            val properties = mutableMapOf<String, String>()
+            world.mockServerPort?.let {
+                properties["plantuml.langchain4j.model"] = "ollama"
+                properties["plantuml.langchain4j.ollama.baseUrl"] = "http://localhost:$it"
+                properties["plantuml.langchain4j.ollama.modelName"] = "smollm:135m"
+            }
+            properties["plantuml.langchain4j.maxIterations"] = maxIterations.toString()
+            properties["plantuml.test.mode"] = "true"
 
-        val systemProperties = mutableMapOf<String, String>()
-        world.projectDir?.let {
-            systemProperties["plugin.project.dir"] = it.absolutePath
-        }
+            val systemProperties = mutableMapOf<String, String>()
+            world.projectDir?.let {
+                systemProperties["plugin.project.dir"] = it.absolutePath
+            }
 
-        try {
-            world.executeGradle("generatePlantumlDiagrams", properties = properties, systemProperties = systemProperties)
-        } catch (e: Exception) {
-            world.exception = e
+            try {
+                world.executeGradle("generatePlantumlDiagrams", properties = properties, systemProperties = systemProperties)
+            } catch (e: Exception) {
+                world.exception = e
+            }
         }
-    }
 
     @Then("a PNG image should be created")
     fun verifyPngImageCreated() {

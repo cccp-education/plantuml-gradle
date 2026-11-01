@@ -7,7 +7,6 @@ import kotlin.test.assertTrue
 
 // Tests are quick
 class PlantumlPluginTest {
-
     @Test
     fun `should create plantuml extension`() {
         // Given

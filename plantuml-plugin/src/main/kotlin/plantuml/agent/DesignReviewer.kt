@@ -9,5 +9,8 @@ package plantuml.agent
  * is disabled, so the default generation path is unchanged.
  */
 fun interface DesignReviewer {
-    fun review(pngBytes: ByteArray, source: String): String
+    fun review(
+        pngBytes: ByteArray,
+        source: String,
+    ): String
 }

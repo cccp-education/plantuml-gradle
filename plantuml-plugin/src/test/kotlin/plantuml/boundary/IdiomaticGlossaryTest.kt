@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class IdiomaticGlossaryTest {
-
     @Test
     fun `should register and retrieve entry by term and language`() {
         val glossary = IdiomaticGlossary()
@@ -86,10 +85,11 @@ class IdiomaticGlossaryTest {
     @Test
     fun `should support bulk registration from map`() {
         val glossary = IdiomaticGlossary()
-        val entries = mapOf(
-            "pipeline" to mapOf("fr" to GlossaryEntry("pipeline", TranslationStrategy.BORROW)),
-            "rollback" to mapOf("fr" to GlossaryEntry("rollback", TranslationStrategy.BORROW))
-        )
+        val entries =
+            mapOf(
+                "pipeline" to mapOf("fr" to GlossaryEntry("pipeline", TranslationStrategy.BORROW)),
+                "rollback" to mapOf("fr" to GlossaryEntry("rollback", TranslationStrategy.BORROW)),
+            )
         glossary.registerAll(entries)
 
         assertEquals(TranslationStrategy.BORROW, glossary.lookup("pipeline", "fr")!!.strategy)

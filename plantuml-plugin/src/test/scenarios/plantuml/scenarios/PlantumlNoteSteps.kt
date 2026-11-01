@@ -13,7 +13,6 @@ import plantuml.repair.PlantumlNoteExtractor
  * within the shared `plantuml.scenarios` glue package (anti-collision rule S-088).
  */
 class PlantumlNoteSteps {
-
     private var source: String = ""
     private var noteTexts: List<String> = emptyList()
 

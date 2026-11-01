@@ -4,20 +4,19 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
 import kotlin.test.assertEquals
-import kotlin.test.assertNull
 
 class ConfigMergerEdgeCasesTest {
-
     @TempDir
     lateinit var testProjectDir: File
 
     @Test
     fun `should use getOrDefault helper method for typed values`() {
-        val cliParams = mapOf(
-            "langchain4j.maxIterations" to 10,
-            "langchain4j.validation" to true,
-            "git.watchedBranches" to listOf("main", "develop", "feature")
-        )
+        val cliParams =
+            mapOf(
+                "langchain4j.maxIterations" to 10,
+                "langchain4j.validation" to true,
+                "git.watchedBranches" to listOf("main", "develop", "feature"),
+            )
 
         val result = ConfigMerger.merge(testProjectDir, PlantumlConfig(), cliParams)
 
@@ -28,14 +27,16 @@ class ConfigMergerEdgeCasesTest {
 
     @Test
     fun `should handle CLI parameter with null value`() {
-        val cliParams = mapOf<String, Any?>(
-            "input.prompts" to null,
-            "output.format" to "svg"
-        )
+        val cliParams =
+            mapOf<String, Any?>(
+                "input.prompts" to null,
+                "output.format" to "svg",
+            )
 
-        val yamlConfig = PlantumlConfig(
-            input = InputConfig(prompts = "yaml-prompts")
-        )
+        val yamlConfig =
+            PlantumlConfig(
+                input = InputConfig(prompts = "yaml-prompts"),
+            )
 
         val result = ConfigMerger.merge(testProjectDir, yamlConfig, cliParams)
 
@@ -46,7 +47,8 @@ class ConfigMergerEdgeCasesTest {
     @Test
     fun `should handle gradle properties with comments and empty lines`() {
         val gradleProperties = File(testProjectDir, "gradle.properties")
-        gradleProperties.writeText("""
+        gradleProperties.writeText(
+            """
             # This is a comment
             plantuml.input.prompts=custom-prompts
             
@@ -54,7 +56,8 @@ class ConfigMergerEdgeCasesTest {
             plantuml.output.format=svg
             
             plantuml.langchain4j.validation=true
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
         val config = ConfigMerger.loadFromGradleProperties(testProjectDir)
 
@@ -66,13 +69,15 @@ class ConfigMergerEdgeCasesTest {
     @Test
     fun `should ignore malformed gradle properties lines`() {
         val gradleProperties = File(testProjectDir, "gradle.properties")
-        gradleProperties.writeText("""
+        gradleProperties.writeText(
+            """
             plantuml.input.prompts=custom-prompts
             malformed line without equals
             plantuml.output.format=svg
             = no key
             plantuml.langchain4j.model=gemini
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
         val config = ConfigMerger.loadFromGradleProperties(testProjectDir)
 
@@ -84,11 +89,13 @@ class ConfigMergerEdgeCasesTest {
     @Test
     fun `should handle plantuml prefix in comments correctly`() {
         val gradleProperties = File(testProjectDir, "gradle.properties")
-        gradleProperties.writeText("""
+        gradleProperties.writeText(
+            """
             # plantuml.input.prompts=should-be-ignored
             plantuml.input.prompts=actual-value
             #plantuml.output.format=ignored
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
         val config = ConfigMerger.loadFromGradleProperties(testProjectDir)
 
@@ -99,11 +106,13 @@ class ConfigMergerEdgeCasesTest {
     @Test
     fun `should handle whitespace around property values`() {
         val gradleProperties = File(testProjectDir, "gradle.properties")
-        gradleProperties.writeText("""
+        gradleProperties.writeText(
+            """
             plantuml.input.prompts   =   spaced-prompts   
             plantuml.output.format=  svg  
             plantuml.langchain4j.model  =gemini
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
         val config = ConfigMerger.loadFromGradleProperties(testProjectDir)
 
@@ -115,9 +124,11 @@ class ConfigMergerEdgeCasesTest {
     @Test
     fun `should handle property value with equals sign`() {
         val gradleProperties = File(testProjectDir, "gradle.properties")
-        gradleProperties.writeText("""
+        gradleProperties.writeText(
+            """
             plantuml.input.prompts=prompts-with=equals=sign
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
         val config = ConfigMerger.loadFromGradleProperties(testProjectDir)
 
@@ -126,23 +137,27 @@ class ConfigMergerEdgeCasesTest {
 
     @Test
     fun `should merge RAG config with non-empty check for database credentials`() {
-        val yamlConfig = PlantumlConfig(
-            rag = RagConfig(
-                databaseUrl = "jdbc:postgresql://yaml-db:5432/plantuml",
-                username = "yaml-user",
-                password = "yaml-password",
-                tableName = "yaml_embeddings"
+        val yamlConfig =
+            PlantumlConfig(
+                rag =
+                    RagConfig(
+                        databaseUrl = "jdbc:postgresql://yaml-db:5432/plantuml",
+                        username = "yaml-user",
+                        password = "yaml-password",
+                        tableName = "yaml_embeddings",
+                    ),
             )
-        )
 
-        val propsConfig = PlantumlConfig(
-            rag = RagConfig(
-                databaseUrl = "jdbc:postgresql://props-db:5432/plantuml",
-                username = "props-user",
-                password = "props-password",
-                tableName = "props_embeddings"
+        val propsConfig =
+            PlantumlConfig(
+                rag =
+                    RagConfig(
+                        databaseUrl = "jdbc:postgresql://props-db:5432/plantuml",
+                        username = "props-user",
+                        password = "props-password",
+                        tableName = "props_embeddings",
+                    ),
             )
-        )
 
         val cliParams = emptyMap<String, Any?>()
 
@@ -156,17 +171,20 @@ class ConfigMergerEdgeCasesTest {
 
     @Test
     fun `should override RAG config with CLI parameters`() {
-        val yamlConfig = PlantumlConfig(
-            rag = RagConfig(
-                databaseUrl = "jdbc:postgresql://yaml-db:5432/plantuml",
-                tableName = "yaml_embeddings"
+        val yamlConfig =
+            PlantumlConfig(
+                rag =
+                    RagConfig(
+                        databaseUrl = "jdbc:postgresql://yaml-db:5432/plantuml",
+                        tableName = "yaml_embeddings",
+                    ),
             )
-        )
 
-        val cliParams = mapOf(
-            "rag.databaseUrl" to "jdbc:postgresql://cli-db:5432/plantuml",
-            "rag.tableName" to "cli_embeddings"
-        )
+        val cliParams =
+            mapOf(
+                "rag.databaseUrl" to "jdbc:postgresql://cli-db:5432/plantuml",
+                "rag.tableName" to "cli_embeddings",
+            )
 
         val result = ConfigMerger.merge(testProjectDir, yamlConfig, cliParams)
 
@@ -176,14 +194,16 @@ class ConfigMergerEdgeCasesTest {
 
     @Test
     fun `should merge Git config with custom values`() {
-        val yamlConfig = PlantumlConfig(
-            git = GitConfig(
-                userName = "custom-user",
-                userEmail = "custom@example.com",
-                commitMessage = "Custom commit message",
-                watchedBranches = listOf("main", "develop", "release")
+        val yamlConfig =
+            PlantumlConfig(
+                git =
+                    GitConfig(
+                        userName = "custom-user",
+                        userEmail = "custom@example.com",
+                        commitMessage = "Custom commit message",
+                        watchedBranches = listOf("main", "develop", "release"),
+                    ),
             )
-        )
 
         val cliParams = emptyMap<String, Any?>()
 
@@ -197,17 +217,20 @@ class ConfigMergerEdgeCasesTest {
 
     @Test
     fun `should override Git config with CLI parameters`() {
-        val yamlConfig = PlantumlConfig(
-            git = GitConfig(
-                userName = "yaml-user",
-                watchedBranches = listOf("main", "develop")
+        val yamlConfig =
+            PlantumlConfig(
+                git =
+                    GitConfig(
+                        userName = "yaml-user",
+                        watchedBranches = listOf("main", "develop"),
+                    ),
             )
-        )
 
-        val cliParams = mapOf(
-            "git.userName" to "cli-user",
-            "git.watchedBranches" to listOf("main", "feature", "hotfix")
-        )
+        val cliParams =
+            mapOf(
+                "git.userName" to "cli-user",
+                "git.watchedBranches" to listOf("main", "feature", "hotfix"),
+            )
 
         val result = ConfigMerger.merge(testProjectDir, yamlConfig, cliParams)
 
@@ -230,10 +253,12 @@ class ConfigMergerEdgeCasesTest {
     @Test
     fun `should handle gradle properties with only comments`() {
         val gradleProperties = File(testProjectDir, "gradle.properties")
-        gradleProperties.writeText("""
+        gradleProperties.writeText(
+            """
             # No actual properties here
             # Just comments
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
         val config = ConfigMerger.loadFromGradleProperties(testProjectDir)
 

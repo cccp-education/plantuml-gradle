@@ -18,7 +18,6 @@ import kotlin.test.assertTrue
  * economy of ink — AGENT.adoc).
  */
 class CollectAugmentedContextFunctionalTest {
-
     @field:TempDir
     lateinit var projectDir: File
 
@@ -50,7 +49,8 @@ class CollectAugmentedContextFunctionalTest {
     }
 
     private fun runner(vararg args: String): GradleRunner =
-        GradleRunner.create()
+        GradleRunner
+            .create()
             .forwardOutput()
             .withPluginClasspath()
             .withArguments(*args)
@@ -70,11 +70,12 @@ class CollectAugmentedContextFunctionalTest {
     fun `collectPlantumlAugmentedContext produces the augmented context artefact`() {
         writeBuildFile()
         writeEagerFiles()
-        val result = runner(
-            "collectPlantumlAugmentedContext",
-            "-Pcontext.ragContent=similarity: 0.98 — RAG nugget about diagrams",
-            "-Pcontext.graphifyContent=node: plantuml -> edge: feeds -> node: diagram",
-        ).build()
+        val result =
+            runner(
+                "collectPlantumlAugmentedContext",
+                "-Pcontext.ragContent=similarity: 0.98 — RAG nugget about diagrams",
+                "-Pcontext.graphifyContent=node: plantuml -> edge: feeds -> node: diagram",
+            ).build()
         assertEquals(
             TaskOutcome.SUCCESS,
             result.task(":collectPlantumlAugmentedContext")?.outcome,
@@ -116,10 +117,11 @@ class CollectAugmentedContextFunctionalTest {
             "collectPlantumlAugmentedContext",
             "-Pcontext.ragContent=unchanged",
         ).build()
-        val second = runner(
-            "collectPlantumlAugmentedContext",
-            "-Pcontext.ragContent=unchanged",
-        ).build()
+        val second =
+            runner(
+                "collectPlantumlAugmentedContext",
+                "-Pcontext.ragContent=unchanged",
+            ).build()
         assertEquals(
             TaskOutcome.UP_TO_DATE,
             second.task(":collectPlantumlAugmentedContext")?.outcome,

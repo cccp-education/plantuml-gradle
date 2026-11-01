@@ -4,16 +4,16 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class TranslationResolverTest {
-
     @Test
     fun `should translate presentation label via messages fallback`() {
         val classifier = TextClassifier()
         val glossary = IdiomaticGlossary()
-        val resolver = TranslationResolver(
-            classifier = classifier,
-            glossary = glossary,
-            messageResolver = { _, _ -> "Classes" }
-        )
+        val resolver =
+            TranslationResolver(
+                classifier = classifier,
+                glossary = glossary,
+                messageResolver = { _, _ -> "Classes" },
+            )
 
         val result = resolver.resolve("Classes", "fr")
 
@@ -25,11 +25,12 @@ class TranslationResolverTest {
     fun `should preserve semantic identity`() {
         val classifier = TextClassifier()
         val glossary = IdiomaticGlossary()
-        val resolver = TranslationResolver(
-            classifier = classifier,
-            glossary = glossary,
-            messageResolver = { _, _ -> null }
-        )
+        val resolver =
+            TranslationResolver(
+                classifier = classifier,
+                glossary = glossary,
+                messageResolver = { _, _ -> null },
+            )
 
         val result = resolver.resolve("LlmService", "fr")
 
@@ -40,14 +41,16 @@ class TranslationResolverTest {
     @Test
     fun `should borrow lexical term when glossary says borrow`() {
         val classifier = TextClassifier()
-        val glossary = IdiomaticGlossary().apply {
-            register("pipeline", "fr", GlossaryEntry("pipeline", TranslationStrategy.BORROW))
-        }
-        val resolver = TranslationResolver(
-            classifier = classifier,
-            glossary = glossary,
-            messageResolver = { _, _ -> null }
-        )
+        val glossary =
+            IdiomaticGlossary().apply {
+                register("pipeline", "fr", GlossaryEntry("pipeline", TranslationStrategy.BORROW))
+            }
+        val resolver =
+            TranslationResolver(
+                classifier = classifier,
+                glossary = glossary,
+                messageResolver = { _, _ -> null },
+            )
 
         val result = resolver.resolve("pipeline", "fr")
 
@@ -58,14 +61,16 @@ class TranslationResolverTest {
     @Test
     fun `should translate lexical term when glossary says translate`() {
         val classifier = TextClassifier()
-        val glossary = IdiomaticGlossary().apply {
-            register("dependency injection", "fr", GlossaryEntry("injection de dépendances", TranslationStrategy.TRANSLATE))
-        }
-        val resolver = TranslationResolver(
-            classifier = classifier,
-            glossary = glossary,
-            messageResolver = { _, _ -> null }
-        )
+        val glossary =
+            IdiomaticGlossary().apply {
+                register("dependency injection", "fr", GlossaryEntry("injection de dépendances", TranslationStrategy.TRANSLATE))
+            }
+        val resolver =
+            TranslationResolver(
+                classifier = classifier,
+                glossary = glossary,
+                messageResolver = { _, _ -> null },
+            )
 
         val result = resolver.resolve("dependency injection", "fr")
 
@@ -77,11 +82,12 @@ class TranslationResolverTest {
     fun `should preserve lexical term when not in glossary and no message`() {
         val classifier = TextClassifier()
         val glossary = IdiomaticGlossary()
-        val resolver = TranslationResolver(
-            classifier = classifier,
-            glossary = glossary,
-            messageResolver = { _, _ -> null }
-        )
+        val resolver =
+            TranslationResolver(
+                classifier = classifier,
+                glossary = glossary,
+                messageResolver = { _, _ -> null },
+            )
 
         val result = resolver.resolve("pipeline", "fr")
 
@@ -93,11 +99,12 @@ class TranslationResolverTest {
     fun `should translate presentation label using message resolver`() {
         val classifier = TextClassifier()
         val glossary = IdiomaticGlossary()
-        val resolver = TranslationResolver(
-            classifier = classifier,
-            glossary = glossary,
-            messageResolver = { key, language -> if (key == "label.classes" && language == "fr") "Classes" else null }
-        )
+        val resolver =
+            TranslationResolver(
+                classifier = classifier,
+                glossary = glossary,
+                messageResolver = { key, language -> if (key == "label.classes" && language == "fr") "Classes" else null },
+            )
 
         val result = resolver.resolve("Classes", "fr")
 
@@ -109,11 +116,12 @@ class TranslationResolverTest {
     fun `should expose classified text in result`() {
         val classifier = TextClassifier()
         val glossary = IdiomaticGlossary()
-        val resolver = TranslationResolver(
-            classifier = classifier,
-            glossary = glossary,
-            messageResolver = { _, _ -> null }
-        )
+        val resolver =
+            TranslationResolver(
+                classifier = classifier,
+                glossary = glossary,
+                messageResolver = { _, _ -> null },
+            )
 
         val result = resolver.resolve("LlmService", "fr")
 
@@ -126,12 +134,13 @@ class TranslationResolverTest {
         val classifier = TextClassifier()
         val glossary = IdiomaticGlossary()
         val registry = NonTranslatableTermRegistry().apply { register("RFC") }
-        val resolver = TranslationResolver(
-            classifier = classifier,
-            glossary = glossary,
-            messageResolver = { _, _ -> "RFC-translated" },
-            nonTranslatableRegistry = registry
-        )
+        val resolver =
+            TranslationResolver(
+                classifier = classifier,
+                glossary = glossary,
+                messageResolver = { _, _ -> "RFC-translated" },
+                nonTranslatableRegistry = registry,
+            )
 
         val result = resolver.resolve("RFC", "fr")
 
@@ -142,16 +151,18 @@ class TranslationResolverTest {
     @Test
     fun `should preserve non-translatable term even when glossary would borrow`() {
         val classifier = TextClassifier()
-        val glossary = IdiomaticGlossary().apply {
-            register("RFC", "fr", GlossaryEntry("RFC-emprunt", TranslationStrategy.BORROW))
-        }
+        val glossary =
+            IdiomaticGlossary().apply {
+                register("RFC", "fr", GlossaryEntry("RFC-emprunt", TranslationStrategy.BORROW))
+            }
         val registry = NonTranslatableTermRegistry().apply { register("RFC") }
-        val resolver = TranslationResolver(
-            classifier = classifier,
-            glossary = glossary,
-            messageResolver = { _, _ -> null },
-            nonTranslatableRegistry = registry
-        )
+        val resolver =
+            TranslationResolver(
+                classifier = classifier,
+                glossary = glossary,
+                messageResolver = { _, _ -> null },
+                nonTranslatableRegistry = registry,
+            )
 
         val result = resolver.resolve("RFC", "fr")
 
@@ -163,11 +174,12 @@ class TranslationResolverTest {
     fun `should behave as before when no registry provided`() {
         val classifier = TextClassifier()
         val glossary = IdiomaticGlossary()
-        val resolver = TranslationResolver(
-            classifier = classifier,
-            glossary = glossary,
-            messageResolver = { _, _ -> null }
-        )
+        val resolver =
+            TranslationResolver(
+                classifier = classifier,
+                glossary = glossary,
+                messageResolver = { _, _ -> null },
+            )
 
         val result = resolver.resolve("LlmService", "fr")
 

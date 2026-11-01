@@ -20,8 +20,9 @@ import plantuml.boundary.PlantumlTranslationPortAdapter
  * Prefix-free step names are unique to this feature (anti-glue collision rule
  * S-088 — the shared `plantuml.scenarios` glue package).
  */
-class RoundTripSteps(private val world: PlantumlWorld) {
-
+class RoundTripSteps(
+    private val world: PlantumlWorld,
+) {
     private var block: PlantUmlBlock? = null
     private var provider: TranslationService? = null
     private var validator: PlantUmlSyntaxValidator? = null
@@ -32,7 +33,10 @@ class RoundTripSteps(private val world: PlantumlWorld) {
     }
 
     @Given("a label provider returning {string} for {string}")
-    fun aLabelProviderReturning(replacement: String, source: String) {
+    fun aLabelProviderReturning(
+        replacement: String,
+        source: String,
+    ) {
         val decoded = replacement.replace("\\n", "\n")
         provider =
             object : TranslationService {
@@ -49,8 +53,7 @@ class RoundTripSteps(private val world: PlantumlWorld) {
     fun aSyntaxValidatorRejecting() {
         validator =
             object : PlantUmlSyntaxValidator {
-                override fun validate(plantumlCode: String): SyntaxValidationResult =
-                    SyntaxValidationResult.Invalid("broken", "")
+                override fun validate(plantumlCode: String): SyntaxValidationResult = SyntaxValidationResult.Invalid("broken", "")
             }
     }
 
@@ -58,13 +61,15 @@ class RoundTripSteps(private val world: PlantumlWorld) {
     fun aSyntaxValidatorAccepting() {
         validator =
             object : PlantUmlSyntaxValidator {
-                override fun validate(plantumlCode: String): SyntaxValidationResult =
-                    SyntaxValidationResult.Valid
+                override fun validate(plantumlCode: String): SyntaxValidationResult = SyntaxValidationResult.Valid
             }
     }
 
     @When("the PlantUML translation port translates the block from {string} to {string}")
-    fun thePortTranslates(sourceLanguage: String, targetLanguage: String) {
+    fun thePortTranslates(
+        sourceLanguage: String,
+        targetLanguage: String,
+    ) {
         val adapter = PlantumlTranslationPortAdapter(provider!!, validator = validator)
         world.roundTripOutcome =
             adapter.translate(PlantUmlTranslationRequest(block!!, sourceLanguage, targetLanguage))

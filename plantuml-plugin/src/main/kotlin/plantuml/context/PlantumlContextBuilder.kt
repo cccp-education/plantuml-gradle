@@ -33,7 +33,6 @@ data class PlantumlContext(
  * GRAPHIFY → DOCS → RESOURCE), the token budgeting from [CompositeContext.channelsWithBudget].
  */
 object PlantumlContextBuilder {
-
     /** The 5 canonical channels of [composite], in contract order. */
     fun toChannels(composite: CompositeContext): List<ContextChannel> = composite.toChannels()
 
@@ -54,8 +53,11 @@ object PlantumlContextBuilder {
             .filter { it.isNotEmpty() }
             .joinToString("\n\n") { channel ->
                 val header = channel.sectionHeader
-                if (header.isBlank()) channel.content
-                else "==== $header (${channel.name})\n${channel.content}"
+                if (header.isBlank()) {
+                    channel.content
+                } else {
+                    "==== $header (${channel.name})\n${channel.content}"
+                }
             }
 
     /**

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class TranslationCategoryTest {
-
     @Test
     fun `should define three categories`() {
         val categories = TranslationCategory.entries

@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test
  * Pure (operates on bytes + the N0 validator) — unit-testable in isolation.
  */
 class DiagramOutputProbeTest {
-
     private val acceptAll = PlantUmlSyntaxValidator { SyntaxValidationResult.Valid }
     private val rejectAll = PlantUmlSyntaxValidator { SyntaxValidationResult.Invalid("broken", "") }
 

@@ -1,6 +1,11 @@
 package plantuml
 
-import com.github.tomakehurst.wiremock.client.WireMock.*
+import com.github.tomakehurst.wiremock.client.WireMock.aResponse
+import com.github.tomakehurst.wiremock.client.WireMock.equalTo
+import com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath
+import com.github.tomakehurst.wiremock.client.WireMock.post
+import com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor
+import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.junit.jupiter.api.BeforeEach
@@ -9,9 +14,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.io.TempDir
 import org.mockito.kotlin.any
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
 import org.mockito.kotlin.isNull
+import org.mockito.kotlin.mock
 import org.mockito.kotlin.verifyNoInteractions
 import org.mockito.kotlin.whenever
 import org.slf4j.Logger
@@ -22,7 +26,6 @@ import plantuml.service.PlantumlService
 import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
-
 
 /**
  * Unit tests for PromptOrchestrator.
@@ -38,7 +41,6 @@ import kotlin.test.assertTrue
  *    without starting a real model. Execution: < 50 ms per test.
  */
 class PromptOrchestratorTest {
-
     private val logger: Logger = LoggerFactory.getLogger(PromptOrchestratorTest::class.java)
 
     @TempDir
@@ -50,7 +52,6 @@ class PromptOrchestratorTest {
 
     @Nested
     inner class WithMockDiagramProcessor {
-
         private val logger: Logger = LoggerFactory.getLogger(WithMockDiagramProcessor::class.java)
         private lateinit var mockProcessor: DiagramProcessor
         private lateinit var mockPlantumlService: PlantumlService
@@ -60,12 +61,13 @@ class PromptOrchestratorTest {
         fun setup() {
             mockPlantumlService = mock<PlantumlService>()
             mockProcessor = mock<DiagramProcessor>()
-            orchestrator = PromptOrchestrator(
-                config = minimalConfig(),
-                diagramProcessor = mockProcessor,
-                plantumlService = mockPlantumlService,
-                projectDir = tempDir.toPath(),
-            )
+            orchestrator =
+                PromptOrchestrator(
+                    config = minimalConfig(),
+                    diagramProcessor = mockProcessor,
+                    plantumlService = mockPlantumlService,
+                    projectDir = tempDir.toPath(),
+                )
         }
 
         @Test
@@ -150,9 +152,10 @@ class PromptOrchestratorTest {
             val promptsDir = File(tempDir, "prompts").also { it.mkdirs() }
             File(promptsDir, "test.prompt").writeText("A diagram")
 
-            val configNoValidation = minimalConfig().copy(
-                langchain4j = minimalConfig().langchain4j.copy(validation = false),
-            )
+            val configNoValidation =
+                minimalConfig().copy(
+                    langchain4j = minimalConfig().langchain4j.copy(validation = false),
+                )
             val orch = PromptOrchestrator(configNoValidation, mockProcessor, mockPlantumlService, tempDir.toPath())
 
             whenever(mockProcessor.processPrompt(any(), any(), any(), isNull(), any())).thenReturn(fakeDiagram())
@@ -169,13 +172,14 @@ class PromptOrchestratorTest {
 
     @Suppress("JUnitMalformedDeclaration")
     @RegisterExtension
-    val wireMock: WireMockExtension = WireMockExtension.newInstance()
-        .options(WireMockConfiguration.wireMockConfig().dynamicPort())
-        .build()
+    val wireMock: WireMockExtension =
+        WireMockExtension
+            .newInstance()
+            .options(WireMockConfiguration.wireMockConfig().dynamicPort())
+            .build()
 
     @Nested
     inner class WithWireMockLlm {
-
         private lateinit var orchestrator: PromptOrchestrator
         private lateinit var mockPlantumlService: PlantumlService
 
@@ -194,15 +198,18 @@ class PromptOrchestratorTest {
                     ),
             )
 
-            val config = minimalConfig().copy(
-                langchain4j = LangchainConfig(
-                    model = "ollama",
-                    ollama = OllamaConfig(
-                        baseUrl = "http://localhost:${wireMock.port}",
-                        modelName = "smollm:135m",
-                    ),
-                ),
-            )
+            val config =
+                minimalConfig().copy(
+                    langchain4j =
+                        LangchainConfig(
+                            model = "ollama",
+                            ollama =
+                                OllamaConfig(
+                                    baseUrl = "http://localhost:${wireMock.port}",
+                                    modelName = "smollm:135m",
+                                ),
+                        ),
+                )
 
             // The real DiagramProcessor is instantiated here with the real LlmService
             // pointing to WireMock — we test the complete HTTP path.
@@ -254,26 +261,28 @@ class PromptOrchestratorTest {
                     .withRequestBody(matchingJsonPath("$.model", equalTo("smollm:135m"))),
             )
         }
-
     }
 
     // ------------------------------------------------------------------ //
     //  Helpers                                                             //
     // ------------------------------------------------------------------ //
 
-    private fun minimalConfig() = PlantumlConfig(
-        input = plantuml.InputConfig(prompts = "prompts"),
-        output = plantuml.OutputConfig(
-            diagrams = "generated/diagrams",
-            images = "generated/images",
-            format = "png",
-        ),
-        langchain4j = LangchainConfig(
-            model = "ollama",
-            validation = false,
-            maxIterations = 1,
-        ),
-    )
+    private fun minimalConfig() =
+        PlantumlConfig(
+            input = plantuml.InputConfig(prompts = "prompts"),
+            output =
+                plantuml.OutputConfig(
+                    diagrams = "generated/diagrams",
+                    images = "generated/images",
+                    format = "png",
+                ),
+            langchain4j =
+                LangchainConfig(
+                    model = "ollama",
+                    validation = false,
+                    maxIterations = 1,
+                ),
+        )
 
     private fun fakeDiagram(code: String = "@startuml\nclass Fake\n@enduml") =
         plantuml.PlantumlDiagram(
@@ -281,7 +290,8 @@ class PromptOrchestratorTest {
             plantuml = plantuml.PlantumlCode(code = code, description = "fake"),
         )
 
-    private fun ollamaChatJsonResponse(plantumlCode: String) = """
+    private fun ollamaChatJsonResponse(plantumlCode: String) =
+        """
         {
           "model": "smollm:135m",
           "message": {
@@ -290,5 +300,5 @@ class PromptOrchestratorTest {
           },
           "done": true
         }
-    """.trimIndent()
+        """.trimIndent()
 }

@@ -17,7 +17,6 @@ import kotlin.test.assertTrue
  * no Gradle, no network.
  */
 class ContextProvenanceTest {
-
     private val mapper: ObjectMapper = ObjectMapper()
 
     // ─── ProvenanceSource ───────────────────────────────────────────────
@@ -49,13 +48,15 @@ class ContextProvenanceTest {
 
     @Test
     fun `ProvenanceChannel sums chars and tokens across sources`() {
-        val channel = ProvenanceChannel(
-            channel = "EAGER",
-            sources = listOf(
-                ProvenanceSource("INDEX.adoc", chars = 120, tokens = 30),
-                ProvenanceSource("AGENT.adoc", chars = 80, tokens = 20),
-            ),
-        )
+        val channel =
+            ProvenanceChannel(
+                channel = "EAGER",
+                sources =
+                    listOf(
+                        ProvenanceSource("INDEX.adoc", chars = 120, tokens = 30),
+                        ProvenanceSource("AGENT.adoc", chars = 80, tokens = 20),
+                    ),
+            )
         assertEquals(200, channel.totalChars())
         assertEquals(50, channel.totalTokens())
     }
@@ -73,14 +74,16 @@ class ContextProvenanceTest {
 
     @Test
     fun `ContextProvenance toJson serialises channels with sources and totals`() {
-        val provenance = ContextProvenance(
-            channels = listOf(
-                ProvenanceChannel(
-                    channel = "EAGER",
-                    sources = listOf(ProvenanceSource("INDEX.adoc", chars = 120, tokens = 30)),
-                ),
-            ),
-        )
+        val provenance =
+            ContextProvenance(
+                channels =
+                    listOf(
+                        ProvenanceChannel(
+                            channel = "EAGER",
+                            sources = listOf(ProvenanceSource("INDEX.adoc", chars = 120, tokens = 30)),
+                        ),
+                    ),
+            )
         val json: JsonNode = mapper.readTree(provenance.toJson())
         val channels = json["channels"]
         assertEquals(1, channels.size())
@@ -95,13 +98,15 @@ class ContextProvenanceTest {
 
     @Test
     fun `ContextProvenance aggregates totals across channels`() {
-        val provenance = ContextProvenance(
-            channels = listOf(
-                ProvenanceChannel("EAGER", listOf(ProvenanceSource("a.adoc", chars = 100, tokens = 25))),
-                ProvenanceChannel("RAG", listOf(ProvenanceSource("rag-injected", chars = 60, tokens = 15))),
-                ProvenanceChannel("DOCS", listOf(ProvenanceSource("b.adoc", chars = 40, tokens = 10))),
-            ),
-        )
+        val provenance =
+            ContextProvenance(
+                channels =
+                    listOf(
+                        ProvenanceChannel("EAGER", listOf(ProvenanceSource("a.adoc", chars = 100, tokens = 25))),
+                        ProvenanceChannel("RAG", listOf(ProvenanceSource("rag-injected", chars = 60, tokens = 15))),
+                        ProvenanceChannel("DOCS", listOf(ProvenanceSource("b.adoc", chars = 40, tokens = 10))),
+                    ),
+            )
         assertEquals(200, provenance.totalChars)
         assertEquals(50, provenance.totalTokens)
     }
@@ -148,7 +153,13 @@ class ContextProvenanceTest {
         tracker.trackChannel("EAGER", listOf(ProvenanceSource("AGENT.adoc", chars = 80, tokens = 20)))
         val snapshot = tracker.build()
         assertEquals(1, snapshot.channels.size)
-        assertEquals(listOf("AGENT.adoc"), snapshot.channels.single().sources.map { it.fileName })
+        assertEquals(
+            listOf("AGENT.adoc"),
+            snapshot.channels
+                .single()
+                .sources
+                .map { it.fileName },
+        )
     }
 
     @Test

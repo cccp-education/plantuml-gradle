@@ -43,9 +43,11 @@ class PromptOrchestrator(
             )
         }
 
-        val promptFiles = promptsDir.walkTopDown()
-            .filter { it.isFile && it.extension == "prompt" }
-            .toList()
+        val promptFiles =
+            promptsDir
+                .walkTopDown()
+                .filter { it.isFile && it.extension == "prompt" }
+                .toList()
 
         if (promptFiles.isEmpty()) {
             return ProcessingResult(
@@ -64,7 +66,7 @@ class PromptOrchestrator(
 
         promptFiles.forEach { promptFile ->
             runCatching {
-                val result = processOnePrompt(promptFile, messages,logger)
+                val result = processOnePrompt(promptFile, messages, logger)
                 when (result) {
                     ProcessResult.SUCCESS -> succeeded++
                     ProcessResult.SKIPPED -> skipped++
@@ -85,23 +87,28 @@ class PromptOrchestrator(
         )
     }
 
-    private fun processOnePrompt(promptFile: File, messages: MutableList<String>, logger: Logger): ProcessResult {
+    private fun processOnePrompt(
+        promptFile: File,
+        messages: MutableList<String>,
+        logger: Logger,
+    ): ProcessResult {
         val promptText = promptFile.readText().trim()
         if (promptText.isBlank()) {
             messages += "Skipping empty prompt: ${promptFile.name}"
             return ProcessResult.SKIPPED
         }
 
-        val diagram = diagramProcessor.processPrompt(
-            prompt = promptText,
-            maxIterations = config.langchain4j.maxIterations,
-            logger = logger,
-            resolver = null,
-            language = "en"
-        ) ?: run {
-            messages += "Could not generate valid diagram for: ${promptFile.name}"
-            return ProcessResult.SKIPPED
-        }
+        val diagram =
+            diagramProcessor.processPrompt(
+                prompt = promptText,
+                maxIterations = config.langchain4j.maxIterations,
+                logger = logger,
+                resolver = null,
+                language = "en",
+            ) ?: run {
+                messages += "Could not generate valid diagram for: ${promptFile.name}"
+                return ProcessResult.SKIPPED
+            }
 
         val outputDir = projectDir.resolve(config.output.diagrams).toFile()
         outputDir.mkdirs()

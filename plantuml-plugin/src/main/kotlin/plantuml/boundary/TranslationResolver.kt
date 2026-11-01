@@ -12,7 +12,7 @@ data class ResolvedText(
     val sourceText: String,
     val translated: String,
     val strategy: TranslationStrategy,
-    val category: TranslationCategory
+    val category: TranslationCategory,
 )
 
 /**
@@ -33,9 +33,8 @@ class TranslationResolver(
     private val classifier: TextClassifier,
     private val glossary: IdiomaticGlossary,
     private val messageResolver: (String, String) -> String?,
-    private val nonTranslatableRegistry: NonTranslatableTermRegistry? = null
+    private val nonTranslatableRegistry: NonTranslatableTermRegistry? = null,
 ) {
-
     /**
      * Resolves a text for the given language through the full pipeline.
      *
@@ -43,13 +42,16 @@ class TranslationResolver(
      * @param language Target language code (e.g., "fr", "zh")
      * @return A [ResolvedText] with the translated output and metadata
      */
-    fun resolve(text: String, language: String): ResolvedText {
+    fun resolve(
+        text: String,
+        language: String,
+    ): ResolvedText {
         if (nonTranslatableRegistry?.contains(text) == true) {
             return ResolvedText(
                 sourceText = text,
                 translated = text,
                 strategy = TranslationStrategy.PRESERVE,
-                category = TranslationCategory.SEMANTIC_IDENTITY
+                category = TranslationCategory.SEMANTIC_IDENTITY,
             )
         }
         val translatable = classifier.classify(text)
@@ -60,12 +62,15 @@ class TranslationResolver(
             sourceText = text,
             translated = translated,
             strategy = strategy,
-            category = translatable.category
+            category = translatable.category,
         )
     }
 
-    private fun decideStrategy(translatable: TranslatableText, language: String): TranslationStrategy {
-        return when (translatable.category) {
+    private fun decideStrategy(
+        translatable: TranslatableText,
+        language: String,
+    ): TranslationStrategy =
+        when (translatable.category) {
             TranslationCategory.SEMANTIC_IDENTITY -> TranslationStrategy.PRESERVE
             TranslationCategory.PRESENTATION -> TranslationStrategy.TRANSLATE
             TranslationCategory.LEXICAL_FIELD -> {
@@ -73,15 +78,14 @@ class TranslationResolver(
                 entry?.strategy ?: TranslationStrategy.PRESERVE
             }
         }
-    }
 
     private fun applyStrategy(
         text: String,
         category: TranslationCategory,
         strategy: TranslationStrategy,
-        language: String
-    ): String {
-        return when (strategy) {
+        language: String,
+    ): String =
+        when (strategy) {
             TranslationStrategy.PRESERVE -> text
             TranslationStrategy.BORROW -> {
                 glossary.lookup(text, language)?.translation ?: text
@@ -99,9 +103,6 @@ class TranslationResolver(
                 }
             }
         }
-    }
 
-    private fun messageKey(text: String): String {
-        return "label.${text.lowercase().replace(' ', '.')}"
-    }
+    private fun messageKey(text: String): String = "label.${text.lowercase().replace(' ', '.')}"
 }

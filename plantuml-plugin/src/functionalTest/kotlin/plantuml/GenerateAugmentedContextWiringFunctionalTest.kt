@@ -16,7 +16,6 @@ import kotlin.test.assertTrue
  * artefact `build/plantuml/augmented-context.txt` from the consumer EAGER files.
  */
 class GenerateAugmentedContextWiringFunctionalTest {
-
     @field:TempDir
     lateinit var projectDir: File
 
@@ -64,7 +63,8 @@ class GenerateAugmentedContextWiringFunctionalTest {
     }
 
     private fun runner(vararg args: String): GradleRunner =
-        GradleRunner.create()
+        GradleRunner
+            .create()
             .forwardOutput()
             .withPluginClasspath()
             .withArguments(*args)
@@ -76,10 +76,11 @@ class GenerateAugmentedContextWiringFunctionalTest {
         writeEagerFiles()
         writePrompt()
 
-        val result = runner(
-            "generatePlantumlDiagrams",
-            "-Pplantuml.test.mode=true",
-        ).build()
+        val result =
+            runner(
+                "generatePlantumlDiagrams",
+                "-Pplantuml.test.mode=true",
+            ).build()
 
         assertEquals(
             TaskOutcome.SUCCESS,
@@ -115,10 +116,11 @@ class GenerateAugmentedContextWiringFunctionalTest {
         writeBuildFile()
         writePrompt()
 
-        val result = runner(
-            "generatePlantumlDiagrams",
-            "-Pplantuml.test.mode=true",
-        ).build()
+        val result =
+            runner(
+                "generatePlantumlDiagrams",
+                "-Pplantuml.test.mode=true",
+            ).build()
 
         assertEquals(
             TaskOutcome.SUCCESS,

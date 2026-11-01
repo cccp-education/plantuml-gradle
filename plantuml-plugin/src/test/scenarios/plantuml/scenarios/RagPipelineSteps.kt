@@ -11,8 +11,9 @@ import java.io.File
 import java.security.MessageDigest
 import java.time.Duration
 
-class RagPipelineSteps(private val world: PlantumlWorld) {
-
+class RagPipelineSteps(
+    private val world: PlantumlWorld,
+) {
     companion object {
         private val log = LoggerFactory.getLogger(RagPipelineSteps::class.java)
     }
@@ -26,14 +27,15 @@ class RagPipelineSteps(private val world: PlantumlWorld) {
         if (configPath.exists()) {
             val configContent = configPath.readText()
             if (!configContent.contains("rag:")) {
-                val updatedConfig = configContent.replace(
-                    "output:".toRegex(),
-                    """rag:
+                val updatedConfig =
+                    configContent.replace(
+                        "output:".toRegex(),
+                        """rag:
                       |  enabled: true
                       |  mode: "database"
                       |output:
-                    """.trimMargin()
-                )
+                        """.trimMargin(),
+                    )
                 configPath.writeText(updatedConfig)
             }
         }
@@ -43,34 +45,37 @@ class RagPipelineSteps(private val world: PlantumlWorld) {
     fun startPgvectorContainer() {
         log.info("Starting pgvector container...")
 
-        pgvectorContainer = PostgreSQLContainer<Nothing>("pgvector/pgvector:pg15").apply {
-            withDatabaseName("plantuml_rag")
-            withUsername("test")
-            withPassword("test")
-            withStartupTimeout(Duration.ofMinutes(2))
-            withReuse(false) // Force new container each test
-        }.also { container ->
-            try {
-                container.start()
-                log.info("pgvector container started: ${container.containerId}")
-            } catch (e: Exception) {
-                log.error("Failed to start pgvector container: ${e.message}", e)
-                throw e
-            }
-        }
+        pgvectorContainer =
+            PostgreSQLContainer<Nothing>("pgvector/pgvector:pg15")
+                .apply {
+                    withDatabaseName("plantuml_rag")
+                    withUsername("test")
+                    withPassword("test")
+                    withStartupTimeout(Duration.ofMinutes(2))
+                    withReuse(false) // Force new container each test
+                }.also { container ->
+                    try {
+                        container.start()
+                        log.info("pgvector container started: ${container.containerId}")
+                    } catch (e: Exception) {
+                        log.error("Failed to start pgvector container: ${e.message}", e)
+                        throw e
+                    }
+                }
 
         val configPath = File(world.projectDir, "plantuml-context.yml")
         val configContent = configPath.readText()
-        val updatedConfig = configContent.replace(
-            "rag:\\s*\\n\\s*databaseUrl:.*".toRegex(RegexOption.MULTILINE),
-            """rag:
+        val updatedConfig =
+            configContent.replace(
+                "rag:\\s*\\n\\s*databaseUrl:.*".toRegex(RegexOption.MULTILINE),
+                """rag:
               |  databaseUrl: "localhost"
               |  port: ${pgvectorContainer!!.firstMappedPort}
               |  username: "test"
               |  password: "test"
               |  tableName: "embeddings_test"
-            """.trimMargin()
-        )
+                """.trimMargin(),
+            )
         configPath.writeText(updatedConfig)
         log.info("pgvector configured on port ${pgvectorContainer!!.firstMappedPort}")
     }
@@ -86,7 +91,7 @@ class RagPipelineSteps(private val world: PlantumlWorld) {
               +field: String
             }
             @enduml
-            """.trimIndent()
+            """.trimIndent(),
         )
         File(ragDir, "attempt-history-001.json").writeText(
             """
@@ -96,7 +101,7 @@ class RagPipelineSteps(private val world: PlantumlWorld) {
               "finalDiagram": "@startuml\nclass Existing\n@enduml",
               "validationFeedback": []
             }
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -111,7 +116,7 @@ class RagPipelineSteps(private val world: PlantumlWorld) {
               +field: String
             }
             @enduml
-            """.trimIndent()
+            """.trimIndent(),
         )
         val promptFile = File(File(world.projectDir, "prompts"), "rag-test.prompt")
         val checksumsDir = File(world.projectDir, "build/plantuml-plugin/checksums").apply { mkdirs() }
@@ -122,21 +127,23 @@ class RagPipelineSteps(private val world: PlantumlWorld) {
     fun startPgvectorContainerWithMultipleEmbeddings(count: Int) {
         log.info("Starting pgvector container for $count prompts...")
 
-        pgvectorContainer = PostgreSQLContainer<Nothing>("pgvector/pgvector:pg15").apply {
-            withDatabaseName("plantuml_rag")
-            withUsername("test")
-            withPassword("test")
-            withStartupTimeout(Duration.ofMinutes(2))
-            withReuse(false)
-        }.also { container ->
-            try {
-                container.start()
-                log.info("pgvector container started: ${container.containerId}")
-            } catch (e: Exception) {
-                log.error("Failed to start pgvector container: ${e.message}", e)
-                throw e
-            }
-        }
+        pgvectorContainer =
+            PostgreSQLContainer<Nothing>("pgvector/pgvector:pg15")
+                .apply {
+                    withDatabaseName("plantuml_rag")
+                    withUsername("test")
+                    withPassword("test")
+                    withStartupTimeout(Duration.ofMinutes(2))
+                    withReuse(false)
+                }.also { container ->
+                    try {
+                        container.start()
+                        log.info("pgvector container started: ${container.containerId}")
+                    } catch (e: Exception) {
+                        log.error("Failed to start pgvector container: ${e.message}", e)
+                        throw e
+                    }
+                }
 
         val ragDir = File(world.projectDir, "generated/rag")
         ragDir.mkdirs()
@@ -149,7 +156,7 @@ class RagPipelineSteps(private val world: PlantumlWorld) {
                   +field: String
                 }
                 @enduml
-                """.trimIndent()
+                """.trimIndent(),
             )
             File(ragDir, "attempt-history-$i.json").writeText(
                 """
@@ -159,43 +166,45 @@ class RagPipelineSteps(private val world: PlantumlWorld) {
                   "finalDiagram": "@startuml\nclass Class$i\n@enduml",
                   "validationFeedback": []
                 }
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
 
         val configPath = File(world.projectDir, "plantuml-context.yml")
         val configContent = configPath.readText()
-        val updatedConfig = configContent.replace(
-            "rag:\\s*\\n\\s*databaseUrl:.*".toRegex(RegexOption.MULTILINE),
-            """rag:
+        val updatedConfig =
+            configContent.replace(
+                "rag:\\s*\\n\\s*databaseUrl:.*".toRegex(RegexOption.MULTILINE),
+                """rag:
               |  databaseUrl: "localhost"
               |  port: ${pgvectorContainer!!.firstMappedPort}
               |  username: "test"
               |  password: "test"
               |  tableName: "embeddings_multi"
-            """.trimMargin()
-        )
+                """.trimMargin(),
+            )
         configPath.writeText(updatedConfig)
     }
 
     @When("I run collectPlantumlIndex task")
-    fun runCollectPlantumlIndexTask() = runBlocking {
-        val properties = mutableMapOf<String, String>()
-        pgvectorContainer?.let {
-            properties["plantuml.rag.databaseUrl"] = "localhost"
-            properties["plantuml.rag.port"] = it.firstMappedPort.toString()
-            properties["plantuml.rag.username"] = "test"
-            properties["plantuml.rag.password"] = "test"
-            properties["plantuml.rag.tableName"] = "embeddings_test"
-        }
-        val systemProperties = mutableMapOf<String, String>()
-        world.projectDir?.let {
-            systemProperties["plugin.project.dir"] = it.absolutePath
-        }
-        properties["plantuml.test.mode"] = "true"
+    fun runCollectPlantumlIndexTask() =
+        runBlocking {
+            val properties = mutableMapOf<String, String>()
+            pgvectorContainer?.let {
+                properties["plantuml.rag.databaseUrl"] = "localhost"
+                properties["plantuml.rag.port"] = it.firstMappedPort.toString()
+                properties["plantuml.rag.username"] = "test"
+                properties["plantuml.rag.password"] = "test"
+                properties["plantuml.rag.tableName"] = "embeddings_test"
+            }
+            val systemProperties = mutableMapOf<String, String>()
+            world.projectDir?.let {
+                systemProperties["plugin.project.dir"] = it.absolutePath
+            }
+            properties["plantuml.test.mode"] = "true"
 
-        world.executeGradle("collectPlantumlIndex", properties = properties, systemProperties = systemProperties)
-    }
+            world.executeGradle("collectPlantumlIndex", properties = properties, systemProperties = systemProperties)
+        }
 
     @Then("embeddings should be stored in pgvector")
     fun verifyEmbeddingsStoredInPgvector() {
@@ -203,7 +212,7 @@ class RagPipelineSteps(private val world: PlantumlWorld) {
         assertThat(world.buildResult!!.output).containsAnyOf(
             "Rebuilding RAG index",
             "RAG mode",
-            "database"
+            "database",
         )
     }
 
@@ -219,7 +228,7 @@ class RagPipelineSteps(private val world: PlantumlWorld) {
         assertThat(world.buildResult!!.output).containsAnyOf(
             "RAG",
             "context",
-            "similarity"
+            "similarity",
         )
     }
 
@@ -229,7 +238,7 @@ class RagPipelineSteps(private val world: PlantumlWorld) {
         assertThat(world.buildResult!!.output).containsAnyOf(
             "similarity",
             "score",
-            "RAG"
+            "RAG",
         )
     }
 
@@ -240,7 +249,7 @@ class RagPipelineSteps(private val world: PlantumlWorld) {
             "Skipped",
             "skipped",
             "unchanged",
-            "Unchanged"
+            "Unchanged",
         )
     }
 
@@ -286,15 +295,16 @@ class RagPipelineSteps(private val world: PlantumlWorld) {
     }
 
     @When("I run collectPlantumlIndex task in simulation mode")
-    fun runCollectPlantumlIndexTaskInSimulationMode() = runBlocking {
-        val properties = mutableMapOf<String, String>()
-        val systemProperties = mutableMapOf<String, String>()
-        world.projectDir?.let {
-            systemProperties["plugin.project.dir"] = it.absolutePath
+    fun runCollectPlantumlIndexTaskInSimulationMode() =
+        runBlocking {
+            val properties = mutableMapOf<String, String>()
+            val systemProperties = mutableMapOf<String, String>()
+            world.projectDir?.let {
+                systemProperties["plugin.project.dir"] = it.absolutePath
+            }
+            properties["plantuml.test.mode"] = "true"
+            world.executeGradle("collectPlantumlIndex", properties = properties, systemProperties = systemProperties)
         }
-        properties["plantuml.test.mode"] = "true"
-        world.executeGradle("collectPlantumlIndex", properties = properties, systemProperties = systemProperties)
-    }
 
     @Then("the puml file should be skipped in RAG reindex")
     fun pumlFileShouldBeSkippedInRagReindex() {
@@ -303,7 +313,7 @@ class RagPipelineSteps(private val world: PlantumlWorld) {
             "Skipped",
             "skipped",
             "unchanged",
-            "Unchanged"
+            "Unchanged",
         )
     }
 
@@ -315,7 +325,7 @@ class RagPipelineSteps(private val world: PlantumlWorld) {
             "found",
             "indexing",
             "Indexing",
-            "Rebuilding RAG"
+            "Rebuilding RAG",
         )
     }
 

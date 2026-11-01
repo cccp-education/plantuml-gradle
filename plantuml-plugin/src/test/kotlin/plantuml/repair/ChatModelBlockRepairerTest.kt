@@ -16,7 +16,6 @@ import kotlin.test.assertNull
  * The round-trip gate is the corrector's responsibility, not this adapter's.
  */
 class ChatModelBlockRepairerTest {
-
     private fun repairerReturning(response: String): ChatModelBlockRepairer {
         val model = mock(ChatModel::class.java)
         `when`(model.chat(any<String>())).thenReturn(response)

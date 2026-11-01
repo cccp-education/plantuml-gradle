@@ -11,19 +11,19 @@ import plantuml.agent.DiagramSubtypeDetector.Subtype
  * the object is I/O-free beyond a bundled resource read.
  */
 object DiagramExampleCatalog {
-
     private const val DIR = "/plantuml/examples"
 
     /** Resource file name for a subtype, or `null` when there is no example. */
-    fun resourceName(subtype: Subtype): String? = when (subtype) {
-        Subtype.CONTEXT -> "context.puml"
-        Subtype.CONTAINER -> "container.puml"
-        Subtype.COMPONENT -> "component.puml"
-        Subtype.SEQUENCE -> "sequence.puml"
-        Subtype.ACTIVITY -> "activity.puml"
-        Subtype.CLASS -> "class.puml"
-        Subtype.UNKNOWN -> null
-    }
+    fun resourceName(subtype: Subtype): String? =
+        when (subtype) {
+            Subtype.CONTEXT -> "context.puml"
+            Subtype.CONTAINER -> "container.puml"
+            Subtype.COMPONENT -> "component.puml"
+            Subtype.SEQUENCE -> "sequence.puml"
+            Subtype.ACTIVITY -> "activity.puml"
+            Subtype.CLASS -> "class.puml"
+            Subtype.UNKNOWN -> null
+        }
 
     /** Returns the canonical example for [subtype], or `null` when none applies. */
     fun selectExample(subtype: Subtype): String? {

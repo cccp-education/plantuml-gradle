@@ -6,7 +6,6 @@ import java.io.File
 import kotlin.test.assertEquals
 
 class PlantumlConfigFailureTest {
-
     @TempDir
     lateinit var tempDir: File
 
@@ -20,7 +19,7 @@ class PlantumlConfigFailureTest {
               yaml:
                 - syntax
                   error: "missing dash"
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         // When & Then
@@ -40,7 +39,7 @@ class PlantumlConfigFailureTest {
         configFile.writeText(
             """
             # Intentionally empty config file
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         // When & Then
@@ -69,7 +68,7 @@ class PlantumlConfigFailureTest {
             langchain4j:
               maxIterations: "five"  # Should be integer
               model: 456  # Should be string
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         // When & Then
@@ -99,7 +98,7 @@ class PlantumlConfigFailureTest {
                 
             git:
               watchedBranches: "main"  # Should be array
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         // When & Then

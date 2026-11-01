@@ -19,8 +19,10 @@ import java.util.Base64
 class VisionDesignReviewer(
     private val chatModel: ChatModel,
 ) : DesignReviewer {
-
-    override fun review(pngBytes: ByteArray, source: String): String {
+    override fun review(
+        pngBytes: ByteArray,
+        source: String,
+    ): String {
         val image = ImageContent.from(Base64.getEncoder().encodeToString(pngBytes), "image/png")
         val message = UserMessage.from(TextContent.from(DesignReview.prompt()), image)
         return chatModel.chat(message).aiMessage().text()

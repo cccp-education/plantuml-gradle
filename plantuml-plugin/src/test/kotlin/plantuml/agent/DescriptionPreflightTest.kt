@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test
  * DIA-02 — description pre-flight (fail-safe parsing).
  */
 class DescriptionPreflightTest {
-
     @Test
     fun `VALID yields Valid`() {
         assertThat(DescriptionPreflight.parse("VALID")).isEqualTo(PreflightVerdict.Valid)

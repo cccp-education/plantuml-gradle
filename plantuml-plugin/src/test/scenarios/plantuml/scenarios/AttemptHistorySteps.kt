@@ -4,8 +4,9 @@ import io.cucumber.java.en.Then
 import org.assertj.core.api.Assertions.assertThat
 import java.io.File
 
-class AttemptHistorySteps(private val world: PlantumlWorld) {
-
+class AttemptHistorySteps(
+    private val world: PlantumlWorld,
+) {
     @Then("attempt history should be tracked with {int} entries")
     fun attemptHistoryShouldHaveEntries(expectedCount: Int) {
         val historyDir = File(world.projectDir, "generated/diagrams")
@@ -26,8 +27,10 @@ class AttemptHistorySteps(private val world: PlantumlWorld) {
         val historyDir = File(world.projectDir, "generated/diagrams")
         assertThat(historyDir).`as`("History directory should exist").exists()
 
-        val historyFiles = historyDir.listFiles { file -> file.extension == "json" }
-            ?.sortedByDescending { it.lastModified() }
+        val historyFiles =
+            historyDir
+                .listFiles { file -> file.extension == "json" }
+                ?.sortedByDescending { it.lastModified() }
 
         assertThat(historyFiles).`as`("Should find JSON files").isNotNull.isNotEmpty
 
@@ -47,8 +50,10 @@ class AttemptHistorySteps(private val world: PlantumlWorld) {
         val historyDir = File(world.projectDir, "generated/diagrams")
         assertThat(historyDir).`as`("History directory should exist").exists()
 
-        val historyFiles = historyDir.listFiles { file -> file.extension == "json" }
-            ?.sortedByDescending { it.lastModified() }
+        val historyFiles =
+            historyDir
+                .listFiles { file -> file.extension == "json" }
+                ?.sortedByDescending { it.lastModified() }
 
         assertThat(historyFiles).`as`("Should find JSON files").isNotNull.isNotEmpty
 
@@ -95,8 +100,10 @@ class AttemptHistorySteps(private val world: PlantumlWorld) {
         val historyDir = File(world.projectDir, "generated/diagrams")
         assertThat(historyDir).`as`("History directory should exist").exists()
 
-        val historyFiles = historyDir.listFiles { file -> file.extension == "json" }
-            ?.sortedByDescending { it.lastModified() }
+        val historyFiles =
+            historyDir
+                .listFiles { file -> file.extension == "json" }
+                ?.sortedByDescending { it.lastModified() }
 
         assertThat(historyFiles).`as`("Should find at least one JSON file").isNotNull.isNotEmpty
 
@@ -122,8 +129,10 @@ class AttemptHistorySteps(private val world: PlantumlWorld) {
         val historyDir = File(world.projectDir, "generated/diagrams")
         assertThat(historyDir).`as`("History directory should exist").exists()
 
-        val historyFiles = historyDir.listFiles { file -> file.extension == "json" }
-            ?.sortedByDescending { it.lastModified() }
+        val historyFiles =
+            historyDir
+                .listFiles { file -> file.extension == "json" }
+                ?.sortedByDescending { it.lastModified() }
 
         assertThat(historyFiles).`as`("Should find at least one JSON file").isNotNull.isNotEmpty
 

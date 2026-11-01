@@ -1,4 +1,5 @@
 @file:JvmName("TranslationStrategyAlias")
+
 package plantuml.boundary
 
 /**

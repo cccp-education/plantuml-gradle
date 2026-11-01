@@ -8,9 +8,8 @@ import dev.langchain4j.model.ollama.OllamaChatModel
 import dev.langchain4j.model.openai.OpenAiChatModel
 import plantuml.ApiKeyPoolEntry
 import plantuml.PlantumlConfig
-import plantuml.PoolQuotaConfig
-import plantuml.apikey.ApiKeyPool
 import plantuml.apikey.ApiKeyEntry
+import plantuml.apikey.ApiKeyPool
 import plantuml.apikey.CrossProviderFallbackOrchestrator
 import plantuml.apikey.Provider
 import plantuml.apikey.QuotaAuditLogger
@@ -39,7 +38,6 @@ class LlmService(
     internal var auditLogger: QuotaAuditLogger = QuotaAuditLogger(),
     private val runtime: RuntimeEnvironment = RuntimeEnvironment.system(),
 ) {
-
     private val apiKeyPools = mutableMapOf<String, ApiKeyPool>()
     private lateinit var fallbackOrchestrator: CrossProviderFallbackOrchestrator
 
@@ -75,7 +73,8 @@ class LlmService(
 
         val huggingfacePool = config.langchain4j.huggingface.pool
         if (huggingfacePool.isNotEmpty()) {
-            apiKeyPools["huggingface"] = ApiKeyPool(huggingfacePool.map { it.toApiKeyEntry() }, rotation, fallbackEnabled = fallback, freemiumRatio = freemiumRatio)
+            apiKeyPools["huggingface"] =
+                ApiKeyPool(huggingfacePool.map { it.toApiKeyEntry() }, rotation, fallbackEnabled = fallback, freemiumRatio = freemiumRatio)
         }
 
         val groqPool = config.langchain4j.groq.pool
@@ -99,11 +98,10 @@ class LlmService(
         fallbackOrchestrator = CrossProviderFallbackOrchestrator(apiKeyPools.toMap(), order)
     }
 
-    private fun parseRotationStrategy(value: String): plantuml.apikey.RotationStrategy {
-        return runCatching {
+    private fun parseRotationStrategy(value: String): plantuml.apikey.RotationStrategy =
+        runCatching {
             plantuml.apikey.RotationStrategy.valueOf(value.uppercase())
         }.getOrDefault(plantuml.apikey.RotationStrategy.ROUND_ROBIN)
-    }
 
     private fun resolveProvider(name: String): Provider {
         val upper = name.uppercase()
@@ -114,8 +112,8 @@ class LlmService(
         }
     }
 
-    private fun ApiKeyPoolEntry.toApiKeyEntry(): ApiKeyEntry {
-        return ApiKeyEntry(
+    private fun ApiKeyPoolEntry.toApiKeyEntry(): ApiKeyEntry =
+        ApiKeyEntry(
             id = this.id,
             email = this.email,
             name = this.name,
@@ -124,18 +122,17 @@ class LlmService(
             services = this.services.map { plantuml.apikey.ServiceType.valueOf(it.uppercase()) },
             tier = parseTier(this.tier),
             weight = this.weight,
-            quota = QuotaConfig(
-                limitValue = this.quota.limitValue,
-                thresholdPercent = this.quota.thresholdPercent
-            )
+            quota =
+                QuotaConfig(
+                    limitValue = this.quota.limitValue,
+                    thresholdPercent = this.quota.thresholdPercent,
+                ),
         )
-    }
 
-    private fun parseTier(value: String): plantuml.apikey.KeyTier {
-        return runCatching {
+    private fun parseTier(value: String): plantuml.apikey.KeyTier =
+        runCatching {
             plantuml.apikey.KeyTier.valueOf(value.uppercase())
         }.getOrDefault(plantuml.apikey.KeyTier.FREE)
-    }
 
     private fun getApiKeyFromPool(provider: String): String? {
         val keyEntry = selectKeyWithCrossProviderFallback(provider)
@@ -168,21 +165,23 @@ class LlmService(
      */
     fun createChatModel(): ChatModel? {
         val provider = config.langchain4j.model
-        
+
         auditLogger.logInfo(
             resolveProvider(provider),
-            "Creating chat model for provider: $provider"
+            "Creating chat model for provider: $provider",
         )
-        
+
         // Return null only in simple test mode without mock LLM server
         // If mock LLM server is configured (localhost baseUrl), use real Ollama model
         // If runtime.isRealLlmTest, bypass the null guard and create a real ChatModel
-        val isMockConfigured = config.langchain4j.ollama.baseUrl.contains("localhost")
+        val isMockConfigured =
+            config.langchain4j.ollama.baseUrl
+                .contains("localhost")
 
         if (runtime.isTestMode && !isMockConfigured && !runtime.isRealLlmTest) {
             return null
         }
-        
+
         return when (config.langchain4j.model.lowercase()) {
             "ollama" -> createOllamaModel()
             "openai" -> createOpenAiModel()
@@ -194,7 +193,7 @@ class LlmService(
             else -> {
                 auditLogger.logError(
                     plantuml.apikey.Provider.UNKNOWN,
-                    "Unknown provider: $provider, defaulting to Ollama"
+                    "Unknown provider: $provider, defaulting to Ollama",
                 )
                 createOllamaModel()
             }
@@ -206,12 +205,14 @@ class LlmService(
      *
      * @return Configured [OllamaChatModel] with baseUrl and modelName from config
      */
-    private fun createOllamaModel(): ChatModel = OllamaChatModel.builder()
-        .baseUrl(config.langchain4j.ollama.baseUrl)
-        .modelName(config.langchain4j.ollama.modelName)
-        .temperature(0.7)
-        .timeout(Duration.ofSeconds(runtime.providerTimeoutSeconds))
-        .build()
+    private fun createOllamaModel(): ChatModel =
+        OllamaChatModel
+            .builder()
+            .baseUrl(config.langchain4j.ollama.baseUrl)
+            .modelName(config.langchain4j.ollama.modelName)
+            .temperature(0.7)
+            .timeout(Duration.ofSeconds(runtime.providerTimeoutSeconds))
+            .build()
 
     /**
      * Creates an OpenAI chat model.
@@ -220,16 +221,20 @@ class LlmService(
      */
     private fun createOpenAiModel(): ChatModel {
         val apiKey = getApiKeyFromPool("openai") ?: config.langchain4j.openai.apiKey
-        val builder = OpenAiChatModel.builder()
-            .apiKey(apiKey)
-            .modelName(config.langchain4j.openai.modelName)
-            .temperature(0.7)
-            .timeout(Duration.ofSeconds(runtime.providerTimeoutSeconds))
-        
-        if (config.langchain4j.openai.baseUrl.isNotBlank()) {
+        val builder =
+            OpenAiChatModel
+                .builder()
+                .apiKey(apiKey)
+                .modelName(config.langchain4j.openai.modelName)
+                .temperature(0.7)
+                .timeout(Duration.ofSeconds(runtime.providerTimeoutSeconds))
+
+        if (config.langchain4j.openai.baseUrl
+                .isNotBlank()
+        ) {
             builder.baseUrl(config.langchain4j.openai.baseUrl)
         }
-        
+
         return builder.build()
     }
 
@@ -240,7 +245,8 @@ class LlmService(
      */
     private fun createGeminiModel(): ChatModel {
         val apiKey = getApiKeyFromPool("gemini") ?: config.langchain4j.gemini.apiKey
-        return GoogleAiGeminiChatModel.builder()
+        return GoogleAiGeminiChatModel
+            .builder()
             .apiKey(apiKey)
             .modelName(config.langchain4j.gemini.modelName)
             .temperature(0.7)
@@ -255,16 +261,20 @@ class LlmService(
      */
     private fun createMistralModel(): ChatModel {
         val apiKey = getApiKeyFromPool("mistral") ?: config.langchain4j.mistral.apiKey
-        val builder = MistralAiChatModel.builder()
-            .apiKey(apiKey)
-            .modelName(config.langchain4j.mistral.modelName)
-            .temperature(0.7)
-            .timeout(Duration.ofSeconds(runtime.providerTimeoutSeconds))
-        
-        if (config.langchain4j.mistral.baseUrl.isNotBlank()) {
+        val builder =
+            MistralAiChatModel
+                .builder()
+                .apiKey(apiKey)
+                .modelName(config.langchain4j.mistral.modelName)
+                .temperature(0.7)
+                .timeout(Duration.ofSeconds(runtime.providerTimeoutSeconds))
+
+        if (config.langchain4j.mistral.baseUrl
+                .isNotBlank()
+        ) {
             builder.baseUrl(config.langchain4j.mistral.baseUrl)
         }
-        
+
         return builder.build()
     }
 
@@ -275,16 +285,20 @@ class LlmService(
      */
     private fun createClaudeModel(): ChatModel {
         val apiKey = getApiKeyFromPool("claude") ?: config.langchain4j.claude.apiKey
-        val builder = AnthropicChatModel.builder()
-            .apiKey(apiKey)
-            .modelName(config.langchain4j.claude.modelName)
-            .temperature(0.7)
-            .timeout(Duration.ofSeconds(runtime.providerTimeoutSeconds))
-        
-        if (config.langchain4j.claude.baseUrl.isNotBlank()) {
+        val builder =
+            AnthropicChatModel
+                .builder()
+                .apiKey(apiKey)
+                .modelName(config.langchain4j.claude.modelName)
+                .temperature(0.7)
+                .timeout(Duration.ofSeconds(runtime.providerTimeoutSeconds))
+
+        if (config.langchain4j.claude.baseUrl
+                .isNotBlank()
+        ) {
             builder.baseUrl(config.langchain4j.claude.baseUrl)
         }
-        
+
         return builder.build()
     }
 
@@ -295,7 +309,8 @@ class LlmService(
      */
     private fun createHuggingFaceModel(): ChatModel {
         val apiKey = getApiKeyFromPool("huggingface") ?: config.langchain4j.huggingface.apiKey
-        return OpenAiChatModel.builder()
+        return OpenAiChatModel
+            .builder()
             .apiKey(apiKey)
             .baseUrl("https://api-inference.huggingface.co")
             .modelName(ProviderModelResolver.huggingFace(config.langchain4j.huggingface))
@@ -311,7 +326,8 @@ class LlmService(
      */
     private fun createGroqModel(): ChatModel {
         val apiKey = getApiKeyFromPool("groq") ?: config.langchain4j.groq.apiKey
-        return OpenAiChatModel.builder()
+        return OpenAiChatModel
+            .builder()
             .apiKey(apiKey)
             .baseUrl("https://api.groq.com/openai/v1")
             .modelName(ProviderModelResolver.groq(config.langchain4j.groq))
@@ -319,5 +335,4 @@ class LlmService(
             .timeout(Duration.ofSeconds(runtime.providerTimeoutSeconds))
             .build()
     }
-    
 }

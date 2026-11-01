@@ -17,7 +17,6 @@ import kotlin.test.assertTrue
  * unified translation tree (G-4). No I/O, no LLM, no rendering.
  */
 class PlantumlBlockStatusTest {
-
     private val mapper: ObjectMapper = ObjectMapper()
 
     private val valid: PlantUmlSyntaxValidator =
@@ -90,14 +89,16 @@ class PlantumlBlockStatusTest {
 
     @Test
     fun `the report counts blocks per status`() {
-        val report = PlantumlBlockReport(
-            blocks = listOf(
-                PlantumlBlockEntry("a", PlantumlBlockStatus.TRANSLATED),
-                PlantumlBlockEntry("b", PlantumlBlockStatus.TRANSLATED),
-                PlantumlBlockEntry("c", PlantumlBlockStatus.BROKEN),
-                PlantumlBlockEntry("d", PlantumlBlockStatus.PENDING),
-            ),
-        )
+        val report =
+            PlantumlBlockReport(
+                blocks =
+                    listOf(
+                        PlantumlBlockEntry("a", PlantumlBlockStatus.TRANSLATED),
+                        PlantumlBlockEntry("b", PlantumlBlockStatus.TRANSLATED),
+                        PlantumlBlockEntry("c", PlantumlBlockStatus.BROKEN),
+                        PlantumlBlockEntry("d", PlantumlBlockStatus.PENDING),
+                    ),
+            )
         assertEquals(4, report.total)
         assertEquals(2, report.count(PlantumlBlockStatus.TRANSLATED))
         assertEquals(1, report.count(PlantumlBlockStatus.BROKEN))
@@ -107,9 +108,10 @@ class PlantumlBlockStatusTest {
 
     @Test
     fun `the report serialises as JSON with owner, toolchain and blocks`() {
-        val report = PlantumlBlockReport(
-            blocks = listOf(PlantumlBlockEntry("diagram-1", PlantumlBlockStatus.BROKEN)),
-        )
+        val report =
+            PlantumlBlockReport(
+                blocks = listOf(PlantumlBlockEntry("diagram-1", PlantumlBlockStatus.BROKEN)),
+            )
         val json: JsonNode = mapper.readTree(report.toJson())
 
         assertEquals("plantuml", json["owner"].asText())

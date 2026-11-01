@@ -12,7 +12,6 @@ import java.util.regex.Pattern
  * Supports environment variable substitution using ${VAR_NAME} syntax.
  */
 object ConfigLoader {
-
     private val ENV_VAR_PATTERN = Pattern.compile("\\$\\{([^}]+)\\}")
     private val MAPPER: ObjectMapper = ObjectMapper(YAMLFactory()).registerKotlinModule()
 

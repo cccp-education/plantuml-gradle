@@ -2,22 +2,24 @@ package plantuml.scenarios
 
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
-import io.cucumber.java.en.When
-import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import java.io.File
 import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Paths
 
-class FileEdgeCasesSteps(private val world: PlantumlWorld) {
-
+class FileEdgeCasesSteps(
+    private val world: PlantumlWorld,
+) {
     @Given("a prompt file {string} with UTF-8 content:")
-    fun createUtf8PromptFile(fileName: String, content: String) {
+    fun createUtf8PromptFile(
+        fileName: String,
+        content: String,
+    ) {
         world.createGradleProject()
         val promptFile = world.createPromptFile(fileName, content)
         assertThat(promptFile.exists()).isTrue
-        
+
         world.startMockLlm(
             """
             {
@@ -26,7 +28,7 @@ class FileEdgeCasesSteps(private val world: PlantumlWorld) {
                 "description": "Generated diagram with UTF-8"
               }
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -35,27 +37,35 @@ class FileEdgeCasesSteps(private val world: PlantumlWorld) {
         assertThat(world.buildResult?.output).containsAnyOf(
             "BUILD SUCCESSFUL",
             "Processing",
-            "é", "à", "ü", "ñ"
+            "é",
+            "à",
+            "ü",
+            "ñ",
         )
     }
 
     @Given("a prompt file {string} with {int}+ characters")
-    fun createLargePromptFile(fileName: String, minCharacters: Int) {
+    fun createLargePromptFile(
+        fileName: String,
+        minCharacters: Int,
+    ) {
         world.createGradleProject()
-        val promptsDir = File(world.projectDir, "prompts").apply { 
-            if (!exists()) mkdirs() 
-        }
-        val promptFile = File(promptsDir, fileName)
-        
-        val largeContent = buildString {
-            repeat(minCharacters / 10 + 1) {
-                append("This is line $it with some content to make the file larger. ")
+        val promptsDir =
+            File(world.projectDir, "prompts").apply {
+                if (!exists()) mkdirs()
             }
-        }
-        
+        val promptFile = File(promptsDir, fileName)
+
+        val largeContent =
+            buildString {
+                repeat(minCharacters / 10 + 1) {
+                    append("This is line $it with some content to make the file larger. ")
+                }
+            }
+
         promptFile.writeText(largeContent)
         assertThat(promptFile.length()).isGreaterThan(minCharacters.toLong())
-        
+
         world.startMockLlm(
             """
             {
@@ -64,7 +74,7 @@ class FileEdgeCasesSteps(private val world: PlantumlWorld) {
                 "description": "Generated diagram for large file"
               }
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -72,7 +82,7 @@ class FileEdgeCasesSteps(private val world: PlantumlWorld) {
     fun taskShouldCompleteWithinReasonableTime() {
         assertThat(world.buildResult?.output).containsAnyOf(
             "BUILD SUCCESSFUL",
-            "Processing"
+            "Processing",
         )
     }
 
@@ -81,20 +91,21 @@ class FileEdgeCasesSteps(private val world: PlantumlWorld) {
         assertThat(world.buildResult?.output).containsAnyOf(
             "BUILD SUCCESSFUL",
             "No prompt files found",
-            "Processing"
+            "Processing",
         )
     }
 
     @Given("a prompt file {string} exists")
     fun promptFileExists(fileName: String) {
         world.createGradleProject()
-        val promptsDir = File(world.projectDir, "prompts").apply { 
-            if (!exists()) mkdirs() 
-        }
+        val promptsDir =
+            File(world.projectDir, "prompts").apply {
+                if (!exists()) mkdirs()
+            }
         val promptFile = File(promptsDir, fileName)
         promptFile.writeText("Create a diagram with special filename")
         assertThat(promptFile.exists()).isTrue
-        
+
         world.startMockLlm(
             """
             {
@@ -103,7 +114,7 @@ class FileEdgeCasesSteps(private val world: PlantumlWorld) {
                 "description": "Generated diagram"
               }
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -112,7 +123,7 @@ class FileEdgeCasesSteps(private val world: PlantumlWorld) {
         assertThat(world.buildResult?.output).containsAnyOf(
             "BUILD SUCCESSFUL",
             "Processing",
-            "No prompt files found"
+            "No prompt files found",
         )
     }
 
@@ -132,13 +143,14 @@ class FileEdgeCasesSteps(private val world: PlantumlWorld) {
     @Given("an empty prompt file {string}")
     fun createEmptyPromptFile(fileName: String) {
         world.createGradleProject()
-        val promptsDir = File(world.projectDir, "prompts").apply { 
-            if (!exists()) mkdirs() 
-        }
+        val promptsDir =
+            File(world.projectDir, "prompts").apply {
+                if (!exists()) mkdirs()
+            }
         val promptFile = File(promptsDir, fileName)
         promptFile.writeText("")
         assertThat(promptFile.length()).isEqualTo(0)
-        
+
         world.startMockLlm(
             """
             {
@@ -147,7 +159,7 @@ class FileEdgeCasesSteps(private val world: PlantumlWorld) {
                 "description": "Empty file handling"
               }
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -156,7 +168,7 @@ class FileEdgeCasesSteps(private val world: PlantumlWorld) {
         assertThat(world.buildResult?.output).containsAnyOf(
             "BUILD SUCCESSFUL",
             "empty",
-            "skip"
+            "skip",
         )
     }
 
@@ -165,20 +177,21 @@ class FileEdgeCasesSteps(private val world: PlantumlWorld) {
         assertThat(world.buildResult?.output).containsAnyOf(
             "empty",
             "warning",
-            "skip"
+            "skip",
         )
     }
 
     @Given("a prompt file containing only spaces and newlines")
     fun createWhitespaceOnlyPromptFile() {
         world.createGradleProject()
-        val promptsDir = File(world.projectDir, "prompts").apply { 
-            if (!exists()) mkdirs() 
-        }
+        val promptsDir =
+            File(world.projectDir, "prompts").apply {
+                if (!exists()) mkdirs()
+            }
         val promptFile = File(promptsDir, "whitespace.prompt")
         promptFile.writeText("   \n\n   \n  \n")
         assertThat(promptFile.readText().trim()).isEmpty()
-        
+
         world.startMockLlm(
             """
             {
@@ -187,7 +200,7 @@ class FileEdgeCasesSteps(private val world: PlantumlWorld) {
                 "description": "Whitespace file handling"
               }
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -196,7 +209,7 @@ class FileEdgeCasesSteps(private val world: PlantumlWorld) {
         assertThat(world.buildResult?.output).containsAnyOf(
             "BUILD SUCCESSFUL",
             "empty",
-            "skip"
+            "skip",
         )
     }
 
@@ -205,25 +218,26 @@ class FileEdgeCasesSteps(private val world: PlantumlWorld) {
         assertThat(world.buildResult?.output).containsAnyOf(
             "BUILD SUCCESSFUL",
             "No prompt files found",
-            "skip"
+            "skip",
         )
     }
 
     @Given("a prompt file without trailing newline")
     fun createPromptFileWithoutTrailingNewline() {
         world.createGradleProject()
-        val promptsDir = File(world.projectDir, "prompts").apply { 
-            if (!exists()) mkdirs() 
-        }
+        val promptsDir =
+            File(world.projectDir, "prompts").apply {
+                if (!exists()) mkdirs()
+            }
         val promptFile = File(promptsDir, "no-newline.prompt")
         Files.writeString(
             Paths.get(promptFile.absolutePath),
             "Create a diagram without newline",
-            StandardCharsets.UTF_8
+            StandardCharsets.UTF_8,
         )
         val content = promptFile.readText()
         assertThat(content).doesNotEndWith("\n")
-        
+
         world.startMockLlm(
             """
             {
@@ -232,7 +246,7 @@ class FileEdgeCasesSteps(private val world: PlantumlWorld) {
                 "description": "Generated diagram"
               }
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -240,7 +254,7 @@ class FileEdgeCasesSteps(private val world: PlantumlWorld) {
     fun contentShouldBeReadCorrectly() {
         assertThat(world.buildResult?.output).containsAnyOf(
             "BUILD SUCCESSFUL",
-            "Processing"
+            "Processing",
         )
     }
 

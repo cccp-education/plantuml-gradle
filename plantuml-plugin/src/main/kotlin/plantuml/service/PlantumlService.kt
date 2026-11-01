@@ -1,11 +1,11 @@
 package plantuml.service
 
+import contracts.plantuml.PlantUmlSyntaxValidator
+import contracts.plantuml.SyntaxValidationResult
 import net.sourceforge.plantuml.SourceStringReader
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import plantuml.PlantumlMessages
-import contracts.plantuml.PlantUmlSyntaxValidator
-import contracts.plantuml.SyntaxValidationResult
 import java.io.ByteArrayOutputStream
 import java.io.File
 
@@ -18,7 +18,6 @@ import java.io.File
  * @see contracts.plantuml.SyntaxValidationResult
  */
 class PlantumlService {
-
     private val logger: Logger = LoggerFactory.getLogger(PlantumlService::class.java)
 
     /**
@@ -39,7 +38,7 @@ class PlantumlService {
             if (!plantumlCode.contains("@startuml") || !plantumlCode.contains("@enduml")) {
                 return SyntaxValidationResult.Invalid(
                     "Missing @startuml or @enduml tags",
-                    "PlantUML code must be wrapped in @startuml and @enduml tags"
+                    "PlantUML code must be wrapped in @startuml and @enduml tags",
                 )
             }
 
@@ -47,12 +46,15 @@ class PlantumlService {
         } catch (e: Exception) {
             SyntaxValidationResult.Invalid(
                 "PlantUML parsing failed: ${e.message}",
-                e.stackTraceToString()
+                e.stackTraceToString(),
             )
         }
     }
 
-    fun generateImage(plantumlCode: String, outputFile: File) {
+    fun generateImage(
+        plantumlCode: String,
+        outputFile: File,
+    ) {
         try {
             val reader = SourceStringReader(plantumlCode)
             val outputStream = ByteArrayOutputStream()
@@ -75,15 +77,16 @@ class PlantumlService {
      * Unlike [generateImage], this never writes the textual fallback: on failure it
      * returns `null`, so the design reviewer degrades instead of reviewing a non-image.
      */
-    fun renderPng(plantumlCode: String): ByteArray? = try {
-        val reader = SourceStringReader(plantumlCode)
-        val outputStream = ByteArrayOutputStream()
-        reader.outputImage(outputStream)
-        outputStream.toByteArray().takeIf { it.isNotEmpty() }
-    } catch (e: Exception) {
-        logger.warn("PlantUML render to PNG failed: ${e.message}")
-        null
-    }
+    fun renderPng(plantumlCode: String): ByteArray? =
+        try {
+            val reader = SourceStringReader(plantumlCode)
+            val outputStream = ByteArrayOutputStream()
+            reader.outputImage(outputStream)
+            outputStream.toByteArray().takeIf { it.isNotEmpty() }
+        } catch (e: Exception) {
+            logger.warn("PlantUML render to PNG failed: ${e.message}")
+            null
+        }
 
     /**
      * The native parser exposed through the N0 validation port (PLT-CR3-2), so the

@@ -67,7 +67,6 @@ enum class RagMode { SIMULATION, DATABASE, TESTCONTAINERS }
  */
 @DisableCachingByDefault(because = "RAG indexing processes all files and results depend on current state")
 abstract class CollectPlantumlIndexTask : DefaultTask() {
-
     private val lang: String = PlantumlManager.resolveLanguage(project)
 
     init {
@@ -88,8 +87,9 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         logger.lifecycle(PlantumlMessages.get("collect.rebuilding", lang))
 
         // Check for test mode port conflict simulation FIRST, before determining RAG mode
-        val simulatePortConflict = System.getProperty("plantuml.test.simulate.port.conflict") == "true" ||
-            project.properties["plantuml.test.simulate.port.conflict"]?.toString() == "true"
+        val simulatePortConflict =
+            System.getProperty("plantuml.test.simulate.port.conflict") == "true" ||
+                project.properties["plantuml.test.simulate.port.conflict"]?.toString() == "true"
         if (simulatePortConflict) {
             val message = PlantumlMessages.get("collect.port_conflict", lang)
             logger.error(message)
@@ -97,10 +97,11 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         }
 
         // Extract CLI parameters from project properties and strip "plantuml." prefix
-        val cliParams = project.properties
-            .filterKeys { it.startsWith("plantuml.") }
-            .mapKeys { it.key.removePrefix("plantuml.") }
-            .mapValues { it.value }
+        val cliParams =
+            project.properties
+                .filterKeys { it.startsWith("plantuml.") }
+                .mapKeys { it.key.removePrefix("plantuml.") }
+                .mapValues { it.value }
 
         // Load configuration with CLI overrides
         val config = PlantumlManager.Configuration.load(project, cliParams)
@@ -131,54 +132,70 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
             throw RuntimeException(errorMsg)
         }
 
-        val diagramFiles = try {
-            ragDir.listFiles { file ->
-                file.extension == "puml"
-            } ?: emptyArray()
-        } catch (e: SecurityException) {
-            val errorMsg = PlantumlMessages.format(
-                "collect.permission_denied_files", lang, ragDir.absolutePath, e.message ?: ""
-            )
-            logger.error(errorMsg)
-            throw RuntimeException(errorMsg, e)
-        } catch (e: Exception) {
-            val errorMsg = PlantumlMessages.format(
-                "collect.error_access_dir", lang, ragDir.absolutePath, e.message ?: ""
-            )
-            logger.error(errorMsg)
-            throw RuntimeException(errorMsg, e)
-        }
-
-        // Also load attempt history files for training data
-        val trainingDirPath = if (RuntimeEnvironment.system().isTestMode) {
-            config.output.diagrams
-        } else {
-            config.output.rag
-        }
-        val trainingDir = File(trainingDirPath)
-        val historyFiles = if (trainingDir.exists()) {
+        val diagramFiles =
             try {
-                trainingDir.listFiles { file ->
-                    file.extension == "json" && file.name.startsWith("attempt-history")
+                ragDir.listFiles { file ->
+                    file.extension == "puml"
                 } ?: emptyArray()
             } catch (e: SecurityException) {
-                val errorMsg = PlantumlMessages.format(
-                    "collect.permission_denied_training", lang, trainingDir.absolutePath, e.message ?: ""
-                )
+                val errorMsg =
+                    PlantumlMessages.format(
+                        "collect.permission_denied_files",
+                        lang,
+                        ragDir.absolutePath,
+                        e.message ?: "",
+                    )
+                logger.error(errorMsg)
+                throw RuntimeException(errorMsg, e)
+            } catch (e: Exception) {
+                val errorMsg =
+                    PlantumlMessages.format(
+                        "collect.error_access_dir",
+                        lang,
+                        ragDir.absolutePath,
+                        e.message ?: "",
+                    )
                 logger.error(errorMsg)
                 throw RuntimeException(errorMsg, e)
             }
-        } else {
-            emptyArray()
-        }
+
+        // Also load attempt history files for training data
+        val trainingDirPath =
+            if (RuntimeEnvironment.system().isTestMode) {
+                config.output.diagrams
+            } else {
+                config.output.rag
+            }
+        val trainingDir = File(trainingDirPath)
+        val historyFiles =
+            if (trainingDir.exists()) {
+                try {
+                    trainingDir.listFiles { file ->
+                        file.extension == "json" && file.name.startsWith("attempt-history")
+                    } ?: emptyArray()
+                } catch (e: SecurityException) {
+                    val errorMsg =
+                        PlantumlMessages.format(
+                            "collect.permission_denied_training",
+                            lang,
+                            trainingDir.absolutePath,
+                            e.message ?: "",
+                        )
+                    logger.error(errorMsg)
+                    throw RuntimeException(errorMsg, e)
+                }
+            } else {
+                emptyArray()
+            }
 
         val promptsDir = project.file(config.input.prompts)
         val checksumsDir = File(project.buildDir, config.incremental.checksumsDir.removePrefix("build/"))
         val incrementalProcessor = IncrementalProcessor(checksumsDir)
 
-        val (toReindex, skipped) = diagramFiles.partition { pumlFile ->
-            incrementalProcessor.shouldReindexPuml(pumlFile, promptsDir)
-        }
+        val (toReindex, skipped) =
+            diagramFiles.partition { pumlFile ->
+                incrementalProcessor.shouldReindexPuml(pumlFile, promptsDir)
+            }
         skipped.forEach { pumlFile ->
             logger.lifecycle(PlantumlMessages.format("collect.skipped_unchanged", lang, pumlFile.name))
         }
@@ -191,16 +208,17 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
 
         logger.lifecycle(PlantumlMessages.format("collect.found_data", lang, filteredDiagramFiles.size, historyFiles.size))
 
-        val embeddingModel: EmbeddingModel = if (System.getProperty("plantuml.test.rag.mode") != null) {
-            val stubClass = System.getProperty("plantuml.test.embedding.model.class")
-            if (stubClass != null) {
-                Class.forName(stubClass).getDeclaredConstructor().newInstance() as EmbeddingModel
+        val embeddingModel: EmbeddingModel =
+            if (System.getProperty("plantuml.test.rag.mode") != null) {
+                val stubClass = System.getProperty("plantuml.test.embedding.model.class")
+                if (stubClass != null) {
+                    Class.forName(stubClass).getDeclaredConstructor().newInstance() as EmbeddingModel
+                } else {
+                    AllMiniLmL6V2EmbeddingModel()
+                }
             } else {
                 AllMiniLmL6V2EmbeddingModel()
             }
-        } else {
-            AllMiniLmL6V2EmbeddingModel()
-        }
 
         // Initialize document splitter
         val documentSplitter: DocumentSplitter = DocumentSplitters.recursive(300, 0)
@@ -233,7 +251,10 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
      * @param config PlantUML configuration with RAG database settings
      * @return Determined [RagMode] for this execution
      */
-    private fun determineRagMode(cliParams: Map<String, Any?>, config: PlantumlConfig): RagMode {
+    private fun determineRagMode(
+        cliParams: Map<String, Any?>,
+        config: PlantumlConfig,
+    ): RagMode {
         // Priority 1: CLI parameter (-Prag.mode)
         val cliMode = cliParams["rag.mode"]?.toString()?.lowercase()
         if (cliMode != null) {
@@ -253,14 +274,16 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
             return RagMode.valueOf(gradlePropMode.uppercase())
         }
 
-        val testMode = project.properties["plantuml.test.rag.mode"]?.toString()?.lowercase()
-            ?: System.getProperty("plantuml.test.rag.mode")?.lowercase()
+        val testMode =
+            project.properties["plantuml.test.rag.mode"]?.toString()?.lowercase()
+                ?: System.getProperty("plantuml.test.rag.mode")?.lowercase()
         if (testMode != null) {
             logger.lifecycle(PlantumlMessages.format("collect.rag_mode_test", lang, testMode))
             return RagMode.valueOf(testMode.uppercase())
         }
 
-        val useDatabase = config.rag.databaseUrl.isNotBlank() &&
+        val useDatabase =
+            config.rag.databaseUrl.isNotBlank() &&
                 config.rag.port != 0 &&
                 config.rag.username.isNotBlank() &&
                 config.rag.password.isNotBlank()
@@ -290,21 +313,23 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         historyFiles: Array<File>,
         config: PlantumlConfig,
         embeddingModel: EmbeddingModel,
-        documentSplitter: DocumentSplitter
+        documentSplitter: DocumentSplitter,
     ) {
         logger.lifecycle(PlantumlMessages.get("collect.using_db", lang))
         logger.lifecycle(PlantumlMessages.format("collect.db_url", lang, config.rag.databaseUrl, config.rag.port))
 
         // Initialize PGVector embedding store
-        val embeddingStore: EmbeddingStore<TextSegment> = PgVectorEmbeddingStore.builder()
-            .host(config.rag.databaseUrl)
-            .port(config.rag.port)
-            .database("plantuml_rag")
-            .user(config.rag.username)
-            .password(config.rag.password)
-            .table(config.rag.tableName)
-            .dimension(384)
-            .build()
+        val embeddingStore: EmbeddingStore<TextSegment> =
+            PgVectorEmbeddingStore
+                .builder()
+                .host(config.rag.databaseUrl)
+                .port(config.rag.port)
+                .database("plantuml_rag")
+                .user(config.rag.username)
+                .password(config.rag.password)
+                .table(config.rag.tableName)
+                .dimension(384)
+                .build()
 
         indexDiagrams(diagramFiles, historyFiles, embeddingModel, documentSplitter, embeddingStore)
 
@@ -327,38 +352,41 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         diagramFiles: Array<File>,
         historyFiles: Array<File>,
         embeddingModel: EmbeddingModel,
-        documentSplitter: DocumentSplitter
+        documentSplitter: DocumentSplitter,
     ) {
         logger.lifecycle(PlantumlMessages.get("collect.using_testcontainers", lang))
 
-        val container = try {
-            org.testcontainers.containers.PostgreSQLContainer<Nothing>("postgres:15-alpine").apply {
-                start()
-            }
-        } catch (e: Exception) {
-            val errorMsg = e.message ?: "Unknown error"
-            if (errorMsg.contains("port") || errorMsg.contains("bind") || errorMsg.contains("in use")) {
-                val message = PlantumlMessages.get("collect.port_conflict", lang)
+        val container =
+            try {
+                org.testcontainers.containers.PostgreSQLContainer<Nothing>("postgres:15-alpine").apply {
+                    start()
+                }
+            } catch (e: Exception) {
+                val errorMsg = e.message ?: "Unknown error"
+                if (errorMsg.contains("port") || errorMsg.contains("bind") || errorMsg.contains("in use")) {
+                    val message = PlantumlMessages.get("collect.port_conflict", lang)
+                    logger.error(message)
+                    throw RuntimeException(message, e)
+                }
+                val message = PlantumlMessages.format("collect.container_failed", lang, e.message ?: "")
                 logger.error(message)
                 throw RuntimeException(message, e)
             }
-            val message = PlantumlMessages.format("collect.container_failed", lang, e.message ?: "")
-            logger.error(message)
-            throw RuntimeException(message, e)
-        }
 
         logger.lifecycle(PlantumlMessages.format("collect.container_started", lang, container.containerId))
         logger.lifecycle(PlantumlMessages.format("collect.jdbc_url", lang, container.jdbcUrl))
 
-        val embeddingStore: EmbeddingStore<TextSegment> = PgVectorEmbeddingStore.builder()
-            .host(container.host)
-            .port(container.firstMappedPort)
-            .database(container.databaseName)
-            .user(container.username)
-            .password(container.password)
-            .table("embeddings")
-            .dimension(384)
-            .build()
+        val embeddingStore: EmbeddingStore<TextSegment> =
+            PgVectorEmbeddingStore
+                .builder()
+                .host(container.host)
+                .port(container.firstMappedPort)
+                .database(container.databaseName)
+                .user(container.username)
+                .password(container.password)
+                .table("embeddings")
+                .dimension(384)
+                .build()
 
         indexDiagrams(diagramFiles, historyFiles, embeddingModel, documentSplitter, embeddingStore)
 
@@ -389,23 +417,25 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         historyFiles: Array<File>,
         embeddingModel: EmbeddingModel,
         documentSplitter: DocumentSplitter,
-        embeddingStore: EmbeddingStore<TextSegment>
+        embeddingStore: EmbeddingStore<TextSegment>,
     ) {
         diagramFiles.forEach { file ->
             logger.lifecycle(PlantumlMessages.format("collect.indexing_diagram", lang, file.name))
 
-            val content = try {
-                file.readText()
-            } catch (e: Exception) {
-                handleFileReadError(file, e)
-            }
+            val content =
+                try {
+                    file.readText()
+                } catch (e: Exception) {
+                    handleFileReadError(file, e)
+                }
 
-            val doc = document(
-                content,
-                metadata("source", file.name)
-                    .put("type", "plantuml")
-                    .put("contentType", "diagram")
-            )
+            val doc =
+                document(
+                    content,
+                    metadata("source", file.name)
+                        .put("type", "plantuml")
+                        .put("contentType", "diagram"),
+                )
 
             val segments = documentSplitter.split(doc)
             logger.lifecycle(PlantumlMessages.format("collect.split_segments", lang, segments.size))
@@ -424,18 +454,20 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         historyFiles.forEach { file ->
             logger.lifecycle(PlantumlMessages.format("collect.indexing_history", lang, file.name))
 
-            val content = try {
-                file.readText()
-            } catch (e: Exception) {
-                handleFileReadError(file, e)
-            }
+            val content =
+                try {
+                    file.readText()
+                } catch (e: Exception) {
+                    handleFileReadError(file, e)
+                }
 
-            val doc = document(
-                content,
-                metadata("source", file.name)
-                    .put("type", "training")
-                    .put("contentType", "history")
-            )
+            val doc =
+                document(
+                    content,
+                    metadata("source", file.name)
+                        .put("type", "training")
+                        .put("contentType", "history"),
+                )
 
             val segments = documentSplitter.split(doc)
             logger.lifecycle(PlantumlMessages.format("collect.split_segments", lang, segments.size))
@@ -455,7 +487,10 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
     /**
      * Handles file read errors, including disk space issues.
      */
-    private fun handleFileReadError(file: File, e: Exception): Nothing {
+    private fun handleFileReadError(
+        file: File,
+        e: Exception,
+    ): Nothing {
         val errorMsg = e.message ?: "Unknown error"
         if (errorMsg.contains("space") || errorMsg.contains("No space left on device")) {
             val message = PlantumlMessages.format("collect.disk_space_read", lang, file.name, e.message ?: "")
@@ -470,10 +505,16 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
     /**
      * Handles embedding store errors, including disk space issues during write operations.
      */
-    private fun handleEmbeddingStoreError(e: Exception, context: File) {
+    private fun handleEmbeddingStoreError(
+        e: Exception,
+        context: File,
+    ) {
         val errorMsg = e.message ?: "Unknown error"
-        if (errorMsg.contains("space") || errorMsg.contains("No space left on device") ||
-            errorMsg.contains("disk") || errorMsg.contains("storage")) {
+        if (errorMsg.contains("space") ||
+            errorMsg.contains("No space left on device") ||
+            errorMsg.contains("disk") ||
+            errorMsg.contains("storage")
+        ) {
             val message = PlantumlMessages.format("collect.disk_space_store", lang, context.name, e.message ?: "")
             logger.error(message)
             cleanupPartialOutputs()
@@ -516,18 +557,18 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         diagramFiles: Array<File>,
         historyFiles: Array<File>,
         embeddingModel: EmbeddingModel,
-        documentSplitter: DocumentSplitter
+        documentSplitter: DocumentSplitter,
     ) {
         // Check for test mode disk space simulation
         val simulateDiskFull = RuntimeEnvironment.system().isDiskFullSimulated
-        
+
         if (simulateDiskFull) {
             val message = PlantumlMessages.get("collect.disk_space_sim", lang)
             logger.error(message)
             cleanupPartialOutputs()
             throw RuntimeException(message)
         }
-        
+
         // For now, we'll just log the indexing process
         // In a production implementation, this would connect to a vector database
         diagramFiles.forEach { file ->
@@ -535,11 +576,11 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
 
             val content = file.readText()
 
-            val document = document(
-                content,
-                metadata("source", file.name).put("type", "plantuml").put("contentType", "diagram")
-            )
-
+            val document =
+                document(
+                    content,
+                    metadata("source", file.name).put("type", "plantuml").put("contentType", "diagram"),
+                )
 
             val segments = documentSplitter.split(document)
             logger.lifecycle(PlantumlMessages.format("collect.split_segments", lang, segments.size))
@@ -555,10 +596,11 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
 
             val content = file.readText()
 
-            val document = document(
-                content,
-                metadata("source", file.name).put("type", "training").put("contentType", "history")
-            )
+            val document =
+                document(
+                    content,
+                    metadata("source", file.name).put("type", "training").put("contentType", "history"),
+                )
 
             val segments = documentSplitter.split(document)
             logger.lifecycle(PlantumlMessages.format("collect.split_segments", lang, segments.size))
@@ -575,5 +617,3 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         logger.lifecycle(PlantumlMessages.get("collect.note_config", lang))
     }
 }
-
-

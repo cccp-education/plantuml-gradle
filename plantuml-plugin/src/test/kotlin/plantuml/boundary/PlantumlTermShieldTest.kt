@@ -11,7 +11,6 @@ import kotlin.test.assertTrue
  * translation provider while leaving the prose translatable.
  */
 class PlantumlTermShieldTest {
-
     private val shield = PlantumlTermShield()
 
     @Test

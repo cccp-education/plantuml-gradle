@@ -17,7 +17,7 @@ class ApiKeyPool(
     private val fallbackEnabled: Boolean = true,
     autoResetEnabled: Boolean = true,
     auditEnabled: Boolean = true,
-    freemiumRatio: Double = 0.0
+    freemiumRatio: Double = 0.0,
 ) {
     private var currentIndex = 0
     private val tracker: QuotaTracker = QuotaTracker()
@@ -43,12 +43,13 @@ class ApiKeyPool(
             throw IllegalStateException(PlantumlMessages.get("apikey.pool_empty"))
         }
 
-        val selectedEntry = when (rotationStrategy) {
-            RotationStrategy.ROUND_ROBIN -> getNextRoundRobin()
-            RotationStrategy.LEAST_USED -> getNextLeastUsed()
-            RotationStrategy.WEIGHTED, RotationStrategy.SMART -> getNextRoundRobin()
-            RotationStrategy.TIERED -> getNextTiered()
-        }
+        val selectedEntry =
+            when (rotationStrategy) {
+                RotationStrategy.ROUND_ROBIN -> getNextRoundRobin()
+                RotationStrategy.LEAST_USED -> getNextLeastUsed()
+                RotationStrategy.WEIGHTED, RotationStrategy.SMART -> getNextRoundRobin()
+                RotationStrategy.TIERED -> getNextTiered()
+            }
 
         tracker.trackUsage(selectedEntry.id)
         val usageCount = tracker.getUsage(selectedEntry.id)
@@ -91,11 +92,10 @@ class ApiKeyPool(
     /**
      * Get next key using least-used strategy.
      */
-    private fun getNextLeastUsed(): ApiKeyEntry {
-        return entries.minByOrNull { entry ->
+    private fun getNextLeastUsed(): ApiKeyEntry =
+        entries.minByOrNull { entry ->
             tracker.getUsage(entry.id)
         } ?: entries.first()
-    }
 
     /**
      * Get next key using tiered strategy (Enterprise > Pro > Free, intra-tier by weight).
@@ -109,12 +109,13 @@ class ApiKeyPool(
      * saturated, FREE is never reached).
      */
     private fun getNextTiered(): ApiKeyEntry {
-        val candidates = if (fallbackEnabled) {
-            val available = entries.filterNot { tracker.isQuotaExceeded(it) }
-            if (available.isEmpty()) entries else available
-        } else {
-            entries
-        }
+        val candidates =
+            if (fallbackEnabled) {
+                val available = entries.filterNot { tracker.isQuotaExceeded(it) }
+                if (available.isEmpty()) entries else available
+            } else {
+                entries
+            }
         return tieredStrategy.select(candidates)
     }
 
@@ -124,9 +125,7 @@ class ApiKeyPool(
      * @param entry The API key entry to check
      * @return true if quota threshold is exceeded
      */
-    fun isQuotaExceeded(entry: ApiKeyEntry): Boolean {
-        return tracker.isQuotaExceeded(entry)
-    }
+    fun isQuotaExceeded(entry: ApiKeyEntry): Boolean = tracker.isQuotaExceeded(entry)
 
     /**
      * Get all keys in the pool.
@@ -153,9 +152,7 @@ class ApiKeyPool(
     /**
      * Get usage count for a specific key.
      */
-    fun getUsageCount(entryId: String): Long {
-        return tracker.getUsage(entryId)
-    }
+    fun getUsageCount(entryId: String): Long = tracker.getUsage(entryId)
 
     /**
      * Get the quota tracker instance.
@@ -175,9 +172,7 @@ class ApiKeyPool(
     /**
      * Get usage percentage for a specific key.
      */
-    fun getUsagePercentage(entry: ApiKeyEntry): Double {
-        return tracker.getUsagePercentage(entry)
-    }
+    fun getUsagePercentage(entry: ApiKeyEntry): Double = tracker.getUsagePercentage(entry)
 
     /**
      * Perform manual reset for a specific key.

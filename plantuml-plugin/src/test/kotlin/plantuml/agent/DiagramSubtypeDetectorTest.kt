@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test
  * DIA-06 — deterministic diagram subtype detection.
  */
 class DiagramSubtypeDetectorTest {
-
     @Test
     fun `detects a C4 context diagram`() {
         assertThat(DiagramSubtypeDetector.detect("C4 context diagram for the API gateway"))

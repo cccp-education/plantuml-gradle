@@ -11,9 +11,8 @@ package plantuml.apikey
  *   freemium ratio and quota usage; when disabled, raw [ApiKeyEntry.weight] is used
  */
 class TieredRotationStrategy(
-    private val weightCalculator: FreemiumWeightCalculator? = null
+    private val weightCalculator: FreemiumWeightCalculator? = null,
 ) {
-
     /**
      * Selects the best candidate from a non-empty list of entries.
      *
@@ -31,17 +30,16 @@ class TieredRotationStrategy(
             } else {
                 compareBy<ApiKeyEntry> { it.tier.priority() }
                     .thenBy { effectiveWeight(it) }
-            }
+            },
         ) ?: error("unreachable")
     }
 
-    private fun effectiveWeight(entry: ApiKeyEntry): Int {
-        return weightCalculator?.calculateWeight(entry) ?: entry.weight
-    }
+    private fun effectiveWeight(entry: ApiKeyEntry): Int = weightCalculator?.calculateWeight(entry) ?: entry.weight
 
-    private fun KeyTier.priority(): Int = when (this) {
-        KeyTier.ENTERPRISE -> 3
-        KeyTier.PRO -> 2
-        KeyTier.FREE -> 1
-    }
+    private fun KeyTier.priority(): Int =
+        when (this) {
+            KeyTier.ENTERPRISE -> 3
+            KeyTier.PRO -> 2
+            KeyTier.FREE -> 1
+        }
 }

@@ -9,7 +9,6 @@ package plantuml.service
  * historical exception contract by folding, exactly once, at the boundary.
  */
 sealed interface KnowledgeGraphParseError {
-
     /** Human-readable, already-localized message. */
     val message: String
 

@@ -3,11 +3,10 @@ package plantuml.apikey
 import org.junit.jupiter.api.Test
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 class ApiKeyModelsTest {
-
     @Test
     fun `QuotaConfig should have correct defaults`() {
         val config = QuotaConfig()
@@ -24,16 +23,17 @@ class ApiKeyModelsTest {
     @Test
     fun `QuotaConfig should be customizable`() {
         val now = LocalDateTime.now()
-        val config = QuotaConfig(
-            limitType = QuotaType.TOKENS,
-            limitValue = 50000,
-            consumedValue = 12000,
-            thresholdPercent = 90,
-            periodStart = now,
-            periodEnd = now.plusDays(1),
-            resetPolicy = ResetPolicy.WEEKLY,
-            lastManualSync = now.minusHours(1)
-        )
+        val config =
+            QuotaConfig(
+                limitType = QuotaType.TOKENS,
+                limitValue = 50000,
+                consumedValue = 12000,
+                thresholdPercent = 90,
+                periodStart = now,
+                periodEnd = now.plusDays(1),
+                resetPolicy = ResetPolicy.WEEKLY,
+                lastManualSync = now.minusHours(1),
+            )
         assertEquals(QuotaType.TOKENS, config.limitType)
         assertEquals(50000, config.limitValue)
         assertEquals(12000, config.consumedValue)
@@ -43,14 +43,15 @@ class ApiKeyModelsTest {
 
     @Test
     fun `ApiKeyEntry should be instantiable with minimal params`() {
-        val entry = ApiKeyEntry(
-            id = "key-001",
-            email = "test@example.com",
-            name = "Test Key",
-            keyRef = "GOOGLE_API_KEY_1",
-            provider = Provider.GOOGLE,
-            services = emptyList()
-        )
+        val entry =
+            ApiKeyEntry(
+                id = "key-001",
+                email = "test@example.com",
+                name = "Test Key",
+                keyRef = "GOOGLE_API_KEY_1",
+                provider = Provider.GOOGLE,
+                services = emptyList(),
+            )
         assertEquals("key-001", entry.id)
         assertEquals("test@example.com", entry.email)
         assertEquals("Test Key", entry.name)
@@ -64,18 +65,20 @@ class ApiKeyModelsTest {
 
     @Test
     fun `ApiKeyEntry should support all services`() {
-        val entry = ApiKeyEntry(
-            id = "key-002",
-            email = "multi@example.com",
-            name = "Multi-Service Key",
-            keyRef = "HF_API_KEY_1",
-            provider = Provider.HUGGINGFACE,
-            services = listOf(
-                ServiceType.TEXT_GENERATION,
-                ServiceType.IMAGE_GENERATION,
-                ServiceType.EMBEDDINGS
+        val entry =
+            ApiKeyEntry(
+                id = "key-002",
+                email = "multi@example.com",
+                name = "Multi-Service Key",
+                keyRef = "HF_API_KEY_1",
+                provider = Provider.HUGGINGFACE,
+                services =
+                    listOf(
+                        ServiceType.TEXT_GENERATION,
+                        ServiceType.IMAGE_GENERATION,
+                        ServiceType.EMBEDDINGS,
+                    ),
             )
-        )
         assertEquals(3, entry.services.size)
         assertTrue(entry.services.contains(ServiceType.TEXT_GENERATION))
         assertTrue(entry.services.contains(ServiceType.IMAGE_GENERATION))
@@ -85,21 +88,23 @@ class ApiKeyModelsTest {
     @Test
     fun `ApiKeyEntry should support expiration and metadata`() {
         val expiration = LocalDateTime.of(2026, 12, 31, 23, 59)
-        val metadata = mapOf(
-            "createdAt" to "2024-01-01",
-            "purpose" to "testing",
-            "owner" to "dev-team"
-        )
-        val entry = ApiKeyEntry(
-            id = "key-003",
-            email = "expiring@example.com",
-            name = "Expiring Key",
-            keyRef = "OPENAI_API_KEY_1",
-            provider = Provider.OPENAI,
-            services = emptyList(),
-            expirationDate = expiration,
-            metadata = metadata
-        )
+        val metadata =
+            mapOf(
+                "createdAt" to "2024-01-01",
+                "purpose" to "testing",
+                "owner" to "dev-team",
+            )
+        val entry =
+            ApiKeyEntry(
+                id = "key-003",
+                email = "expiring@example.com",
+                name = "Expiring Key",
+                keyRef = "OPENAI_API_KEY_1",
+                provider = Provider.OPENAI,
+                services = emptyList(),
+                expirationDate = expiration,
+                metadata = metadata,
+            )
         assertEquals(expiration, entry.expirationDate)
         assertEquals(3, entry.metadata.size)
         assertEquals("testing", entry.metadata["purpose"])
@@ -118,18 +123,20 @@ class ApiKeyModelsTest {
 
     @Test
     fun `ApiKeyPoolConfig should support custom configuration`() {
-        val googleKeys = listOf(
-            ApiKeyEntry("g1", "g1@test.com", "Google #1", "GOOGLE_KEY_1", Provider.GOOGLE, emptyList()),
-            ApiKeyEntry("g2", "g2@test.com", "Google #2", "GOOGLE_KEY_2", Provider.GOOGLE, emptyList())
-        )
-        val config = ApiKeyPoolConfig(
-            version = "2.0",
-            poolName = "production-pool",
-            rotationStrategy = RotationStrategy.LEAST_USED,
-            fallbackEnabled = false,
-            auditEnabled = false,
-            providers = mapOf(Provider.GOOGLE to googleKeys)
-        )
+        val googleKeys =
+            listOf(
+                ApiKeyEntry("g1", "g1@test.com", "Google #1", "GOOGLE_KEY_1", Provider.GOOGLE, emptyList()),
+                ApiKeyEntry("g2", "g2@test.com", "Google #2", "GOOGLE_KEY_2", Provider.GOOGLE, emptyList()),
+            )
+        val config =
+            ApiKeyPoolConfig(
+                version = "2.0",
+                poolName = "production-pool",
+                rotationStrategy = RotationStrategy.LEAST_USED,
+                fallbackEnabled = false,
+                auditEnabled = false,
+                providers = mapOf(Provider.GOOGLE to googleKeys),
+            )
         assertEquals("2.0", config.version)
         assertEquals("production-pool", config.poolName)
         assertEquals(RotationStrategy.LEAST_USED, config.rotationStrategy)

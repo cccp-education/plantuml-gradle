@@ -1,6 +1,5 @@
 package plantuml
 
-import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -8,8 +7,8 @@ import plantuml.PlantumlManager.Configuration
 import plantuml.PlantumlManager.Extensions
 import plantuml.PlantumlManager.Tasks
 import plantuml.PlantumlPlugin.PlantumlExtension
-import plantuml.tasks.GeneratePlantumlDiagramsTask
 import plantuml.tasks.CollectPlantumlIndexTask
+import plantuml.tasks.GeneratePlantumlDiagramsTask
 import plantuml.tasks.ValidatePlantumlSyntaxTask
 import java.io.File
 import kotlin.test.assertEquals
@@ -17,15 +16,16 @@ import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 class PlantumlManagerTest {
-
     @TempDir
     lateinit var tempDir: File
 
     @Test
     fun `should load default config when no config file exists`() {
-        val project = ProjectBuilder.builder()
-            .withProjectDir(tempDir)
-            .build()
+        val project =
+            ProjectBuilder
+                .builder()
+                .withProjectDir(tempDir)
+                .build()
 
         val config = Configuration.load(project)
 
@@ -37,9 +37,11 @@ class PlantumlManagerTest {
 
     @Test
     fun `should load default config when config file is empty`() {
-        val project = ProjectBuilder.builder()
-            .withProjectDir(tempDir)
-            .build()
+        val project =
+            ProjectBuilder
+                .builder()
+                .withProjectDir(tempDir)
+                .build()
 
         val emptyConfigFile = File(tempDir, "plantuml-context.yml")
         emptyConfigFile.writeText("")
@@ -54,28 +56,33 @@ class PlantumlManagerTest {
 
     @Test
     fun `should throw exception when YAML is invalid`() {
-        val project = ProjectBuilder.builder()
-            .withProjectDir(tempDir)
-            .build()
+        val project =
+            ProjectBuilder
+                .builder()
+                .withProjectDir(tempDir)
+                .build()
 
         val invalidConfigFile = File(tempDir, "plantuml-context.yml")
         invalidConfigFile.writeText("invalid: yaml: content: [")
 
-        val exception = org.junit.jupiter.api.assertThrows<IllegalStateException> {
-            Configuration.load(project)
-        }
+        val exception =
+            org.junit.jupiter.api.assertThrows<IllegalStateException> {
+                Configuration.load(project)
+            }
 
         org.junit.jupiter.api.Assertions.assertTrue(
-            exception.message!!.contains("Invalid YAML configuration") || 
-            exception.message!!.contains("line")
+            exception.message!!.contains("Invalid YAML configuration") ||
+                exception.message!!.contains("line"),
         )
     }
 
     @Test
     fun `should load config from extension configPath`() {
-        val project = ProjectBuilder.builder()
-            .withProjectDir(tempDir)
-            .build()
+        val project =
+            ProjectBuilder
+                .builder()
+                .withProjectDir(tempDir)
+                .build()
 
         val customConfigFile = File(tempDir, "custom-config.yml")
         customConfigFile.writeText(
@@ -84,13 +91,14 @@ class PlantumlManagerTest {
               prompts: "custom/prompts"
             output:
               diagrams: "custom/diagrams"
-        """.trimIndent()
+            """.trimIndent(),
         )
 
-        project.extensions.create(
-            "plantuml",
-            PlantumlExtension::class.java
-        ).apply { configPath.set("custom-config.yml") }
+        project.extensions
+            .create(
+                "plantuml",
+                PlantumlExtension::class.java,
+            ).apply { configPath.set("custom-config.yml") }
 
         val config = Configuration.load(project)
 
@@ -101,16 +109,18 @@ class PlantumlManagerTest {
 
     @Test
     fun `should use default config file when extension not set`() {
-        val project = ProjectBuilder.builder()
-            .withProjectDir(tempDir)
-            .build()
+        val project =
+            ProjectBuilder
+                .builder()
+                .withProjectDir(tempDir)
+                .build()
 
         val defaultConfigFile = File(tempDir, "plantuml-context.yml")
         defaultConfigFile.writeText(
             """
             input:
               prompts: "default/prompts"
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         val config = Configuration.load(project)
@@ -121,9 +131,11 @@ class PlantumlManagerTest {
 
     @Test
     fun `should register all three tasks correctly`() {
-        val project = ProjectBuilder.builder()
-            .withProjectDir(tempDir)
-            .build()
+        val project =
+            ProjectBuilder
+                .builder()
+                .withProjectDir(tempDir)
+                .build()
 
         Tasks.registerTasks(project)
 
@@ -134,9 +146,11 @@ class PlantumlManagerTest {
 
     @Test
     fun `should register tasks with correct types`() {
-        val project = ProjectBuilder.builder()
-            .withProjectDir(tempDir)
-            .build()
+        val project =
+            ProjectBuilder
+                .builder()
+                .withProjectDir(tempDir)
+                .build()
 
         Tasks.registerTasks(project)
 
@@ -147,18 +161,22 @@ class PlantumlManagerTest {
 
     @Test
     fun `should call configureExtensions without throwing`() {
-        val project = ProjectBuilder.builder()
-            .withProjectDir(tempDir)
-            .build()
+        val project =
+            ProjectBuilder
+                .builder()
+                .withProjectDir(tempDir)
+                .build()
 
         Extensions.configureExtensions(project)
     }
 
     @Test
     fun `should load config with all sections populated`() {
-        val project = ProjectBuilder.builder()
-            .withProjectDir(tempDir)
-            .build()
+        val project =
+            ProjectBuilder
+                .builder()
+                .withProjectDir(tempDir)
+                .build()
 
         val configFile = File(tempDir, "plantuml-context.yml")
         configFile.writeText(
@@ -199,7 +217,7 @@ class PlantumlManagerTest {
               username: "raguser"
               password: "ragpass"
               tableName: "plantuml_embeddings"
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         val config = Configuration.load(project)
@@ -226,16 +244,18 @@ class PlantumlManagerTest {
 
     @Test
     fun `should prioritize extension configPath over default file`() {
-        val project = ProjectBuilder.builder()
-            .withProjectDir(tempDir)
-            .build()
+        val project =
+            ProjectBuilder
+                .builder()
+                .withProjectDir(tempDir)
+                .build()
 
         val defaultConfigFile = File(tempDir, "plantuml-context.yml")
         defaultConfigFile.writeText(
             """
             input:
               prompts: "default-prompts"
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         val customConfigFile = File(tempDir, "custom.yml")
@@ -243,13 +263,14 @@ class PlantumlManagerTest {
             """
             input:
               prompts: "custom-prompts"
-        """.trimIndent()
+            """.trimIndent(),
         )
 
-        project.extensions.create(
-            "plantuml",
-            PlantumlExtension::class.java
-        ).apply { configPath.set("custom.yml") }
+        project.extensions
+            .create(
+                "plantuml",
+                PlantumlExtension::class.java,
+            ).apply { configPath.set("custom.yml") }
 
         val config = Configuration.load(project)
 
@@ -258,16 +279,18 @@ class PlantumlManagerTest {
 
     @Test
     fun `should handle partial config and use defaults for missing sections`() {
-        val project = ProjectBuilder.builder()
-            .withProjectDir(tempDir)
-            .build()
+        val project =
+            ProjectBuilder
+                .builder()
+                .withProjectDir(tempDir)
+                .build()
 
         val configFile = File(tempDir, "plantuml-context.yml")
         configFile.writeText(
             """
             input:
               prompts: "only-prompts"
-        """.trimIndent()
+            """.trimIndent(),
         )
 
         val config = Configuration.load(project)

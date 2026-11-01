@@ -8,8 +8,9 @@ import org.assertj.core.api.Assertions.assertThat
 import org.slf4j.LoggerFactory
 import org.testcontainers.containers.PostgreSQLContainer
 
-class CommonSteps(private val world: PlantumlWorld) {
-
+class CommonSteps(
+    private val world: PlantumlWorld,
+) {
     companion object {
         private val log = LoggerFactory.getLogger(CommonSteps::class.java)
         private val cleanupExtension = TestCleanupExtension()
@@ -49,19 +50,28 @@ class CommonSteps(private val world: PlantumlWorld) {
     }
 
     @Given("a prompt file {string} with content {string}")
-    fun createPromptFile(fileName: String, content: String) {
+    fun createPromptFile(
+        fileName: String,
+        content: String,
+    ) {
         world.createGradleProject()
         world.createPromptFile(fileName, content)
     }
 
     @Given("a valid PlantUML file {string} with content {string}")
-    fun createValidPlantumlFile(fileName: String, content: String) {
+    fun createValidPlantumlFile(
+        fileName: String,
+        content: String,
+    ) {
         world.createGradleProject()
         world.createPlantUmlFile(fileName, content)
     }
 
     @Given("an invalid PlantUML file {string} with content {string}")
-    fun createInvalidPlantumlFile(fileName: String, content: String) {
+    fun createInvalidPlantumlFile(
+        fileName: String,
+        content: String,
+    ) {
         world.createGradleProject()
         world.createPlantUmlFile(fileName, content)
     }
@@ -76,7 +86,7 @@ class CommonSteps(private val world: PlantumlWorld) {
                 "description": "Generated diagram"
               }
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -90,7 +100,7 @@ class CommonSteps(private val world: PlantumlWorld) {
                 "description": "Generated diagram with syntax error"
               }
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -104,7 +114,7 @@ class CommonSteps(private val world: PlantumlWorld) {
                 "description": "Generated diagram"
               }
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -118,7 +128,7 @@ class CommonSteps(private val world: PlantumlWorld) {
                 "description": "Invalid PlantUML diagram - typo @endulm"
               }
             }
-        """.trimIndent(),
+            """.trimIndent(),
             """
             {
               "plantuml": {
@@ -126,7 +136,7 @@ class CommonSteps(private val world: PlantumlWorld) {
                 "description": "Invalid PlantUML diagram - typo @endulm"
               }
             }
-        """.trimIndent(),
+            """.trimIndent(),
             """
             {
               "plantuml": {
@@ -134,7 +144,7 @@ class CommonSteps(private val world: PlantumlWorld) {
                 "description": "Invalid PlantUML diagram - typo @endulm"
               }
             }
-        """.trimIndent(),
+            """.trimIndent(),
             """
             {
               "plantuml": {
@@ -142,7 +152,7 @@ class CommonSteps(private val world: PlantumlWorld) {
                 "description": "Invalid PlantUML diagram - typo @endulm"
               }
             }
-        """.trimIndent(),
+            """.trimIndent(),
             """
             {
               "plantuml": {
@@ -150,7 +160,7 @@ class CommonSteps(private val world: PlantumlWorld) {
                 "description": "Invalid PlantUML diagram - typo @endulm"
               }
             }
-        """.trimIndent(),
+            """.trimIndent(),
             """
             {
               "plantuml": {
@@ -158,7 +168,7 @@ class CommonSteps(private val world: PlantumlWorld) {
                 "description": "Invalid PlantUML diagram - typo @endulm"
               }
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -172,7 +182,7 @@ class CommonSteps(private val world: PlantumlWorld) {
                 "description": "Invalid PlantUML diagram"
               }
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -186,7 +196,7 @@ class CommonSteps(private val world: PlantumlWorld) {
                 "description": "Generated diagram"
               }
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -208,7 +218,7 @@ class CommonSteps(private val world: PlantumlWorld) {
                 "description": "Valid diagram"
               }
             }
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -246,7 +256,7 @@ class CommonSteps(private val world: PlantumlWorld) {
                 "description": "Valid diagram"
               }
             }
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -260,7 +270,7 @@ class CommonSteps(private val world: PlantumlWorld) {
                 "description": "Generated diagram with RAG context"
               }
             }
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 

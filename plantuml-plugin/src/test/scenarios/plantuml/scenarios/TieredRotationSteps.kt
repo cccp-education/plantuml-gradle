@@ -13,8 +13,9 @@ import plantuml.apikey.ResetPolicy
 import plantuml.apikey.RotationStrategy
 import plantuml.apikey.ServiceType
 
-class TieredRotationSteps(private val world: PlantumlWorld) {
-
+class TieredRotationSteps(
+    private val world: PlantumlWorld,
+) {
     private val pendingEntries = mutableListOf<ApiKeyEntry>()
     private var fallbackEnabled = true
 
@@ -52,22 +53,37 @@ class TieredRotationSteps(private val world: PlantumlWorld) {
     }
 
     @Given("the pool contains an ENTERPRISE key {string} with weight {int}")
-    fun thePoolContainsAnEnterpriseKeyWithWeight(id: String, weight: Int) {
+    fun thePoolContainsAnEnterpriseKeyWithWeight(
+        id: String,
+        weight: Int,
+    ) {
         pendingEntries.add(entry(id, KeyTier.ENTERPRISE, weight = weight))
     }
 
     @Given("the pool contains an ENTERPRISE key {string} with quota limit {int} and threshold {int}")
-    fun thePoolContainsAnEnterpriseKeyWithQuota(id: String, limit: Int, threshold: Int) {
+    fun thePoolContainsAnEnterpriseKeyWithQuota(
+        id: String,
+        limit: Int,
+        threshold: Int,
+    ) {
         pendingEntries.add(entry(id, KeyTier.ENTERPRISE, quota = quota(limit, threshold)))
     }
 
     @Given("the pool contains a PRO key {string} with quota limit {int} and threshold {int}")
-    fun thePoolContainsAProKeyWithQuota(id: String, limit: Int, threshold: Int) {
+    fun thePoolContainsAProKeyWithQuota(
+        id: String,
+        limit: Int,
+        threshold: Int,
+    ) {
         pendingEntries.add(entry(id, KeyTier.PRO, quota = quota(limit, threshold)))
     }
 
     @Given("the pool contains a FREE key {string} with quota limit {int} and threshold {int}")
-    fun thePoolContainsAFreeKeyWithQuota(id: String, limit: Int, threshold: Int) {
+    fun thePoolContainsAFreeKeyWithQuota(
+        id: String,
+        limit: Int,
+        threshold: Int,
+    ) {
         pendingEntries.add(entry(id, KeyTier.FREE, quota = quota(limit, threshold)))
     }
 
@@ -92,31 +108,41 @@ class TieredRotationSteps(private val world: PlantumlWorld) {
     }
 
     @Then("the {int}st selected key should be {string}")
-    fun theFirstSelectedKeyShouldBe(index: Int, id: String) {
+    fun theFirstSelectedKeyShouldBe(
+        index: Int,
+        id: String,
+    ) {
         assertThat(world.tieredSelectedKeys).hasSizeGreaterThanOrEqualTo(index)
         assertThat(world.tieredSelectedKeys[index - 1].id).isEqualTo(id)
     }
 
     @Then("the {int}nd selected key should be {string}")
-    fun theSecondSelectedKeyShouldBe(index: Int, id: String) {
+    fun theSecondSelectedKeyShouldBe(
+        index: Int,
+        id: String,
+    ) {
         assertThat(world.tieredSelectedKeys).hasSizeGreaterThanOrEqualTo(index)
         assertThat(world.tieredSelectedKeys[index - 1].id).isEqualTo(id)
     }
 
     @Then("the {int}rd selected key should be {string}")
-    fun theThirdSelectedKeyShouldBe(index: Int, id: String) {
+    fun theThirdSelectedKeyShouldBe(
+        index: Int,
+        id: String,
+    ) {
         assertThat(world.tieredSelectedKeys).hasSizeGreaterThanOrEqualTo(index)
         assertThat(world.tieredSelectedKeys[index - 1].id).isEqualTo(id)
     }
 
     private fun buildPool() {
         if (world.tieredPool == null) {
-            world.tieredPool = ApiKeyPool(
-                entries = pendingEntries.toList(),
-                rotationStrategy = RotationStrategy.TIERED,
-                fallbackEnabled = fallbackEnabled,
-                autoResetEnabled = false
-            )
+            world.tieredPool =
+                ApiKeyPool(
+                    entries = pendingEntries.toList(),
+                    rotationStrategy = RotationStrategy.TIERED,
+                    fallbackEnabled = fallbackEnabled,
+                    autoResetEnabled = false,
+                )
         }
     }
 
@@ -124,22 +150,27 @@ class TieredRotationSteps(private val world: PlantumlWorld) {
         id: String,
         tier: KeyTier,
         weight: Int = 1,
-        quota: QuotaConfig = QuotaConfig()
-    ): ApiKeyEntry = ApiKeyEntry(
-        id = id,
-        email = "t@e.com",
-        name = "Test $id",
-        keyRef = "REF_$id",
-        provider = Provider.GOOGLE,
-        services = listOf(ServiceType.CHAT_COMPLETION),
-        tier = tier,
-        weight = weight,
-        quota = quota
-    )
+        quota: QuotaConfig = QuotaConfig(),
+    ): ApiKeyEntry =
+        ApiKeyEntry(
+            id = id,
+            email = "t@e.com",
+            name = "Test $id",
+            keyRef = "REF_$id",
+            provider = Provider.GOOGLE,
+            services = listOf(ServiceType.CHAT_COMPLETION),
+            tier = tier,
+            weight = weight,
+            quota = quota,
+        )
 
-    private fun quota(limit: Int, threshold: Int): QuotaConfig = QuotaConfig(
-        limitValue = limit.toLong(),
-        thresholdPercent = threshold,
-        resetPolicy = ResetPolicy.MANUAL
-    )
+    private fun quota(
+        limit: Int,
+        threshold: Int,
+    ): QuotaConfig =
+        QuotaConfig(
+            limitValue = limit.toLong(),
+            thresholdPercent = threshold,
+            resetPolicy = ResetPolicy.MANUAL,
+        )
 }

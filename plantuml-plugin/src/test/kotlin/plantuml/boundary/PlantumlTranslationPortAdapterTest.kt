@@ -12,12 +12,12 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class PlantumlTranslationPortAdapterTest {
-
-    private fun translator(map: Map<String, String>) = object : TranslationService {
-        override fun translate(request: TranslationRequest): TranslationResult =
-            map[request.sourceText]?.let { TranslationResult.Success(it) }
-                ?: TranslationResult.Failure("no entry")
-    }
+    private fun translator(map: Map<String, String>) =
+        object : TranslationService {
+            override fun translate(request: TranslationRequest): TranslationResult =
+                map[request.sourceText]?.let { TranslationResult.Success(it) }
+                    ?: TranslationResult.Failure("no entry")
+        }
 
     private fun port(map: Map<String, String>) = PlantumlTranslationPortAdapter(translator(map))
 
@@ -216,7 +216,8 @@ class PlantumlTranslationPortAdapterTest {
         // D4 — one vocabulary: the boundary alias resolves to the contract enum.
         assertEquals(
             listOf(PlantUmlStrategy.TRANSLATE, PlantUmlStrategy.BORROW, PlantUmlStrategy.PRESERVE),
-            contracts.plantuml.PlantUmlStrategy.entries.toList(),
+            contracts.plantuml.PlantUmlStrategy.entries
+                .toList(),
         )
     }
 

@@ -14,8 +14,9 @@ import plantuml.apikey.ResetPolicy
 import plantuml.apikey.RotationStrategy
 import plantuml.apikey.ServiceType
 
-class CrossProviderFallbackSteps(private val world: PlantumlWorld) {
-
+class CrossProviderFallbackSteps(
+    private val world: PlantumlWorld,
+) {
     private val pendingProviderPools = mutableMapOf<String, MutableList<ApiKeyEntry>>()
     private var fallbackOrder: List<String> = emptyList()
 
@@ -28,7 +29,10 @@ class CrossProviderFallbackSteps(private val world: PlantumlWorld) {
     }
 
     @Given("the {string} provider pool contains a FREE key {string}")
-    fun theProviderPoolContainsAFreeKey(providerName: String, keyId: String) {
+    fun theProviderPoolContainsAFreeKey(
+        providerName: String,
+        keyId: String,
+    ) {
         addEntry(providerName, keyId, KeyTier.FREE)
     }
 
@@ -37,7 +41,7 @@ class CrossProviderFallbackSteps(private val world: PlantumlWorld) {
         providerName: String,
         keyId: String,
         limit: Int,
-        threshold: Int
+        threshold: Int,
     ) {
         addEntry(providerName, keyId, KeyTier.FREE, quota(limit, threshold))
     }
@@ -69,25 +73,37 @@ class CrossProviderFallbackSteps(private val world: PlantumlWorld) {
     }
 
     @Then("the {int}st cross-provider key should be {string}")
-    fun theFirstCrossProviderKeyShouldBe(index: Int, keyId: String) {
+    fun theFirstCrossProviderKeyShouldBe(
+        index: Int,
+        keyId: String,
+    ) {
         assertThat(world.crossProviderSelectedKeys).hasSizeGreaterThanOrEqualTo(index)
         assertThat(world.crossProviderSelectedKeys[index - 1].id).isEqualTo(keyId)
     }
 
     @Then("the {int}nd cross-provider key should be {string}")
-    fun theSecondCrossProviderKeyShouldBe(index: Int, keyId: String) {
+    fun theSecondCrossProviderKeyShouldBe(
+        index: Int,
+        keyId: String,
+    ) {
         assertThat(world.crossProviderSelectedKeys).hasSizeGreaterThanOrEqualTo(index)
         assertThat(world.crossProviderSelectedKeys[index - 1].id).isEqualTo(keyId)
     }
 
     @Then("the {int}rd cross-provider key should be {string}")
-    fun theThirdCrossProviderKeyShouldBe(index: Int, keyId: String) {
+    fun theThirdCrossProviderKeyShouldBe(
+        index: Int,
+        keyId: String,
+    ) {
         assertThat(world.crossProviderSelectedKeys).hasSizeGreaterThanOrEqualTo(index)
         assertThat(world.crossProviderSelectedKeys[index - 1].id).isEqualTo(keyId)
     }
 
     @Then("the {int}th cross-provider key should be {string}")
-    fun theNthCrossProviderKeyShouldBe(index: Int, keyId: String) {
+    fun theNthCrossProviderKeyShouldBe(
+        index: Int,
+        keyId: String,
+    ) {
         assertThat(world.crossProviderSelectedKeys).hasSizeGreaterThanOrEqualTo(index)
         assertThat(world.crossProviderSelectedKeys[index - 1].id).isEqualTo(keyId)
     }
@@ -99,9 +115,10 @@ class CrossProviderFallbackSteps(private val world: PlantumlWorld) {
 
     private fun buildOrchestrator() {
         if (world.crossProviderOrchestrator == null) {
-            val pools = pendingProviderPools.mapValues { (_, entries) ->
-                ApiKeyPool(entries.toList(), RotationStrategy.TIERED, autoResetEnabled = false)
-            }
+            val pools =
+                pendingProviderPools.mapValues { (_, entries) ->
+                    ApiKeyPool(entries.toList(), RotationStrategy.TIERED, autoResetEnabled = false)
+                }
             world.crossProviderOrchestrator = CrossProviderFallbackOrchestrator(pools, fallbackOrder)
         }
     }
@@ -110,7 +127,7 @@ class CrossProviderFallbackSteps(private val world: PlantumlWorld) {
         providerName: String,
         keyId: String,
         tier: KeyTier,
-        quota: QuotaConfig = QuotaConfig(limitValue = 100, thresholdPercent = 50)
+        quota: QuotaConfig = QuotaConfig(limitValue = 100, thresholdPercent = 50),
     ) {
         val entries = pendingProviderPools.getOrPut(providerName) { mutableListOf() }
         entries.add(entry(keyId, resolveProvider(providerName), tier, quota))
@@ -120,32 +137,38 @@ class CrossProviderFallbackSteps(private val world: PlantumlWorld) {
         id: String,
         provider: Provider,
         tier: KeyTier,
-        quota: QuotaConfig
-    ): ApiKeyEntry = ApiKeyEntry(
-        id = id,
-        email = "t@e.com",
-        name = "Test $id",
-        keyRef = "REF_$id",
-        provider = provider,
-        services = listOf(ServiceType.CHAT_COMPLETION),
-        tier = tier,
-        quota = quota
-    )
+        quota: QuotaConfig,
+    ): ApiKeyEntry =
+        ApiKeyEntry(
+            id = id,
+            email = "t@e.com",
+            name = "Test $id",
+            keyRef = "REF_$id",
+            provider = provider,
+            services = listOf(ServiceType.CHAT_COMPLETION),
+            tier = tier,
+            quota = quota,
+        )
 
-    private fun quota(limit: Int, threshold: Int): QuotaConfig = QuotaConfig(
-        limitValue = limit.toLong(),
-        thresholdPercent = threshold,
-        resetPolicy = ResetPolicy.MANUAL
-    )
+    private fun quota(
+        limit: Int,
+        threshold: Int,
+    ): QuotaConfig =
+        QuotaConfig(
+            limitValue = limit.toLong(),
+            thresholdPercent = threshold,
+            resetPolicy = ResetPolicy.MANUAL,
+        )
 
-    private fun resolveProvider(name: String): Provider = when (name.lowercase()) {
-        "gemini" -> Provider.GOOGLE
-        "mistral" -> Provider.MISTRAL
-        "ollama" -> Provider.OLLAMA
-        "openai" -> Provider.OPENAI
-        "claude" -> Provider.ANTHROPIC
-        "huggingface" -> Provider.HUGGINGFACE
-        "groq" -> Provider.GROQ
-        else -> Provider.UNKNOWN
-    }
+    private fun resolveProvider(name: String): Provider =
+        when (name.lowercase()) {
+            "gemini" -> Provider.GOOGLE
+            "mistral" -> Provider.MISTRAL
+            "ollama" -> Provider.OLLAMA
+            "openai" -> Provider.OPENAI
+            "claude" -> Provider.ANTHROPIC
+            "huggingface" -> Provider.HUGGINGFACE
+            "groq" -> Provider.GROQ
+            else -> Provider.UNKNOWN
+        }
 }

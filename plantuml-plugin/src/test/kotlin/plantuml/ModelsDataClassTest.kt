@@ -5,7 +5,6 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 class ModelsDataClassTest {
-
     @Test
     fun `InputConfig should have correct defaults`() {
         val config = InputConfig()
@@ -30,7 +29,10 @@ class ModelsDataClassTest {
         assertEquals(5, config.maxIterations)
         assertEquals("ollama", config.model)
         assertTrue(config.validation)
-        assertEquals("Rate this diagram on clarity, completeness, and best practices. Return a JSON with 'score' (1-10) and 'feedback' (string) and 'recommendations' (array).", config.validationPrompt)
+        assertEquals(
+            "Rate this diagram on clarity, completeness, and best practices. Return a JSON with 'score' (1-10) and 'feedback' (string) and 'recommendations' (array).",
+            config.validationPrompt,
+        )
     }
 
     @Test
@@ -67,10 +69,11 @@ class ModelsDataClassTest {
     @Test
     fun `PlantumlDiagram should be instantiable`() {
         val code = PlantumlCode("@startuml\nA -> B\n@enduml", "Test diagram")
-        val diagram = PlantumlDiagram(
-            conversation = listOf("Create a sequence diagram"),
-            plantuml = code
-        )
+        val diagram =
+            PlantumlDiagram(
+                conversation = listOf("Create a sequence diagram"),
+                plantuml = code,
+            )
         assertEquals(1, diagram.conversation.size)
         assertEquals("@startuml\nA -> B\n@enduml", diagram.plantuml.code)
         assertEquals("Test diagram", diagram.plantuml.description)
@@ -85,11 +88,12 @@ class ModelsDataClassTest {
 
     @Test
     fun `ValidationFeedback should be instantiable`() {
-        val feedback = ValidationFeedback(
-            score = 8,
-            feedback = "Good diagram",
-            recommendations = listOf("Add more comments")
-        )
+        val feedback =
+            ValidationFeedback(
+                score = 8,
+                feedback = "Good diagram",
+                recommendations = listOf("Add more comments"),
+            )
         assertEquals(8, feedback.score)
         assertEquals("Good diagram", feedback.feedback)
         assertEquals(1, feedback.recommendations.size)
@@ -97,13 +101,22 @@ class ModelsDataClassTest {
 
     @Test
     fun `PlantumlConfig should compose all configs correctly`() {
-        val config = PlantumlConfig(
-            input = InputConfig("custom-prompts", "fr"),
-            output = OutputConfig("out/diagrams", "out/images", "out/validations", "out/rag", "svg", "dark"),
-            langchain4j = LangchainConfig(maxIterations = 3, model = "openai", validation = true, validationPrompt = "", ollama = OllamaConfig("http://custom:11434", "llama2"), openai = ApiKeyConfig("sk-key")),
-            git = GitConfig("user", "user@email.com", "custom message", listOf("main")),
-            rag = RagConfig("jdbc:postgresql://localhost:5432/rag", 5432, "user", "pass", "custom_table")
-        )
+        val config =
+            PlantumlConfig(
+                input = InputConfig("custom-prompts", "fr"),
+                output = OutputConfig("out/diagrams", "out/images", "out/validations", "out/rag", "svg", "dark"),
+                langchain4j =
+                    LangchainConfig(
+                        maxIterations = 3,
+                        model = "openai",
+                        validation = true,
+                        validationPrompt = "",
+                        ollama = OllamaConfig("http://custom:11434", "llama2"),
+                        openai = ApiKeyConfig("sk-key"),
+                    ),
+                git = GitConfig("user", "user@email.com", "custom message", listOf("main")),
+                rag = RagConfig("jdbc:postgresql://localhost:5432/rag", 5432, "user", "pass", "custom_table"),
+            )
         assertEquals("custom-prompts", config.input.prompts)
         assertEquals("fr", config.input.defaultLang)
         assertEquals("out/diagrams", config.output.diagrams)

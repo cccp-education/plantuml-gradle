@@ -16,7 +16,6 @@ package plantuml.context
  * composition unit-testable.
  */
 object AugmentedContextPrompt {
-
     /** Marker line opening the injected block, so provenance stays auditable. */
     const val CONTEXT_HEADER: String =
         "Augmented context (governance EAGER + retrieved RAG/Graphify/Docs):"
@@ -28,7 +27,10 @@ object AugmentedContextPrompt {
      * unchanged — the offline fallback path. The context is trimmed so the
      * rendered block stays stable regardless of the collector's trailing newline.
      */
-    fun prepend(augmentedContext: String, prompt: String): String {
+    fun prepend(
+        augmentedContext: String,
+        prompt: String,
+    ): String {
         val context = augmentedContext.trim()
         if (context.isEmpty()) return prompt
         return "$CONTEXT_HEADER\n$context\n\n$prompt"

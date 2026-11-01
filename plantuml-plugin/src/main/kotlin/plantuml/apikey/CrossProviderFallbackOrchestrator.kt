@@ -15,9 +15,8 @@ package plantuml.apikey
  */
 class CrossProviderFallbackOrchestrator(
     private val pools: Map<String, ApiKeyPool>,
-    private val fallbackOrder: List<String>
+    private val fallbackOrder: List<String>,
 ) {
-
     /**
      * Select the next available API key entry, trying each provider in
      * [fallbackOrder] until a non-saturated pool is found.

@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test
  * DIA-01 — vision design review parsing.
  */
 class DesignReviewTest {
-
     @Test
     fun `approved feedback is Approved`() {
         assertThat(DesignReview.parse("approved")).isEqualTo(DesignVerdict.Approved)

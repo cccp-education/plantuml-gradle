@@ -2,8 +2,13 @@
 
 package plantuml
 
-import org.junit.jupiter.api.*
 import org.junit.jupiter.api.ClassOrderer.OrderAnnotation
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Order
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestClassOrder
+import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty
 import org.slf4j.LoggerFactory
@@ -21,7 +26,6 @@ import kotlin.test.assertTrue
 @DisplayName("PlantUML plugin — fine-tuning SmolLM2 en conteneur Python")
 @TestInstance(Lifecycle.PER_CLASS)
 class SmolLMFineTuneFunctionalTest {
-
     private val log = LoggerFactory.getLogger(javaClass)
 
     @Test
@@ -29,17 +33,24 @@ class SmolLMFineTuneFunctionalTest {
     @DisplayName("1-step smoke → adapter weights")
     fun smokeTest() {
         withContainer(name = "smollm-smoke", withModel = true) { c ->
-            val r = c.execInContainer(
-                "python3", "/scripts/fine_tune.py",
-                "--model-dir", "/model",
-                "--output-dir", "/tmp/lora-smoke",
-                "--max-steps", "1",
-            )
+            val r =
+                c.execInContainer(
+                    "python3",
+                    "/scripts/fine_tune.py",
+                    "--model-dir",
+                    "/model",
+                    "--output-dir",
+                    "/tmp/lora-smoke",
+                    "--max-steps",
+                    "1",
+                )
             logInfo(r)
             assertTrue(r.exitCode == 0, "code=${r.exitCode}: ${r.stderr}")
             assertTrue(r.stdout.contains("SUCCESS"), "Missing SUCCESS")
-            assertTrue(ls(c, "/tmp/lora-smoke").contains("adapter_model.safetensors"),
-                "Missing adapter")
+            assertTrue(
+                ls(c, "/tmp/lora-smoke").contains("adapter_model.safetensors"),
+                "Missing adapter",
+            )
         }
     }
 
@@ -48,22 +59,31 @@ class SmolLMFineTuneFunctionalTest {
     @DisplayName("5-step pipeline → adapter + metrics.json")
     fun fullPipeline() {
         withContainer(name = "smollm-pipeline", withModel = true) { c ->
-            val r = c.execInContainer(
-                "python3", "/scripts/fine_tune.py",
-                "--model-dir", "/model",
-                "--output-dir", "/tmp/lora-pipeline",
-                "--max-steps", "5",
-            )
+            val r =
+                c.execInContainer(
+                    "python3",
+                    "/scripts/fine_tune.py",
+                    "--model-dir",
+                    "/model",
+                    "--output-dir",
+                    "/tmp/lora-pipeline",
+                    "--max-steps",
+                    "5",
+                )
             logInfo(r)
             assertTrue(r.exitCode == 0, "code=${r.exitCode}: ${r.stderr}")
             assertTrue(r.stdout.contains("SUCCESS"), "Missing SUCCESS")
             assertTrue(r.stdout.contains("Training loss:"), "Missing loss")
 
             val adapters = ls(c, "/tmp/lora-pipeline/adapter")
-            assertTrue(adapters.contains("adapter_model.safetensors"),
-                "Missing adapter: $adapters")
-            assertTrue(adapters.contains("adapter_config.json"),
-                "Missing config: $adapters")
+            assertTrue(
+                adapters.contains("adapter_model.safetensors"),
+                "Missing adapter: $adapters",
+            )
+            assertTrue(
+                adapters.contains("adapter_config.json"),
+                "Missing config: $adapters",
+            )
 
             val m = c.execInContainer("cat", "/tmp/lora-pipeline/metrics.json").stdout
             assertTrue(m.contains(""""status": "ok""""), "Bad metrics: $m")
@@ -76,19 +96,24 @@ class SmolLMFineTuneFunctionalTest {
     @DisplayName("missing model directory → non-zero exit")
     fun missingModel() {
         withContainer(name = "smollm-nomodel", withModel = false) { c ->
-            val r = c.execInContainer(
-                "python3", "/scripts/fine_tune.py",
-                "--model-dir", "/nonexistent",
-                "--output-dir", "/tmp/lora-err",
-                "--max-steps", "1",
-            )
+            val r =
+                c.execInContainer(
+                    "python3",
+                    "/scripts/fine_tune.py",
+                    "--model-dir",
+                    "/nonexistent",
+                    "--output-dir",
+                    "/tmp/lora-err",
+                    "--max-steps",
+                    "1",
+                )
             logInfo(r)
             assertTrue(r.exitCode != 0, "Expected failure, got ${r.exitCode}")
             assertTrue(
                 r.stderr.contains("model.safetensors not found") ||
-                        r.stdout.contains("model.safetensors not found") ||
-                        r.stderr.contains("ERROR") ||
-                        r.stdout.contains("ERROR"),
+                    r.stdout.contains("model.safetensors not found") ||
+                    r.stderr.contains("ERROR") ||
+                    r.stdout.contains("ERROR"),
                 "Bad error: stdout=${r.stdout} stderr=${r.stderr}",
             )
         }
@@ -101,9 +126,13 @@ class SmolLMFineTuneFunctionalTest {
     private val modelDir: Path = findResource("models/SmolLM2-135M-Instruct", "model.safetensors")
     private val pythonDir: Path = findResource("python", "fine_tune.py")
 
-    private fun findResource(dir: String, marker: String): Path {
-        val url = javaClass.classLoader.getResource("$dir/$marker")
-            ?: error("Resource not found on classpath: $dir/$marker")
+    private fun findResource(
+        dir: String,
+        marker: String,
+    ): Path {
+        val url =
+            javaClass.classLoader.getResource("$dir/$marker")
+                ?: error("Resource not found on classpath: $dir/$marker")
         return Path.of(url.toURI()).parent
     }
 
@@ -142,9 +171,14 @@ class SmolLMFineTuneFunctionalTest {
         }
     }
 
-    private fun ls(container: GenericContainer<*>, path: String): List<String> {
+    private fun ls(
+        container: GenericContainer<*>,
+        path: String,
+    ): List<String> {
         val r = container.execInContainer("find", path, "-type", "f")
-        return r.stdout.lines().filter { it.isNotBlank() }
+        return r.stdout
+            .lines()
+            .filter { it.isNotBlank() }
             .map { it.trimStart('/').substringAfterLast('/') }
     }
 

@@ -6,14 +6,14 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class RuntimeEnvironmentTest {
-
     private fun runtime(
         properties: Map<String, String> = emptyMap(),
         environment: Map<String, String> = emptyMap(),
-    ): RuntimeEnvironment = RuntimeEnvironment.system(
-        property = { properties[it] },
-        environment = { environment[it] },
-    )
+    ): RuntimeEnvironment =
+        RuntimeEnvironment.system(
+            property = { properties[it] },
+            environment = { environment[it] },
+        )
 
     @Test
     fun `test mode is enabled by the plantuml_test_mode property`() {

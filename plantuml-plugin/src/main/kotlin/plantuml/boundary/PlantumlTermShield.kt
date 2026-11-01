@@ -29,7 +29,6 @@ class PlantumlTermShield(
     private val registry: NonTranslatableTermRegistry = NonTranslatableTermRegistry(),
     private val borrowedVocabulary: Set<String> = emptySet(),
 ) {
-
     /**
      * Shields every protected token of [text].
      *
@@ -137,8 +136,7 @@ class PlantumlTermShield(
         return !isIdentifierChar(before) && !isIdentifierChar(after)
     }
 
-    private fun isIdentifierChar(character: Char?): Boolean =
-        character != null && (character.isLetterOrDigit() || character == '_')
+    private fun isIdentifierChar(character: Char?): Boolean = character != null && (character.isLetterOrDigit() || character == '_')
 
     private data class Candidate(
         val start: Int,
@@ -159,23 +157,92 @@ class PlantumlTermShield(
          */
         val TYPE_TERMS: Set<String> =
             setOf(
-                "integer", "int", "long", "short", "byte", "float", "double", "decimal",
-                "boolean", "bool", "char", "void", "null", "true", "false",
-                "string", "String", "Integer", "Long", "Short", "Byte", "Float", "Double",
-                "Boolean", "Char", "Character", "Void", "Any", "Unit", "Nothing", "Number",
-                "Object", "List", "Map", "Set", "Array", "Collection", "Optional", "Result",
-                "Either", "Pair", "Triple", "Duration", "Instant", "LocalDate", "LocalDateTime",
-                "OffsetDateTime", "ZonedDateTime", "UUID", "BigDecimal", "BigInteger",
-                "json", "xml", "yaml", "toml",
+                "integer",
+                "int",
+                "long",
+                "short",
+                "byte",
+                "float",
+                "double",
+                "decimal",
+                "boolean",
+                "bool",
+                "char",
+                "void",
+                "null",
+                "true",
+                "false",
+                "string",
+                "String",
+                "Integer",
+                "Long",
+                "Short",
+                "Byte",
+                "Float",
+                "Double",
+                "Boolean",
+                "Char",
+                "Character",
+                "Void",
+                "Any",
+                "Unit",
+                "Nothing",
+                "Number",
+                "Object",
+                "List",
+                "Map",
+                "Set",
+                "Array",
+                "Collection",
+                "Optional",
+                "Result",
+                "Either",
+                "Pair",
+                "Triple",
+                "Duration",
+                "Instant",
+                "LocalDate",
+                "LocalDateTime",
+                "OffsetDateTime",
+                "ZonedDateTime",
+                "UUID",
+                "BigDecimal",
+                "BigInteger",
+                "json",
+                "xml",
+                "yaml",
+                "toml",
             )
 
         /** Product/company names that must survive any translation. */
         val DOMAIN_TERMS: Set<String> =
             setOf(
-                "cheroliv", "talaria", "edster", "cccp", "opencode", "PlantUML", "Gradle",
-                "Kotlin", "Java", "GitHub", "Maven", "Ollama", "Firebase", "Supabase", "JBake",
-                "AsciiDoc", "Asciidoctor", "Thymeleaf", "Playwright", "FFmpeg", "Remotion",
-                "Manim", "Piper", "espeak", "Docker", "Kubernetes",
+                "cheroliv",
+                "talaria",
+                "edster",
+                "cccp",
+                "opencode",
+                "PlantUML",
+                "Gradle",
+                "Kotlin",
+                "Java",
+                "GitHub",
+                "Maven",
+                "Ollama",
+                "Firebase",
+                "Supabase",
+                "JBake",
+                "AsciiDoc",
+                "Asciidoctor",
+                "Thymeleaf",
+                "Playwright",
+                "FFmpeg",
+                "Remotion",
+                "Manim",
+                "Piper",
+                "espeak",
+                "Docker",
+                "Kubernetes",
             )
 
         private val TERM_PATTERNS =

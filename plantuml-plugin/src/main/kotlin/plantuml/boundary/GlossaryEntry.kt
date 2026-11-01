@@ -6,4 +6,7 @@ package plantuml.boundary
  * @property translation The translated or borrowed form of the term
  * @property strategy The [TranslationStrategy] to apply
  */
-data class GlossaryEntry(val translation: String, val strategy: TranslationStrategy)
+data class GlossaryEntry(
+    val translation: String,
+    val strategy: TranslationStrategy,
+)

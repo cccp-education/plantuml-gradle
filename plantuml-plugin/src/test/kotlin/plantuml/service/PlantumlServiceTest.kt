@@ -1,16 +1,15 @@
 package plantuml.service
 
+import contracts.plantuml.SyntaxValidationResult
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
-import contracts.plantuml.SyntaxValidationResult
 import java.io.File
 import kotlin.test.assertTrue
 
 class PlantumlServiceTest {
-
     private lateinit var plantumlService: PlantumlService
 
     @TempDir
@@ -68,11 +67,10 @@ class PlantumlServiceTest {
     }
 
     // Utility method to create a minimal valid PlantUML
-    private fun createMinimalValidPlantUml(): String {
-        return """
-            @startuml
-            actor User
-            @enduml
+    private fun createMinimalValidPlantUml(): String =
+        """
+        @startuml
+        actor User
+        @enduml
         """.trimIndent()
-    }
 }

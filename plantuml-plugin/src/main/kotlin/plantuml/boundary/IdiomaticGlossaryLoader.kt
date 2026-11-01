@@ -20,10 +20,10 @@ import com.fasterxml.jackson.module.kotlin.kotlinModule
  * ```
  */
 class IdiomaticGlossaryLoader {
-
-    private val mapper = ObjectMapper(YAMLFactory()).apply {
-        registerModule(kotlinModule())
-    }
+    private val mapper =
+        ObjectMapper(YAMLFactory()).apply {
+            registerModule(kotlinModule())
+        }
 
     /**
      * Parses a YAML string into an [IdiomaticGlossary].
@@ -42,8 +42,9 @@ class IdiomaticGlossaryLoader {
             byLanguage.forEach { (language, fields) ->
                 val translation = fields["translation"] ?: term
                 val strategyName = fields["strategy"] ?: "PRESERVE"
-                val strategy = runCatching { TranslationStrategy.valueOf(strategyName) }
-                    .getOrDefault(TranslationStrategy.PRESERVE)
+                val strategy =
+                    runCatching { TranslationStrategy.valueOf(strategyName) }
+                        .getOrDefault(TranslationStrategy.PRESERVE)
                 glossary.register(term, language, GlossaryEntry(translation, strategy))
             }
         }

@@ -13,7 +13,6 @@ import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 class GenerateDiagramDocsTaskTest {
-
     @TempDir
     lateinit var tempDir: File
 
@@ -23,9 +22,11 @@ class GenerateDiagramDocsTaskTest {
 
     @BeforeEach
     fun setup() {
-        project = ProjectBuilder.builder()
-            .withProjectDir(tempDir)
-            .build()
+        project =
+            ProjectBuilder
+                .builder()
+                .withProjectDir(tempDir)
+                .build()
 
         project.pluginManager.apply("education.cccp.plantuml")
         task = project.tasks.getByName("generateDiagramDocs") as GenerateDiagramDocsTask
@@ -58,13 +59,14 @@ class GenerateDiagramDocsTaskTest {
 
     @Test
     fun `should generate prompt for default subgraph`() {
-        val communities = listOf(
-            mapOf(
-                "name" to "service layer",
-                "nodes" to listOf("LlmService", "DiagramProcessor"),
-                "edges" to listOf("LlmService --> DiagramProcessor")
+        val communities =
+            listOf(
+                mapOf(
+                    "name" to "service layer",
+                    "nodes" to listOf("LlmService", "DiagramProcessor"),
+                    "edges" to listOf("LlmService --> DiagramProcessor"),
+                ),
             )
-        )
         createGraphifyOut(communities)
 
         task.generateDocs()
@@ -80,18 +82,19 @@ class GenerateDiagramDocsTaskTest {
 
     @Test
     fun `should generate prompt for specific subgraph via property`() {
-        val communities = listOf(
-            mapOf(
-                "name" to "service layer",
-                "nodes" to listOf("LlmService"),
-                "edges" to emptyList<String>()
-            ),
-            mapOf(
-                "name" to "config layer",
-                "nodes" to listOf("ConfigLoader", "ConfigMerger"),
-                "edges" to listOf("ConfigLoader --> ConfigMerger")
+        val communities =
+            listOf(
+                mapOf(
+                    "name" to "service layer",
+                    "nodes" to listOf("LlmService"),
+                    "edges" to emptyList<String>(),
+                ),
+                mapOf(
+                    "name" to "config layer",
+                    "nodes" to listOf("ConfigLoader", "ConfigMerger"),
+                    "edges" to listOf("ConfigLoader --> ConfigMerger"),
+                ),
             )
-        )
         createGraphifyOut(communities)
         project.extensions.extraProperties.set("plantuml.diagram.subgraph", "config layer")
 
@@ -106,18 +109,19 @@ class GenerateDiagramDocsTaskTest {
 
     @Test
     fun `should generate all prompts when all property is true`() {
-        val communities = listOf(
-            mapOf(
-                "name" to "service layer",
-                "nodes" to listOf("LlmService"),
-                "edges" to emptyList<String>()
-            ),
-            mapOf(
-                "name" to "config layer",
-                "nodes" to listOf("ConfigLoader"),
-                "edges" to emptyList<String>()
+        val communities =
+            listOf(
+                mapOf(
+                    "name" to "service layer",
+                    "nodes" to listOf("LlmService"),
+                    "edges" to emptyList<String>(),
+                ),
+                mapOf(
+                    "name" to "config layer",
+                    "nodes" to listOf("ConfigLoader"),
+                    "edges" to emptyList<String>(),
+                ),
             )
-        )
         createGraphifyOut(communities)
         project.extensions.extraProperties.set("plantuml.diagram.all", "true")
 

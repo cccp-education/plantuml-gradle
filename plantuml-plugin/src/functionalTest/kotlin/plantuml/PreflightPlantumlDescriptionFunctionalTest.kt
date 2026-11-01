@@ -23,7 +23,6 @@ import kotlin.test.assertTrue
  * VALID and INVALID verdicts.
  */
 class PreflightPlantumlDescriptionFunctionalTest {
-
     @field:TempDir
     lateinit var projectDir: File
 
@@ -36,9 +35,12 @@ class PreflightPlantumlDescriptionFunctionalTest {
             wireMock = WireMockServer(WireMockConfiguration.options().dynamicPort())
             wireMock.start()
             wireMock.stubFor(
-                WireMock.get(WireMock.urlEqualTo("/api/tags"))
+                WireMock
+                    .get(WireMock.urlEqualTo("/api/tags"))
                     .willReturn(
-                        WireMock.aResponse().withStatus(200)
+                        WireMock
+                            .aResponse()
+                            .withStatus(200)
                             .withHeader("Content-Type", "application/json")
                             .withBody("""{"models":[]}"""),
                     ),
@@ -54,9 +56,12 @@ class PreflightPlantumlDescriptionFunctionalTest {
 
     private fun stubChat(content: String) {
         wireMock.stubFor(
-            WireMock.post(WireMock.urlEqualTo("/api/chat"))
+            WireMock
+                .post(WireMock.urlEqualTo("/api/chat"))
                 .willReturn(
-                    WireMock.aResponse().withStatus(200)
+                    WireMock
+                        .aResponse()
+                        .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(
                             """{"model":"smollm:135m","message":{"role":"assistant","content":"$content"},"done":true}""",
@@ -69,9 +74,12 @@ class PreflightPlantumlDescriptionFunctionalTest {
     fun resetStubs() {
         wireMock.resetAll()
         wireMock.stubFor(
-            WireMock.get(WireMock.urlEqualTo("/api/tags"))
+            WireMock
+                .get(WireMock.urlEqualTo("/api/tags"))
                 .willReturn(
-                    WireMock.aResponse().withStatus(200)
+                    WireMock
+                        .aResponse()
+                        .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody("""{"models":[]}"""),
                 ),
@@ -100,7 +108,8 @@ class PreflightPlantumlDescriptionFunctionalTest {
     }
 
     private fun runner(vararg args: String): GradleRunner =
-        GradleRunner.create()
+        GradleRunner
+            .create()
             .forwardOutput()
             .withPluginClasspath()
             .withArguments(*args)
@@ -121,12 +130,13 @@ class PreflightPlantumlDescriptionFunctionalTest {
     fun `passes when the description is valid`() {
         writeProject()
         stubChat("VALID")
-        val result = runner(
-            "preflightPlantumlDescription",
-            "-Pplantuml.langchain4j.preflight=true",
-            "-Pplantuml.description=C4 context of the API gateway",
-            "--console=plain",
-        ).build()
+        val result =
+            runner(
+                "preflightPlantumlDescription",
+                "-Pplantuml.langchain4j.preflight=true",
+                "-Pplantuml.description=C4 context of the API gateway",
+                "--console=plain",
+            ).build()
         assertEquals(
             TaskOutcome.SUCCESS,
             result.task(":preflightPlantumlDescription")?.outcome,
@@ -138,12 +148,13 @@ class PreflightPlantumlDescriptionFunctionalTest {
     fun `fails with clarifying questions when the description is incomplete`() {
         writeProject()
         stubChat("INVALID\\n1. Which components?\\n2. Which protocols?")
-        val result = runner(
-            "preflightPlantumlDescription",
-            "-Pplantuml.langchain4j.preflight=true",
-            "-Pplantuml.description=some vague idea",
-            "--console=plain",
-        ).buildAndFail()
+        val result =
+            runner(
+                "preflightPlantumlDescription",
+                "-Pplantuml.langchain4j.preflight=true",
+                "-Pplantuml.description=some vague idea",
+                "--console=plain",
+            ).buildAndFail()
         assertEquals(
             TaskOutcome.FAILED,
             result.task(":preflightPlantumlDescription")?.outcome,

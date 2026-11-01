@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test
  * DIA-04 — robust extraction of diagram source from a raw LLM response.
  */
 class LlmCodeExtractorTest {
-
     @Test
     fun `strips a fenced block with a language tag`() {
         val response = "```plantuml\n@startuml\nA --> B\n@enduml\n```"

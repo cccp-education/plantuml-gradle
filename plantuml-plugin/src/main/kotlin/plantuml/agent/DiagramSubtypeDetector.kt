@@ -11,25 +11,25 @@ package plantuml.agent
  * ambiguous.
  */
 object DiagramSubtypeDetector {
-
     enum class Subtype { CONTEXT, CONTAINER, COMPONENT, SEQUENCE, ACTIVITY, CLASS, UNKNOWN }
 
-    private val RULES: List<Pair<Subtype, Regex>> = listOf(
-        Subtype.SEQUENCE to Regex("(?i)\\bsequence\\b"),
-        Subtype.CONTEXT to Regex("(?i)\\bc4\\b[^\\n]*\\bcontext\\b|\\bcontext diagram\\b"),
-        Subtype.CONTAINER to Regex("(?i)\\bcontainer\\b"),
-        Subtype.COMPONENT to Regex("(?i)\\bcomponent\\b"),
-        Subtype.ACTIVITY to Regex("(?i)\\bactivity\\b|\\bworkflow\\b|\\bflow ?chart\\b"),
-        Subtype.CLASS to Regex("(?i)\\bclass diagram\\b|\\buml class\\b"),
-    )
+    private val RULES: List<Pair<Subtype, Regex>> =
+        listOf(
+            Subtype.SEQUENCE to Regex("(?i)\\bsequence\\b"),
+            Subtype.CONTEXT to Regex("(?i)\\bc4\\b[^\\n]*\\bcontext\\b|\\bcontext diagram\\b"),
+            Subtype.CONTAINER to Regex("(?i)\\bcontainer\\b"),
+            Subtype.COMPONENT to Regex("(?i)\\bcomponent\\b"),
+            Subtype.ACTIVITY to Regex("(?i)\\bactivity\\b|\\bworkflow\\b|\\bflow ?chart\\b"),
+            Subtype.CLASS to Regex("(?i)\\bclass diagram\\b|\\buml class\\b"),
+        )
 
     /** Returns the first matching subtype, or [Subtype.UNKNOWN]. */
-    fun detect(description: String): Subtype =
-        RULES.firstOrNull { it.second.containsMatchIn(description) }?.first ?: Subtype.UNKNOWN
+    fun detect(description: String): Subtype = RULES.firstOrNull { it.second.containsMatchIn(description) }?.first ?: Subtype.UNKNOWN
 
     /** A short English hint to steer the LLM, or `null` when the subtype is unknown. */
-    fun hint(description: String): String? = when (val subtype = detect(description)) {
-        Subtype.UNKNOWN -> null
-        else -> "Prefer a ${subtype.name.lowercase()} diagram."
-    }
+    fun hint(description: String): String? =
+        when (val subtype = detect(description)) {
+            Subtype.UNKNOWN -> null
+            else -> "Prefer a ${subtype.name.lowercase()} diagram."
+        }
 }

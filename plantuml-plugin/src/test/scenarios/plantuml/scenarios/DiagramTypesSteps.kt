@@ -2,36 +2,39 @@ package plantuml.scenarios
 
 import io.cucumber.java.en.Given
 import io.cucumber.java.en.Then
-import io.cucumber.java.en.When
-import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import java.io.File
 
-class DiagramTypesSteps(private val world: PlantumlWorld) {
-
+class DiagramTypesSteps(
+    private val world: PlantumlWorld,
+) {
     @Given("a prompt file {string} with content:")
-    fun createPromptFileWithContent(fileName: String, content: String) {
+    fun createPromptFileWithContent(
+        fileName: String,
+        content: String,
+    ) {
         world.createGradleProject()
         world.createPromptFile(fileName, content)
-        
-        val plantumlCode = when {
-            content.contains("sequence", ignoreCase = true) -> 
-                "@startuml\\nactor User\\nparticipant System\\nUser -> System: Login\\n@enduml"
-            content.contains("class", ignoreCase = true) -> 
-                "@startuml\\nclass Book\\nclass Library\\nBook --> Library\\n@enduml"
-            content.contains("component", ignoreCase = true) -> 
-                "@startuml\\ncomponent [API]\\ncomponent [Database]\\n[API] --> [Database]\\n@enduml"
-            content.contains("use case", ignoreCase = true) -> 
-                "@startuml\\nactor User\\nusecase Login\\nUser --> Login\\n@enduml"
-            content.contains("activity", ignoreCase = true) -> 
-                "@startuml\\nstart\\n:Process Order;\\nstop\\n@enduml"
-            content.contains("state", ignoreCase = true) -> 
-                "@startuml\\n[*] --> Red\\nRed --> Green\\n@enduml"
-            content.contains("deployment", ignoreCase = true) -> 
-                "@startuml\\nnode Cloud\\nnode DB\\nCloud --> DB\\n@enduml"
-            else -> "@startuml\\nactor User\\n@enduml"
-        }
-        
+
+        val plantumlCode =
+            when {
+                content.contains("sequence", ignoreCase = true) ->
+                    "@startuml\\nactor User\\nparticipant System\\nUser -> System: Login\\n@enduml"
+                content.contains("class", ignoreCase = true) ->
+                    "@startuml\\nclass Book\\nclass Library\\nBook --> Library\\n@enduml"
+                content.contains("component", ignoreCase = true) ->
+                    "@startuml\\ncomponent [API]\\ncomponent [Database]\\n[API] --> [Database]\\n@enduml"
+                content.contains("use case", ignoreCase = true) ->
+                    "@startuml\\nactor User\\nusecase Login\\nUser --> Login\\n@enduml"
+                content.contains("activity", ignoreCase = true) ->
+                    "@startuml\\nstart\\n:Process Order;\\nstop\\n@enduml"
+                content.contains("state", ignoreCase = true) ->
+                    "@startuml\\n[*] --> Red\\nRed --> Green\\n@enduml"
+                content.contains("deployment", ignoreCase = true) ->
+                    "@startuml\\nnode Cloud\\nnode DB\\nCloud --> DB\\n@enduml"
+                else -> "@startuml\\nactor User\\n@enduml"
+            }
+
         world.startMockLlm(
             """
             {
@@ -40,7 +43,7 @@ class DiagramTypesSteps(private val world: PlantumlWorld) {
                 "description": "Generated diagram"
               }
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -55,18 +58,21 @@ class DiagramTypesSteps(private val world: PlantumlWorld) {
                     "@startuml",
                     "@enduml",
                     "participant",
-                    "actor"
+                    "actor",
                 )
             }
         }
         assertThat(world.buildResult?.output).containsAnyOf(
             "BUILD SUCCESSFUL",
-            "Processing"
+            "Processing",
         )
     }
 
     @Then("contain {string} or {string} keywords")
-    fun containKeywords(keyword1: String, keyword2: String) {
+    fun containKeywords(
+        keyword1: String,
+        keyword2: String,
+    ) {
         val diagramsDir = File(world.projectDir, "generated/diagrams")
         if (diagramsDir.exists()) {
             val pumlFiles = diagramsDir.listFiles { file -> file.extension == "puml" }
@@ -87,13 +93,13 @@ class DiagramTypesSteps(private val world: PlantumlWorld) {
                 assertThat(content).containsAnyOf(
                     "@startuml",
                     "@enduml",
-                    "class"
+                    "class",
                 )
             }
         }
         assertThat(world.buildResult?.output).containsAnyOf(
             "BUILD SUCCESSFUL",
-            "Processing"
+            "Processing",
         )
     }
 
@@ -110,7 +116,7 @@ class DiagramTypesSteps(private val world: PlantumlWorld) {
                     "-->",
                     "<|--",
                     "*--",
-                    "o--"
+                    "o--",
                 )
             }
         }
@@ -128,18 +134,21 @@ class DiagramTypesSteps(private val world: PlantumlWorld) {
                     "@enduml",
                     "component",
                     "[",
-                    "]"
+                    "]",
                 )
             }
         }
         assertThat(world.buildResult?.output).containsAnyOf(
             "BUILD SUCCESSFUL",
-            "Processing"
+            "Processing",
         )
     }
 
     @Then("contain {string} or {string} notation")
-    fun containComponentNotation(keyword1: String, keyword2: String) {
+    fun containComponentNotation(
+        keyword1: String,
+        keyword2: String,
+    ) {
         val diagramsDir = File(world.projectDir, "generated/diagrams")
         if (diagramsDir.exists()) {
             val pumlFiles = diagramsDir.listFiles { file -> file.extension == "puml" }
@@ -161,18 +170,21 @@ class DiagramTypesSteps(private val world: PlantumlWorld) {
                     "@startuml",
                     "@enduml",
                     "usecase",
-                    "actor"
+                    "actor",
                 )
             }
         }
         assertThat(world.buildResult?.output).containsAnyOf(
             "BUILD SUCCESSFUL",
-            "Processing"
+            "Processing",
         )
     }
 
     @Then("contain {string} and {string} definitions")
-    fun containUsecaseAndActorDefinitions(keyword1: String, keyword2: String) {
+    fun containUsecaseAndActorDefinitions(
+        keyword1: String,
+        keyword2: String,
+    ) {
         val diagramsDir = File(world.projectDir, "generated/diagrams")
         if (diagramsDir.exists()) {
             val pumlFiles = diagramsDir.listFiles { file -> file.extension == "puml" }
@@ -194,18 +206,21 @@ class DiagramTypesSteps(private val world: PlantumlWorld) {
                     "@startuml",
                     "@enduml",
                     "start",
-                    "stop"
+                    "stop",
                 )
             }
         }
         assertThat(world.buildResult?.output).containsAnyOf(
             "BUILD SUCCESSFUL",
-            "Processing"
+            "Processing",
         )
     }
 
     @Then("contain {string}, {string}, and activity nodes")
-    fun containStartStopAndActivityNodes(startKeyword: String, stopKeyword: String) {
+    fun containStartStopAndActivityNodes(
+        startKeyword: String,
+        stopKeyword: String,
+    ) {
         val diagramsDir = File(world.projectDir, "generated/diagrams")
         if (diagramsDir.exists()) {
             val pumlFiles = diagramsDir.listFiles { file -> file.extension == "puml" }
@@ -215,7 +230,7 @@ class DiagramTypesSteps(private val world: PlantumlWorld) {
                     startKeyword,
                     stopKeyword,
                     ":",
-                    "end"
+                    "end",
                 )
             }
         }
@@ -233,13 +248,13 @@ class DiagramTypesSteps(private val world: PlantumlWorld) {
                     "@enduml",
                     "state",
                     "[*",
-                    "*]"
+                    "*]",
                 )
             }
         }
         assertThat(world.buildResult?.output).containsAnyOf(
             "BUILD SUCCESSFUL",
-            "Processing"
+            "Processing",
         )
     }
 
@@ -255,7 +270,7 @@ class DiagramTypesSteps(private val world: PlantumlWorld) {
                     "-->",
                     "--",
                     "[*",
-                    "*]"
+                    "*]",
                 )
             }
         }
@@ -271,13 +286,13 @@ class DiagramTypesSteps(private val world: PlantumlWorld) {
                 assertThat(content).containsAnyOf(
                     "@startuml",
                     "@enduml",
-                    "node"
+                    "node",
                 )
             }
         }
         assertThat(world.buildResult?.output).containsAnyOf(
             "BUILD SUCCESSFUL",
-            "Processing"
+            "Processing",
         )
     }
 
@@ -292,7 +307,7 @@ class DiagramTypesSteps(private val world: PlantumlWorld) {
                     keyword,
                     "artifact",
                     "component",
-                    "cloud"
+                    "cloud",
                 )
             }
         }

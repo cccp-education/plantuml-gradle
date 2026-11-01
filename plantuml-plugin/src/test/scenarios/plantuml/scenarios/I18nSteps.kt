@@ -8,8 +8,9 @@ import org.assertj.core.api.Assertions.assertThat
 import plantuml.PlantumlMessages
 import java.io.File
 
-class I18nSteps(private val world: PlantumlWorld) {
-
+class I18nSteps(
+    private val world: PlantumlWorld,
+) {
     @Given("plantuml-context.yml specifies language {string}")
     fun configSpecifiesLanguage(language: String) {
         world.createGradleProject()
@@ -30,7 +31,7 @@ class I18nSteps(private val world: PlantumlWorld) {
                 modelName: "smollm:135m"
               maxIterations: 5
             language: "$language"
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -56,14 +57,14 @@ class I18nSteps(private val world: PlantumlWorld) {
               maxIterations: 5
             language: "en"
             supportedLanguages: [${langList.joinToString(", ") { "\"$it\"" }}]
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
     @Given("gradle.properties specifies plantuml.language={word}")
     fun gradlePropertiesSpecifiesLanguage(language: String) {
         world.createGradleProject(
-            gradleProperties = mapOf("plantuml.language" to language)
+            gradleProperties = mapOf("plantuml.language" to language),
         )
     }
 
@@ -73,26 +74,27 @@ class I18nSteps(private val world: PlantumlWorld) {
     }
 
     @When("I run generatePlantumlDiagrams task with language override {string}")
-    fun runGeneratePlantumlDiagramsTaskWithLanguageOverride(language: String) = runBlocking {
-        val properties = mutableMapOf<String, String>()
-        world.mockServerPort?.let {
-            properties["plantuml.langchain4j.model"] = "ollama"
-            properties["plantuml.langchain4j.ollama.baseUrl"] = "http://localhost:$it"
-            properties["plantuml.langchain4j.ollama.modelName"] = "smollm:135m"
-        }
-        val systemProperties = mutableMapOf<String, String>()
-        world.projectDir?.let {
-            systemProperties["plugin.project.dir"] = it.absolutePath
-        }
-        properties["plantuml.language"] = language
-        properties["plantuml.test.mode"] = "true"
+    fun runGeneratePlantumlDiagramsTaskWithLanguageOverride(language: String) =
+        runBlocking {
+            val properties = mutableMapOf<String, String>()
+            world.mockServerPort?.let {
+                properties["plantuml.langchain4j.model"] = "ollama"
+                properties["plantuml.langchain4j.ollama.baseUrl"] = "http://localhost:$it"
+                properties["plantuml.langchain4j.ollama.modelName"] = "smollm:135m"
+            }
+            val systemProperties = mutableMapOf<String, String>()
+            world.projectDir?.let {
+                systemProperties["plugin.project.dir"] = it.absolutePath
+            }
+            properties["plantuml.language"] = language
+            properties["plantuml.test.mode"] = "true"
 
-        try {
-            world.executeGradle("generatePlantumlDiagrams", properties = properties, systemProperties = systemProperties)
-        } catch (e: Exception) {
-            world.exception = e
+            try {
+                world.executeGradle("generatePlantumlDiagrams", properties = properties, systemProperties = systemProperties)
+            } catch (e: Exception) {
+                world.exception = e
+            }
         }
-    }
 
     @Then("the resolved language should be {string}")
     fun resolvedLanguageShouldBe(expectedLanguage: String) {
@@ -103,7 +105,11 @@ class I18nSteps(private val world: PlantumlWorld) {
     }
 
     @Then("the supported languages should include {string}, {string}, and {string}")
-    fun supportedLanguagesShouldInclude(lang1: String, lang2: String, lang3: String) {
+    fun supportedLanguagesShouldInclude(
+        lang1: String,
+        lang2: String,
+        lang3: String,
+    ) {
         assertThat(world.buildResult).isNotNull
         val output = world.buildResult!!.output
         assertThat(output).contains("BUILD SUCCESSFUL")
@@ -111,34 +117,46 @@ class I18nSteps(private val world: PlantumlWorld) {
     }
 
     @When("I run the {string} task")
-    fun runTask(taskName: String) = runBlocking {
-        val properties = mutableMapOf<String, String>()
-        val systemProperties = mutableMapOf<String, String>()
-        world.projectDir?.let {
-            systemProperties["plugin.project.dir"] = it.absolutePath
-        }
+    fun runTask(taskName: String) =
+        runBlocking {
+            val properties = mutableMapOf<String, String>()
+            val systemProperties = mutableMapOf<String, String>()
+            world.projectDir?.let {
+                systemProperties["plugin.project.dir"] = it.absolutePath
+            }
 
-        try {
-            world.executeGradle(taskName, properties = properties, systemProperties = systemProperties)
-        } catch (e: Exception) {
-            world.exception = e
+            try {
+                world.executeGradle(taskName, properties = properties, systemProperties = systemProperties)
+            } catch (e: Exception) {
+                world.exception = e
+            }
         }
-    }
 
     @Then("the output should contain the i18n lifecycle message {string} with args {string} in language {string}")
-    fun outputShouldContainI18nLifecycleMessage(key: String, argsRaw: String, language: String) {
+    fun outputShouldContainI18nLifecycleMessage(
+        key: String,
+        argsRaw: String,
+        language: String,
+    ) {
         assertThat(world.buildResult).isNotNull
         val output = world.buildResult!!.output
         assertThat(output).contains("BUILD SUCCESSFUL")
-        val args = argsRaw.removeSurrounding("[", "]").split(",").map { it.trim() }
-            .filter { it.isNotEmpty() }
-            .map { it.toInt() }
+        val args =
+            argsRaw
+                .removeSurrounding("[", "]")
+                .split(",")
+                .map { it.trim() }
+                .filter { it.isNotEmpty() }
+                .map { it.toInt() }
         val expectedMessage = PlantumlMessages.format(key, language, *args.toTypedArray())
         assertThat(output).contains(expectedMessage)
     }
 
     @Then("the output should contain the i18n task description for {string} in language {string}")
-    fun outputShouldContainI18nTaskDescription(taskName: String, language: String) {
+    fun outputShouldContainI18nTaskDescription(
+        taskName: String,
+        language: String,
+    ) {
         assertThat(world.buildResult).isNotNull
         val output = world.buildResult!!.output
         assertThat(output).contains("BUILD SUCCESSFUL")

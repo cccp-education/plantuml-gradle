@@ -6,8 +6,9 @@ import io.cucumber.java.en.When
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 
-class MinimalSteps(private val world: PlantumlWorld) {
-
+class MinimalSteps(
+    private val world: PlantumlWorld,
+) {
     @Given("a new Plantuml project")
     fun createNewPlantumlProject() {
         world.createGradleProject()
@@ -15,13 +16,15 @@ class MinimalSteps(private val world: PlantumlWorld) {
     }
 
     @When("I am executing the task {string}")
-    fun runTaskByName(taskName: String) = runBlocking {
-        world.executeGradle(taskName)
-    }
+    fun runTaskByName(taskName: String) =
+        runBlocking {
+            world.executeGradle(taskName)
+        }
 
     @When("I'm launching the {string} task asynchronously")
     fun launchingAsyncTask(taskName: String) {
-        world.executeGradleAsync(taskName)
+        world
+            .executeGradleAsync(taskName)
             .run(::assertThat)
             .describedAs("The task '$taskName' should be successful")
             .isNotNull

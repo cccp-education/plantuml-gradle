@@ -15,7 +15,7 @@ sealed class IncrementalEvent {
  * @property promptName Name of the skipped prompt (without extension)
  */
 data class PromptSkipped(
-    val promptName: String
+    val promptName: String,
 ) : IncrementalEvent() {
     override val eventType: String = "PROMPT_SKIPPED"
 }
@@ -28,7 +28,7 @@ data class PromptSkipped(
  */
 data class PromptProcessed(
     val promptName: String,
-    val iterations: Int
+    val iterations: Int,
 ) : IncrementalEvent() {
     override val eventType: String = "PROMPT_PROCESSED"
 }
@@ -39,7 +39,7 @@ data class PromptProcessed(
  * @property removedCount Number of files removed
  */
 data class OutputsCleaned(
-    val removedCount: Int
+    val removedCount: Int,
 ) : IncrementalEvent() {
     override val eventType: String = "OUTPUTS_CLEANED"
 }

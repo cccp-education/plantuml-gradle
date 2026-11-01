@@ -7,7 +7,6 @@ import contracts.i18n.TranslationService
 class PlantumlTranslationServiceAdapter(
     private val resolver: TranslationResolver,
 ) : TranslationService {
-
     override fun translate(request: TranslationRequest): TranslationResult {
         val resolved = resolver.resolve(request.sourceText, request.targetLanguage)
         return if (resolved.translated == request.sourceText && resolved.strategy == TranslationStrategy.PRESERVE) {

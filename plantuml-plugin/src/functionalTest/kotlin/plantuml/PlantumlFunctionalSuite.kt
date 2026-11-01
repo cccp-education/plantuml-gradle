@@ -7,9 +7,22 @@ import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assumptions.assumeTrue
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.ClassOrderer.OrderAnnotation
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.MethodOrderer
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Order
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestClassOrder
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.TestMethodOrder
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -51,11 +64,9 @@ import kotlin.test.assertTrue
  */
 @TestClassOrder(OrderAnnotation::class)
 class PlantumlFunctionalSuite {
-
     companion object {
-
         @TempDir
-        @JvmStatic                          // @JvmField was incorrect in the original
+        @JvmStatic // @JvmField was incorrect in the original
         lateinit var sharedProjectDir: File
 
         private lateinit var wireMockServer: WireMockServer
@@ -104,9 +115,11 @@ class PlantumlFunctionalSuite {
 
             // GET /api/tags — handshake Ollama
             wireMockServer.stubFor(
-                WireMock.get(WireMock.urlEqualTo("/api/tags"))
+                WireMock
+                    .get(WireMock.urlEqualTo("/api/tags"))
                     .willReturn(
-                        WireMock.aResponse()
+                        WireMock
+                            .aResponse()
                             .withStatus(200)
                             .withHeader("Content-Type", "application/json")
                             .withBody(
@@ -117,9 +130,11 @@ class PlantumlFunctionalSuite {
 
             // POST /api/chat — endpoint LangChain4j OllamaChatModel (API v1)
             wireMockServer.stubFor(
-                WireMock.post(WireMock.urlEqualTo("/api/chat"))
+                WireMock
+                    .post(WireMock.urlEqualTo("/api/chat"))
                     .willReturn(
-                        WireMock.aResponse()
+                        WireMock
+                            .aResponse()
                             .withStatus(200)
                             .withHeader("Content-Type", "application/json")
                             .withBody(
@@ -139,9 +154,11 @@ class PlantumlFunctionalSuite {
 
             // POST /api/generate — endpoint fallback (API legacy)
             wireMockServer.stubFor(
-                WireMock.post(WireMock.urlEqualTo("/api/generate"))
+                WireMock
+                    .post(WireMock.urlEqualTo("/api/generate"))
                     .willReturn(
-                        WireMock.aResponse()
+                        WireMock
+                            .aResponse()
                             .withStatus(200)
                             .withHeader("Content-Type", "application/json")
                             .withBody(
@@ -223,7 +240,8 @@ class PlantumlFunctionalSuite {
 
         /** Creates a configured GradleRunner on the shared project. */
         fun runner(vararg args: String): GradleRunner =
-            GradleRunner.create()
+            GradleRunner
+                .create()
                 .withProjectDir(sharedProjectDir)
                 .withArguments(*args, "-Pplantuml.output.rag=${sharedProjectDir.absolutePath}/build/plantuml-plugin/generated/rag")
                 .withPluginClasspath()
@@ -243,7 +261,6 @@ class PlantumlFunctionalSuite {
     @DisplayName("Plugin lifecycle")
     @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
     inner class PluginLifecycle {
-
         @BeforeEach
         fun restoreBaseConfig() {
             writeConfigYaml(model = "ollama")
@@ -360,13 +377,14 @@ class PlantumlFunctionalSuite {
         @Order(6)
         @Tag("quick")
         fun `dry-run should list all plantuml tasks without executing them`() {
-            val result = runner(
-                "generatePlantumlDiagrams",
-                "validatePlantumlSyntax",
-                "collectPlantumlIndex",
-                "--dry-run",
-                "--console=plain",
-            ).build()
+            val result =
+                runner(
+                    "generatePlantumlDiagrams",
+                    "validatePlantumlSyntax",
+                    "collectPlantumlIndex",
+                    "--dry-run",
+                    "--console=plain",
+                ).build()
 
             assertTrue(result.output.contains("generatePlantumlDiagrams"))
             assertTrue(result.output.contains("validatePlantumlSyntax"))
@@ -390,7 +408,6 @@ class PlantumlFunctionalSuite {
     @DisplayName("LLM provider configuration")
     @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
     inner class LlmProviderConfiguration {
-
         @BeforeEach
         fun restoreOllamaConfig() {
             writeConfigYaml(model = "ollama")
@@ -408,21 +425,22 @@ class PlantumlFunctionalSuite {
         fun `should handle Ollama configuration correctly via WireMock`() {
             writeConfigYaml(model = "ollama")
 
-            val result = runner(
-                "generatePlantumlDiagrams",
-                "-Dplantuml.test.mode=true",
-                "--stacktrace",
-            ).build()
+            val result =
+                runner(
+                    "generatePlantumlDiagrams",
+                    "-Dplantuml.test.mode=true",
+                    "--stacktrace",
+                ).build()
 
             // WireMock must have received at least one request to /api/chat or /api/generate
             assertTrue(
                 wireMockServer.allServeEvents.any { e ->
                     e.request.url.startsWith("/api/chat") ||
-                            e.request.url.startsWith("/api/generate")
+                        e.request.url.startsWith("/api/generate")
                 } ||
-                        result.output.contains("Processing") ||
-                        result.output.contains("Completed") ||
-                        result.output.contains("prompt"),
+                    result.output.contains("Processing") ||
+                    result.output.contains("Completed") ||
+                    result.output.contains("prompt"),
                 "The plugin must have attempted to call the Ollama endpoint or process prompts",
             )
         }
@@ -440,7 +458,7 @@ class PlantumlFunctionalSuite {
 
             assertTrue(
                 result.output.contains("401") ||
-                        result.output.contains("API key", ignoreCase = true),
+                    result.output.contains("API key", ignoreCase = true),
                 "The plugin must produce a 401 error for Gemini\n${result.output}",
             )
         }
@@ -458,7 +476,7 @@ class PlantumlFunctionalSuite {
 
             assertTrue(
                 result.output.contains("401") ||
-                        result.output.contains("Unauthorized", ignoreCase = true),
+                    result.output.contains("Unauthorized", ignoreCase = true),
                 "The plugin must produce a 401 error for Mistral\n${result.output}",
             )
         }
@@ -476,7 +494,7 @@ class PlantumlFunctionalSuite {
 
             assertTrue(
                 result.output.contains("401") ||
-                        result.output.contains("Incorrect API key", ignoreCase = true),
+                    result.output.contains("Incorrect API key", ignoreCase = true),
                 "The plugin must produce a 401 error for OpenAI\n${result.output}",
             )
         }
@@ -494,7 +512,7 @@ class PlantumlFunctionalSuite {
 
             assertTrue(
                 result.output.contains("401") ||
-                        result.output.contains("x-api-key", ignoreCase = true),
+                    result.output.contains("x-api-key", ignoreCase = true),
                 "The plugin must produce a 401 error for Claude\n${result.output}",
             )
         }
@@ -512,7 +530,7 @@ class PlantumlFunctionalSuite {
 
             assertTrue(
                 result.output.contains("401") ||
-                        result.output.contains("router.huggingface.co", ignoreCase = true),
+                    result.output.contains("router.huggingface.co", ignoreCase = true),
                 "The plugin must produce a 401 error for HuggingFace\n${result.output}",
             )
         }
@@ -530,7 +548,7 @@ class PlantumlFunctionalSuite {
 
             assertTrue(
                 result.output.contains("401") ||
-                        result.output.contains("api.groq.com", ignoreCase = true),
+                    result.output.contains("api.groq.com", ignoreCase = true),
                 "The plugin must produce a 401 error for Groq\n${result.output}",
             )
         }
@@ -545,16 +563,17 @@ class PlantumlFunctionalSuite {
             // All providers declared, but only ollama is active
             writeConfigYaml(model = "ollama")
 
-            val result = runner(
-                "generatePlantumlDiagrams",
-                "-Dplantuml.test.mode=true",
-                "--stacktrace",
-            ).build()
+            val result =
+                runner(
+                    "generatePlantumlDiagrams",
+                    "-Dplantuml.test.mode=true",
+                    "--stacktrace",
+                ).build()
 
             assertTrue(
                 result.output.contains("BUILD SUCCESSFUL") ||
-                        result.output.contains("Processing") ||
-                        result.output.contains("Completed"),
+                    result.output.contains("Processing") ||
+                    result.output.contains("Completed"),
                 "Mixed config with ollama active must succeed\n${result.output}",
             )
         }
@@ -572,7 +591,6 @@ class PlantumlFunctionalSuite {
     @DisplayName("Shared Gradle instance")
     @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
     inner class GradleSharedInstance {
-
         @BeforeEach
         fun ensureBaseConfig() {
             writeConfigYaml(model = "ollama")
@@ -641,7 +659,6 @@ class PlantumlFunctionalSuite {
     @DisplayName("Plugin integration")
     @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
     inner class PluginIntegration {
-
         @BeforeEach
         fun setupIntegrationTest() {
             File(sharedProjectDir, "plantuml-context.yml").writeText(
@@ -685,12 +702,13 @@ class PlantumlFunctionalSuite {
         @Order(2)
         @Tag("quick")
         fun `dry-run should list all tasks without failing`() {
-            val result = runner(
-                "generatePlantumlDiagrams",
-                "validatePlantumlSyntax",
-                "collectPlantumlIndex",
-                "--dry-run",
-            ).build()
+            val result =
+                runner(
+                    "generatePlantumlDiagrams",
+                    "validatePlantumlSyntax",
+                    "collectPlantumlIndex",
+                    "--dry-run",
+                ).build()
             assertTrue(result.output.contains("generatePlantumlDiagrams"))
         }
 
@@ -701,11 +719,12 @@ class PlantumlFunctionalSuite {
             File(sharedProjectDir, "sample.puml").writeText(
                 "@startuml\nclass Car {\n  - String brand\n}\n@enduml",
             )
-            val result = runner(
-                "validatePlantumlSyntax",
-                "-Pplantuml.diagram=sample.puml",
-                "-Dplantuml.test.mode=true",
-            ).build()
+            val result =
+                runner(
+                    "validatePlantumlSyntax",
+                    "-Pplantuml.diagram=sample.puml",
+                    "-Dplantuml.test.mode=true",
+                ).build()
             assertEquals(SUCCESS, result.task(":validatePlantumlSyntax")?.outcome)
             assertTrue(result.output.contains("PlantUML syntax is valid"))
         }
@@ -714,15 +733,16 @@ class PlantumlFunctionalSuite {
         @Order(4)
         @Tag("quick")
         fun `should fail on missing diagram file`() {
-            val result = runner(
-                "validatePlantumlSyntax",
-                "-Pplantuml.diagram=nonexistent.puml",
-                "-Dplantuml.test.mode=true",
-            ).buildAndFail()
+            val result =
+                runner(
+                    "validatePlantumlSyntax",
+                    "-Pplantuml.diagram=nonexistent.puml",
+                    "-Dplantuml.test.mode=true",
+                ).buildAndFail()
             assertTrue(
                 result.output.contains("does not exist", ignoreCase = true) ||
-                        result.output.contains("not found", ignoreCase = true) ||
-                        result.output.contains("No such file", ignoreCase = true),
+                    result.output.contains("not found", ignoreCase = true) ||
+                    result.output.contains("No such file", ignoreCase = true),
             )
         }
 
@@ -733,11 +753,12 @@ class PlantumlFunctionalSuite {
             File(sharedProjectDir, "unicode.puml").writeText(
                 "@startuml\ntitle Diagram with special characters\nactor User\n@enduml",
             )
-            val result = runner(
-                "validatePlantumlSyntax",
-                "-Pplantuml.diagram=unicode.puml",
-                "-Dplantuml.test.mode=true",
-            ).build()
+            val result =
+                runner(
+                    "validatePlantumlSyntax",
+                    "-Pplantuml.diagram=unicode.puml",
+                    "-Dplantuml.test.mode=true",
+                ).build()
             assertEquals(SUCCESS, result.task(":validatePlantumlSyntax")?.outcome)
         }
 
@@ -745,15 +766,16 @@ class PlantumlFunctionalSuite {
         @Order(6)
         @Tag("slow")
         fun `should succeed with pre-existing rag directory`() {
-            val result = runner(
-                "collectPlantumlIndex",
-                "-Dplantuml.test.mode=true",
-            ).build()
+            val result =
+                runner(
+                    "collectPlantumlIndex",
+                    "-Dplantuml.test.mode=true",
+                ).build()
             assertEquals(SUCCESS, result.task(":collectPlantumlIndex")?.outcome)
             assertTrue(
                 result.output.contains("Found") ||
-                        result.output.contains("Indexed") ||
-                        result.output.contains("Processed"),
+                    result.output.contains("Indexed") ||
+                    result.output.contains("Processed"),
             )
         }
 
@@ -803,10 +825,11 @@ class PlantumlFunctionalSuite {
             val ragDir = File(sharedProjectDir, "build/plantuml-plugin/generated/rag")
             File(ragDir, "extra1.puml").writeText("@startuml\nclass Extra1\n@enduml")
             File(ragDir, "extra2.puml").writeText("@startuml\nclass Extra2\n@enduml")
-            val result = runner(
-                "collectPlantumlIndex",
-                "-Dplantuml.test.mode=true",
-            ).build()
+            val result =
+                runner(
+                    "collectPlantumlIndex",
+                    "-Dplantuml.test.mode=true",
+                ).build()
             assertEquals(SUCCESS, result.task(":collectPlantumlIndex")?.outcome)
         }
 
@@ -814,11 +837,12 @@ class PlantumlFunctionalSuite {
         @Order(9)
         @Tag("slow")
         fun `should complete in test mode without calling real llm`() {
-            val result = runner(
-                "generatePlantumlDiagrams",
-                "-Dplantuml.test.mode=true",
-                "--stacktrace",
-            ).build()
+            val result =
+                runner(
+                    "generatePlantumlDiagrams",
+                    "-Dplantuml.test.mode=true",
+                    "--stacktrace",
+                ).build()
             assertEquals(SUCCESS, result.task(":generatePlantumlDiagrams")?.outcome)
             assertTrue(result.output.contains("Processing 1 prompt files"))
         }
@@ -827,11 +851,12 @@ class PlantumlFunctionalSuite {
         @Order(10)
         @Tag("slow")
         fun `command-line model parameter should override config`() {
-            val result = runner(
-                "generatePlantumlDiagrams",
-                "-Pplantuml.langchain4j.model=ollama",
-                "-Dplantuml.test.mode=true",
-            ).build()
+            val result =
+                runner(
+                    "generatePlantumlDiagrams",
+                    "-Pplantuml.langchain4j.model=ollama",
+                    "-Dplantuml.test.mode=true",
+                ).build()
             assertEquals(SUCCESS, result.task(":generatePlantumlDiagrams")?.outcome)
             assertTrue(!result.output.contains("Invalid model configuration"))
         }
@@ -865,8 +890,8 @@ class PlantumlFunctionalSuite {
     @DisplayName("File permissions")
     @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
     inner class FilePermission {
-
-        private val simpleDiagram = """
+        private val simpleDiagram =
+            """
             @startuml
             left to right direction
             actor "Food Critic" as fc
@@ -879,10 +904,11 @@ class PlantumlFunctionalSuite {
             fc --> UC2
             fc --> UC3
             @enduml
-        """.trimIndent()
+            """.trimIndent()
 
         private fun writeConfig(ragDir: String) {
-            File(sharedProjectDir, "plantuml-context.yml").writeText("""
+            File(sharedProjectDir, "plantuml-context.yml").writeText(
+                """
                 input:
                   prompts: "test-prompts"
                 output:
@@ -893,22 +919,26 @@ class PlantumlFunctionalSuite {
                   username: ""
                   password: ""
                   tableName: "embeddings"
-            """.trimIndent())
+                """.trimIndent(),
+            )
         }
 
-        private fun assertContainsPermissionOrNotFoundMessage(output: String, message: String) {
+        private fun assertContainsPermissionOrNotFoundMessage(
+            output: String,
+            message: String,
+        ) {
             assertTrue(
                 output.contains("Permission denied", true) ||
-                        output.contains("Access is denied", true) ||
-                        output.contains("access denied", true) ||
-                        output.contains("Permission non accordée", true) ||
-                        output.contains("Accès refusé", true) ||
-                        output.contains("Unable to read", true) ||
-                        output.contains("Failed to read", true) ||
-                        output.contains("Directory not found", true) ||
-                        output.contains("No such file or directory", true) ||
-                        output.contains("No PlantUML diagrams or training data found", true) ||
-                        output.contains("Created RAG directory", true),
+                    output.contains("Access is denied", true) ||
+                    output.contains("access denied", true) ||
+                    output.contains("Permission non accordée", true) ||
+                    output.contains("Accès refusé", true) ||
+                    output.contains("Unable to read", true) ||
+                    output.contains("Failed to read", true) ||
+                    output.contains("Directory not found", true) ||
+                    output.contains("No such file or directory", true) ||
+                    output.contains("No PlantUML diagrams or training data found", true) ||
+                    output.contains("Created RAG directory", true),
                 message,
             )
         }
@@ -946,10 +976,11 @@ class PlantumlFunctionalSuite {
             }
 
             try {
-                val result = runner(
-                    "validatePlantumlSyntax",
-                    "-Pplantuml.diagram=protected.puml",
-                ).buildAndFail()
+                val result =
+                    runner(
+                        "validatePlantumlSyntax",
+                        "-Pplantuml.diagram=protected.puml",
+                    ).buildAndFail()
 
                 assertContainsPermissionOrNotFoundMessage(
                     result.output,
@@ -978,10 +1009,11 @@ class PlantumlFunctionalSuite {
             diagramFile.setWritable(false)
 
             try {
-                val result = runner(
-                    "validatePlantumlSyntax",
-                    "-Pplantuml.diagram=test.puml",
-                ).build()
+                val result =
+                    runner(
+                        "validatePlantumlSyntax",
+                        "-Pplantuml.diagram=test.puml",
+                    ).build()
 
                 assertTrue(
                     result.output.contains("valid", true),
@@ -1000,24 +1032,29 @@ class PlantumlFunctionalSuite {
             File(sharedProjectDir, "settings.gradle.kts").writeText(
                 """rootProject.name = "plantuml-permission-test"""".trimIndent(),
             )
-            File(sharedProjectDir, "build.gradle.kts").writeText("""
+            File(sharedProjectDir, "build.gradle.kts").writeText(
+                """
                 plugins { id("education.cccp.plantuml") }
                 plantuml { configPath = "plantuml-context.yml" }
-            """.trimIndent())
+                """.trimIndent(),
+            )
 
-            val configContent = """
+            val configContent =
+                """
                 input:
                   prompts: prompts
                 output:
                   rag: /etc/shadow/invalid
-            """.trimIndent()
+                """.trimIndent()
             File(sharedProjectDir, "plantuml-context.yml").writeText(configContent)
 
-            val result = GradleRunner.create()
-                .withProjectDir(sharedProjectDir)
-                .withArguments("collectPlantumlIndex", "-Dplantuml.test.mode=true")
-                .withPluginClasspath()
-                .build()
+            val result =
+                GradleRunner
+                    .create()
+                    .withProjectDir(sharedProjectDir)
+                    .withArguments("collectPlantumlIndex", "-Dplantuml.test.mode=true")
+                    .withPluginClasspath()
+                    .build()
 
             assertContainsPermissionOrNotFoundMessage(
                 result.output,
@@ -1032,23 +1069,27 @@ class PlantumlFunctionalSuite {
             File(sharedProjectDir, "settings.gradle.kts").writeText(
                 """rootProject.name = "plantuml-permission-test"""".trimIndent(),
             )
-            File(sharedProjectDir, "build.gradle.kts").writeText("""
+            File(sharedProjectDir, "build.gradle.kts").writeText(
+                """
                 plugins { id("education.cccp.plantuml") }
                 plantuml { configPath = "plantuml-context.yml" }
-            """.trimIndent())
+                """.trimIndent(),
+            )
 
             writeConfig("nonexistent-rag")
 
-            val result = GradleRunner.create()
-                .withProjectDir(sharedProjectDir)
-                .withArguments("collectPlantumlIndex", "-Dplantuml.test.mode=true")
-                .withPluginClasspath()
-                .build()
+            val result =
+                GradleRunner
+                    .create()
+                    .withProjectDir(sharedProjectDir)
+                    .withArguments("collectPlantumlIndex", "-Dplantuml.test.mode=true")
+                    .withPluginClasspath()
+                    .build()
 
             assertTrue(
                 result.output.contains("No RAG directory found", true) ||
-                        result.output.contains("No PlantUML diagrams or training data found", true) ||
-                        result.output.contains("RAG reindexing complete with 0 diagrams", true),
+                    result.output.contains("No PlantUML diagrams or training data found", true) ||
+                    result.output.contains("RAG reindexing complete with 0 diagrams", true),
                 "Expected missing RAG directory message but got: ${result.output}",
             )
         }
@@ -1064,21 +1105,21 @@ class PlantumlFunctionalSuite {
     @DisplayName("Large files and complex paths")
     @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
     inner class LargeFileAndPath {
-
         private fun buildSmallLargePlantUmlContent(): String =
-            StringBuilder().run {
-                append("@startuml\ntitle Large Diagram Test\n")
-                (1..10).forEach {
-                    append("class Class$it {\n")
-                        .append("  - String field$it\n")
-                        .append("  + void method$it()\n")
-                        .append("}\n\n")
-                }
-                (1..5).forEach {
-                    append("Class$it --> Class${it + 1}\n")
-                }
-                append("@enduml\n")
-            }.toString()
+            StringBuilder()
+                .run {
+                    append("@startuml\ntitle Large Diagram Test\n")
+                    (1..10).forEach {
+                        append("class Class$it {\n")
+                            .append("  - String field$it\n")
+                            .append("  + void method$it()\n")
+                            .append("}\n\n")
+                    }
+                    (1..5).forEach {
+                        append("Class$it --> Class${it + 1}\n")
+                    }
+                    append("@enduml\n")
+                }.toString()
 
         @Test
         @Order(1)
@@ -1113,11 +1154,12 @@ class PlantumlFunctionalSuite {
                 """plugins { id("education.cccp.plantuml") }""".trimIndent(),
             )
 
-            val specialFiles = listOf(
-                "file with spaces.puml",
-                "file-with-dashes.puml",
-                "àccéntéd_nâmë.puml",
-            )
+            val specialFiles =
+                listOf(
+                    "file with spaces.puml",
+                    "file-with-dashes.puml",
+                    "àccéntéd_nâmë.puml",
+                )
 
             try {
                 specialFiles.forEach { filename ->
@@ -1216,7 +1258,6 @@ class PlantumlFunctionalSuite {
     @DisplayName("Network timeouts")
     @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
     inner class NetworkTimeout {
-
         @Test
         @Order(1)
         @Tag("slow")
@@ -1244,15 +1285,17 @@ class PlantumlFunctionalSuite {
                 writeText("Create a simple class diagram")
             }
 
-            val serverThread = Thread {
-                try {
-                    java.net.ServerSocket(12345).use { server ->
-                        server.accept().use { client ->
-                            Thread.sleep(100)
+            val serverThread =
+                Thread {
+                    try {
+                        java.net.ServerSocket(12345).use { server ->
+                            server.accept().use { client ->
+                                Thread.sleep(100)
+                            }
                         }
+                    } catch (_: Exception) {
                     }
-                } catch (_: Exception) { }
-            }
+                }
             serverThread.isDaemon = true
             serverThread.start()
 
@@ -1262,20 +1305,21 @@ class PlantumlFunctionalSuite {
 
                 assertTrue(
                     result.output.contains("timeout", ignoreCase = true) ||
-                            result.output.contains("Connection refused", ignoreCase = true) ||
-                            result.output.contains("Connect timed out", ignoreCase = true) ||
-                            result.output.contains("Read timed out", ignoreCase = true) ||
-                            result.output.contains("Connection reset", ignoreCase = true) ||
-                            result.output.contains("EOF", ignoreCase = true) ||
-                            result.output.contains("unexpected", ignoreCase = true) ||
-                            result.output.contains("Failed to connect", ignoreCase = true),
+                        result.output.contains("Connection refused", ignoreCase = true) ||
+                        result.output.contains("Connect timed out", ignoreCase = true) ||
+                        result.output.contains("Read timed out", ignoreCase = true) ||
+                        result.output.contains("Connection reset", ignoreCase = true) ||
+                        result.output.contains("EOF", ignoreCase = true) ||
+                        result.output.contains("unexpected", ignoreCase = true) ||
+                        result.output.contains("Failed to connect", ignoreCase = true),
                     "Expected network error but got:\n${result.output}",
                 )
             } finally {
                 serverThread.interrupt()
                 try {
                     serverThread.join(1000)
-                } catch (_: Exception) { }
+                } catch (_: Exception) {
+                }
             }
         }
 
@@ -1310,10 +1354,10 @@ class PlantumlFunctionalSuite {
 
             assertTrue(
                 result.output.contains("Connection refused") ||
-                        result.output.contains("connect") ||
-                        result.output.contains("refused") ||
-                        result.output.contains("UnknownHostException") ||
-                        result.output.contains("Failed to connect"),
+                    result.output.contains("connect") ||
+                    result.output.contains("refused") ||
+                    result.output.contains("UnknownHostException") ||
+                    result.output.contains("Failed to connect"),
             )
         }
 
@@ -1348,13 +1392,13 @@ class PlantumlFunctionalSuite {
 
             assertTrue(
                 result.output.contains("UnresolvedAddressException") ||
-                        result.output.contains("UnknownHostException") ||
-                        result.output.contains("DNS") ||
-                        result.output.contains("resolution") ||
-                        result.output.contains("connect") ||
-                        result.output.contains("nonexistent") ||
-                        result.output.contains("Failed to connect") ||
-                        result.output.contains("java.net"),
+                    result.output.contains("UnknownHostException") ||
+                    result.output.contains("DNS") ||
+                    result.output.contains("resolution") ||
+                    result.output.contains("connect") ||
+                    result.output.contains("nonexistent") ||
+                    result.output.contains("Failed to connect") ||
+                    result.output.contains("java.net"),
                 "La sortie ne contient aucun des mots attendus. Contenu de la sortie:\n${result.output}",
             )
         }
@@ -1393,12 +1437,13 @@ class PlantumlFunctionalSuite {
     @DisplayName("Performance")
     @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
     inner class Performance {
-
         private fun stubOllamaChatResponse() {
             wireMockServer.stubFor(
-                WireMock.post(WireMock.urlEqualTo("/api/chat"))
+                WireMock
+                    .post(WireMock.urlEqualTo("/api/chat"))
                     .willReturn(
-                        WireMock.aResponse()
+                        WireMock
+                            .aResponse()
                             .withStatus(200)
                             .withHeader("Content-Type", "application/json")
                             .withBody(
@@ -1443,12 +1488,13 @@ class PlantumlFunctionalSuite {
             File(sharedProjectDir, "test-prompts").apply { mkdirs() }
             File(sharedProjectDir, "test-prompts/minimal.prompt").writeText("Simple diagram")
 
-            val duration = kotlin.system.measureTimeMillis {
-                val result = runner("generatePlantumlDiagrams").build()
+            val duration =
+                kotlin.system.measureTimeMillis {
+                    val result = runner("generatePlantumlDiagrams").build()
 
-                assertTrue(result.output.contains("generatePlantumlDiagrams"), "Task should run")
-                assertTrue(result.output.contains("BUILD SUCCESSFUL"), "Build should succeed")
-            }
+                    assertTrue(result.output.contains("generatePlantumlDiagrams"), "Task should run")
+                    assertTrue(result.output.contains("BUILD SUCCESSFUL"), "Build should succeed")
+                }
 
             assertTrue(duration < 30000, "Processing should complete within 30s: ${duration}ms")
         }
@@ -1466,15 +1512,17 @@ class PlantumlFunctionalSuite {
 
             File(sharedProjectDir, "minimal.puml").writeText("@startuml\nclass A\n@enduml")
 
-            val duration = kotlin.system.measureTimeMillis {
-                val result = runner(
-                    "validatePlantumlSyntax",
-                    "-Pplantuml.diagram=minimal.puml",
-                ).build()
+            val duration =
+                kotlin.system.measureTimeMillis {
+                    val result =
+                        runner(
+                            "validatePlantumlSyntax",
+                            "-Pplantuml.diagram=minimal.puml",
+                        ).build()
 
-                assertTrue(result.output.contains("validatePlantumlSyntax"), "Validation should run")
-                assertTrue(result.output.contains("BUILD SUCCESSFUL"), "Build should succeed")
-            }
+                    assertTrue(result.output.contains("validatePlantumlSyntax"), "Validation should run")
+                    assertTrue(result.output.contains("BUILD SUCCESSFUL"), "Build should succeed")
+                }
 
             assertTrue(duration < 60000, "Validation should complete within 1 minute: ${duration}ms")
         }
@@ -1494,23 +1542,25 @@ class PlantumlFunctionalSuite {
                 File(sharedProjectDir, "diagram$i.puml").writeText("@startuml\nclass A$i\n@enduml")
             }
 
-            val duration = kotlin.system.measureTimeMillis {
-                for (i in 1..2) {
-                    val result = runner(
-                        "validatePlantumlSyntax",
-                        "-Pplantuml.diagram=diagram$i.puml",
-                    ).build()
+            val duration =
+                kotlin.system.measureTimeMillis {
+                    for (i in 1..2) {
+                        val result =
+                            runner(
+                                "validatePlantumlSyntax",
+                                "-Pplantuml.diagram=diagram$i.puml",
+                            ).build()
 
-                    assertTrue(
-                        result.output.contains("validatePlantumlSyntax"),
-                        "Validation should complete for file $i",
-                    )
-                    assertTrue(
-                        result.output.contains("BUILD SUCCESSFUL"),
-                        "Build should succeed for file $i",
-                    )
+                        assertTrue(
+                            result.output.contains("validatePlantumlSyntax"),
+                            "Validation should complete for file $i",
+                        )
+                        assertTrue(
+                            result.output.contains("BUILD SUCCESSFUL"),
+                            "Build should succeed for file $i",
+                        )
+                    }
                 }
-            }
 
             assertTrue(
                 duration < 120000,
@@ -1553,12 +1603,13 @@ class PlantumlFunctionalSuite {
             File(sharedProjectDir, "min").apply { mkdirs() }
             File(sharedProjectDir, "min/x.prompt").writeText("Y")
 
-            val duration = kotlin.system.measureTimeMillis {
-                val result = runner("generatePlantumlDiagrams").build()
+            val duration =
+                kotlin.system.measureTimeMillis {
+                    val result = runner("generatePlantumlDiagrams").build()
 
-                assertTrue(result.output.contains("generatePlantumlDiagrams"), "Should run")
-                assertTrue(result.output.contains("BUILD SUCCESSFUL"), "Build should succeed")
-            }
+                    assertTrue(result.output.contains("generatePlantumlDiagrams"), "Should run")
+                    assertTrue(result.output.contains("BUILD SUCCESSFUL"), "Build should succeed")
+                }
 
             assertTrue(duration < 30000, "Should complete within 30s: ${duration}ms")
         }
@@ -1575,25 +1626,26 @@ class PlantumlFunctionalSuite {
     @TestClassOrder(OrderAnnotation::class)
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     inner class RealInfrastructure {
-
         private val ollamaUrl = "http://localhost:11438"
         private val ollamaModel = "smollm:135m-instruct-v0.2-q8_0"
         private var ollamaAvailable = false
 
         @BeforeAll
         fun checkOllamaAvailability() {
-            ollamaAvailable = try {
-                val conn = URI("$ollamaUrl/api/tags").toURL().openConnection() as HttpURLConnection
-                conn.connectTimeout = 2000
-                conn.readTimeout = 2000
-                conn.responseCode == 200
-            } catch (_: Exception) {
-                false
-            }
+            ollamaAvailable =
+                try {
+                    val conn = URI("$ollamaUrl/api/tags").toURL().openConnection() as HttpURLConnection
+                    conn.connectTimeout = 2000
+                    conn.readTimeout = 2000
+                    conn.responseCode == 200
+                } catch (_: Exception) {
+                    false
+                }
         }
 
         private fun runner(vararg args: String): GradleRunner =
-            GradleRunner.create()
+            GradleRunner
+                .create()
                 .withProjectDir(sharedProjectDir)
                 .withArguments(*args, "--stacktrace")
                 .withPluginClasspath()!!
@@ -1602,7 +1654,6 @@ class PlantumlFunctionalSuite {
         @Order(1)
         @DisplayName("LLM handshake")
         inner class LlmHandshake {
-
             @BeforeEach
             fun requireOllama() {
                 assumeTrue(ollamaAvailable, "Ollama not available at $ollamaUrl — skipping real-llm tests")
@@ -1618,12 +1669,14 @@ class PlantumlFunctionalSuite {
             @Test
             @Ignore("Requires real Ollama model configured and running")
             fun `should create chat model without exception`() {
-                val config = PlantumlConfig(
-                    langchain4j = LangchainConfig(
-                        model = "ollama",
-                        ollama = OllamaConfig(ollamaUrl, ollamaModel),
-                    ),
-                )
+                val config =
+                    PlantumlConfig(
+                        langchain4j =
+                            LangchainConfig(
+                                model = "ollama",
+                                ollama = OllamaConfig(ollamaUrl, ollamaModel),
+                            ),
+                    )
                 LlmService(config).createChatModel()
             }
         }
@@ -1632,7 +1685,6 @@ class PlantumlFunctionalSuite {
         @Order(2)
         @DisplayName("Real prompt processing")
         inner class RealPromptProcessing {
-
             @BeforeEach
             fun requireOllama() {
                 assumeTrue(ollamaAvailable, "Ollama not available — skipping")
@@ -1689,7 +1741,6 @@ class PlantumlFunctionalSuite {
         @Order(3)
         @DisplayName("Network failure handling")
         inner class NetworkFailure {
-
             @Test
             @Ignore("Tests unreachable LLM endpoint — needs network isolation")
             fun `should fail gracefully when llm endpoint is unreachable`() {
@@ -1719,17 +1770,19 @@ class PlantumlFunctionalSuite {
                 File(subDir, "prompts").mkdirs()
                 File(subDir, "prompts/test.prompt").writeText("A diagram")
 
-                val result = GradleRunner.create()
-                    .withProjectDir(subDir)
-                    .withArguments("generatePlantumlDiagrams", "--stacktrace")
-                    .withPluginClasspath()
-                    .buildAndFail()
+                val result =
+                    GradleRunner
+                        .create()
+                        .withProjectDir(subDir)
+                        .withArguments("generatePlantumlDiagrams", "--stacktrace")
+                        .withPluginClasspath()
+                        .buildAndFail()
 
                 assertTrue(
                     result.output.contains("Connection refused", ignoreCase = true) ||
-                            result.output.contains("connect", ignoreCase = true) ||
-                            result.output.contains("refused", ignoreCase = true) ||
-                            result.output.contains("timeout", ignoreCase = true),
+                        result.output.contains("connect", ignoreCase = true) ||
+                        result.output.contains("refused", ignoreCase = true) ||
+                        result.output.contains("timeout", ignoreCase = true),
                 )
             }
         }
@@ -1738,7 +1791,6 @@ class PlantumlFunctionalSuite {
         @Order(4)
         @DisplayName("File permission handling")
         inner class FilePermissions {
-
             @BeforeEach
             fun requireUnix() {
                 assumeTrue(File.separator == "/", "File permission tests require Unix")
@@ -1753,15 +1805,16 @@ class PlantumlFunctionalSuite {
                 try {
                     file.setReadable(false)
 
-                    val result = runner(
-                        "validatePlantumlSyntax",
-                        "-Pplantuml.diagram=protected.puml",
-                    ).buildAndFail()
+                    val result =
+                        runner(
+                            "validatePlantumlSyntax",
+                            "-Pplantuml.diagram=protected.puml",
+                        ).buildAndFail()
 
                     assertTrue(
                         result.output.contains("Permission denied", ignoreCase = true) ||
-                                result.output.contains("Unable to read", ignoreCase = true) ||
-                                result.output.contains("does not exist", ignoreCase = true),
+                            result.output.contains("Unable to read", ignoreCase = true) ||
+                            result.output.contains("does not exist", ignoreCase = true),
                     )
                 } finally {
                     file.setReadable(true)
@@ -1780,7 +1833,6 @@ class PlantumlFunctionalSuite {
     @DisplayName("RAG task")
     @Tag("rag-heavy")
     inner class RagTask {
-
         @BeforeEach
         fun setupRagTest() {
             File(sharedProjectDir, "settings.gradle.kts").writeText(
@@ -1808,7 +1860,10 @@ class PlantumlFunctionalSuite {
             return ragDir
         }
 
-        private fun createDiagramFile(name: String, content: String) {
+        private fun createDiagramFile(
+            name: String,
+            content: String,
+        ) {
             val file = File(File(sharedProjectDir, "generated/rag"), name)
             file.writeText(content)
         }
@@ -1846,8 +1901,8 @@ class PlantumlFunctionalSuite {
             assertEquals(SUCCESS, result.task(":collectPlantumlIndex")?.outcome)
             assertTrue(
                 result.output.contains("RAG") ||
-                        result.output.contains("No PlantUML") ||
-                        result.output.contains("Created"),
+                    result.output.contains("No PlantUML") ||
+                    result.output.contains("Created"),
             )
         }
 
@@ -1935,7 +1990,14 @@ class PlantumlFunctionalSuite {
             createRagDirectory()
             createDiagramFile("test.puml", "@startuml\nclass Fallback\n@enduml")
 
-            val result = runner("collectPlantumlIndex", "-Prag.mode=database", "-Pplantuml.rag.databaseUrl=invalid-host", "-Pplantuml.rag.username=invalid", "-Pplantuml.rag.password=invalid").buildAndFail()
+            val result =
+                runner(
+                    "collectPlantumlIndex",
+                    "-Prag.mode=database",
+                    "-Pplantuml.rag.databaseUrl=invalid-host",
+                    "-Pplantuml.rag.username=invalid",
+                    "-Pplantuml.rag.password=invalid",
+                ).buildAndFail()
 
             assertTrue(result.output.contains("BUILD FAILED") || result.output.contains("FAILURE"))
         }
@@ -1961,7 +2023,6 @@ class PlantumlFunctionalSuite {
     @DisplayName("API Key Pool Rotation")
     @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
     inner class ApiKeyPoolRotation {
-
         @BeforeEach
         fun setupApiKeyPoolConfig() {
             File(sharedProjectDir, "settings.gradle.kts").writeText(
@@ -2016,17 +2077,18 @@ class PlantumlFunctionalSuite {
             File(sharedProjectDir, "test-prompts/pool-test.prompt")
                 .writeText("Create a simple class diagram")
 
-            val result = runner(
-                "generatePlantumlDiagrams",
-                "-Dplantuml.test.mode=true",
-                "--stacktrace",
-            ).build()
+            val result =
+                runner(
+                    "generatePlantumlDiagrams",
+                    "-Dplantuml.test.mode=true",
+                    "--stacktrace",
+                ).build()
 
             assertEquals(SUCCESS, result.task(":generatePlantumlDiagrams")?.outcome)
             assertTrue(
                 result.output.contains("BUILD SUCCESSFUL") ||
-                        result.output.contains("Processing") ||
-                        result.output.contains("prompt"),
+                    result.output.contains("Processing") ||
+                    result.output.contains("prompt"),
                 "Configuration avec pool API doit réussir\n${result.output}",
             )
         }
@@ -2036,10 +2098,12 @@ class PlantumlFunctionalSuite {
         @Tag("quick")
         fun `should handle round robin rotation with WireMock`() {
             wireMockServer.stubFor(
-                WireMock.post(WireMock.urlEqualTo("/api/chat"))
+                WireMock
+                    .post(WireMock.urlEqualTo("/api/chat"))
                     .withRequestBody(WireMock.matching(".*"))
                     .willReturn(
-                        WireMock.aResponse()
+                        WireMock
+                            .aResponse()
                             .withStatus(200)
                             .withHeader("Content-Type", "application/json")
                             .withBody(
@@ -2085,11 +2149,12 @@ class PlantumlFunctionalSuite {
             File(sharedProjectDir, "test-prompts/rotation.prompt")
                 .writeText("Create a class diagram with rotation test")
 
-            val result = runner(
-                "generatePlantumlDiagrams",
-                "-Dplantuml.test.mode=true",
-                "--stacktrace",
-            ).build()
+            val result =
+                runner(
+                    "generatePlantumlDiagrams",
+                    "-Dplantuml.test.mode=true",
+                    "--stacktrace",
+                ).build()
 
             assertEquals(SUCCESS, result.task(":generatePlantumlDiagrams")?.outcome)
             assertTrue(
@@ -2103,20 +2168,24 @@ class PlantumlFunctionalSuite {
         @Tag("quick")
         fun `should fallback to next key when first key fails with 401`() {
             wireMockServer.stubFor(
-                WireMock.post(WireMock.urlEqualTo("/api/chat"))
+                WireMock
+                    .post(WireMock.urlEqualTo("/api/chat"))
                     .withRequestBody(WireMock.matching(".*key1.*"))
                     .willReturn(
-                        WireMock.aResponse()
+                        WireMock
+                            .aResponse()
                             .withStatus(401)
                             .withBody("""{"error": "Unauthorized - Invalid API key"}"""),
                     ),
             )
 
             wireMockServer.stubFor(
-                WireMock.post(WireMock.urlEqualTo("/api/chat"))
+                WireMock
+                    .post(WireMock.urlEqualTo("/api/chat"))
                     .withRequestBody(WireMock.matching(".*key2.*"))
                     .willReturn(
-                        WireMock.aResponse()
+                        WireMock
+                            .aResponse()
                             .withStatus(200)
                             .withHeader("Content-Type", "application/json")
                             .withBody(
@@ -2147,11 +2216,12 @@ class PlantumlFunctionalSuite {
             File(sharedProjectDir, "test-prompts/fallback.prompt")
                 .writeText("Create a diagram with fallback test")
 
-            val result = runner(
-                "generatePlantumlDiagrams",
-                "-Dplantuml.test.mode=true",
-                "--stacktrace",
-            ).build()
+            val result =
+                runner(
+                    "generatePlantumlDiagrams",
+                    "-Dplantuml.test.mode=true",
+                    "--stacktrace",
+                ).build()
 
             assertEquals(SUCCESS, result.task(":generatePlantumlDiagrams")?.outcome)
         }
@@ -2161,9 +2231,11 @@ class PlantumlFunctionalSuite {
         @Tag("quick")
         fun `should log which API key is being used`() {
             wireMockServer.stubFor(
-                WireMock.post(WireMock.urlEqualTo("/api/chat"))
+                WireMock
+                    .post(WireMock.urlEqualTo("/api/chat"))
                     .willReturn(
-                        WireMock.aResponse()
+                        WireMock
+                            .aResponse()
                             .withStatus(200)
                             .withHeader("Content-Type", "application/json")
                             .withBody(
@@ -2201,19 +2273,20 @@ class PlantumlFunctionalSuite {
             File(sharedProjectDir, "test-prompts/logging.prompt")
                 .writeText("Create a diagram with logging test")
 
-            val result = runner(
-                "generatePlantumlDiagrams",
-                "-Dplantuml.test.mode=true",
-                "--info",
-            ).build()
+            val result =
+                runner(
+                    "generatePlantumlDiagrams",
+                    "-Dplantuml.test.mode=true",
+                    "--info",
+                ).build()
 
             assertEquals(SUCCESS, result.task(":generatePlantumlDiagrams")?.outcome)
             assertTrue(
                 result.output.contains("Using API key") ||
-                        result.output.contains("ollama-logged-key") ||
-                        result.output.contains("Logged Key Test") ||
-                        result.output.contains("Processing") ||
-                        result.output.contains("prompt"),
+                    result.output.contains("ollama-logged-key") ||
+                    result.output.contains("Logged Key Test") ||
+                    result.output.contains("Processing") ||
+                    result.output.contains("prompt"),
                 "Doit logger l'utilisation de la clé API\n${result.output}",
             )
         }
@@ -2223,9 +2296,11 @@ class PlantumlFunctionalSuite {
         @Tag("quick")
         fun `should handle multiple providers with separate pools`() {
             wireMockServer.stubFor(
-                WireMock.post(WireMock.urlEqualTo("/api/chat"))
+                WireMock
+                    .post(WireMock.urlEqualTo("/api/chat"))
                     .willReturn(
-                        WireMock.aResponse()
+                        WireMock
+                            .aResponse()
                             .withStatus(200)
                             .withHeader("Content-Type", "application/json")
                             .withBody(
@@ -2279,17 +2354,18 @@ class PlantumlFunctionalSuite {
             File(sharedProjectDir, "test-prompts/multi-provider.prompt")
                 .writeText("Create a diagram with multi-provider config")
 
-            val result = runner(
-                "generatePlantumlDiagrams",
-                "-Dplantuml.test.mode=true",
-                "--stacktrace",
-            ).build()
+            val result =
+                runner(
+                    "generatePlantumlDiagrams",
+                    "-Dplantuml.test.mode=true",
+                    "--stacktrace",
+                ).build()
 
             assertEquals(SUCCESS, result.task(":generatePlantumlDiagrams")?.outcome)
             assertTrue(
                 result.output.contains("BUILD SUCCESSFUL") ||
-                        result.output.contains("Processing") ||
-                        result.output.contains("prompt"),
+                    result.output.contains("Processing") ||
+                    result.output.contains("prompt"),
                 "Configuration multi-providers doit réussir\n${result.output}",
             )
         }
@@ -2299,9 +2375,11 @@ class PlantumlFunctionalSuite {
         @Tag("quick")
         fun `should respect quota threshold before rotation`() {
             wireMockServer.stubFor(
-                WireMock.post(WireMock.urlEqualTo("/api/chat"))
+                WireMock
+                    .post(WireMock.urlEqualTo("/api/chat"))
                     .willReturn(
-                        WireMock.aResponse()
+                        WireMock
+                            .aResponse()
                             .withStatus(200)
                             .withHeader("Content-Type", "application/json")
                             .withBody(
@@ -2353,18 +2431,19 @@ class PlantumlFunctionalSuite {
             File(sharedProjectDir, "test-prompts/quota.prompt")
                 .writeText("Create a diagram with quota test")
 
-            val result = runner(
-                "generatePlantumlDiagrams",
-                "-Dplantuml.test.mode=true",
-                "--stacktrace",
-            ).build()
+            val result =
+                runner(
+                    "generatePlantumlDiagrams",
+                    "-Dplantuml.test.mode=true",
+                    "--stacktrace",
+                ).build()
 
             assertEquals(SUCCESS, result.task(":generatePlantumlDiagrams")?.outcome)
             assertTrue(
                 result.output.contains("quota") ||
-                        result.output.contains("Processing") ||
-                        result.output.contains("prompt") ||
-                        result.output.contains("BUILD SUCCESSFUL"),
+                    result.output.contains("Processing") ||
+                    result.output.contains("prompt") ||
+                    result.output.contains("BUILD SUCCESSFUL"),
                 "Configuration avec quota doit réussir\n${result.output}",
             )
         }

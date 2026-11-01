@@ -9,9 +9,11 @@ package plantuml.agent
  * l'Économie d'Encre: never burn an LLM/vision call that cannot change the outcome.
  */
 object DesignConvergence {
-
     /** True when the current feedback is identical to the previous one (no progress). */
-    fun isConverged(previous: String?, current: String): Boolean {
+    fun isConverged(
+        previous: String?,
+        current: String,
+    ): Boolean {
         if (previous == null) return false
         return previous.trim().equals(current.trim(), ignoreCase = true)
     }

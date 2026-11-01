@@ -7,7 +7,6 @@ package plantuml.boundary
  * regardless of their classification.
  */
 class NonTranslatableTermRegistry {
-
     private val terms: MutableSet<String> = mutableSetOf()
 
     /**

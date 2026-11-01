@@ -18,11 +18,11 @@ package plantuml.agent
  * `processor.malformed_json`).
  */
 object LlmCodeExtractor {
-
-    private val FENCE = Regex(
-        pattern = "```[^\\n]*\\n(.*?)(?:\\n?```|\\z)",
-        option = RegexOption.DOT_MATCHES_ALL,
-    )
+    private val FENCE =
+        Regex(
+            pattern = "```[^\\n]*\\n(.*?)(?:\\n?```|\\z)",
+            option = RegexOption.DOT_MATCHES_ALL,
+        )
 
     private const val START = "@startuml"
     private const val END = "@enduml"

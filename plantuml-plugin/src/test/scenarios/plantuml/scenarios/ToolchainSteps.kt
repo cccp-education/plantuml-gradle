@@ -14,7 +14,6 @@ import kotlin.text.Charsets.UTF_8
  * S-088 — the shared `plantuml.scenarios` glue package).
  */
 class ToolchainSteps {
-
     private val pluginDir = File(System.getProperty("user.dir")).absoluteFile
 
     @Given("the governed PlantUML toolchain")
@@ -40,7 +39,10 @@ class ToolchainSteps {
             .isEqualTo(reference.diagramPlantumlVersion)
     }
 
-    private fun versionOf(toml: String, key: String): String =
+    private fun versionOf(
+        toml: String,
+        key: String,
+    ): String =
         toml
             .lineSequence()
             .map { it.substringBefore('#').trim() }

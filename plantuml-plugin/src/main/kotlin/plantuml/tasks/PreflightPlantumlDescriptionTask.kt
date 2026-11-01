@@ -31,7 +31,6 @@ import plantuml.service.LlmService
  */
 @DisableCachingByDefault(because = "Pre-flight involves an LLM call and depends on external input")
 abstract class PreflightPlantumlDescriptionTask : DefaultTask() {
-
     init {
         group = "verification"
         description = "Validates a diagram description before generation (opt-in langchain4j.preflight)"
@@ -45,8 +44,9 @@ abstract class PreflightPlantumlDescriptionTask : DefaultTask() {
     fun preflight() {
         val config = PlantumlManager.Configuration.load(project)
 
-        val enabled = (project.findProperty("plantuml.langchain4j.preflight") as? String)?.toBoolean()
-            ?: config.langchain4j.preflight
+        val enabled =
+            (project.findProperty("plantuml.langchain4j.preflight") as? String)?.toBoolean()
+                ?: config.langchain4j.preflight
         if (!enabled) {
             logger.lifecycle("preflightPlantumlDescription: disabled (enable with plantuml.langchain4j.preflight=true)")
             return
@@ -64,14 +64,15 @@ abstract class PreflightPlantumlDescriptionTask : DefaultTask() {
             return
         }
 
-        val verdict = try {
-            DescriptionPreflight.parse(
-                chatModel.chat(DescriptionPreflight.prompt(text, DiagramSubtypeDetector.hint(text)))
-            )
-        } catch (e: Exception) {
-            logger.warn("preflightPlantumlDescription: LLM error, treating description as valid (fail-safe): ${e.message}")
-            PreflightVerdict.Valid
-        }
+        val verdict =
+            try {
+                DescriptionPreflight.parse(
+                    chatModel.chat(DescriptionPreflight.prompt(text, DiagramSubtypeDetector.hint(text))),
+                )
+            } catch (e: Exception) {
+                logger.warn("preflightPlantumlDescription: LLM error, treating description as valid (fail-safe): ${e.message}")
+                PreflightVerdict.Valid
+            }
 
         when (verdict) {
             is PreflightVerdict.Valid ->

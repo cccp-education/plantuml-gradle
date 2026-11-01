@@ -18,19 +18,21 @@ import kotlin.test.assertTrue
  * - Quota events
  */
 class LlmServiceAuditTest {
-
     @Test
     fun `should log LLM call on successful chat model creation`() {
-        val config = PlantumlConfig().copy(
-            langchain4j = PlantumlConfig().langchain4j.copy(
-                model = "ollama",
-                ollama = PlantumlConfig().langchain4j.ollama.copy(
-                    baseUrl = "http://localhost:11438",
-                    modelName = "llama2"
-                )
+        val config =
+            PlantumlConfig().copy(
+                langchain4j =
+                    PlantumlConfig().langchain4j.copy(
+                        model = "ollama",
+                        ollama =
+                            PlantumlConfig().langchain4j.ollama.copy(
+                                baseUrl = "http://localhost:11438",
+                                modelName = "llama2",
+                            ),
+                    ),
             )
-        )
-        
+
         val auditLogger = plantuml.apikey.QuotaAuditLogger()
         val llmService = LlmService(config, auditLogger)
 
@@ -43,27 +45,32 @@ class LlmServiceAuditTest {
 
     @Test
     fun `should log when using API key from pool`() {
-        val poolEntry = ApiKeyPoolEntry(
-            id = "test-key-1",
-            email = "test@example.com",
-            name = "Test Key",
-            keyRef = "test-api-key",
-            provider = "OPENAI",
-            services = listOf("CHAT_COMPLETION"),
-            quota = PoolQuotaConfig(
-                limitValue = 1000,
-                thresholdPercent = 80
+        val poolEntry =
+            ApiKeyPoolEntry(
+                id = "test-key-1",
+                email = "test@example.com",
+                name = "Test Key",
+                keyRef = "test-api-key",
+                provider = "OPENAI",
+                services = listOf("CHAT_COMPLETION"),
+                quota =
+                    PoolQuotaConfig(
+                        limitValue = 1000,
+                        thresholdPercent = 80,
+                    ),
             )
-        )
-        val config = PlantumlConfig().copy(
-            langchain4j = PlantumlConfig().langchain4j.copy(
-                model = "openai",
-                openai = PlantumlConfig().langchain4j.openai.copy(
-                    pool = listOf(poolEntry)
-                )
+        val config =
+            PlantumlConfig().copy(
+                langchain4j =
+                    PlantumlConfig().langchain4j.copy(
+                        model = "openai",
+                        openai =
+                            PlantumlConfig().langchain4j.openai.copy(
+                                pool = listOf(poolEntry),
+                            ),
+                    ),
             )
-        )
-        
+
         val auditLogger = plantuml.apikey.QuotaAuditLogger()
         val llmService = LlmService(config, auditLogger)
 
@@ -75,33 +82,38 @@ class LlmServiceAuditTest {
 
     @Test
     fun `should log key rotation event`() {
-        val poolEntry1 = ApiKeyPoolEntry(
-            id = "key-1",
-            email = "test1@example.com",
-            name = "Key 1",
-            keyRef = "key-ref-1",
-            provider = "OPENAI",
-            services = listOf("CHAT_COMPLETION"),
-            quota = PoolQuotaConfig(limitValue = 10, thresholdPercent = 80)
-        )
-        val poolEntry2 = ApiKeyPoolEntry(
-            id = "key-2",
-            email = "test2@example.com",
-            name = "Key 2",
-            keyRef = "key-ref-2",
-            provider = "OPENAI",
-            services = listOf("CHAT_COMPLETION"),
-            quota = PoolQuotaConfig(limitValue = 10, thresholdPercent = 80)
-        )
-        val config = PlantumlConfig().copy(
-            langchain4j = PlantumlConfig().langchain4j.copy(
-                model = "openai",
-                openai = PlantumlConfig().langchain4j.openai.copy(
-                    pool = listOf(poolEntry1, poolEntry2)
-                )
+        val poolEntry1 =
+            ApiKeyPoolEntry(
+                id = "key-1",
+                email = "test1@example.com",
+                name = "Key 1",
+                keyRef = "key-ref-1",
+                provider = "OPENAI",
+                services = listOf("CHAT_COMPLETION"),
+                quota = PoolQuotaConfig(limitValue = 10, thresholdPercent = 80),
             )
-        )
-        
+        val poolEntry2 =
+            ApiKeyPoolEntry(
+                id = "key-2",
+                email = "test2@example.com",
+                name = "Key 2",
+                keyRef = "key-ref-2",
+                provider = "OPENAI",
+                services = listOf("CHAT_COMPLETION"),
+                quota = PoolQuotaConfig(limitValue = 10, thresholdPercent = 80),
+            )
+        val config =
+            PlantumlConfig().copy(
+                langchain4j =
+                    PlantumlConfig().langchain4j.copy(
+                        model = "openai",
+                        openai =
+                            PlantumlConfig().langchain4j.openai.copy(
+                                pool = listOf(poolEntry1, poolEntry2),
+                            ),
+                    ),
+            )
+
         val auditLogger = plantuml.apikey.QuotaAuditLogger()
         val llmService = LlmService(config, auditLogger)
 
@@ -114,24 +126,28 @@ class LlmServiceAuditTest {
 
     @Test
     fun `should log quota exceeded event`() {
-        val poolEntry = ApiKeyPoolEntry(
-            id = "limited-key",
-            email = "test@example.com",
-            name = "Limited Key",
-            keyRef = "limited-key-ref",
-            provider = "OPENAI",
-            services = listOf("CHAT_COMPLETION"),
-            quota = PoolQuotaConfig(limitValue = 1, thresholdPercent = 80)
-        )
-        val config = PlantumlConfig().copy(
-            langchain4j = PlantumlConfig().langchain4j.copy(
-                model = "openai",
-                openai = PlantumlConfig().langchain4j.openai.copy(
-                    pool = listOf(poolEntry)
-                )
+        val poolEntry =
+            ApiKeyPoolEntry(
+                id = "limited-key",
+                email = "test@example.com",
+                name = "Limited Key",
+                keyRef = "limited-key-ref",
+                provider = "OPENAI",
+                services = listOf("CHAT_COMPLETION"),
+                quota = PoolQuotaConfig(limitValue = 1, thresholdPercent = 80),
             )
-        )
-        
+        val config =
+            PlantumlConfig().copy(
+                langchain4j =
+                    PlantumlConfig().langchain4j.copy(
+                        model = "openai",
+                        openai =
+                            PlantumlConfig().langchain4j.openai.copy(
+                                pool = listOf(poolEntry),
+                            ),
+                    ),
+            )
+
         val auditLogger = plantuml.apikey.QuotaAuditLogger()
         val llmService = LlmService(config, auditLogger)
 
@@ -144,11 +160,13 @@ class LlmServiceAuditTest {
 
     @Test
     fun `should include provider name in audit logs`() {
-        val config = PlantumlConfig().copy(
-            langchain4j = PlantumlConfig().langchain4j.copy(
-                model = "openai"
+        val config =
+            PlantumlConfig().copy(
+                langchain4j =
+                    PlantumlConfig().langchain4j.copy(
+                        model = "openai",
+                    ),
             )
-        )
         val auditLogger = plantuml.apikey.QuotaAuditLogger()
         val llmService = LlmService(config, auditLogger)
 
@@ -160,15 +178,18 @@ class LlmServiceAuditTest {
 
     @Test
     fun `should include timestamp in audit logs`() {
-        val config = PlantumlConfig().copy(
-            langchain4j = PlantumlConfig().langchain4j.copy(
-                model = "ollama",
-                ollama = PlantumlConfig().langchain4j.ollama.copy(
-                    baseUrl = "http://localhost:11438",
-                    modelName = "llama2"
-                )
+        val config =
+            PlantumlConfig().copy(
+                langchain4j =
+                    PlantumlConfig().langchain4j.copy(
+                        model = "ollama",
+                        ollama =
+                            PlantumlConfig().langchain4j.ollama.copy(
+                                baseUrl = "http://localhost:11438",
+                                modelName = "llama2",
+                            ),
+                    ),
             )
-        )
         val auditLogger = plantuml.apikey.QuotaAuditLogger()
         val llmService = LlmService(config, auditLogger)
 
@@ -186,24 +207,28 @@ class LlmServiceAuditTest {
 
     @Test
     fun `should log usage count for each API call`() {
-        val poolEntry = ApiKeyPoolEntry(
-            id = "usage-key",
-            email = "test@example.com",
-            name = "Usage Key",
-            keyRef = "usage-key-ref",
-            provider = "MISTRAL",
-            services = listOf("CHAT_COMPLETION"),
-            quota = PoolQuotaConfig(limitValue = 100, thresholdPercent = 80)
-        )
-        val config = PlantumlConfig().copy(
-            langchain4j = PlantumlConfig().langchain4j.copy(
-                model = "mistral",
-                mistral = PlantumlConfig().langchain4j.mistral.copy(
-                    pool = listOf(poolEntry)
-                )
+        val poolEntry =
+            ApiKeyPoolEntry(
+                id = "usage-key",
+                email = "test@example.com",
+                name = "Usage Key",
+                keyRef = "usage-key-ref",
+                provider = "MISTRAL",
+                services = listOf("CHAT_COMPLETION"),
+                quota = PoolQuotaConfig(limitValue = 100, thresholdPercent = 80),
             )
-        )
-        
+        val config =
+            PlantumlConfig().copy(
+                langchain4j =
+                    PlantumlConfig().langchain4j.copy(
+                        model = "mistral",
+                        mistral =
+                            PlantumlConfig().langchain4j.mistral.copy(
+                                pool = listOf(poolEntry),
+                            ),
+                    ),
+            )
+
         val auditLogger = plantuml.apikey.QuotaAuditLogger()
         val llmService = LlmService(config, auditLogger)
 
@@ -217,11 +242,13 @@ class LlmServiceAuditTest {
 
     @Test
     fun `should disable audit logging when disabled`() {
-        val config = PlantumlConfig().copy(
-            langchain4j = PlantumlConfig().langchain4j.copy(
-                model = "ollama"
+        val config =
+            PlantumlConfig().copy(
+                langchain4j =
+                    PlantumlConfig().langchain4j.copy(
+                        model = "ollama",
+                    ),
             )
-        )
         val disabledLogger = plantuml.apikey.QuotaAuditLogger(enabled = false)
         val llmService = LlmService(config, disabledLogger)
 
@@ -232,11 +259,13 @@ class LlmServiceAuditTest {
 
     @Test
     fun `should log error events gracefully`() {
-        val config = PlantumlConfig().copy(
-            langchain4j = PlantumlConfig().langchain4j.copy(
-                model = "unknown"
+        val config =
+            PlantumlConfig().copy(
+                langchain4j =
+                    PlantumlConfig().langchain4j.copy(
+                        model = "unknown",
+                    ),
             )
-        )
         val auditLogger = plantuml.apikey.QuotaAuditLogger()
         val llmService = LlmService(config, auditLogger)
 

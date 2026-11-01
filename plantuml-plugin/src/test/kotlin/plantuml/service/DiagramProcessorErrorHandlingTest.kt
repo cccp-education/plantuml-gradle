@@ -1,12 +1,16 @@
 package plantuml.service
 
+import contracts.plantuml.SyntaxValidationResult
 import dev.langchain4j.model.chat.ChatModel
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.*
+import org.mockito.Mockito.anyString
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.times
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.`when`
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import plantuml.PlantumlConfig
-import contracts.plantuml.SyntaxValidationResult
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -15,7 +19,7 @@ import kotlin.test.assertTrue
 /**
  * Tests to cover error handling branches in DiagramProcessor
  * Target: do-while loop with real ChatModel (lines 220-251)
- * 
+ *
  * Covers uncovered branches:
  * - if (validationResult is SyntaxValidationResult.Invalid) — true branch
  * - correctionPrompt + chatModel.chat()
@@ -33,8 +37,8 @@ class DiagramProcessorErrorHandlingTest {
 
         // Setup: first response invalid, second response valid
         `when`(mockChatModel.chat(anyString()))
-            .thenReturn("@startuml\nInvalid syntax")  // First response invalid
-            .thenReturn("@startuml\nFixed\n@enduml")  // Second response valid
+            .thenReturn("@startuml\nInvalid syntax") // First response invalid
+            .thenReturn("@startuml\nFixed\n@enduml") // Second response valid
 
         // Setup validation: first invalid, then valid
         `when`(mockPlantumlService.validateSyntax("@startuml\nInvalid syntax"))
@@ -83,10 +87,11 @@ class DiagramProcessorErrorHandlingTest {
         `when`(mockLangchainConfig.validationPrompt).thenReturn("Validate this")
 
         val processor = DiagramProcessor(mockPlantumlService, mockChatModel, mockConfig)
-        val result = processor.processPrompt(
-            prompt = "Test with multiple corrections",
-            logger = logger
-        )
+        val result =
+            processor.processPrompt(
+                prompt = "Test with multiple corrections",
+                logger = logger,
+            )
 
         // Verify: ChatModel was called 3 times
         verify(mockChatModel, times(3)).chat(anyString())
@@ -113,10 +118,12 @@ class DiagramProcessorErrorHandlingTest {
         `when`(mockLangchainConfig.validationPrompt).thenReturn("Validate this")
 
         val processor = DiagramProcessor(mockPlantumlService, mockChatModel, mockConfig)
-        val result = processor.processPrompt(
-            "Test that always fails", maxIterations = 2,
-            logger = logger
-        )
+        val result =
+            processor.processPrompt(
+                "Test that always fails",
+                maxIterations = 2,
+                logger = logger,
+            )
 
         // Verify: ChatModel was called 3 times (1 initial + 2 retries)
         verify(mockChatModel, times(3)).chat(anyString())
@@ -148,10 +155,11 @@ class DiagramProcessorErrorHandlingTest {
         `when`(mockLangchainConfig.validationPrompt).thenReturn("Validate this")
 
         val processor = DiagramProcessor(mockPlantumlService, mockChatModel, mockConfig)
-        val result = processor.processPrompt(
-            "Test with history context",
-            logger = logger
-        )
+        val result =
+            processor.processPrompt(
+                "Test with history context",
+                logger = logger,
+            )
 
         // Verify: ChatModel was called 3 times, including correction prompts with history
         verify(mockChatModel, times(3)).chat(anyString())
@@ -181,10 +189,11 @@ class DiagramProcessorErrorHandlingTest {
         `when`(mockLangchainConfig.validationPrompt).thenReturn("Validate this")
 
         val processor = DiagramProcessor(mockPlantumlService, mockChatModel, mockConfig)
-        val result = processor.processPrompt(
-            prompt = "Test with archiving",
-            logger = logger
-        )
+        val result =
+            processor.processPrompt(
+                prompt = "Test with archiving",
+                logger = logger,
+            )
 
         assertNotNull(result)
         // History should be archived because there were multiple attempts
@@ -198,7 +207,10 @@ class DiagramProcessorErrorHandlingTest {
         val mockConfig = mock(PlantumlConfig::class.java)
         val mockLangchainConfig = mock(plantuml.LangchainConfig::class.java)
 
-        val llmJsonResponse = """{"score": 9, "feedback": "Excellent diagram with clear architecture", "recommendations": ["Add legend", "Use consistent colors"]}"""
+        val llmJsonResponse =
+            """
+            {"score": 9, "feedback": "Excellent diagram with clear architecture", "recommendations": ["Add legend", "Use consistent colors"]}
+            """.trimIndent()
 
         `when`(mockConfig.langchain4j).thenReturn(mockLangchainConfig)
         `when`(mockLangchainConfig.validationPrompt).thenReturn("Validate this PlantUML")
@@ -206,13 +218,15 @@ class DiagramProcessorErrorHandlingTest {
 
         val processor = DiagramProcessor(mockPlantumlService, mockChatModel, mockConfig)
 
-        val diagram = plantuml.PlantumlDiagram(
-            conversation = listOf("Test"),
-            plantuml = plantuml.PlantumlCode(
-                code = "@startuml\nactor User\n@enduml",
-                description = "Test"
+        val diagram =
+            plantuml.PlantumlDiagram(
+                conversation = listOf("Test"),
+                plantuml =
+                    plantuml.PlantumlCode(
+                        code = "@startuml\nactor User\n@enduml",
+                        description = "Test",
+                    ),
             )
-        )
 
         val result = processor.validateDiagram(diagram)
 
@@ -238,13 +252,15 @@ class DiagramProcessorErrorHandlingTest {
 
         val processor = DiagramProcessor(mockPlantumlService, mockChatModel, mockConfig)
 
-        val diagram = plantuml.PlantumlDiagram(
-            conversation = listOf("Test"),
-            plantuml = plantuml.PlantumlCode(
-                code = "@startuml\nactor User\n@enduml",
-                description = "Test"
+        val diagram =
+            plantuml.PlantumlDiagram(
+                conversation = listOf("Test"),
+                plantuml =
+                    plantuml.PlantumlCode(
+                        code = "@startuml\nactor User\n@enduml",
+                        description = "Test",
+                    ),
             )
-        )
 
         val result = processor.validateDiagram(diagram)
 
@@ -265,13 +281,15 @@ class DiagramProcessorErrorHandlingTest {
 
         val processor = DiagramProcessor(mockPlantumlService, mockChatModel, mockConfig)
 
-        val diagram = plantuml.PlantumlDiagram(
-            conversation = listOf("Test"),
-            plantuml = plantuml.PlantumlCode(
-                code = "@startuml\nactor User\n@enduml",
-                description = "Test"
+        val diagram =
+            plantuml.PlantumlDiagram(
+                conversation = listOf("Test"),
+                plantuml =
+                    plantuml.PlantumlCode(
+                        code = "@startuml\nactor User\n@enduml",
+                        description = "Test",
+                    ),
             )
-        )
 
         val result = processor.validateDiagram(diagram)
 

@@ -4,10 +4,10 @@ import contracts.i18n.TranslationRequest
 import contracts.i18n.TranslationResult
 import contracts.i18n.TranslationService
 import contracts.plantuml.PlantUmlBlock
+import contracts.plantuml.PlantUmlSyntaxValidator
 import contracts.plantuml.PlantUmlTranslationOutcome
 import contracts.plantuml.PlantUmlTranslationRequest
 import contracts.plantuml.SyntaxValidationResult
-import contracts.plantuml.PlantUmlSyntaxValidator
 import org.junit.jupiter.api.Test
 import plantuml.boundary.PlantumlTranslationPortAdapter
 import kotlin.test.assertEquals
@@ -18,7 +18,6 @@ import kotlin.test.assertTrue
  * code/business tokens and still parses with the real PlantUML validator.
  */
 class PlantumlTermProtectionFunctionalTest {
-
     private class MappingTranslator(
         private val translations: Map<String, String>,
     ) : TranslationService {

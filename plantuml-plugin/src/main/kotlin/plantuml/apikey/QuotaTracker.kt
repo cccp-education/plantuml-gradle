@@ -7,7 +7,6 @@ package plantuml.apikey
  * for automatic rotation triggers.
  */
 class QuotaTracker {
-
     private val usageCounts = mutableMapOf<String, Long>()
 
     /**
@@ -25,9 +24,7 @@ class QuotaTracker {
      * @param entryId The ID of the API key entry
      * @return The current usage count
      */
-    fun getUsage(entryId: String): Long {
-        return usageCounts[entryId] ?: 0
-    }
+    fun getUsage(entryId: String): Long = usageCounts[entryId] ?: 0
 
     /**
      * Check if the API key has exceeded its quota threshold.

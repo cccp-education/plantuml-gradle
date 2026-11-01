@@ -9,14 +9,14 @@ import kotlin.test.assertTrue
  * Unit tests for ConfigLoader environment variable resolution.
  */
 class ConfigLoaderTest {
-
     @Test
     fun `test resolveEnvironmentVariables with existing env var`() {
-        val yamlContent = """
+        val yamlContent =
+            """
             langchain4j:
               openai:
                 apiKey: ${'$'}{TEST_API_KEY}
-        """.trimIndent()
+            """.trimIndent()
 
         val result = ConfigLoader.resolveEnvironmentVariables(yamlContent)
 
@@ -26,11 +26,12 @@ class ConfigLoaderTest {
 
     @Test
     fun `test resolveEnvironmentVariables with missing env var preserves syntax`() {
-        val yamlContent = """
+        val yamlContent =
+            """
             langchain4j:
               openai:
                 apiKey: ${'$'}{NONEXISTENT_VAR_12345}
-        """.trimIndent()
+            """.trimIndent()
 
         val result = ConfigLoader.resolveEnvironmentVariables(yamlContent)
 
@@ -39,13 +40,14 @@ class ConfigLoaderTest {
 
     @Test
     fun `test resolveEnvironmentVariables with multiple env vars`() {
-        val yamlContent = """
+        val yamlContent =
+            """
             langchain4j:
               openai:
                 apiKey: ${'$'}{VAR_ONE}
               gemini:
                 apiKey: ${'$'}{VAR_TWO}
-        """.trimIndent()
+            """.trimIndent()
 
         val result = ConfigLoader.resolveEnvironmentVariables(yamlContent)
 
@@ -57,11 +59,12 @@ class ConfigLoaderTest {
 
     @Test
     fun `test resolveEnvironmentVariables with no env vars returns unchanged`() {
-        val yamlContent = """
+        val yamlContent =
+            """
             langchain4j:
               maxIterations: 5
               model: ollama
-        """.trimIndent()
+            """.trimIndent()
 
         val result = ConfigLoader.resolveEnvironmentVariables(yamlContent)
 
@@ -71,11 +74,13 @@ class ConfigLoaderTest {
     @Test
     fun `test load with environment variable in apiKey`() {
         val tempFile = File.createTempFile("test-config", ".yml")
-        tempFile.writeText("""
+        tempFile.writeText(
+            """
             langchain4j:
               openai:
                 apiKey: ${'$'}{TEST_OPENAI_KEY}
-        """.trimIndent())
+            """.trimIndent(),
+        )
         tempFile.deleteOnExit()
 
         val config = ConfigLoader.load(tempFile)

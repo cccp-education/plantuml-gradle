@@ -4,7 +4,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
 class IncrementalConfigTest {
-
     @Test
     fun `should have default checksums dir`() {
         val config = IncrementalConfig()

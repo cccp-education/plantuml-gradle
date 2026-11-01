@@ -1,6 +1,16 @@
 package plantuml
 
 /**
+ * Default prompt template used by the LLM design validation.
+ *
+ * Shared between the [LangchainConfig] default and the configuration sources
+ * merged by `ConfigMerger` (single source of truth).
+ */
+internal const val DEFAULT_VALIDATION_PROMPT: String =
+    "Rate this diagram on clarity, completeness, and best practices. " +
+        "Return a JSON with 'score' (1-10) and 'feedback' (string) and 'recommendations' (array)."
+
+/**
  * Main configuration model for the PlantUML plugin.
  *
  * Contains all configuration settings for input/output directories, LLM providers,
@@ -22,7 +32,7 @@ data class PlantumlConfig(
     val diagramDocs: DiagramDocsConfig = DiagramDocsConfig(),
     val incremental: plantuml.incremental.IncrementalConfig = plantuml.incremental.IncrementalConfig(),
     val language: String = "en",
-    val supportedLanguages: List<String> = listOf("en")
+    val supportedLanguages: List<String> = listOf("en"),
 ) {
     companion object {
         val SUPPORTED_LANGS = setOf("en", "zh", "hi", "es", "fr", "ar", "bn", "pt", "ru", "ur")
@@ -37,7 +47,7 @@ data class PlantumlConfig(
  */
 data class InputConfig(
     val prompts: String = "prompts",
-    val defaultLang: String = "en"
+    val defaultLang: String = "en",
 )
 
 /**
@@ -59,7 +69,7 @@ data class OutputConfig(
     val validations: String = "generated/validations",
     val rag: String = "generated/rag",
     val format: String = "png",
-    val theme: String = "default"
+    val theme: String = "default",
 )
 
 /**
@@ -88,7 +98,7 @@ data class LangchainConfig(
     val designValidation: Boolean = false,
     val model: String = "ollama",
     val validation: Boolean = true,
-    val validationPrompt: String = "Rate this diagram on clarity, completeness, and best practices. Return a JSON with 'score' (1-10) and 'feedback' (string) and 'recommendations' (array).",
+    val validationPrompt: String = DEFAULT_VALIDATION_PROMPT,
     val rotationStrategy: String = "ROUND_ROBIN",
     val fallbackEnabled: Boolean = true,
     val freemiumRatio: Double = 0.0,
@@ -98,7 +108,7 @@ data class LangchainConfig(
     val openai: ApiKeyConfig = ApiKeyConfig(),
     val claude: ApiKeyConfig = ApiKeyConfig(),
     val huggingface: ApiKeyConfig = ApiKeyConfig(),
-    val groq: ApiKeyConfig = ApiKeyConfig()
+    val groq: ApiKeyConfig = ApiKeyConfig(),
 )
 
 /**
@@ -115,7 +125,7 @@ data class GitConfig(
     val userName: String = "github-actions[bot]",
     val userEmail: String = "github-actions[bot]@users.noreply.github.com",
     val commitMessage: String = "chore: update PlantUML diagrams [skip ci]",
-    val watchedBranches: List<String> = listOf("main", "develop")
+    val watchedBranches: List<String> = listOf("main", "develop"),
 )
 
 /**
@@ -128,7 +138,7 @@ data class GitConfig(
 data class OllamaConfig(
     val baseUrl: String = "http://localhost:11438",
     val modelName: String = "gpt-oss:120b-cloud",
-    val pool: List<ApiKeyPoolEntry> = emptyList()
+    val pool: List<ApiKeyPoolEntry> = emptyList(),
 )
 
 /**
@@ -143,7 +153,7 @@ data class ApiKeyConfig(
     val apiKey: String = "",
     val baseUrl: String = "",
     val modelName: String = "",
-    val pool: List<ApiKeyPoolEntry> = emptyList()
+    val pool: List<ApiKeyPoolEntry> = emptyList(),
 )
 
 /**
@@ -170,7 +180,7 @@ data class ApiKeyPoolEntry(
     val baseUrl: String = "",
     val quota: PoolQuotaConfig = PoolQuotaConfig(),
     val tier: String = "FREE",
-    val weight: Int = 1
+    val weight: Int = 1,
 )
 
 /**
@@ -183,7 +193,7 @@ data class ApiKeyPoolEntry(
 data class PoolQuotaConfig(
     val limitType: String = "REQUESTS",
     val limitValue: Long = 1000,
-    val thresholdPercent: Int = 80
+    val thresholdPercent: Int = 80,
 )
 
 /**
@@ -202,7 +212,7 @@ data class RagConfig(
     val port: Int = 5432,
     val username: String = "",
     val password: String = "",
-    val tableName: String = "embeddings"
+    val tableName: String = "embeddings",
 )
 
 /**
@@ -215,7 +225,7 @@ data class RagConfig(
  */
 data class PlantumlDiagram(
     val conversation: List<String>,
-    val plantuml: PlantumlCode
+    val plantuml: PlantumlCode,
 )
 
 /**
@@ -226,7 +236,7 @@ data class PlantumlDiagram(
  */
 data class PlantumlCode(
     val code: String,
-    val description: String
+    val description: String,
 )
 
 /**
@@ -239,7 +249,7 @@ data class PlantumlCode(
 data class ValidationFeedback(
     val score: Int,
     val feedback: String,
-    val recommendations: List<String>
+    val recommendations: List<String>,
 )
 
 /**
@@ -256,8 +266,13 @@ data class ValidationFeedback(
 data class DiagramDocsConfig(
     val enabled: Boolean = true,
     val outputDir: String = "diagrams/auto",
-    val subgraphs: List<String> = listOf(
-        "service layer", "config layer", "task layer", "model layer", "RAG"
-    ),
-    val model: String = "qwen3.5-cloud"
+    val subgraphs: List<String> =
+        listOf(
+            "service layer",
+            "config layer",
+            "task layer",
+            "model layer",
+            "RAG",
+        ),
+    val model: String = "qwen3.5-cloud",
 )

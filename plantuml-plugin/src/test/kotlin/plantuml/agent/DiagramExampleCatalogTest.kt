@@ -8,7 +8,6 @@ import plantuml.agent.DiagramSubtypeDetector.Subtype
  * DIA-05 — canonical example catalogue.
  */
 class DiagramExampleCatalogTest {
-
     @Test
     fun `each known subtype has a canonical example`() {
         Subtype.entries.filter { it != Subtype.UNKNOWN }.forEach { subtype ->

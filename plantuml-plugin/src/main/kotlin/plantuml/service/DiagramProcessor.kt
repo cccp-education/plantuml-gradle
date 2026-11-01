@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
+import contracts.plantuml.SyntaxValidationResult
 import dev.langchain4j.model.chat.ChatModel
 import org.slf4j.Logger
 import plantuml.PlantumlCode
@@ -22,7 +23,6 @@ import plantuml.agent.LlmCodeExtractor
 import plantuml.boundary.TranslationResolver
 import plantuml.context.AugmentedContextPrompt
 import plantuml.runtime.RuntimeEnvironment
-import contracts.plantuml.SyntaxValidationResult
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -46,7 +46,7 @@ data class AttemptEntry(
     val iteration: Int,
     val isValid: Boolean,
     val errorMessage: String? = null,
-    val timestamp: LocalDateTime = LocalDateTime.now()
+    val timestamp: LocalDateTime = LocalDateTime.now(),
 )
 
 /**
@@ -72,13 +72,13 @@ class DiagramProcessor(
     private val augmentedContext: String = "",
     private val runtime: RuntimeEnvironment = RuntimeEnvironment.system(),
 ) {
-
     private val logger: org.slf4j.Logger = org.slf4j.LoggerFactory.getLogger(DiagramProcessor::class.java)
 
-    private val objectMapper: ObjectMapper = ObjectMapper()
-        .registerModule(JavaTimeModule())
-        .registerModule(KotlinModule.Builder().build())
-        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+    private val objectMapper: ObjectMapper =
+        ObjectMapper()
+            .registerModule(JavaTimeModule())
+            .registerModule(KotlinModule.Builder().build())
+            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
     /**
      * Processes a natural language prompt through an LLM interaction loop.
@@ -103,7 +103,7 @@ class DiagramProcessor(
         maxIterations: Int = 5,
         logger: Logger,
         resolver: TranslationResolver? = null,
-        language: String = "en"
+        language: String = "en",
     ): PlantumlDiagram? {
         logger.debug("processPrompt: chatModel={}, config={}, testMode={}", chatModel, config, runtime.isTestMode)
         // Initialize attempt history
@@ -129,8 +129,8 @@ class DiagramProcessor(
                             currentCode,
                             iterations,
                             false,
-                            validationResult.errorMessage
-                        )
+                            validationResult.errorMessage,
+                        ),
                     )
                     // In a real implementation, we would send the error back to LLM
                     // For this demo, we'll try to fix common issues
@@ -147,10 +147,11 @@ class DiagramProcessor(
                 archiveAttemptHistory(attemptHistory, logger)
                 return PlantumlDiagram(
                     conversation = attemptHistory.map { "${it.prompt} -> ${it.response}" },
-                    plantuml = PlantumlCode(
-                        code = currentCode,
-                        description = "${label("Auto-generated diagram based on prompt:")} $prompt"
-                    )
+                    plantuml =
+                        PlantumlCode(
+                            code = currentCode,
+                            description = "${label("Auto-generated diagram based on prompt:")} $prompt",
+                        ),
                 )
             }
 
@@ -165,20 +166,22 @@ class DiagramProcessor(
         val subtype = DiagramSubtypeDetector.detect(prompt)
         val subtypeHint = DiagramSubtypeDetector.hint(prompt)
         // PLT-AGENT DIA-05 — inject a canonical example when opt-in (complements the RAG).
-        val example = if (config?.langchain4j?.examples == true) {
-            DiagramExampleCatalog.selectExample(subtype)
-        } else {
-            null
-        }
-        val fullPrompt = buildString {
-            appendLine("Generate a PlantUML diagram based on the following description:")
-            appendLine(prompt)
-            appendLine()
-            appendLine("Please return ONLY valid PlantUML code wrapped in @startuml and @enduml tags.")
-            append("The diagram should be clear, well-structured, and follow PlantUML best practices.")
-            if (subtypeHint != null) append("\n$subtypeHint")
-            if (example != null) append("\n\nCanonical example to follow:\n$example")
-        }
+        val example =
+            if (config?.langchain4j?.examples == true) {
+                DiagramExampleCatalog.selectExample(subtype)
+            } else {
+                null
+            }
+        val fullPrompt =
+            buildString {
+                appendLine("Generate a PlantUML diagram based on the following description:")
+                appendLine(prompt)
+                appendLine()
+                appendLine("Please return ONLY valid PlantUML code wrapped in @startuml and @enduml tags.")
+                append("The diagram should be clear, well-structured, and follow PlantUML best practices.")
+                if (subtypeHint != null) append("\n$subtypeHint")
+                if (example != null) append("\n\nCanonical example to follow:\n$example")
+            }
 
         // PLT-CONTEXT CTX-04 — inject the augmented context (EAGER/RAG/Graphify/Docs)
         // collected into `build/plantuml/augmented-context.txt`. Blank/missing context
@@ -187,19 +190,20 @@ class DiagramProcessor(
 
         // Send prompt to LLM via ChatModel
         val initialResponse = chatModel.chat(effectivePrompt)
-        
+
         // Extract PlantUML code from JSON response, catching parse errors
         var parseError: String? = null
-        val extractedCode = try {
-            extractPlantUmlFromResponse(initialResponse)
-        } catch (e: IllegalStateException) {
-            // JSON parsing failed - capture error for history
-            parseError = e.message
-            logger.warn(PlantumlMessages.format("processor.invalid_format", "en", e.message ?: ""))
-            // Return a placeholder that will fail validation
-            "// INVALID_JSON_RESPONSE"
-        }
-        
+        val extractedCode =
+            try {
+                extractPlantUmlFromResponse(initialResponse)
+            } catch (e: IllegalStateException) {
+                // JSON parsing failed - capture error for history
+                parseError = e.message
+                logger.warn(PlantumlMessages.format("processor.invalid_format", "en", e.message ?: ""))
+                // Return a placeholder that will fail validation
+                "// INVALID_JSON_RESPONSE"
+            }
+
         attemptHistory.add(AttemptEntry(prompt, initialResponse, 0, false, parseError))
         var currentCode = extractedCode
         var iterations = 0
@@ -228,54 +232,58 @@ class DiagramProcessor(
 
                 // Prepare correction prompt with previous attempt history
                 val historyContext = buildHistoryContext(attemptHistory.takeLast(3)) // Last 3 attempts for context
-                
-                val errorDetails = if (parseError != null) {
-                    "The LLM response had invalid JSON format:\n$parseError\n\nPlease return ONLY valid JSON with PlantUML code wrapped in @startuml and @enduml tags."
-                } else {
-                    "The following PlantUML code has syntax errors:\n$currentCode\n\nError: ${validationResult.errorMessage}\n\nPlease correct the code and return ONLY valid PlantUML code wrapped in @startuml and @enduml tags."
-                }
-                
-                val correctionPrompt = """
+
+                val errorDetails =
+                    if (parseError != null) {
+                        "The LLM response had invalid JSON format:\n$parseError\n\nPlease return ONLY valid JSON with PlantUML code wrapped in @startuml and @enduml tags."
+                    } else {
+                        "The following PlantUML code has syntax errors:\n$currentCode\n\nError: ${validationResult.errorMessage}\n\nPlease correct the code and return ONLY valid PlantUML code wrapped in @startuml and @enduml tags."
+                    }
+
+                val correctionPrompt =
+                    """
                     $historyContext
                     
                     $errorDetails
                     
                     Learn from previous attempts to avoid repeating the same mistakes.
-                """.trimIndent()
+                    """.trimIndent()
 
                 val correctionResponse = chatModel.chat(correctionPrompt)
                 // Extract PlantUML code from JSON response (mock controls validity, don't auto-fix)
-                currentCode = try {
-                    extractPlantUmlFromResponse(correctionResponse)
-                } catch (e: IllegalStateException) {
-                    parseError = e.message
-                    logger.warn(PlantumlMessages.format("processor.invalid_correction", "en", e.message ?: ""))
-                    "// INVALID_JSON_RESPONSE"
-                }
+                currentCode =
+                    try {
+                        extractPlantUmlFromResponse(correctionResponse)
+                    } catch (e: IllegalStateException) {
+                        parseError = e.message
+                        logger.warn(PlantumlMessages.format("processor.invalid_correction", "en", e.message ?: ""))
+                        "// INVALID_JSON_RESPONSE"
+                    }
                 attemptHistory.add(
                     AttemptEntry(
                         "Correction attempt #$iterations",
                         currentCode,
                         iterations,
                         false, // Will be updated if valid
-                        if (validationResult is SyntaxValidationResult.Invalid) validationResult.errorMessage else parseError
-                    )
+                        if (validationResult is SyntaxValidationResult.Invalid) validationResult.errorMessage else parseError,
+                    ),
                 )
             } else {
                 // PLT-AGENT DIA-01/07 — optional vision design review loop. Only
                 // active when a reviewer is injected (opt-in `langchain4j.designValidation`).
                 if (designReviewer != null) {
                     val png = plantumlService.renderPng(currentCode)
-                    val feedback = if (png != null) {
-                        try {
-                            designReviewer.review(png, currentCode)
-                        } catch (e: Exception) {
-                            logger.warn("Design review failed, skipping (degraded): ${e.message}")
+                    val feedback =
+                        if (png != null) {
+                            try {
+                                designReviewer.review(png, currentCode)
+                            } catch (e: Exception) {
+                                logger.warn("Design review failed, skipping (degraded): ${e.message}")
+                                null
+                            }
+                        } else {
                             null
                         }
-                    } else {
-                        null
-                    }
 
                     if (feedback != null) {
                         val verdict = DesignReview.parse(feedback)
@@ -286,27 +294,29 @@ class DiagramProcessor(
                             if (budget.stopReason(iterations, elapsedSeconds) == null) {
                                 iterations++
                                 lastDesignFeedback = feedback
-                                val designPrompt = """
+                                val designPrompt =
+                                    """
                                     Improve the following PlantUML diagram based on this design feedback:
                                     ${verdict.feedback}
 
                                     Return ONLY valid PlantUML code wrapped in @startuml and @enduml tags.
                                     $currentCode
-                                """.trimIndent()
-                                currentCode = try {
-                                    extractPlantUmlFromResponse(chatModel.chat(designPrompt))
-                                } catch (e: IllegalStateException) {
-                                    logger.warn(PlantumlMessages.format("processor.invalid_correction", "en", e.message ?: ""))
-                                    "// INVALID_JSON_RESPONSE"
-                                }
+                                    """.trimIndent()
+                                currentCode =
+                                    try {
+                                        extractPlantUmlFromResponse(chatModel.chat(designPrompt))
+                                    } catch (e: IllegalStateException) {
+                                        logger.warn(PlantumlMessages.format("processor.invalid_correction", "en", e.message ?: ""))
+                                        "// INVALID_JSON_RESPONSE"
+                                    }
                                 attemptHistory.add(
                                     AttemptEntry(
                                         "Design refinement #$iterations",
                                         currentCode,
                                         iterations,
                                         false,
-                                        verdict.feedback
-                                    )
+                                        verdict.feedback,
+                                    ),
                                 )
                                 continue
                             }
@@ -325,10 +335,11 @@ class DiagramProcessor(
         if (validationResult is SyntaxValidationResult.Valid) {
             return PlantumlDiagram(
                 conversation = attemptHistory.map { "${it.prompt} -> ${it.response}" },
-                plantuml = PlantumlCode(
-                    code = currentCode,
-                    description = "${label("Auto-generated diagram based on prompt:")} $prompt"
-                )
+                plantuml =
+                    PlantumlCode(
+                        code = currentCode,
+                        description = "${label("Auto-generated diagram based on prompt:")} $prompt",
+                    ),
             )
         }
 
@@ -347,9 +358,10 @@ class DiagramProcessor(
     private fun buildHistoryContext(history: List<AttemptEntry>): String {
         if (history.isEmpty()) return ""
 
-        return "Previous attempts:\n" + history.joinToString("\n") { entry ->
-            "Attempt #${entry.iteration}: ${entry.response.take(100)}..."
-        }
+        return "Previous attempts:\n" +
+            history.joinToString("\n") { entry ->
+                "Attempt #${entry.iteration}: ${entry.response.take(100)}..."
+            }
     }
 
     /**
@@ -364,22 +376,27 @@ class DiagramProcessor(
      *
      * @param history Complete list of [AttemptEntry] from prompt processing
      */
-    private fun archiveAttemptHistory(history: List<AttemptEntry>, logger: Logger) {
+    private fun archiveAttemptHistory(
+        history: List<AttemptEntry>,
+        logger: Logger,
+    ) {
         logger.info(PlantumlMessages.format("processor.archive_start", "en", history.size, runtime.projectDir))
         // Always archive if there is at least one attempt
         if (history.isNotEmpty()) {
             try {
                 // Determine the output directory relative to project root
                 val diagramsPath = config?.output?.diagrams ?: "generated/diagrams"
-                
+
                 // Get the project directory from the runtime environment
                 val projectDirPath = runtime.projectDir
-                
+
                 val projectDir = File(projectDirPath)
                 val diagramsDir = File(projectDir, diagramsPath)
-                
-                logger.info(PlantumlMessages.format("processor.archive_path", "en", diagramsPath, projectDirPath, diagramsDir.absolutePath, diagramsDir.exists()))
-                
+
+                logger.info(
+                    PlantumlMessages.format("processor.archive_path", "en", diagramsPath, projectDirPath, diagramsDir.absolutePath, diagramsDir.exists()),
+                )
+
                 if (!diagramsDir.exists()) {
                     val created = diagramsDir.mkdirs()
                     logger.info(PlantumlMessages.format("processor.archive_created", "en", diagramsDir.absolutePath, created))
@@ -393,9 +410,8 @@ class DiagramProcessor(
                 // Convert history to JSON format for storage
                 val historyJson = convertHistoryToJson(history)
                 historyFile.writeText(historyJson)
-                
-                logger.info(PlantumlMessages.format("processor.archive_success", "en", history.size, historyFile.absolutePath, historyFile.exists()))
 
+                logger.info(PlantumlMessages.format("processor.archive_success", "en", history.size, historyFile.absolutePath, historyFile.exists()))
             } catch (e: Exception) {
                 logger.error(PlantumlMessages.format("processor.archive_failed", "en", e.message ?: ""), e)
             }
@@ -414,11 +430,12 @@ class DiagramProcessor(
      * @return JSON string representation of the attempt history
      */
     private fun convertHistoryToJson(history: List<AttemptEntry>): String {
-        val output = mapOf(
-            "entries" to history,
-            "totalAttempts" to history.size,
-            "timestamp" to LocalDateTime.now()
-        )
+        val output =
+            mapOf(
+                "entries" to history,
+                "totalAttempts" to history.size,
+                "timestamp" to LocalDateTime.now(),
+            )
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(output)
     }
 
@@ -439,7 +456,10 @@ class DiagramProcessor(
      * @param maxIterations Maximum iterations allowed (used to detect archive test)
      * @return Basic PlantUML code with a common typo for testing corrections
      */
-    private fun generateSimulatedLlmResponse(prompt: String, maxIterations: Int = 5): String {
+    private fun generateSimulatedLlmResponse(
+        prompt: String,
+        maxIterations: Int = 5,
+    ): String {
         // Special case: "Archive history after max iterations" test
         // Return syntax that cannot be auto-corrected
         if (prompt == "Create a complex diagram" && maxIterations == 5) {
@@ -447,9 +467,9 @@ class DiagramProcessor(
                 @startuml
                 [actor User
                 @enduml
-            """.trimIndent()
+                """.trimIndent()
         }
-        
+
         return """
             @startuml
             title ${prompt.substringBefore("\n").takeIf { it.isNotEmpty() } ?: "Generated Diagram"}
@@ -458,13 +478,13 @@ class DiagramProcessor(
               User --> (Feature)
             }
             @enduml
-        """.trimIndent()
+            """.trimIndent()
     }
 
     private fun applyStructuralLabels(
         code: String,
         prompt: String,
-        label: (String) -> String
+        label: (String) -> String,
     ): String {
         var result = code
         if (prompt.substringBefore("\n").isEmpty()) {
@@ -574,21 +594,23 @@ class DiagramProcessor(
             return ValidationFeedback(
                 score = 8,
                 feedback = "Good diagram structure with clear relationships. The component layout is logical.",
-                recommendations = listOf(
-                    "Add more detailed component descriptions",
-                    "Include data flow annotations",
-                    "Consider adding boundary boxes for subsystems"
-                )
+                recommendations =
+                    listOf(
+                        "Add more detailed component descriptions",
+                        "Include data flow annotations",
+                        "Consider adding boundary boxes for subsystems",
+                    ),
             )
         }
 
         // Create validation prompt with diagram and validation instructions
-        val validationPrompt = """
+        val validationPrompt =
+            """
             ${config.langchain4j.validationPrompt}
             
             PlantUML diagram to evaluate:
             ${diagram.plantuml.code}
-        """.trimIndent()
+            """.trimIndent()
 
         // Send to LLM for validation
         val validationResult = chatModel.chat(validationPrompt)
@@ -601,7 +623,7 @@ class DiagramProcessor(
             ValidationFeedback(
                 score = 5,
                 feedback = "Unable to parse LLM validation response, returning default feedback.",
-                recommendations = emptyList()
+                recommendations = emptyList(),
             )
         }
     }

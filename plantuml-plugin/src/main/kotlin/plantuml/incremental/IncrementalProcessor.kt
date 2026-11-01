@@ -8,8 +8,9 @@ import java.io.File
 enum class ProcessingDecision {
     /** Prompt has not changed; skip processing. */
     SKIP,
+
     /** Prompt is new or has changed; process it. */
-    PROCESS
+    PROCESS,
 }
 
 /**
@@ -20,8 +21,9 @@ enum class ProcessingDecision {
  *
  * @param checksumsDir Directory for checksum storage
  */
-class IncrementalProcessor(checksumsDir: File) {
-
+class IncrementalProcessor(
+    checksumsDir: File,
+) {
     private val checksumStore = ChecksumStore(checksumsDir)
     private val eventListeners = mutableListOf<(IncrementalEvent) -> Unit>()
 
@@ -45,7 +47,10 @@ class IncrementalProcessor(checksumsDir: File) {
      * @param forceReprocess If true, always returns [ProcessingDecision.PROCESS]
      * @return [ProcessingDecision.SKIP] if unchanged, [ProcessingDecision.PROCESS] otherwise
      */
-    fun decideProcessing(promptFile: File, forceReprocess: Boolean): ProcessingDecision {
+    fun decideProcessing(
+        promptFile: File,
+        forceReprocess: Boolean,
+    ): ProcessingDecision {
         if (forceReprocess) return ProcessingDecision.PROCESS
         return if (checksumStore.hasPromptChanged(promptFile)) {
             ProcessingDecision.PROCESS
@@ -61,7 +66,10 @@ class IncrementalProcessor(checksumsDir: File) {
      * @param promptFile The processed prompt file
      * @param iterations Number of LLM correction iterations used
      */
-    fun markAsProcessed(promptFile: File, iterations: Int = 0) {
+    fun markAsProcessed(
+        promptFile: File,
+        iterations: Int = 0,
+    ) {
         checksumStore.storeChecksum(promptFile)
         emit(PromptProcessed(promptFile.nameWithoutExtension, iterations))
     }
@@ -76,7 +84,10 @@ class IncrementalProcessor(checksumsDir: File) {
      * @param promptsDir Directory containing source `.prompt` files
      * @return true if the diagram should be reindexed
      */
-    fun shouldReindexPuml(pumlFile: File, promptsDir: File): Boolean {
+    fun shouldReindexPuml(
+        pumlFile: File,
+        promptsDir: File,
+    ): Boolean {
         val promptName = pumlFile.nameWithoutExtension
         val promptFile = File(promptsDir, "$promptName.prompt")
         if (!promptFile.exists()) return true
@@ -90,23 +101,33 @@ class IncrementalProcessor(checksumsDir: File) {
      * @param diagramsDir Directory containing generated `.puml` and `.yml` files
      * @param imagesDir Directory containing generated `.png` images
      */
-    fun cleanupOrphanedOutputs(promptsDir: File, diagramsDir: File, imagesDir: File) {
-        val promptNames = promptsDir.listFiles { it.extension == "prompt" }
-            ?.map { sanitizeFileName(it.nameWithoutExtension) }
-            ?: emptyList()
+    fun cleanupOrphanedOutputs(
+        promptsDir: File,
+        diagramsDir: File,
+        imagesDir: File,
+    ) {
+        val promptNames =
+            promptsDir
+                .listFiles { it.extension == "prompt" }
+                ?.map { sanitizeFileName(it.nameWithoutExtension) }
+                ?: emptyList()
 
-        val removedCount = cleanupOrphanedDir(diagramsDir, promptNames, setOf("yml", "puml")) +
-            cleanupOrphanedDir(imagesDir, promptNames, setOf("png"))
+        val removedCount =
+            cleanupOrphanedDir(diagramsDir, promptNames, setOf("yml", "puml")) +
+                cleanupOrphanedDir(imagesDir, promptNames, setOf("png"))
 
         if (removedCount > 0) {
             emit(OutputsCleaned(removedCount))
         }
     }
 
-    private fun sanitizeFileName(name: String): String =
-        name.replace("[^a-zA-Z0-9._-]".toRegex(), "_")
+    private fun sanitizeFileName(name: String): String = name.replace("[^a-zA-Z0-9._-]".toRegex(), "_")
 
-    private fun cleanupOrphanedDir(dir: File, promptNames: List<String>, extensions: Set<String>): Int {
+    private fun cleanupOrphanedDir(
+        dir: File,
+        promptNames: List<String>,
+        extensions: Set<String>,
+    ): Int {
         if (!dir.exists()) return 0
         var count = 0
         dir.listFiles()?.forEach { file ->

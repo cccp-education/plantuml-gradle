@@ -1,10 +1,12 @@
 package plantuml.service
 
-import org.junit.jupiter.api.Test
-import org.slf4j.LoggerFactory
-import org.mockito.Mockito.*
-import org.slf4j.Logger
 import contracts.plantuml.SyntaxValidationResult
+import org.junit.jupiter.api.Test
+import org.mockito.Mockito.anyString
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.`when`
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -92,10 +94,11 @@ class DiagramProcessorRetryTest {
             .thenReturn(SyntaxValidationResult.Valid)
 
         val processor = DiagramProcessor(mockPlantumlService, null, null)
-        val result = processor.processPrompt(
-            "Test prompt",
-            logger = logger
-        )
+        val result =
+            processor.processPrompt(
+                "Test prompt",
+                logger = logger,
+            )
 
         assertNotNull(result)
         assertTrue(result.plantuml.code.contains("@startuml"))

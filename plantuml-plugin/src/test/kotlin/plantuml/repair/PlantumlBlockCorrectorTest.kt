@@ -15,7 +15,6 @@ import kotlin.test.assertTrue
  * no LLM, no rendering.
  */
 class PlantumlBlockCorrectorTest {
-
     private val acceptAll: PlantUmlSyntaxValidator =
         PlantUmlSyntaxValidator { SyntaxValidationResult.Valid }
 
@@ -23,10 +22,14 @@ class PlantumlBlockCorrectorTest {
         PlantUmlSyntaxValidator { SyntaxValidationResult.Invalid("syntax error", "trace") }
 
     /** Rejects any code that does not contain `FIXED` — models the LLM oracle. */
-    private val onlyFixed: PlantUmlSyntaxValidator = PlantUmlSyntaxValidator { code ->
-        if (code.contains("FIXED")) SyntaxValidationResult.Valid
-        else SyntaxValidationResult.Invalid("not fixed", "trace")
-    }
+    private val onlyFixed: PlantUmlSyntaxValidator =
+        PlantUmlSyntaxValidator { code ->
+            if (code.contains("FIXED")) {
+                SyntaxValidationResult.Valid
+            } else {
+                SyntaxValidationResult.Invalid("not fixed", "trace")
+            }
+        }
 
     private val classDiagram = "@startuml\nclass Car\n@enduml"
     private val brokenLabel = "@startuml\nrectangle \"a\nb\" as R\n@enduml"

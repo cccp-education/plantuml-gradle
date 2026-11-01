@@ -7,12 +7,12 @@ import contracts.context.ContextChannel
 import org.gradle.api.Project
 import plantuml.PlantumlPlugin.PlantumlExtension
 import plantuml.tasks.CollectPlantumlAugmentedContextTask
-import plantuml.tasks.GeneratePlantumlDiagramsTask
 import plantuml.tasks.CollectPlantumlIndexTask
-import plantuml.tasks.ValidatePlantumlSyntaxTask
 import plantuml.tasks.GenerateDiagramDocsTask
 import plantuml.tasks.GenerateKnowledgeGraphDiagramTask
+import plantuml.tasks.GeneratePlantumlDiagramsTask
 import plantuml.tasks.PreflightPlantumlDescriptionTask
+import plantuml.tasks.ValidatePlantumlSyntaxTask
 import java.io.File
 
 /**
@@ -25,61 +25,92 @@ import java.io.File
  * - [Extensions] — Extension point management
  */
 object PlantumlManager {
-
     /**
      * Manages plugin configuration.
      */
     object Configuration {
-        private val MAPPER: ObjectMapper = ObjectMapper(YAMLFactory())
-            .registerKotlinModule()
+        private val MAPPER: ObjectMapper =
+            ObjectMapper(YAMLFactory())
+                .registerKotlinModule()
 
         const val CONFIG_FILE_NAME = "plantuml-context.yml"
 
-        fun load(project: Project, cliParams: Map<String, Any?> = emptyMap()): PlantumlConfig {
+        fun load(
+            project: Project,
+            cliParams: Map<String, Any?> = emptyMap(),
+        ): PlantumlConfig {
             val extension = project.extensions.findByType(PlantumlExtension::class.java)
             val configPath = extension?.configPath?.orNull
 
-            val configFile = if (configPath != null) File(project.projectDir, configPath)
-            else File(project.projectDir, CONFIG_FILE_NAME)
-
-            val yamlConfig = if (!configFile.exists() || configFile.length() == 0L) {
-                project.logger.lifecycle(PlantumlMessages.get("manager.no_config"))
-                PlantumlConfig()
-            } else {
-                try {
-                    val config = ConfigLoader.load(configFile)
-                    project.logger.lifecycle(PlantumlMessages.format("manager.config_loaded", "en", configFile.absolutePath))
-                    config
-                } catch (e: com.fasterxml.jackson.core.JsonParseException) {
-                    val lineNum = e.location?.lineNr ?: -1
-                    val colNum = e.location?.columnNr ?: -1
-                    val locationMsg = if (lineNum > 0 && colNum > 0)
-                        " (line $lineNum, column $colNum)" else ""
-                    val errorMessage = PlantumlMessages.format(
-                        "manager.invalid_yaml", "en", configFile.absolutePath, e.message ?: "", locationMsg
-                    )
-                    project.logger.error(PlantumlMessages.format("manager.error_prefix", "en", errorMessage))
-                    throw IllegalStateException(errorMessage)
-                } catch (e: com.fasterxml.jackson.databind.exc.MismatchedInputException) {
-                    val lineNum = e.location?.lineNr ?: -1
-                    val colNum = e.location?.columnNr ?: -1
-                    val locationMsg = if (lineNum > 0 && colNum > 0)
-                        " (line $lineNum, column $colNum)" else ""
-                    val errorMessage = PlantumlMessages.format(
-                        "manager.invalid_syntax", "en", configFile.absolutePath, e.message ?: "", locationMsg
-                    )
-                    project.logger.error(PlantumlMessages.format("manager.error_prefix", "en", errorMessage))
-                    throw IllegalStateException(errorMessage)
-                } catch (e: Exception) {
-                    val errorMessage = PlantumlMessages.format(
-                        "manager.parse_failed", "en", configFile.absolutePath, e.message ?: ""
-                    )
-                    project.logger.error(PlantumlMessages.format("manager.error_prefix", "en", errorMessage))
-                    throw IllegalStateException(errorMessage)
+            val configFile =
+                if (configPath != null) {
+                    File(project.projectDir, configPath)
+                } else {
+                    File(project.projectDir, CONFIG_FILE_NAME)
                 }
-            }
 
-            return ConfigMerger.merge(project, yamlConfig, cliParams)
+            val yamlConfig =
+                if (!configFile.exists() || configFile.length() == 0L) {
+                    project.logger.lifecycle(PlantumlMessages.get("manager.no_config"))
+                    PlantumlConfig()
+                } else {
+                    try {
+                        val config = ConfigLoader.load(configFile)
+                        project.logger.lifecycle(PlantumlMessages.format("manager.config_loaded", "en", configFile.absolutePath))
+                        config
+                    } catch (e: com.fasterxml.jackson.core.JsonParseException) {
+                        val lineNum = e.location?.lineNr ?: -1
+                        val colNum = e.location?.columnNr ?: -1
+                        val locationMsg =
+                            if (lineNum > 0 && colNum > 0) {
+                                " (line $lineNum, column $colNum)"
+                            } else {
+                                ""
+                            }
+                        val errorMessage =
+                            PlantumlMessages.format(
+                                "manager.invalid_yaml",
+                                "en",
+                                configFile.absolutePath,
+                                e.message ?: "",
+                                locationMsg,
+                            )
+                        project.logger.error(PlantumlMessages.format("manager.error_prefix", "en", errorMessage))
+                        throw IllegalStateException(errorMessage)
+                    } catch (e: com.fasterxml.jackson.databind.exc.MismatchedInputException) {
+                        val lineNum = e.location?.lineNr ?: -1
+                        val colNum = e.location?.columnNr ?: -1
+                        val locationMsg =
+                            if (lineNum > 0 && colNum > 0) {
+                                " (line $lineNum, column $colNum)"
+                            } else {
+                                ""
+                            }
+                        val errorMessage =
+                            PlantumlMessages.format(
+                                "manager.invalid_syntax",
+                                "en",
+                                configFile.absolutePath,
+                                e.message ?: "",
+                                locationMsg,
+                            )
+                        project.logger.error(PlantumlMessages.format("manager.error_prefix", "en", errorMessage))
+                        throw IllegalStateException(errorMessage)
+                    } catch (e: Exception) {
+                        val errorMessage =
+                            PlantumlMessages.format(
+                                "manager.parse_failed",
+                                "en",
+                                configFile.absolutePath,
+                                e.message ?: "",
+                            )
+                        project.logger.error(PlantumlMessages.format("manager.error_prefix", "en", errorMessage))
+                        throw IllegalStateException(errorMessage)
+                    }
+                }
+
+            return ConfigMerger
+                .merge(project, yamlConfig, cliParams)
                 .also { project.logger.lifecycle(PlantumlMessages.get("manager.config_merged")) }
         }
     }
@@ -121,9 +152,15 @@ object PlantumlManager {
                 task.eagerFiles.from(
                     project.provider {
                         listOf(
-                            project.layout.projectDirectory.file(".agents/INDEX.adoc").asFile,
-                            project.layout.projectDirectory.file("PROMPT_REPRISE.adoc").asFile,
-                            project.layout.projectDirectory.file("AGENT.adoc").asFile,
+                            project.layout.projectDirectory
+                                .file(".agents/INDEX.adoc")
+                                .asFile,
+                            project.layout.projectDirectory
+                                .file("PROMPT_REPRISE.adoc")
+                                .asFile,
+                            project.layout.projectDirectory
+                                .file("AGENT.adoc")
+                                .asFile,
                         ).filter { it.exists() }
                     },
                 )

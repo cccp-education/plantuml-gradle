@@ -12,7 +12,6 @@ import kotlin.test.assertTrue
  * augmented context into the LLM generation prompt. Pure — no I/O, no Gradle.
  */
 class AugmentedContextPromptTest {
-
     @Test
     fun `a blank context leaves the prompt untouched`() {
         val prompt = "Generate a class diagram"

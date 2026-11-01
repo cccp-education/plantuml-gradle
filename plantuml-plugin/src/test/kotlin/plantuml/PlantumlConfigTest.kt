@@ -13,7 +13,6 @@ import kotlin.test.assertNotNull
 
 // Tests are quick
 class PlantumlConfigTest {
-
     companion object {
         private val mapper = ObjectMapper(YAMLFactory()).registerKotlinModule()
     }
@@ -25,7 +24,8 @@ class PlantumlConfigTest {
     fun `should load configuration from YAML file`() {
         // Given
         val configFile = File(tempDir, "plantuml-context.yml")
-        configFile.writeText("""
+        configFile.writeText(
+            """
             input:
               prompts: "custom-prompts"
               defaultLang: "fr"
@@ -56,7 +56,8 @@ class PlantumlConfigTest {
               username: "custom_user"
               password: "custom_password"
               tableName: "custom_table"
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
         // When
         val config = mapper.readValue(configFile, PlantumlConfig::class.java)

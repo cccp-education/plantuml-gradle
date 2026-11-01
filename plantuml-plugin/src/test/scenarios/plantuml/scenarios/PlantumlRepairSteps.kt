@@ -12,8 +12,9 @@ import plantuml.repair.PlantumlLabelIntegrity
  * Prefix-free step names are unique to this feature (anti-glue collision rule
  * S-088 — the shared `plantuml.scenarios` glue package).
  */
-class PlantumlRepairSteps(private val world: PlantumlWorld) {
-
+class PlantumlRepairSteps(
+    private val world: PlantumlWorld,
+) {
     private var source: String = ""
     private var repaired: String = ""
 

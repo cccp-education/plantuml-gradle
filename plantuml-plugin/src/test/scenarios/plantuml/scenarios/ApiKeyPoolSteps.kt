@@ -7,16 +7,17 @@ import org.assertj.core.api.Assertions.assertThat
 import plantuml.apikey.ApiKeyEntry
 import plantuml.apikey.ApiKeyPool
 import plantuml.apikey.ApiKeyPoolConfig
-import plantuml.apikey.Provider
 import plantuml.apikey.KeyTier
+import plantuml.apikey.Provider
 import plantuml.apikey.QuotaConfig
 import plantuml.apikey.ResetPolicy
 import plantuml.apikey.RotationStrategy
 import plantuml.apikey.ServiceType
 import java.time.LocalDateTime
 
-class ApiKeyPoolSteps(private val world: PlantumlWorld) {
-
+class ApiKeyPoolSteps(
+    private val world: PlantumlWorld,
+) {
     private var nextExpirationDate: LocalDateTime? = null
     private var nextMetadata: Map<String, String> = emptyMap()
     private var nextQuotaThreshold: Int? = null
@@ -39,12 +40,13 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
 
     @When("I initialize the pool")
     fun iInitializeThePool() {
-        world.apiKeyPool = ApiKeyPool(
-            entries = world.apiKeyPoolEntries.toList(),
-            rotationStrategy = RotationStrategy.ROUND_ROBIN,
-            fallbackEnabled = world.apiKeyPoolFallbackEnabled,
-            auditEnabled = world.apiKeyPoolAuditEnabled
-        )
+        world.apiKeyPool =
+            ApiKeyPool(
+                entries = world.apiKeyPoolEntries.toList(),
+                rotationStrategy = RotationStrategy.ROUND_ROBIN,
+                fallbackEnabled = world.apiKeyPoolFallbackEnabled,
+                auditEnabled = world.apiKeyPoolAuditEnabled,
+            )
     }
 
     @Then("the pool should be empty")
@@ -61,57 +63,72 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
     @When("I add an API key for provider {word}")
     fun iAddAnApiKeyForProvider(providerName: String) {
         val provider = parseProvider(providerName)
-        val entry = createEntry(
-            id = "${providerName.lowercase()}-key-${world.apiKeyPoolEntries.size + 1}",
-            provider = provider
-        )
+        val entry =
+            createEntry(
+                id = "${providerName.lowercase()}-key-${world.apiKeyPoolEntries.size + 1}",
+                provider = provider,
+            )
         world.apiKeyPoolEntries.add(entry)
-        world.apiKeyPool = ApiKeyPool(
-            entries = world.apiKeyPoolEntries.toList(),
-            rotationStrategy = RotationStrategy.ROUND_ROBIN,
-            fallbackEnabled = world.apiKeyPoolFallbackEnabled,
-            auditEnabled = world.apiKeyPoolAuditEnabled
-        )
+        world.apiKeyPool =
+            ApiKeyPool(
+                entries = world.apiKeyPoolEntries.toList(),
+                rotationStrategy = RotationStrategy.ROUND_ROBIN,
+                fallbackEnabled = world.apiKeyPoolFallbackEnabled,
+                auditEnabled = world.apiKeyPoolAuditEnabled,
+            )
     }
 
     @When("I add {int} API keys for provider {word}")
-    fun iAddMultipleApiKeysForProvider(count: Int, providerName: String) {
+    fun iAddMultipleApiKeysForProvider(
+        count: Int,
+        providerName: String,
+    ) {
         val provider = parseProvider(providerName)
         repeat(count) {
-            val entry = createEntry(
-                id = "${providerName.lowercase()}-key-${world.apiKeyPoolEntries.size + 1}",
-                provider = provider
-            )
+            val entry =
+                createEntry(
+                    id = "${providerName.lowercase()}-key-${world.apiKeyPoolEntries.size + 1}",
+                    provider = provider,
+                )
             world.apiKeyPoolEntries.add(entry)
         }
-        world.apiKeyPool = ApiKeyPool(
-            entries = world.apiKeyPoolEntries.toList(),
-            rotationStrategy = RotationStrategy.ROUND_ROBIN,
-            fallbackEnabled = world.apiKeyPoolFallbackEnabled,
-            auditEnabled = world.apiKeyPoolAuditEnabled
-        )
+        world.apiKeyPool =
+            ApiKeyPool(
+                entries = world.apiKeyPoolEntries.toList(),
+                rotationStrategy = RotationStrategy.ROUND_ROBIN,
+                fallbackEnabled = world.apiKeyPoolFallbackEnabled,
+                auditEnabled = world.apiKeyPoolAuditEnabled,
+            )
     }
 
     @When("I add {int} keys for provider {word}")
-    fun iAddKeysForProvider(count: Int, providerName: String) {
+    fun iAddKeysForProvider(
+        count: Int,
+        providerName: String,
+    ) {
         val provider = parseProvider(providerName)
         repeat(count) {
-            val entry = createEntry(
-                id = "${providerName.lowercase()}-key-${world.apiKeyPoolEntries.size + 1}",
-                provider = provider
-            )
+            val entry =
+                createEntry(
+                    id = "${providerName.lowercase()}-key-${world.apiKeyPoolEntries.size + 1}",
+                    provider = provider,
+                )
             world.apiKeyPoolEntries.add(entry)
         }
-        world.apiKeyPool = ApiKeyPool(
-            entries = world.apiKeyPoolEntries.toList(),
-            rotationStrategy = RotationStrategy.ROUND_ROBIN,
-            fallbackEnabled = world.apiKeyPoolFallbackEnabled,
-            auditEnabled = world.apiKeyPoolAuditEnabled
-        )
+        world.apiKeyPool =
+            ApiKeyPool(
+                entries = world.apiKeyPoolEntries.toList(),
+                rotationStrategy = RotationStrategy.ROUND_ROBIN,
+                fallbackEnabled = world.apiKeyPoolFallbackEnabled,
+                auditEnabled = world.apiKeyPoolAuditEnabled,
+            )
     }
 
     @When("I add {int} key for provider {word}")
-    fun iAddOneKeyForProvider(count: Int, providerName: String) {
+    fun iAddOneKeyForProvider(
+        count: Int,
+        providerName: String,
+    ) {
         iAddKeysForProvider(count, providerName)
     }
 
@@ -151,22 +168,27 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
     }
 
     @Given("a pool with {int} {word} keys")
-    fun aPoolWithKeys(count: Int, providerName: String) {
+    fun aPoolWithKeys(
+        count: Int,
+        providerName: String,
+    ) {
         val provider = parseProvider(providerName)
         world.apiKeyPoolEntries.clear()
         repeat(count) {
-            val entry = createEntry(
-                id = "${providerName.lowercase()}-key-${it + 1}",
-                provider = provider
-            )
+            val entry =
+                createEntry(
+                    id = "${providerName.lowercase()}-key-${it + 1}",
+                    provider = provider,
+                )
             world.apiKeyPoolEntries.add(entry)
         }
-        world.apiKeyPool = ApiKeyPool(
-            entries = world.apiKeyPoolEntries.toList(),
-            rotationStrategy = RotationStrategy.ROUND_ROBIN,
-            fallbackEnabled = world.apiKeyPoolFallbackEnabled,
-            auditEnabled = world.apiKeyPoolAuditEnabled
-        )
+        world.apiKeyPool =
+            ApiKeyPool(
+                entries = world.apiKeyPoolEntries.toList(),
+                rotationStrategy = RotationStrategy.ROUND_ROBIN,
+                fallbackEnabled = world.apiKeyPoolFallbackEnabled,
+                auditEnabled = world.apiKeyPoolAuditEnabled,
+            )
         world.apiKeyPoolSelectedKeys.clear()
     }
 
@@ -205,13 +227,14 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
     @Given("the first key has consumed {int}% of its quota")
     fun theFirstKeyHasConsumedPercentOfQuota(percent: Int) {
         if (world.apiKeyPool == null) {
-            world.apiKeyPool = ApiKeyPool(
-                entries = world.apiKeyPoolEntries.toList(),
-                rotationStrategy = RotationStrategy.TIERED,
-                fallbackEnabled = world.apiKeyPoolFallbackEnabled,
-                auditEnabled = world.apiKeyPoolAuditEnabled,
-                freemiumRatio = freemiumRatio
-            )
+            world.apiKeyPool =
+                ApiKeyPool(
+                    entries = world.apiKeyPoolEntries.toList(),
+                    rotationStrategy = RotationStrategy.TIERED,
+                    fallbackEnabled = world.apiKeyPoolFallbackEnabled,
+                    auditEnabled = world.apiKeyPoolAuditEnabled,
+                    freemiumRatio = freemiumRatio,
+                )
         }
         val firstEntry = world.apiKeyPool!!.getAllKeys().first()
         val limit = firstEntry.quota.limitValue
@@ -232,35 +255,39 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
     @Given("an API key with expiration date in the past")
     fun anApiKeyWithExpirationDateInThePast() {
         world.apiKeyPoolEntries.clear()
-        val entry = createEntry(
-            id = "expired-key-1",
-            provider = Provider.GOOGLE,
-            expirationDate = LocalDateTime.now().minusDays(1)
-        )
+        val entry =
+            createEntry(
+                id = "expired-key-1",
+                provider = Provider.GOOGLE,
+                expirationDate = LocalDateTime.now().minusDays(1),
+            )
         world.apiKeyPoolEntries.add(entry)
-        world.apiKeyPool = ApiKeyPool(
-            entries = world.apiKeyPoolEntries.toList(),
-            rotationStrategy = RotationStrategy.ROUND_ROBIN,
-            fallbackEnabled = world.apiKeyPoolFallbackEnabled,
-            auditEnabled = world.apiKeyPoolAuditEnabled
-        )
+        world.apiKeyPool =
+            ApiKeyPool(
+                entries = world.apiKeyPoolEntries.toList(),
+                rotationStrategy = RotationStrategy.ROUND_ROBIN,
+                fallbackEnabled = world.apiKeyPoolFallbackEnabled,
+                auditEnabled = world.apiKeyPoolAuditEnabled,
+            )
     }
 
     @Given("an API key without expiration date")
     fun anApiKeyWithoutExpirationDate() {
         world.apiKeyPoolEntries.clear()
-        val entry = createEntry(
-            id = "no-expiry-key-1",
-            provider = Provider.GOOGLE,
-            expirationDate = null
-        )
+        val entry =
+            createEntry(
+                id = "no-expiry-key-1",
+                provider = Provider.GOOGLE,
+                expirationDate = null,
+            )
         world.apiKeyPoolEntries.add(entry)
-        world.apiKeyPool = ApiKeyPool(
-            entries = world.apiKeyPoolEntries.toList(),
-            rotationStrategy = RotationStrategy.ROUND_ROBIN,
-            fallbackEnabled = world.apiKeyPoolFallbackEnabled,
-            auditEnabled = world.apiKeyPoolAuditEnabled
-        )
+        world.apiKeyPool =
+            ApiKeyPool(
+                entries = world.apiKeyPoolEntries.toList(),
+                rotationStrategy = RotationStrategy.ROUND_ROBIN,
+                fallbackEnabled = world.apiKeyPoolFallbackEnabled,
+                auditEnabled = world.apiKeyPoolAuditEnabled,
+            )
     }
 
     @When("I check key validity")
@@ -282,19 +309,21 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
     @Given("an API key with quota threshold of {int}%")
     fun anApiKeyWithQuotaThreshold(percent: Int) {
         world.apiKeyPoolEntries.clear()
-        val entry = createEntry(
-            id = "threshold-key-1",
-            provider = Provider.GOOGLE,
-            quota = QuotaConfig(limitValue = 100, thresholdPercent = percent)
-        )
+        val entry =
+            createEntry(
+                id = "threshold-key-1",
+                provider = Provider.GOOGLE,
+                quota = QuotaConfig(limitValue = 100, thresholdPercent = percent),
+            )
         world.apiKeyPoolEntries.add(entry)
-        world.apiKeyPool = ApiKeyPool(
-            entries = world.apiKeyPoolEntries.toList(),
-            rotationStrategy = RotationStrategy.ROUND_ROBIN,
-            fallbackEnabled = world.apiKeyPoolFallbackEnabled,
-            auditEnabled = world.apiKeyPoolAuditEnabled,
-            autoResetEnabled = false
-        )
+        world.apiKeyPool =
+            ApiKeyPool(
+                entries = world.apiKeyPoolEntries.toList(),
+                rotationStrategy = RotationStrategy.ROUND_ROBIN,
+                fallbackEnabled = world.apiKeyPoolFallbackEnabled,
+                auditEnabled = world.apiKeyPoolAuditEnabled,
+                autoResetEnabled = false,
+            )
     }
 
     @When("the consumed value reaches {int}%")
@@ -321,18 +350,20 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
     @Given("an API key with metadata")
     fun anApiKeyWithMetadata() {
         world.apiKeyPoolEntries.clear()
-        val entry = createEntry(
-            id = "metadata-key-1",
-            provider = Provider.GOOGLE,
-            metadata = mapOf("owner" to "team-alpha", "project" to "diagrams")
-        )
+        val entry =
+            createEntry(
+                id = "metadata-key-1",
+                provider = Provider.GOOGLE,
+                metadata = mapOf("owner" to "team-alpha", "project" to "diagrams"),
+            )
         world.apiKeyPoolEntries.add(entry)
-        world.apiKeyPool = ApiKeyPool(
-            entries = world.apiKeyPoolEntries.toList(),
-            rotationStrategy = RotationStrategy.ROUND_ROBIN,
-            fallbackEnabled = world.apiKeyPoolFallbackEnabled,
-            auditEnabled = world.apiKeyPoolAuditEnabled
-        )
+        world.apiKeyPool =
+            ApiKeyPool(
+                entries = world.apiKeyPoolEntries.toList(),
+                rotationStrategy = RotationStrategy.ROUND_ROBIN,
+                fallbackEnabled = world.apiKeyPoolFallbackEnabled,
+                auditEnabled = world.apiKeyPoolAuditEnabled,
+            )
     }
 
     @When("I retrieve the key")
@@ -351,49 +382,55 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
     @Given("an API key configured for TEXT_GENERATION service")
     fun anApiKeyConfiguredForTextGenerationService() {
         world.apiKeyPoolEntries.clear()
-        val entry = createEntry(
-            id = "service-key-1",
-            provider = Provider.GOOGLE,
-            services = listOf(ServiceType.TEXT_GENERATION)
-        )
+        val entry =
+            createEntry(
+                id = "service-key-1",
+                provider = Provider.GOOGLE,
+                services = listOf(ServiceType.TEXT_GENERATION),
+            )
         world.apiKeyPoolEntries.add(entry)
-        world.apiKeyPool = ApiKeyPool(
-            entries = world.apiKeyPoolEntries.toList(),
-            rotationStrategy = RotationStrategy.ROUND_ROBIN,
-            fallbackEnabled = world.apiKeyPoolFallbackEnabled,
-            auditEnabled = world.apiKeyPoolAuditEnabled
-        )
+        world.apiKeyPool =
+            ApiKeyPool(
+                entries = world.apiKeyPoolEntries.toList(),
+                rotationStrategy = RotationStrategy.ROUND_ROBIN,
+                fallbackEnabled = world.apiKeyPoolFallbackEnabled,
+                auditEnabled = world.apiKeyPoolAuditEnabled,
+            )
     }
 
     @Given("an API key NOT configured for IMAGE_GENERATION service")
     fun anApiKeyNotConfiguredForImageGenerationService() {
         world.apiKeyPoolEntries.clear()
-        val entry = createEntry(
-            id = "service-key-2",
-            provider = Provider.GOOGLE,
-            services = listOf(ServiceType.TEXT_GENERATION)
-        )
+        val entry =
+            createEntry(
+                id = "service-key-2",
+                provider = Provider.GOOGLE,
+                services = listOf(ServiceType.TEXT_GENERATION),
+            )
         world.apiKeyPoolEntries.add(entry)
-        world.apiKeyPool = ApiKeyPool(
-            entries = world.apiKeyPoolEntries.toList(),
-            rotationStrategy = RotationStrategy.ROUND_ROBIN,
-            fallbackEnabled = world.apiKeyPoolFallbackEnabled,
-            auditEnabled = world.apiKeyPoolAuditEnabled
-        )
+        world.apiKeyPool =
+            ApiKeyPool(
+                entries = world.apiKeyPoolEntries.toList(),
+                rotationStrategy = RotationStrategy.ROUND_ROBIN,
+                fallbackEnabled = world.apiKeyPoolFallbackEnabled,
+                auditEnabled = world.apiKeyPoolAuditEnabled,
+            )
     }
 
     @When("I request a key for TEXT_GENERATION")
     fun iRequestAKeyForTextGeneration() {
-        lastRetrievedEntry = world.apiKeyPool!!.getAllKeys().firstOrNull {
-            it.services.contains(ServiceType.TEXT_GENERATION)
-        }
+        lastRetrievedEntry =
+            world.apiKeyPool!!.getAllKeys().firstOrNull {
+                it.services.contains(ServiceType.TEXT_GENERATION)
+            }
     }
 
     @When("I request a key for IMAGE_GENERATION")
     fun iRequestAKeyForImageGeneration() {
-        lastRetrievedEntry = world.apiKeyPool!!.getAllKeys().firstOrNull {
-            it.services.contains(ServiceType.IMAGE_GENERATION)
-        }
+        lastRetrievedEntry =
+            world.apiKeyPool!!.getAllKeys().firstOrNull {
+                it.services.contains(ServiceType.IMAGE_GENERATION)
+            }
     }
 
     @Then("the key should be eligible for selection")
@@ -412,12 +449,13 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
         world.apiKeyPoolEntries.clear()
         val entry = createEntry(id = "fallback-key-1", provider = Provider.GOOGLE)
         world.apiKeyPoolEntries.add(entry)
-        world.apiKeyPool = ApiKeyPool(
-            entries = world.apiKeyPoolEntries.toList(),
-            rotationStrategy = RotationStrategy.ROUND_ROBIN,
-            fallbackEnabled = true,
-            auditEnabled = world.apiKeyPoolAuditEnabled
-        )
+        world.apiKeyPool =
+            ApiKeyPool(
+                entries = world.apiKeyPoolEntries.toList(),
+                rotationStrategy = RotationStrategy.ROUND_ROBIN,
+                fallbackEnabled = true,
+                auditEnabled = world.apiKeyPoolAuditEnabled,
+            )
     }
 
     @Given("a pool with fallback disabled")
@@ -426,12 +464,13 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
         world.apiKeyPoolEntries.clear()
         val entry = createEntry(id = "fallback-key-2", provider = Provider.GOOGLE)
         world.apiKeyPoolEntries.add(entry)
-        world.apiKeyPool = ApiKeyPool(
-            entries = world.apiKeyPoolEntries.toList(),
-            rotationStrategy = RotationStrategy.ROUND_ROBIN,
-            fallbackEnabled = false,
-            auditEnabled = world.apiKeyPoolAuditEnabled
-        )
+        world.apiKeyPool =
+            ApiKeyPool(
+                entries = world.apiKeyPoolEntries.toList(),
+                rotationStrategy = RotationStrategy.ROUND_ROBIN,
+                fallbackEnabled = false,
+                auditEnabled = world.apiKeyPoolAuditEnabled,
+            )
     }
 
     @When("the selected key fails")
@@ -457,12 +496,13 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
         world.apiKeyPoolEntries.clear()
         val entry = createEntry(id = "audit-key-1", provider = Provider.GOOGLE)
         world.apiKeyPoolEntries.add(entry)
-        world.apiKeyPool = ApiKeyPool(
-            entries = world.apiKeyPoolEntries.toList(),
-            rotationStrategy = RotationStrategy.ROUND_ROBIN,
-            fallbackEnabled = world.apiKeyPoolFallbackEnabled,
-            auditEnabled = true
-        )
+        world.apiKeyPool =
+            ApiKeyPool(
+                entries = world.apiKeyPoolEntries.toList(),
+                rotationStrategy = RotationStrategy.ROUND_ROBIN,
+                fallbackEnabled = world.apiKeyPoolFallbackEnabled,
+                auditEnabled = true,
+            )
     }
 
     @Given("a pool with audit logging disabled")
@@ -471,12 +511,13 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
         world.apiKeyPoolEntries.clear()
         val entry = createEntry(id = "audit-key-2", provider = Provider.GOOGLE)
         world.apiKeyPoolEntries.add(entry)
-        world.apiKeyPool = ApiKeyPool(
-            entries = world.apiKeyPoolEntries.toList(),
-            rotationStrategy = RotationStrategy.ROUND_ROBIN,
-            fallbackEnabled = world.apiKeyPoolFallbackEnabled,
-            auditEnabled = false
-        )
+        world.apiKeyPool =
+            ApiKeyPool(
+                entries = world.apiKeyPoolEntries.toList(),
+                rotationStrategy = RotationStrategy.ROUND_ROBIN,
+                fallbackEnabled = world.apiKeyPoolFallbackEnabled,
+                auditEnabled = false,
+            )
     }
 
     @When("I select a key")
@@ -504,12 +545,13 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
     @When("I load the configuration")
     fun iLoadThePoolConfiguration() {
         world.apiKeyPoolEntries.clear()
-        world.apiKeyPool = ApiKeyPool(
-            entries = world.apiKeyPoolEntries.toList(),
-            rotationStrategy = RotationStrategy.ROUND_ROBIN,
-            fallbackEnabled = world.apiKeyPoolFallbackEnabled,
-            auditEnabled = world.apiKeyPoolAuditEnabled
-        )
+        world.apiKeyPool =
+            ApiKeyPool(
+                entries = world.apiKeyPoolEntries.toList(),
+                rotationStrategy = RotationStrategy.ROUND_ROBIN,
+                fallbackEnabled = world.apiKeyPoolFallbackEnabled,
+                auditEnabled = world.apiKeyPoolAuditEnabled,
+            )
     }
 
     @Then("the version should be {string}")
@@ -521,19 +563,21 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
     @Given("an API key with DAILY reset policy")
     fun anApiKeyWithDailyResetPolicy() {
         world.apiKeyPoolEntries.clear()
-        val entry = createEntry(
-            id = "daily-key-1",
-            provider = Provider.GOOGLE,
-            quota = QuotaConfig(limitValue = 100, thresholdPercent = 80, resetPolicy = ResetPolicy.DAILY)
-        )
+        val entry =
+            createEntry(
+                id = "daily-key-1",
+                provider = Provider.GOOGLE,
+                quota = QuotaConfig(limitValue = 100, thresholdPercent = 80, resetPolicy = ResetPolicy.DAILY),
+            )
         world.apiKeyPoolEntries.add(entry)
-        world.apiKeyPool = ApiKeyPool(
-            entries = world.apiKeyPoolEntries.toList(),
-            rotationStrategy = RotationStrategy.ROUND_ROBIN,
-            fallbackEnabled = world.apiKeyPoolFallbackEnabled,
-            auditEnabled = world.apiKeyPoolAuditEnabled,
-            autoResetEnabled = true
-        )
+        world.apiKeyPool =
+            ApiKeyPool(
+                entries = world.apiKeyPoolEntries.toList(),
+                rotationStrategy = RotationStrategy.ROUND_ROBIN,
+                fallbackEnabled = world.apiKeyPoolFallbackEnabled,
+                auditEnabled = world.apiKeyPoolAuditEnabled,
+                autoResetEnabled = true,
+            )
         repeat(80) {
             world.apiKeyPool!!.getTracker().trackUsage(entry.id)
         }
@@ -554,19 +598,21 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
     @Given("an API key with MANUAL reset policy")
     fun anApiKeyWithManualResetPolicy() {
         world.apiKeyPoolEntries.clear()
-        val entry = createEntry(
-            id = "manual-key-1",
-            provider = Provider.GOOGLE,
-            quota = QuotaConfig(limitValue = 100, thresholdPercent = 80, resetPolicy = ResetPolicy.MANUAL)
-        )
+        val entry =
+            createEntry(
+                id = "manual-key-1",
+                provider = Provider.GOOGLE,
+                quota = QuotaConfig(limitValue = 100, thresholdPercent = 80, resetPolicy = ResetPolicy.MANUAL),
+            )
         world.apiKeyPoolEntries.add(entry)
-        world.apiKeyPool = ApiKeyPool(
-            entries = world.apiKeyPoolEntries.toList(),
-            rotationStrategy = RotationStrategy.ROUND_ROBIN,
-            fallbackEnabled = world.apiKeyPoolFallbackEnabled,
-            auditEnabled = world.apiKeyPoolAuditEnabled,
-            autoResetEnabled = false
-        )
+        world.apiKeyPool =
+            ApiKeyPool(
+                entries = world.apiKeyPoolEntries.toList(),
+                rotationStrategy = RotationStrategy.ROUND_ROBIN,
+                fallbackEnabled = world.apiKeyPoolFallbackEnabled,
+                auditEnabled = world.apiKeyPoolAuditEnabled,
+                autoResetEnabled = false,
+            )
         repeat(80) {
             world.apiKeyPool!!.getTracker().trackUsage(entry.id)
         }
@@ -581,7 +627,10 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
     private var freemiumRatio: Double = 0.0
 
     @Given("a pool with {int} FREE keys and {int} ENTERPRISE key")
-    fun poolWithFreeKeysAndEnterpriseKey(freeCount: Int, enterpriseCount: Int) {
+    fun poolWithFreeKeysAndEnterpriseKey(
+        freeCount: Int,
+        enterpriseCount: Int,
+    ) {
         world.apiKeyPoolEntries.clear()
         repeat(freeCount) { i ->
             world.apiKeyPoolEntries.add(
@@ -589,8 +638,8 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
                     id = "free-$i",
                     provider = Provider.GOOGLE,
                     tier = KeyTier.FREE,
-                    weight = 10
-                )
+                    weight = 10,
+                ),
             )
         }
         repeat(enterpriseCount) { i ->
@@ -599,8 +648,8 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
                     id = "ent-$i",
                     provider = Provider.GOOGLE,
                     tier = KeyTier.ENTERPRISE,
-                    weight = 10
-                )
+                    weight = 10,
+                ),
             )
         }
     }
@@ -614,8 +663,8 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
                     id = "free-$i",
                     provider = Provider.GOOGLE,
                     tier = KeyTier.FREE,
-                    weight = 10
-                )
+                    weight = 10,
+                ),
             )
         }
     }
@@ -627,13 +676,14 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
 
     @Given("the pool is initialized with TIERED strategy")
     fun thePoolIsInitializedWithTieredStrategy() {
-        world.apiKeyPool = ApiKeyPool(
-            entries = world.apiKeyPoolEntries.toList(),
-            rotationStrategy = RotationStrategy.TIERED,
-            fallbackEnabled = world.apiKeyPoolFallbackEnabled,
-            auditEnabled = world.apiKeyPoolAuditEnabled,
-            freemiumRatio = freemiumRatio
-        )
+        world.apiKeyPool =
+            ApiKeyPool(
+                entries = world.apiKeyPoolEntries.toList(),
+                rotationStrategy = RotationStrategy.TIERED,
+                fallbackEnabled = world.apiKeyPoolFallbackEnabled,
+                auditEnabled = world.apiKeyPoolAuditEnabled,
+                freemiumRatio = freemiumRatio,
+            )
     }
 
     @Then("the ENTERPRISE key should be selected")
@@ -648,16 +698,17 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
         assertThat(lastSelected.tier).isEqualTo(KeyTier.FREE)
     }
 
-    private fun parseProvider(name: String): Provider = when (name.uppercase()) {
-        "GOOGLE" -> Provider.GOOGLE
-        "HUGGINGFACE" -> Provider.HUGGINGFACE
-        "GROQ" -> Provider.GROQ
-        "OLLAMA" -> Provider.OLLAMA
-        "MISTRAL" -> Provider.MISTRAL
-        "OPENAI" -> Provider.OPENAI
-        "ANTHROPIC" -> Provider.ANTHROPIC
-        else -> Provider.UNKNOWN
-    }
+    private fun parseProvider(name: String): Provider =
+        when (name.uppercase()) {
+            "GOOGLE" -> Provider.GOOGLE
+            "HUGGINGFACE" -> Provider.HUGGINGFACE
+            "GROQ" -> Provider.GROQ
+            "OLLAMA" -> Provider.OLLAMA
+            "MISTRAL" -> Provider.MISTRAL
+            "OPENAI" -> Provider.OPENAI
+            "ANTHROPIC" -> Provider.ANTHROPIC
+            else -> Provider.UNKNOWN
+        }
 
     private fun createEntry(
         id: String,
@@ -668,18 +719,19 @@ class ApiKeyPoolSteps(private val world: PlantumlWorld) {
         metadata: Map<String, String> = emptyMap(),
         resetPolicy: ResetPolicy = ResetPolicy.DAILY,
         tier: KeyTier = KeyTier.FREE,
-        weight: Int = 1
-    ): ApiKeyEntry = ApiKeyEntry(
-        id = id,
-        email = "test@$id.com",
-        name = "Test $id",
-        keyRef = "REF_$id",
-        provider = provider,
-        services = services,
-        quota = quota.copy(resetPolicy = resetPolicy),
-        expirationDate = expirationDate,
-        metadata = metadata,
-        tier = tier,
-        weight = weight
-    )
+        weight: Int = 1,
+    ): ApiKeyEntry =
+        ApiKeyEntry(
+            id = id,
+            email = "test@$id.com",
+            name = "Test $id",
+            keyRef = "REF_$id",
+            provider = provider,
+            services = services,
+            quota = quota.copy(resetPolicy = resetPolicy),
+            expirationDate = expirationDate,
+            metadata = metadata,
+            tier = tier,
+            weight = weight,
+        )
 }

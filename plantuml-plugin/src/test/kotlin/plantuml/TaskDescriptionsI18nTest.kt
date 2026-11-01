@@ -16,7 +16,6 @@ import java.io.File
 import kotlin.test.assertEquals
 
 class TaskDescriptionsI18nTest {
-
     @TempDir
     lateinit var tempDir: File
 
@@ -24,9 +23,11 @@ class TaskDescriptionsI18nTest {
 
     @BeforeEach
     fun setup() {
-        project = ProjectBuilder.builder()
-            .withProjectDir(tempDir)
-            .build()
+        project =
+            ProjectBuilder
+                .builder()
+                .withProjectDir(tempDir)
+                .build()
         project.pluginManager.apply("education.cccp.plantuml")
     }
 

@@ -4,15 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
+import plantuml.PlantumlMessages
 import java.io.File
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
-import kotlin.test.assertNotNull
 import kotlin.test.assertFailsWith
-import plantuml.PlantumlMessages
+import kotlin.test.assertTrue
 
 class GraphifyPromptAdapterTest {
-
     @TempDir
     lateinit var tempDir: File
 
@@ -35,13 +33,14 @@ class GraphifyPromptAdapterTest {
 
     @Test
     fun `should generate prompt for single subgraph`() {
-        val communities = listOf(
-            mapOf(
-                "name" to "service layer",
-                "nodes" to listOf("LlmService", "DiagramProcessor", "PlantumlService"),
-                "edges" to listOf("LlmService --> DiagramProcessor", "DiagramProcessor --> PlantumlService")
+        val communities =
+            listOf(
+                mapOf(
+                    "name" to "service layer",
+                    "nodes" to listOf("LlmService", "DiagramProcessor", "PlantumlService"),
+                    "edges" to listOf("LlmService --> DiagramProcessor", "DiagramProcessor --> PlantumlService"),
+                ),
             )
-        )
         graphFile.writeText(createGraphJson(communities))
 
         val result = adapter.generatePrompt("service layer")
@@ -59,18 +58,19 @@ class GraphifyPromptAdapterTest {
 
     @Test
     fun `should generate prompts for all communities`() {
-        val communities = listOf(
-            mapOf(
-                "name" to "service layer",
-                "nodes" to listOf("LlmService"),
-                "edges" to listOf("LlmService --> DiagramProcessor")
-            ),
-            mapOf(
-                "name" to "config layer",
-                "nodes" to listOf("ConfigLoader"),
-                "edges" to listOf("ConfigLoader --> ConfigMerger")
+        val communities =
+            listOf(
+                mapOf(
+                    "name" to "service layer",
+                    "nodes" to listOf("LlmService"),
+                    "edges" to listOf("LlmService --> DiagramProcessor"),
+                ),
+                mapOf(
+                    "name" to "config layer",
+                    "nodes" to listOf("ConfigLoader"),
+                    "edges" to listOf("ConfigLoader --> ConfigMerger"),
+                ),
             )
-        )
         graphFile.writeText(createGraphJson(communities))
 
         val results = adapter.generateAllPrompts()
@@ -103,13 +103,14 @@ class GraphifyPromptAdapterTest {
 
     @Test
     fun `should use first community as fallback when no exact match`() {
-        val communities = listOf(
-            mapOf(
-                "name" to "model layer",
-                "nodes" to listOf("PlantumlConfig"),
-                "edges" to listOf("PlantumlConfig --> InputConfig")
+        val communities =
+            listOf(
+                mapOf(
+                    "name" to "model layer",
+                    "nodes" to listOf("PlantumlConfig"),
+                    "edges" to listOf("PlantumlConfig --> InputConfig"),
+                ),
             )
-        )
         graphFile.writeText(createGraphJson(communities))
 
         val result = adapter.generatePrompt("nonexistent layer")
@@ -120,13 +121,14 @@ class GraphifyPromptAdapterTest {
 
     @Test
     fun `should handle empty edges list`() {
-        val communities = listOf(
-            mapOf(
-                "name" to "task layer",
-                "nodes" to listOf("GeneratePlantumlDiagramsTask", "ValidatePlantumlSyntaxTask"),
-                "edges" to emptyList<String>()
+        val communities =
+            listOf(
+                mapOf(
+                    "name" to "task layer",
+                    "nodes" to listOf("GeneratePlantumlDiagramsTask", "ValidatePlantumlSyntaxTask"),
+                    "edges" to emptyList<String>(),
+                ),
             )
-        )
         graphFile.writeText(createGraphJson(communities))
 
         val result = adapter.generatePrompt("task layer")
@@ -140,13 +142,14 @@ class GraphifyPromptAdapterTest {
         val newPromptsDir = File(tempDir, "new-prompts")
         val newAdapter = GraphifyPromptAdapter(graphFile, newPromptsDir)
 
-        val communities = listOf(
-            mapOf(
-                "name" to "service layer",
-                "nodes" to listOf("LlmService"),
-                "edges" to emptyList<String>()
+        val communities =
+            listOf(
+                mapOf(
+                    "name" to "service layer",
+                    "nodes" to listOf("LlmService"),
+                    "edges" to emptyList<String>(),
+                ),
             )
-        )
         graphFile.writeText(createGraphJson(communities))
 
         val result = newAdapter.generatePrompt("service layer")
@@ -157,13 +160,14 @@ class GraphifyPromptAdapterTest {
 
     @Test
     fun `should perform case-insensitive subgraph matching`() {
-        val communities = listOf(
-            mapOf(
-                "name" to "Service Layer",
-                "nodes" to listOf("LlmService"),
-                "edges" to emptyList<String>()
+        val communities =
+            listOf(
+                mapOf(
+                    "name" to "Service Layer",
+                    "nodes" to listOf("LlmService"),
+                    "edges" to emptyList<String>(),
+                ),
             )
-        )
         graphFile.writeText(createGraphJson(communities))
 
         val result = adapter.generatePrompt("service layer")
@@ -173,13 +177,14 @@ class GraphifyPromptAdapterTest {
 
     @Test
     fun `should replace spaces with dashes in prompt filename`() {
-        val communities = listOf(
-            mapOf(
-                "name" to "config layer",
-                "nodes" to listOf("ConfigLoader"),
-                "edges" to emptyList<String>()
+        val communities =
+            listOf(
+                mapOf(
+                    "name" to "config layer",
+                    "nodes" to listOf("ConfigLoader"),
+                    "edges" to emptyList<String>(),
+                ),
             )
-        )
         graphFile.writeText(createGraphJson(communities))
 
         val result = adapter.generatePrompt("config layer")
@@ -191,9 +196,10 @@ class GraphifyPromptAdapterTest {
     fun `should throw when no communities in graph`() {
         graphFile.writeText("""{"other_field": "value"}""")
 
-        val ex = assertFailsWith<IllegalArgumentException> {
-            adapter.generateAllPrompts()
-        }
+        val ex =
+            assertFailsWith<IllegalArgumentException> {
+                adapter.generateAllPrompts()
+            }
         assertEquals(PlantumlMessages.get("graphify.no_communities"), ex.message)
     }
 }

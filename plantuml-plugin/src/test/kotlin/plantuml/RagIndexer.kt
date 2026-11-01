@@ -7,7 +7,9 @@ import java.io.File
  *
  * Receives only the RAG directory — no reference to Project or Task.
  */
-class RagIndexer(private val ragDir: File) {
+class RagIndexer(
+    private val ragDir: File,
+) {
     data class IndexingResult(
         val diagramsFound: Int,
         val historiesFound: Int,
@@ -29,13 +31,17 @@ class RagIndexer(private val ragDir: File) {
             return IndexingResult(0, 0, 0, messages)
         }
 
-        val diagrams = ragDir.walkTopDown()
-            .filter { it.isFile && it.extension == "puml" }
-            .toList()
+        val diagrams =
+            ragDir
+                .walkTopDown()
+                .filter { it.isFile && it.extension == "puml" }
+                .toList()
 
-        val histories = ragDir.walkTopDown()
-            .filter { it.isFile && it.extension == "json" }
-            .toList()
+        val histories =
+            ragDir
+                .walkTopDown()
+                .filter { it.isFile && it.extension == "json" }
+                .toList()
 
         if (diagrams.isEmpty() && histories.isEmpty()) {
             messages += "→ No PlantUML diagrams or training data found in RAG directory"

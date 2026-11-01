@@ -10,18 +10,19 @@ import kotlin.test.assertEquals
  * Cible : lignes 104-158 (merge*Config avec conditions if (yaml.xxx != default))
  */
 class ConfigMergerBranchCoverageTest {
-
     @TempDir
     lateinit var testProjectDir: File
 
     @Test
     fun `mergeInputConfig should use yaml value when different from default`() {
-        val yamlConfig = PlantumlConfig(
-            input = InputConfig(
-                prompts = "custom-prompts",
-                defaultLang = "fr"
+        val yamlConfig =
+            PlantumlConfig(
+                input =
+                    InputConfig(
+                        prompts = "custom-prompts",
+                        defaultLang = "fr",
+                    ),
             )
-        )
 
         val result = ConfigMerger.merge(testProjectDir, yamlConfig, emptyMap())
 
@@ -31,16 +32,18 @@ class ConfigMergerBranchCoverageTest {
 
     @Test
     fun `mergeOutputConfig should use yaml values when different from defaults`() {
-        val yamlConfig = PlantumlConfig(
-            output = OutputConfig(
-                diagrams = "custom-diagrams",
-                images = "custom-images",
-                validations = "custom-validations",
-                rag = "custom-rag",
-                format = "pdf",
-                theme = "modern"
+        val yamlConfig =
+            PlantumlConfig(
+                output =
+                    OutputConfig(
+                        diagrams = "custom-diagrams",
+                        images = "custom-images",
+                        validations = "custom-validations",
+                        rag = "custom-rag",
+                        format = "pdf",
+                        theme = "modern",
+                    ),
             )
-        )
 
         val result = ConfigMerger.merge(testProjectDir, yamlConfig, emptyMap())
 
@@ -54,14 +57,16 @@ class ConfigMergerBranchCoverageTest {
 
     @Test
     fun `mergeLangchain4jConfig should use yaml maxIterations when different from default`() {
-        val yamlConfig = PlantumlConfig(
-            langchain4j = LangchainConfig(
-                maxIterations = 10,
-                model = "gemini",
-                validation = false,
-                validationPrompt = "Custom validation prompt for testing"
+        val yamlConfig =
+            PlantumlConfig(
+                langchain4j =
+                    LangchainConfig(
+                        maxIterations = 10,
+                        model = "gemini",
+                        validation = false,
+                        validationPrompt = "Custom validation prompt for testing",
+                    ),
             )
-        )
 
         val result = ConfigMerger.merge(testProjectDir, yamlConfig, emptyMap())
 
@@ -73,14 +78,17 @@ class ConfigMergerBranchCoverageTest {
 
     @Test
     fun `mergeLangchain4jConfig should use yaml ollama config when different from default`() {
-        val yamlConfig = PlantumlConfig(
-            langchain4j = LangchainConfig(
-                ollama = OllamaConfig(
-                    baseUrl = "http://custom-server:8080",
-                    modelName = "llama3:8b"
-                )
+        val yamlConfig =
+            PlantumlConfig(
+                langchain4j =
+                    LangchainConfig(
+                        ollama =
+                            OllamaConfig(
+                                baseUrl = "http://custom-server:8080",
+                                modelName = "llama3:8b",
+                            ),
+                    ),
             )
-        )
 
         val result = ConfigMerger.merge(testProjectDir, yamlConfig, emptyMap())
 
@@ -90,14 +98,16 @@ class ConfigMergerBranchCoverageTest {
 
     @Test
     fun `mergeGitConfig should use yaml values when different from defaults`() {
-        val yamlConfig = PlantumlConfig(
-            git = GitConfig(
-                userName = "custom-bot",
-                userEmail = "custom@bot.com",
-                commitMessage = "Custom commit message for PlantUML",
-                watchedBranches = listOf("main", "develop", "feature", "release")
+        val yamlConfig =
+            PlantumlConfig(
+                git =
+                    GitConfig(
+                        userName = "custom-bot",
+                        userEmail = "custom@bot.com",
+                        commitMessage = "Custom commit message for PlantUML",
+                        watchedBranches = listOf("main", "develop", "feature", "release"),
+                    ),
             )
-        )
 
         val result = ConfigMerger.merge(testProjectDir, yamlConfig, emptyMap())
 
@@ -109,14 +119,16 @@ class ConfigMergerBranchCoverageTest {
 
     @Test
     fun `mergeRagConfig should use yaml values when non-empty`() {
-        val yamlConfig = PlantumlConfig(
-            rag = RagConfig(
-                databaseUrl = "jdbc:postgresql://custom-db:5432/custom",
-                username = "custom-user",
-                password = "custom-password",
-                tableName = "custom_embeddings"
+        val yamlConfig =
+            PlantumlConfig(
+                rag =
+                    RagConfig(
+                        databaseUrl = "jdbc:postgresql://custom-db:5432/custom",
+                        username = "custom-user",
+                        password = "custom-password",
+                        tableName = "custom_embeddings",
+                    ),
             )
-        )
 
         val result = ConfigMerger.merge(testProjectDir, yamlConfig, emptyMap())
 
@@ -128,14 +140,16 @@ class ConfigMergerBranchCoverageTest {
 
     @Test
     fun `CLI should override yaml values for input config`() {
-        val yamlConfig = PlantumlConfig(
-            input = InputConfig(prompts = "yaml-prompts", defaultLang = "fr")
-        )
+        val yamlConfig =
+            PlantumlConfig(
+                input = InputConfig(prompts = "yaml-prompts", defaultLang = "fr"),
+            )
 
-        val cliParams = mapOf(
-            "input.prompts" to "cli-prompts",
-            "input.defaultLang" to "es"
-        )
+        val cliParams =
+            mapOf(
+                "input.prompts" to "cli-prompts",
+                "input.defaultLang" to "es",
+            )
 
         val result = ConfigMerger.merge(testProjectDir, yamlConfig, cliParams)
 
@@ -145,17 +159,20 @@ class ConfigMergerBranchCoverageTest {
 
     @Test
     fun `CLI should override yaml values for output config`() {
-        val yamlConfig = PlantumlConfig(
-            output = OutputConfig(
-                diagrams = "yaml-diagrams",
-                format = "svg"
+        val yamlConfig =
+            PlantumlConfig(
+                output =
+                    OutputConfig(
+                        diagrams = "yaml-diagrams",
+                        format = "svg",
+                    ),
             )
-        )
 
-        val cliParams = mapOf(
-            "output.diagrams" to "cli-diagrams",
-            "output.format" to "pdf"
-        )
+        val cliParams =
+            mapOf(
+                "output.diagrams" to "cli-diagrams",
+                "output.format" to "pdf",
+            )
 
         val result = ConfigMerger.merge(testProjectDir, yamlConfig, cliParams)
 
@@ -165,19 +182,22 @@ class ConfigMergerBranchCoverageTest {
 
     @Test
     fun `CLI should override yaml values for langchain4j config`() {
-        val yamlConfig = PlantumlConfig(
-            langchain4j = LangchainConfig(
-                maxIterations = 10,
-                model = "gemini",
-                validation = false
+        val yamlConfig =
+            PlantumlConfig(
+                langchain4j =
+                    LangchainConfig(
+                        maxIterations = 10,
+                        model = "gemini",
+                        validation = false,
+                    ),
             )
-        )
 
-        val cliParams = mapOf(
-            "langchain4j.maxIterations" to 15,
-            "langchain4j.model" to "claude",
-            "langchain4j.validation" to true
-        )
+        val cliParams =
+            mapOf(
+                "langchain4j.maxIterations" to 15,
+                "langchain4j.model" to "claude",
+                "langchain4j.validation" to true,
+            )
 
         val result = ConfigMerger.merge(testProjectDir, yamlConfig, cliParams)
 
@@ -188,17 +208,20 @@ class ConfigMergerBranchCoverageTest {
 
     @Test
     fun `CLI should override yaml values for git config`() {
-        val yamlConfig = PlantumlConfig(
-            git = GitConfig(
-                userName = "yaml-user",
-                watchedBranches = listOf("main", "develop")
+        val yamlConfig =
+            PlantumlConfig(
+                git =
+                    GitConfig(
+                        userName = "yaml-user",
+                        watchedBranches = listOf("main", "develop"),
+                    ),
             )
-        )
 
-        val cliParams = mapOf(
-            "git.userName" to "cli-user",
-            "git.watchedBranches" to listOf("main", "feature")
-        )
+        val cliParams =
+            mapOf(
+                "git.userName" to "cli-user",
+                "git.watchedBranches" to listOf("main", "feature"),
+            )
 
         val result = ConfigMerger.merge(testProjectDir, yamlConfig, cliParams)
 
@@ -208,17 +231,20 @@ class ConfigMergerBranchCoverageTest {
 
     @Test
     fun `CLI should override yaml values for rag config`() {
-        val yamlConfig = PlantumlConfig(
-            rag = RagConfig(
-                databaseUrl = "jdbc:postgresql://yaml-db:5432/yaml",
-                tableName = "yaml_embeddings"
+        val yamlConfig =
+            PlantumlConfig(
+                rag =
+                    RagConfig(
+                        databaseUrl = "jdbc:postgresql://yaml-db:5432/yaml",
+                        tableName = "yaml_embeddings",
+                    ),
             )
-        )
 
-        val cliParams = mapOf(
-            "rag.databaseUrl" to "jdbc:postgresql://cli-db:5432/cli",
-            "rag.tableName" to "cli_embeddings"
-        )
+        val cliParams =
+            mapOf(
+                "rag.databaseUrl" to "jdbc:postgresql://cli-db:5432/cli",
+                "rag.tableName" to "cli_embeddings",
+            )
 
         val result = ConfigMerger.merge(testProjectDir, yamlConfig, cliParams)
 
@@ -229,22 +255,26 @@ class ConfigMergerBranchCoverageTest {
     @Test
     fun `merge should prioritize CLI over yaml over properties`() {
         val gradleProperties = File(testProjectDir, "gradle.properties")
-        gradleProperties.writeText("""
+        gradleProperties.writeText(
+            """
             plantuml.input.prompts=props-prompts
             plantuml.output.format=png
             plantuml.langchain4j.model=ollama
-        """.trimIndent())
-
-        val yamlConfig = PlantumlConfig(
-            input = InputConfig(prompts = "yaml-prompts"),
-            output = OutputConfig(format = "svg"),
-            langchain4j = LangchainConfig(model = "gemini")
+            """.trimIndent(),
         )
 
-        val cliParams = mapOf(
-            "input.prompts" to "cli-prompts",
-            "output.format" to "pdf"
-        )
+        val yamlConfig =
+            PlantumlConfig(
+                input = InputConfig(prompts = "yaml-prompts"),
+                output = OutputConfig(format = "svg"),
+                langchain4j = LangchainConfig(model = "gemini"),
+            )
+
+        val cliParams =
+            mapOf(
+                "input.prompts" to "cli-prompts",
+                "output.format" to "pdf",
+            )
 
         val result = ConfigMerger.merge(testProjectDir, yamlConfig, cliParams)
 
@@ -255,11 +285,12 @@ class ConfigMergerBranchCoverageTest {
 
     @Test
     fun `merge should use yaml when properties absent and CLI absent`() {
-        val yamlConfig = PlantumlConfig(
-            input = InputConfig(prompts = "yaml-prompts"),
-            output = OutputConfig(format = "svg", theme = "dark"),
-            langchain4j = LangchainConfig(model = "claude", maxIterations = 20)
-        )
+        val yamlConfig =
+            PlantumlConfig(
+                input = InputConfig(prompts = "yaml-prompts"),
+                output = OutputConfig(format = "svg", theme = "dark"),
+                langchain4j = LangchainConfig(model = "claude", maxIterations = 20),
+            )
 
         val result = ConfigMerger.merge(testProjectDir, yamlConfig, emptyMap())
 
@@ -273,12 +304,14 @@ class ConfigMergerBranchCoverageTest {
     @Test
     fun `merge should use properties when yaml uses defaults`() {
         val gradleProperties = File(testProjectDir, "gradle.properties")
-        gradleProperties.writeText("""
+        gradleProperties.writeText(
+            """
             plantuml.input.prompts=props-prompts
             plantuml.output.format=pdf
             plantuml.langchain4j.model=mistral
             plantuml.git.userName=props-user
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
         val yamlConfig = PlantumlConfig()
 

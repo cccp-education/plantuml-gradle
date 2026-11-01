@@ -1,8 +1,8 @@
 package plantuml.service
 
-import plantuml.ApiKeyConfig
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import plantuml.ApiKeyConfig
 
 /**
  * PLT-CR3-1 — the HuggingFace / Groq model names must be configurable, like the
@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test
  * already existed. The resolution is now a pure function (Red→Green, DDD).
  */
 class ProviderModelResolverTest {
-
     @Test
     fun `huggingFace uses the configured model name when present`() {
         val resolved = ProviderModelResolver.huggingFace(ApiKeyConfig(modelName = "HuggingFaceH4/zephyr-7b-beta"))

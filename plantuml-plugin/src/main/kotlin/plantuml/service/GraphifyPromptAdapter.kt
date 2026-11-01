@@ -10,7 +10,6 @@ class GraphifyPromptAdapter(
     private val promptsDir: File,
     private val docKnowledgeBase: DocKnowledgeBase = DocKnowledgeBase.forPlantUML(),
 ) {
-
     private val mapper = ObjectMapper()
 
     /**
@@ -25,7 +24,7 @@ class GraphifyPromptAdapter(
         val promptFile: File,
         val communityName: String,
         val nodes: List<String>,
-        val edges: List<String>
+        val edges: List<String>,
     )
 
     /**
@@ -39,10 +38,11 @@ class GraphifyPromptAdapter(
         val graph = mapper.readTree(graphFile)
 
         val communities = graph.get("communities")
-        val community = communities?.find {
-            it.get("name")?.asText()?.contains(subgraphName, ignoreCase = true) == true
-        } ?: communities?.first()
-            ?: throw IllegalArgumentException(PlantumlMessages.format("graphify.no_community", "en", subgraphName))
+        val community =
+            communities?.find {
+                it.get("name")?.asText()?.contains(subgraphName, ignoreCase = true) == true
+            } ?: communities?.first()
+                ?: throw IllegalArgumentException(PlantumlMessages.format("graphify.no_community", "en", subgraphName))
 
         val communityName = community.get("name").asText()
         val nodes = community.get("nodes")?.map { it.asText() } ?: emptyList()
@@ -68,8 +68,9 @@ class GraphifyPromptAdapter(
      */
     fun generateAllPrompts(): List<SubgraphResult> {
         val graph = mapper.readTree(graphFile)
-        val communities = graph.get("communities")
-            ?: throw IllegalArgumentException(PlantumlMessages.get("graphify.no_communities"))
+        val communities =
+            graph.get("communities")
+                ?: throw IllegalArgumentException(PlantumlMessages.get("graphify.no_communities"))
 
         return communities.map { community ->
             val name = community.get("name").asText()
@@ -80,18 +81,22 @@ class GraphifyPromptAdapter(
     private fun buildPrompt(
         communityName: String,
         nodes: List<String>,
-        edges: List<String>
+        edges: List<String>,
     ): String {
         val queryText = "class diagram component $communityName ${nodes.joinToString(" ")}"
         val docContext = docKnowledgeBase.queryContext(queryText)
-        val docSection = if (docContext.isNotBlank()) {
-            """PlantUML syntax reference (use ONLY valid PlantUML syntax):
+        val docSection =
+            if (docContext.isNotBlank()) {
+                """PlantUML syntax reference (use ONLY valid PlantUML syntax):
 $docContext
 
 """
-        } else ""
+            } else {
+                ""
+            }
 
-        return """${docSection}Generate a PlantUML class diagram for the "$communityName" module of the plantuml-gradle plugin.
+        return """
+            ${docSection}Generate a PlantUML class diagram for the "$communityName" module of the plantuml-gradle plugin.
 
 Classes and their relationships:
 
@@ -107,6 +112,6 @@ Requirements:
 - Use proper UML relations: -->, ..>, *--, o--
 - No style directives, no skinparam, no colors
 - Structure only
-        """.trimIndent()
+            """.trimIndent()
     }
 }

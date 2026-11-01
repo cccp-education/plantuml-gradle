@@ -12,7 +12,6 @@ import kotlin.test.assertTrue
  * N0 label surface misses.
  */
 class PlantumlNoteExtractorTest {
-
     @Test
     fun `extracts a single-line note text`() {
         val source = "@startuml\nnote left of Car : This is an important note\n@enduml"
@@ -27,14 +26,15 @@ class PlantumlNoteExtractorTest {
 
     @Test
     fun `extracts every note in order`() {
-        val source = """
+        val source =
+            """
             @startuml
             note left of A : first
             note over A, B
               second body
             end note
             @enduml
-        """.trimIndent()
+            """.trimIndent()
         assertEquals(listOf("first", "second body"), PlantumlNoteExtractor.notes(source))
     }
 

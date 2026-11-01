@@ -4,7 +4,16 @@ package plantuml
 
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assumptions
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Order
+import org.junit.jupiter.api.Tag
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
@@ -28,7 +37,6 @@ import kotlin.test.assertTrue
 @TestInstance(Lifecycle.PER_CLASS)
 @DisplayName("PlantUML plugin — integration Ollama locale (sans WireMock)")
 class PlantumlRealLlmFunctionalTest {
-
     private val ollamaBaseUrl = "http://localhost:11438"
     private val ollamaModel = "smollm:135m-instruct-v0.2-q8_0"
     private var ollamaAvailable = false
@@ -38,15 +46,18 @@ class PlantumlRealLlmFunctionalTest {
 
     @BeforeAll
     fun checkOllama() {
-        ollamaAvailable = try {
-            val conn = URI("$ollamaBaseUrl/api/tags").toURL()
-                .openConnection() as HttpURLConnection
-            conn.connectTimeout = 3_000
-            conn.readTimeout = 3_000
-            conn.responseCode == 200
-        } catch (_: Exception) {
-            false
-        }
+        ollamaAvailable =
+            try {
+                val conn =
+                    URI("$ollamaBaseUrl/api/tags")
+                        .toURL()
+                        .openConnection() as HttpURLConnection
+                conn.connectTimeout = 3_000
+                conn.readTimeout = 3_000
+                conn.responseCode == 200
+            } catch (_: Exception) {
+                false
+            }
     }
 
     private fun assumeOllama() {
@@ -61,13 +72,18 @@ class PlantumlRealLlmFunctionalTest {
     // ------------------------------------------------------------------ //
 
     private fun gradleRunner(vararg args: String): GradleRunner =
-        GradleRunner.create()
+        GradleRunner
+            .create()
             .withProjectDir(projectDir)
             .withArguments(*args, "--stacktrace")
             .withPluginClasspath()
 
-    private fun setupProject(promptName: String, promptContent: String) {
-        projectDir.resolve("settings.gradle.kts")
+    private fun setupProject(
+        promptName: String,
+        promptContent: String,
+    ) {
+        projectDir
+            .resolve("settings.gradle.kts")
             .writeText("""rootProject.name = "plantuml-real-ollama"""")
 
         projectDir.resolve("build.gradle.kts").writeText(
@@ -109,14 +125,13 @@ class PlantumlRealLlmFunctionalTest {
     @DisplayName("Class diagram")
     @TestInstance(Lifecycle.PER_CLASS)
     inner class ClassDiagram {
-
         @BeforeAll
         fun setup() {
             assumeOllama()
             setupProject(
                 "class-diagram.prompt",
                 "Create a class diagram with a single class named Person " +
-                        "that has two private fields: name (String) and age (Integer).",
+                    "that has two private fields: name (String) and age (Integer).",
             )
         }
 
@@ -144,15 +159,14 @@ class PlantumlRealLlmFunctionalTest {
     @DisplayName("Sequence diagram")
     @TestInstance(Lifecycle.PER_CLASS)
     inner class SequenceDiagram {
-
         @BeforeAll
         fun setup() {
             assumeOllama()
             setupProject(
                 "sequence-diagram.prompt",
                 "Create a sequence diagram where a Client calls a Service " +
-                        "with method login(username, password). " +
-                        "The Service responds with OK.",
+                    "with method login(username, password). " +
+                    "The Service responds with OK.",
             )
         }
 
@@ -180,14 +194,13 @@ class PlantumlRealLlmFunctionalTest {
     @DisplayName("Use-case diagram")
     @TestInstance(Lifecycle.PER_CLASS)
     inner class UseCaseDiagram {
-
         @BeforeAll
         fun setup() {
             assumeOllama()
             setupProject(
                 "usecase-diagram.prompt",
                 "Create a use case diagram with an actor named Admin " +
-                        "and two use cases: ManageUsers and ViewReports.",
+                    "and two use cases: ManageUsers and ViewReports.",
             )
         }
 
@@ -215,7 +228,6 @@ class PlantumlRealLlmFunctionalTest {
     @DisplayName("Health-check")
     @TestInstance(Lifecycle.PER_CLASS)
     inner class HealthCheck {
-
         @BeforeEach
         fun assumeOllamaAvailable() {
             assumeOllama()
@@ -224,8 +236,10 @@ class PlantumlRealLlmFunctionalTest {
         @Test
         @DisplayName("Ollama /api/tags should return 200")
         fun `ollama tags endpoint reachable`() {
-            val conn = URI("$ollamaBaseUrl/api/tags").toURL()
-                .openConnection() as HttpURLConnection
+            val conn =
+                URI("$ollamaBaseUrl/api/tags")
+                    .toURL()
+                    .openConnection() as HttpURLConnection
             conn.connectTimeout = 5_000
             conn.readTimeout = 5_000
             Assertions.assertEquals(200, conn.responseCode)
@@ -234,8 +248,10 @@ class PlantumlRealLlmFunctionalTest {
         @Test
         @DisplayName("model smollm:135m-instruct-v0.2-q8_0 should be listed in /api/tags")
         fun `smollm instruct model listed`() {
-            val conn = URI("$ollamaBaseUrl/api/tags").toURL()
-                .openConnection() as HttpURLConnection
+            val conn =
+                URI("$ollamaBaseUrl/api/tags")
+                    .toURL()
+                    .openConnection() as HttpURLConnection
             conn.connectTimeout = 5_000
             conn.readTimeout = 5_000
             val body = conn.inputStream.bufferedReader().readText()
@@ -248,12 +264,14 @@ class PlantumlRealLlmFunctionalTest {
         @Test
         @DisplayName("chat model creation should not throw")
         fun `create chat model without exception`() {
-            val config = PlantumlConfig(
-                langchain4j = LangchainConfig(
-                    model = "ollama",
-                    ollama = OllamaConfig(ollamaBaseUrl, ollamaModel),
-                ),
-            )
+            val config =
+                PlantumlConfig(
+                    langchain4j =
+                        LangchainConfig(
+                            model = "ollama",
+                            ollama = OllamaConfig(ollamaBaseUrl, ollamaModel),
+                        ),
+                )
             plantuml.service.LlmService(config).createChatModel()
         }
     }

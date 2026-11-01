@@ -5,17 +5,17 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class IdiomaticGlossaryLoaderTest {
-
     private val loader = IdiomaticGlossaryLoader()
 
     @Test
     fun `should parse single term single language`() {
-        val yaml = """
+        val yaml =
+            """
             pipeline:
               fr:
                 translation: pipeline
                 strategy: BORROW
-        """.trimIndent()
+            """.trimIndent()
 
         val glossary = loader.load(yaml)
 
@@ -27,12 +27,13 @@ class IdiomaticGlossaryLoaderTest {
 
     @Test
     fun `should parse translate strategy`() {
-        val yaml = """
+        val yaml =
+            """
             dependency injection:
               fr:
                 translation: injection de dépendances
                 strategy: TRANSLATE
-        """.trimIndent()
+            """.trimIndent()
 
         val glossary = loader.load(yaml)
 
@@ -43,7 +44,8 @@ class IdiomaticGlossaryLoaderTest {
 
     @Test
     fun `should parse multiple languages for same term`() {
-        val yaml = """
+        val yaml =
+            """
             pipeline:
               fr:
                 translation: pipeline
@@ -51,7 +53,7 @@ class IdiomaticGlossaryLoaderTest {
               zh:
                 translation: 管道
                 strategy: TRANSLATE
-        """.trimIndent()
+            """.trimIndent()
 
         val glossary = loader.load(yaml)
 
@@ -61,7 +63,8 @@ class IdiomaticGlossaryLoaderTest {
 
     @Test
     fun `should parse multiple terms`() {
-        val yaml = """
+        val yaml =
+            """
             pipeline:
               fr:
                 translation: pipeline
@@ -74,7 +77,7 @@ class IdiomaticGlossaryLoaderTest {
               fr:
                 translation: injection de dépendances
                 strategy: TRANSLATE
-        """.trimIndent()
+            """.trimIndent()
 
         val glossary = loader.load(yaml)
 
@@ -85,12 +88,13 @@ class IdiomaticGlossaryLoaderTest {
 
     @Test
     fun `should parse preserve strategy`() {
-        val yaml = """
+        val yaml =
+            """
             RFC:
               fr:
                 translation: RFC
                 strategy: PRESERVE
-        """.trimIndent()
+            """.trimIndent()
 
         val glossary = loader.load(yaml)
 

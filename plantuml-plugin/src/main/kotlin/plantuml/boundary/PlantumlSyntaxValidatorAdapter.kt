@@ -15,6 +15,5 @@ import plantuml.service.PlantumlService
 class PlantumlSyntaxValidatorAdapter(
     private val service: PlantumlService = PlantumlService(),
 ) : PlantUmlSyntaxValidator {
-    override fun validate(plantumlCode: String): SyntaxValidationResult =
-        service.validateSyntax(plantumlCode)
+    override fun validate(plantumlCode: String): SyntaxValidationResult = service.validateSyntax(plantumlCode)
 }

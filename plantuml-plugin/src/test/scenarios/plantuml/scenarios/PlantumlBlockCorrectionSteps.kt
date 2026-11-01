@@ -19,7 +19,6 @@ import plantuml.repair.PlantumlLabelIntegrity
  * `plantuml.scenarios` glue package (anti-collision rule S-088).
  */
 class PlantumlBlockCorrectionSteps {
-
     private var source: String = ""
     private var repairer: PlantumlBlockRepairer? = null
     private var result: PlantumlBlockCorrection? = null
@@ -41,19 +40,24 @@ class PlantumlBlockCorrectionSteps {
 
     @When("the correction block is corrected against an accepting oracle")
     fun correctedAgainstAnAcceptingOracle() {
-        result = PlantumlBlockCorrector.correct(
-            source,
-            PlantUmlSyntaxValidator { SyntaxValidationResult.Valid },
-            repairer,
-        )
+        result =
+            PlantumlBlockCorrector.correct(
+                source,
+                PlantUmlSyntaxValidator { SyntaxValidationResult.Valid },
+                repairer,
+            )
     }
 
     @When("the correction block is corrected against a fix-only oracle")
     fun correctedAgainstAFixOnlyOracle() {
-        val fixOnly = PlantUmlSyntaxValidator { code ->
-            if (code.contains("FIXED")) SyntaxValidationResult.Valid
-            else SyntaxValidationResult.Invalid("not fixed", "trace")
-        }
+        val fixOnly =
+            PlantUmlSyntaxValidator { code ->
+                if (code.contains("FIXED")) {
+                    SyntaxValidationResult.Valid
+                } else {
+                    SyntaxValidationResult.Invalid("not fixed", "trace")
+                }
+            }
         result = PlantumlBlockCorrector.correct(source, fixOnly, repairer)
     }
 

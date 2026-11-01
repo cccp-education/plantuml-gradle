@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class NonTranslatableTermRegistryTest {
-
     @Test
     fun `should register and detect a term`() {
         val registry = NonTranslatableTermRegistry()

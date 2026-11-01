@@ -1,15 +1,20 @@
 package plantuml.service
 
+import contracts.plantuml.SyntaxValidationResult
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
-import org.mockito.Mockito.*
+import org.mockito.Mockito.any
+import org.mockito.Mockito.anyString
+import org.mockito.Mockito.mock
+import org.mockito.Mockito.times
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.`when`
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import plantuml.PlantumlCode
 import plantuml.PlantumlDiagram
-import contracts.plantuml.SyntaxValidationResult
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -87,13 +92,15 @@ class DiagramProcessorTest {
     @Test
     fun `should validate diagram quality`() {
         // Given
-        val diagram = PlantumlDiagram(
-            conversation = listOf("Test conversation"),
-            plantuml = PlantumlCode(
-                code = "@startuml\nactor User\n@enduml",
-                description = "Test diagram"
+        val diagram =
+            PlantumlDiagram(
+                conversation = listOf("Test conversation"),
+                plantuml =
+                    PlantumlCode(
+                        code = "@startuml\nactor User\n@enduml",
+                        description = "Test diagram",
+                    ),
             )
-        )
 
         // When
         val result = diagramProcessor.validateDiagram(diagram)

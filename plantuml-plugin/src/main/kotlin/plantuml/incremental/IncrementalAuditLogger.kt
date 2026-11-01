@@ -12,8 +12,9 @@ import java.time.format.DateTimeFormatter
  *
  * @property logFile The file where audit entries are appended
  */
-class IncrementalAuditLogger(private val logFile: File) : IncrementalEventListener {
-
+class IncrementalAuditLogger(
+    private val logFile: File,
+) : IncrementalEventListener {
     init {
         if (!logFile.exists()) {
             logFile.parentFile?.mkdirs()
@@ -32,11 +33,12 @@ class IncrementalAuditLogger(private val logFile: File) : IncrementalEventListen
      */
     fun log(event: IncrementalEvent) {
         val timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-        val line = when (event) {
-            is PromptSkipped -> "$timestamp | ${event.eventType} | prompt=${event.promptName}"
-            is PromptProcessed -> "$timestamp | ${event.eventType} | prompt=${event.promptName} | iterations=${event.iterations}"
-            is OutputsCleaned -> "$timestamp | ${event.eventType} | removed=${event.removedCount}"
-        }
+        val line =
+            when (event) {
+                is PromptSkipped -> "$timestamp | ${event.eventType} | prompt=${event.promptName}"
+                is PromptProcessed -> "$timestamp | ${event.eventType} | prompt=${event.promptName} | iterations=${event.iterations}"
+                is OutputsCleaned -> "$timestamp | ${event.eventType} | removed=${event.removedCount}"
+            }
         logFile.appendText(line + System.lineSeparator())
     }
 }

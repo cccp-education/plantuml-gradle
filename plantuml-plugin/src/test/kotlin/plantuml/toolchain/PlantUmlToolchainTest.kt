@@ -16,7 +16,6 @@ import kotlin.text.Charsets.UTF_8
  * bakery/CI/local disagreed on the resolved version).
  */
 class PlantUmlToolchainTest {
-
     private val pluginDir = File(System.getProperty("user.dir")).absoluteFile
 
     @Test
@@ -49,7 +48,10 @@ class PlantUmlToolchainTest {
         }.isInstanceOf(IllegalArgumentException::class.java)
     }
 
-    private fun versionOf(toml: String, key: String): String =
+    private fun versionOf(
+        toml: String,
+        key: String,
+    ): String =
         toml
             .lineSequence()
             .map { it.substringBefore('#').trim() }

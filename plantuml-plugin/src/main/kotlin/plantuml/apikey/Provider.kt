@@ -15,7 +15,7 @@ enum class Provider {
     OPENAI,
     ANTHROPIC,
     GITHUB,
-    UNKNOWN
+    UNKNOWN,
 }
 
 /**
@@ -33,7 +33,7 @@ enum class ServiceType {
     TRANSLATION,
     CHAT_COMPLETION,
     VISION,
-    CUSTOM
+    CUSTOM,
 }
 
 /**
@@ -46,7 +46,7 @@ enum class RotationStrategy {
     WEIGHTED,
     LEAST_USED,
     SMART,
-    TIERED
+    TIERED,
 }
 
 /**
@@ -58,5 +58,5 @@ enum class RotationStrategy {
 enum class KeyTier {
     ENTERPRISE,
     PRO,
-    FREE
+    FREE,
 }

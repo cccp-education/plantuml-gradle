@@ -11,7 +11,9 @@ import contracts.plantuml.SyntaxValidationResult
  */
 sealed class DiagramOutputVerdict {
     /** The artifact is a real, non-empty image and its syntax still parses. */
-    data class Rendered(val byteLength: Long) : DiagramOutputVerdict()
+    data class Rendered(
+        val byteLength: Long,
+    ) : DiagramOutputVerdict()
 
     /** The artifact is empty — nothing was rendered. */
     data object EmptyImage : DiagramOutputVerdict()
@@ -21,10 +23,14 @@ sealed class DiagramOutputVerdict {
      * wrote its textual fallback (source + error) into the `.png` on failure.
      * This is the silent-degradation vector of a "white" diagram.
      */
-    data class NotAnImage(val message: String) : DiagramOutputVerdict()
+    data class NotAnImage(
+        val message: String,
+    ) : DiagramOutputVerdict()
 
     /** The image exists but the PlantUML source no longer parses. */
-    data class InvalidSyntax(val message: String) : DiagramOutputVerdict()
+    data class InvalidSyntax(
+        val message: String,
+    ) : DiagramOutputVerdict()
 }
 
 /**
@@ -41,7 +47,6 @@ sealed class DiagramOutputVerdict {
  * source still parses. Pure — it operates on bytes and the port, no I/O.
  */
 object DiagramOutputProbe {
-
     private val PNG_MAGIC = byteArrayOf(0x89.toByte(), 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A)
 
     /**
@@ -61,7 +66,7 @@ object DiagramOutputProbe {
         if (!looksLikeImage(bytes)) {
             return DiagramOutputVerdict.NotAnImage(
                 "artifact is not an image (${bytes.size} bytes, no PNG/JPEG/SVG header) — " +
-                    "PlantUML likely failed and wrote its textual fallback"
+                    "PlantUML likely failed and wrote its textual fallback",
             )
         }
         if (validator != null && validator.validate(plantumlCode) is SyntaxValidationResult.Invalid) {
@@ -74,7 +79,9 @@ object DiagramOutputProbe {
         if (startsWith(bytes, PNG_MAGIC)) return true
         // JPEG
         if (bytes.size >= 3 &&
-            bytes[0] == 0xFF.toByte() && bytes[1] == 0xD8.toByte() && bytes[2] == 0xFF.toByte()
+            bytes[0] == 0xFF.toByte() &&
+            bytes[1] == 0xD8.toByte() &&
+            bytes[2] == 0xFF.toByte()
         ) {
             return true
         }
@@ -83,7 +90,10 @@ object DiagramOutputProbe {
         return head.startsWith("<?xml") || head.startsWith("<svg")
     }
 
-    private fun startsWith(bytes: ByteArray, prefix: ByteArray): Boolean {
+    private fun startsWith(
+        bytes: ByteArray,
+        prefix: ByteArray,
+    ): Boolean {
         if (bytes.size < prefix.size) return false
         for (i in prefix.indices) {
             if (bytes[i] != prefix[i]) return false

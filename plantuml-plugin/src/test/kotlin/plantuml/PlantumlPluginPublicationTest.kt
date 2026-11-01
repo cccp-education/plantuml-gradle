@@ -20,15 +20,14 @@ class PlantumlPluginPublicationTest {
     @Test
     fun `plugin version matches root consumer catalog version`() {
         val buildScript = pluginDir.resolve("build.gradle.kts").readText(UTF_8)
-        val versionLine =
-            buildScript
-                .lineSequence()
-                .first { it.trimStart().startsWith("version =") }
+        // Whitespace-insensitive: the ktlint formatter reflows the assignment across
+        // lines, so a line-by-line match is brittle (S-244/S-325 F34 trap).
+        val compactBuildScript = buildScript.replace(Regex("\\s+"), "")
 
         // MEM-CAT-ROLLOUT-3 (D3) — self version derived from the published workspace catalog.
-        assertThat(versionLine)
+        assertThat(compactBuildScript)
             .withFailMessage("build.gradle.kts version must derive from the published workspace catalog (ws.versions.plantuml.plugin)")
-            .contains("ws.versions.plantuml.plugin.get()")
+            .contains("version=ws.versions.plantuml.plugin.get()")
 
         // Hygiene (D5): local toml self version must match the ws catalog version —
         // the ws catalog (workspace-bom repo) is the cross-borough source of truth.
@@ -44,8 +43,9 @@ class PlantumlPluginPublicationTest {
     fun `workspace bom platform pin matches ws catalog bom version`() {
         val buildScript = pluginDir.resolve("build.gradle.kts").readText(UTF_8)
         val wsBomVersion = publishedCatalogBomVersion()
+        val compactBuildScript = buildScript.replace(Regex("\\s+"), "")
 
-        assertThat(buildScript)
+        assertThat(compactBuildScript)
             .withFailMessage("workspace-bom platform pin must use the ws catalog BOM version ($wsBomVersion)")
             .contains("""platform("education.cccp:workspace-bom:$wsBomVersion")""")
     }

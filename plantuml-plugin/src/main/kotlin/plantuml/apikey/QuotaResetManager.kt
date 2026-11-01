@@ -13,7 +13,7 @@ import java.time.LocalDateTime
  */
 class QuotaResetManager(
     private val tracker: QuotaTracker,
-    private val autoResetEnabled: Boolean = true
+    private val autoResetEnabled: Boolean = true,
 ) {
     private val resetTimestamps = mutableMapOf<String, LocalDateTime>()
     private val resetCounts = mutableMapOf<String, Int>()
@@ -82,9 +82,7 @@ class QuotaResetManager(
      * @param entryId The ID of the API key entry
      * @return The number of resets
      */
-    fun getResetCount(entryId: String): Int {
-        return resetCounts[entryId] ?: 0
-    }
+    fun getResetCount(entryId: String): Int = resetCounts[entryId] ?: 0
 
     /**
      * Get the last reset timestamp for an API key.
@@ -92,9 +90,7 @@ class QuotaResetManager(
      * @param entryId The ID of the API key entry
      * @return The last reset timestamp, or null if never reset
      */
-    fun getLastReset(entryId: String): LocalDateTime? {
-        return resetTimestamps[entryId]
-    }
+    fun getLastReset(entryId: String): LocalDateTime? = resetTimestamps[entryId]
 
     /**
      * Check if daily reset should be performed.
@@ -111,10 +107,23 @@ class QuotaResetManager(
         val lastReset = resetTimestamps[entryId]
         if (lastReset == null) return true
 
-        val currentWeek = LocalDateTime.now().toLocalDate().atStartOfDay()
-            .with(java.time.temporal.TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY))
-        val lastResetWeek = lastReset.toLocalDate().atStartOfDay()
-            .with(java.time.temporal.TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY))
+        val currentWeek =
+            LocalDateTime
+                .now()
+                .toLocalDate()
+                .atStartOfDay()
+                .with(
+                    java.time.temporal.TemporalAdjusters
+                        .previousOrSame(java.time.DayOfWeek.MONDAY),
+                )
+        val lastResetWeek =
+            lastReset
+                .toLocalDate()
+                .atStartOfDay()
+                .with(
+                    java.time.temporal.TemporalAdjusters
+                        .previousOrSame(java.time.DayOfWeek.MONDAY),
+                )
 
         return currentWeek > lastResetWeek
     }

@@ -20,7 +20,6 @@ import plantuml.agent.LlmCodeExtractor
 class ChatModelBlockRepairer(
     private val chatModel: ChatModel,
 ) : PlantumlBlockRepairer {
-
     override fun repair(source: String): String? {
         val response = chatModel.chat(buildRepairPrompt(source))
         return LlmCodeExtractor.stripFences(response) ?: LlmCodeExtractor.rawPlantUml(response)

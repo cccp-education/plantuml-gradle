@@ -19,7 +19,6 @@ import plantuml.boundary.PlantumlTranslationPortAdapter
  * in the shared `plantuml.scenarios` glue package (anti-collision rule S-088).
  */
 class PlantumlTermProtectionSteps {
-
     private var source: String = ""
     private var translations: Map<String, String> = emptyMap()
     private var outcome: PlantUmlTranslationOutcome? = null

@@ -12,11 +12,10 @@ import kotlin.test.assertTrue
 
 /**
  * Unit tests for CollectPlantumlIndexTask
- * 
+ *
  * Tests the RAG re-indexing task (simulation mode, without database)
  */
 class CollectPlantumlIndexTaskUnitTest {
-
     @TempDir
     lateinit var tempDir: File
 
@@ -25,9 +24,11 @@ class CollectPlantumlIndexTaskUnitTest {
 
     @BeforeEach
     fun setup() {
-        project = ProjectBuilder.builder()
-            .withProjectDir(tempDir)
-            .build()
+        project =
+            ProjectBuilder
+                .builder()
+                .withProjectDir(tempDir)
+                .build()
 
         task = project.tasks.register("collectPlantumlIndex", CollectPlantumlIndexTask::class.java).get()
     }
@@ -46,7 +47,7 @@ class CollectPlantumlIndexTaskUnitTest {
                   username: ""
                   password: ""
                   tableName: "embeddings"
-            """.trimIndent()
+                """.trimIndent(),
             )
         }
 
@@ -61,9 +62,10 @@ class CollectPlantumlIndexTaskUnitTest {
     @Test
     fun `should throw when ragDir is file not directory`() {
         // Arrange: Create file instead of directory (isolated in tempDir)
-        val ragFile = File(tempDir, "isolated-rag").apply {
-            writeText("This is a file, not a directory")
-        }
+        val ragFile =
+            File(tempDir, "isolated-rag").apply {
+                writeText("This is a file, not a directory")
+            }
         File(tempDir, "plantuml-context.yml").apply {
             writeText(
                 """
@@ -74,14 +76,15 @@ class CollectPlantumlIndexTaskUnitTest {
                   username: ""
                   password: ""
                   tableName: "embeddings"
-            """.trimIndent()
+                """.trimIndent(),
             )
         }
 
         // Act & Assert: Should throw exception
-        val exception = assertFailsWith<RuntimeException> {
-            task.reindexRag()
-        }
+        val exception =
+            assertFailsWith<RuntimeException> {
+                task.reindexRag()
+            }
         assertTrue(exception.message!!.contains("not a directory"), "Exception should mention 'not a directory'")
     }
 
@@ -99,7 +102,7 @@ class CollectPlantumlIndexTaskUnitTest {
                   username: ""
                   password: ""
                   tableName: "embeddings"
-            """.trimIndent()
+                """.trimIndent(),
             )
         }
 
@@ -114,12 +117,14 @@ class CollectPlantumlIndexTaskUnitTest {
     fun `should scan puml files in directory`() {
         // Arrange: Create RAG directory with .puml files (isolated in tempDir)
         val ragDir = File(tempDir, "isolated-rag").apply { mkdirs() }
-        val diagram1 = File(ragDir, "diagram1.puml").apply {
-            writeText("@startuml\nAlice -> Bob\n@enduml")
-        }
-        val diagram2 = File(ragDir, "diagram2.puml").apply {
-            writeText("@startuml\nBob -> Alice\n@enduml")
-        }
+        val diagram1 =
+            File(ragDir, "diagram1.puml").apply {
+                writeText("@startuml\nAlice -> Bob\n@enduml")
+            }
+        val diagram2 =
+            File(ragDir, "diagram2.puml").apply {
+                writeText("@startuml\nBob -> Alice\n@enduml")
+            }
         File(tempDir, "plantuml-context.yml").apply {
             writeText(
                 """
@@ -130,7 +135,7 @@ class CollectPlantumlIndexTaskUnitTest {
                   username: ""
                   password: ""
                   tableName: "embeddings"
-            """.trimIndent()
+                """.trimIndent(),
             )
         }
 
@@ -146,15 +151,18 @@ class CollectPlantumlIndexTaskUnitTest {
     fun `should scan history json files`() {
         // Arrange: Create RAG directory with history files (isolated in tempDir)
         val ragDir = File(tempDir, "isolated-rag").apply { mkdirs() }
-        val diagram = File(ragDir, "diagram.puml").apply {
-            writeText("@startuml\nAlice -> Bob\n@enduml")
-        }
-        val history1 = File(ragDir, "attempt-history-20260409-120000.json").apply {
-            writeText("""{"attempts": 1, "success": true}""")
-        }
-        val history2 = File(ragDir, "attempt-history-20260409-130000.json").apply {
-            writeText("""{"attempts": 2, "success": true}""")
-        }
+        val diagram =
+            File(ragDir, "diagram.puml").apply {
+                writeText("@startuml\nAlice -> Bob\n@enduml")
+            }
+        val history1 =
+            File(ragDir, "attempt-history-20260409-120000.json").apply {
+                writeText("""{"attempts": 1, "success": true}""")
+            }
+        val history2 =
+            File(ragDir, "attempt-history-20260409-130000.json").apply {
+                writeText("""{"attempts": 2, "success": true}""")
+            }
         File(tempDir, "plantuml-context.yml").apply {
             writeText(
                 """
@@ -165,7 +173,7 @@ class CollectPlantumlIndexTaskUnitTest {
                   username: ""
                   password: ""
                   tableName: "embeddings"
-            """.trimIndent()
+                """.trimIndent(),
             )
         }
 
@@ -182,9 +190,10 @@ class CollectPlantumlIndexTaskUnitTest {
     fun `should handle puml files with minimal content gracefully`() {
         // Arrange: Create RAG directory with minimal .puml file (isolated in tempDir)
         val ragDir = File(tempDir, "isolated-rag").apply { mkdirs() }
-        val minimalDiagram = File(ragDir, "minimal.puml").apply {
-            writeText("@startuml\n@enduml")
-        }
+        val minimalDiagram =
+            File(ragDir, "minimal.puml").apply {
+                writeText("@startuml\n@enduml")
+            }
         File(tempDir, "plantuml-context.yml").apply {
             writeText(
                 """
@@ -195,7 +204,7 @@ class CollectPlantumlIndexTaskUnitTest {
                   username: ""
                   password: ""
                   tableName: "embeddings"
-            """.trimIndent()
+                """.trimIndent(),
             )
         }
 
@@ -210,15 +219,18 @@ class CollectPlantumlIndexTaskUnitTest {
     fun `should skip non puml and non history files`() {
         // Arrange: Create RAG directory with mixed files (isolated in tempDir)
         val ragDir = File(tempDir, "isolated-rag").apply { mkdirs() }
-        val diagram = File(ragDir, "diagram.puml").apply {
-            writeText("@startuml\nAlice -> Bob\n@enduml")
-        }
-        val readme = File(ragDir, "readme.txt").apply {
-            writeText("This is a readme file")
-        }
-        val config = File(ragDir, "config.yml").apply {
-            writeText("some: config")
-        }
+        val diagram =
+            File(ragDir, "diagram.puml").apply {
+                writeText("@startuml\nAlice -> Bob\n@enduml")
+            }
+        val readme =
+            File(ragDir, "readme.txt").apply {
+                writeText("This is a readme file")
+            }
+        val config =
+            File(ragDir, "config.yml").apply {
+                writeText("some: config")
+            }
         File(tempDir, "plantuml-context.yml").apply {
             writeText(
                 """
@@ -229,7 +241,7 @@ class CollectPlantumlIndexTaskUnitTest {
                   username: ""
                   password: ""
                   tableName: "embeddings"
-            """.trimIndent()
+                """.trimIndent(),
             )
         }
 

@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test
  * that finds the frozen blocks before a bake.
  */
 class PlantumlLabelIntegrityTest {
-
     @Test
     fun `escapeNewlines turns a real newline into the plantuml escape`() {
         assertThat(PlantumlLabelIntegrity.escapeNewlines("a\nb")).isEqualTo("a\\nb")

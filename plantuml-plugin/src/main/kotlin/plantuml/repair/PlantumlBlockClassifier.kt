@@ -24,7 +24,6 @@ import contracts.plantuml.SyntaxValidationResult
  *     (present but not converged — the assisted correction pass, G-3)
  */
 object PlantumlBlockClassifier {
-
     /** Classifies [source] into a [PlantumlBlockStatus] using [validator] as oracle. */
     fun classify(
         source: String,

@@ -5,7 +5,10 @@ package plantuml.agent
  */
 sealed interface DesignVerdict {
     data object Approved : DesignVerdict
-    data class NeedsImprovement(val feedback: String) : DesignVerdict
+
+    data class NeedsImprovement(
+        val feedback: String,
+    ) : DesignVerdict
 }
 
 /**
@@ -18,7 +21,6 @@ sealed interface DesignVerdict {
  * ([plantuml.service.VisionDesignReviewer]).
  */
 object DesignReview {
-
     /** Instruction sent to the vision model. Kept short and deterministic. */
     fun prompt(): String =
         "Analyze this diagram for layout quality, readability and spacing. " +
@@ -27,6 +29,9 @@ object DesignReview {
 
     /** Interprets the feedback: any mention of `approved` is an approval. */
     fun parse(feedback: String): DesignVerdict =
-        if (feedback.lowercase().contains("approved")) DesignVerdict.Approved
-        else DesignVerdict.NeedsImprovement(feedback.trim())
+        if (feedback.lowercase().contains("approved")) {
+            DesignVerdict.Approved
+        } else {
+            DesignVerdict.NeedsImprovement(feedback.trim())
+        }
 }

@@ -10,7 +10,6 @@ import java.io.File
 import kotlin.test.assertTrue
 
 class GenerateKnowledgeGraphDiagramTaskTest {
-
     @TempDir
     lateinit var tempDir: File
 
@@ -20,9 +19,11 @@ class GenerateKnowledgeGraphDiagramTaskTest {
 
     @BeforeEach
     fun setup() {
-        project = ProjectBuilder.builder()
-            .withProjectDir(tempDir)
-            .build()
+        project =
+            ProjectBuilder
+                .builder()
+                .withProjectDir(tempDir)
+                .build()
 
         project.pluginManager.apply("education.cccp.plantuml")
         task = project.tasks.getByName("generateKnowledgeGraphDiagram") as GenerateKnowledgeGraphDiagramTask
@@ -42,31 +43,60 @@ class GenerateKnowledgeGraphDiagramTaskTest {
         return graphFile
     }
 
-    private fun createRichGraphJson(): String {
-        return mapper.writeValueAsString(mapOf(
-            "communities" to listOf(
-                mapOf(
-                    "name" to "service layer",
-                    "nodes" to listOf("LlmService", "DiagramProcessor", "PlantumlService"),
-                    "edges" to listOf(
-                        mapOf("source" to "LlmService", "target" to "DiagramProcessor", "label" to "creates", "type" to "EXTRACTED", "confidence" to 1.0),
-                        mapOf("source" to "DiagramProcessor", "target" to "PlantumlService", "label" to "validates with", "type" to "EXTRACTED", "confidence" to 1.0),
-                        mapOf("source" to "LlmService", "target" to "PlantumlService", "label" to "delegates to", "type" to "INFERRED", "confidence" to 0.75)
-                    )
-                ),
-                mapOf(
-                    "name" to "config layer",
-                    "nodes" to listOf("ConfigLoader", "ConfigMerger", "PlantumlConfig"),
-                    "edges" to listOf(
-                        mapOf("source" to "ConfigLoader", "target" to "ConfigMerger", "label" to "loads into", "type" to "EXTRACTED", "confidence" to 1.0)
-                    )
-                )
+    private fun createRichGraphJson(): String =
+        mapper.writeValueAsString(
+            mapOf(
+                "communities" to
+                    listOf(
+                        mapOf(
+                            "name" to "service layer",
+                            "nodes" to listOf("LlmService", "DiagramProcessor", "PlantumlService"),
+                            "edges" to
+                                listOf(
+                                    mapOf(
+                                        "source" to "LlmService",
+                                        "target" to "DiagramProcessor",
+                                        "label" to "creates",
+                                        "type" to "EXTRACTED",
+                                        "confidence" to 1.0,
+                                    ),
+                                    mapOf(
+                                        "source" to "DiagramProcessor",
+                                        "target" to "PlantumlService",
+                                        "label" to "validates with",
+                                        "type" to "EXTRACTED",
+                                        "confidence" to 1.0,
+                                    ),
+                                    mapOf(
+                                        "source" to "LlmService",
+                                        "target" to "PlantumlService",
+                                        "label" to "delegates to",
+                                        "type" to "INFERRED",
+                                        "confidence" to 0.75,
+                                    ),
+                                ),
+                        ),
+                        mapOf(
+                            "name" to "config layer",
+                            "nodes" to listOf("ConfigLoader", "ConfigMerger", "PlantumlConfig"),
+                            "edges" to
+                                listOf(
+                                    mapOf(
+                                        "source" to "ConfigLoader",
+                                        "target" to "ConfigMerger",
+                                        "label" to "loads into",
+                                        "type" to "EXTRACTED",
+                                        "confidence" to 1.0,
+                                    ),
+                                ),
+                        ),
+                    ),
+                "edges" to
+                    listOf(
+                        mapOf("source" to "LlmService", "target" to "ConfigLoader", "label" to "reads config", "type" to "INFERRED", "confidence" to 0.6),
+                    ),
             ),
-            "edges" to listOf(
-                mapOf("source" to "LlmService", "target" to "ConfigLoader", "label" to "reads config", "type" to "INFERRED", "confidence" to 0.6)
-            )
-        ))
-    }
+        )
 
     @Test
     fun `should register generateKnowledgeGraphDiagram task`() {
@@ -82,13 +112,15 @@ class GenerateKnowledgeGraphDiagramTaskTest {
 
     @Test
     fun `should generate knowledge graph diagram from simple communities`() {
-        createGraphifyOut(listOf(
-            mapOf(
-                "name" to "service layer",
-                "nodes" to listOf("LlmService", "DiagramProcessor"),
-                "edges" to listOf("LlmService --> DiagramProcessor")
-            )
-        ))
+        createGraphifyOut(
+            listOf(
+                mapOf(
+                    "name" to "service layer",
+                    "nodes" to listOf("LlmService", "DiagramProcessor"),
+                    "edges" to listOf("LlmService --> DiagramProcessor"),
+                ),
+            ),
+        )
 
         task.generateKnowledgeGraph()
 
@@ -148,13 +180,15 @@ class GenerateKnowledgeGraphDiagramTaskTest {
 
     @Test
     fun `should render PNG when PlantUML syntax is valid`() {
-        createGraphifyOut(listOf(
-            mapOf(
-                "name" to "test community",
-                "nodes" to listOf("NodeA", "NodeB"),
-                "edges" to listOf("NodeA --> NodeB")
-            )
-        ))
+        createGraphifyOut(
+            listOf(
+                mapOf(
+                    "name" to "test community",
+                    "nodes" to listOf("NodeA", "NodeB"),
+                    "edges" to listOf("NodeA --> NodeB"),
+                ),
+            ),
+        )
 
         task.generateKnowledgeGraph()
 
@@ -172,10 +206,12 @@ class GenerateKnowledgeGraphDiagramTaskTest {
 
     @Test
     fun `should generate full knowledge graph when no filter applied`() {
-        createGraphifyOut(listOf(
-            mapOf("name" to "alpha", "nodes" to listOf("A"), "edges" to emptyList<String>()),
-            mapOf("name" to "beta", "nodes" to listOf("B"), "edges" to emptyList<String>())
-        ))
+        createGraphifyOut(
+            listOf(
+                mapOf("name" to "alpha", "nodes" to listOf("A"), "edges" to emptyList<String>()),
+                mapOf("name" to "beta", "nodes" to listOf("B"), "edges" to emptyList<String>()),
+            ),
+        )
 
         task.generateKnowledgeGraph()
 
@@ -227,9 +263,11 @@ class GenerateKnowledgeGraphDiagramTaskTest {
 
     @Test
     fun `should limit nodes with maxNodes property`() {
-        createGraphifyOut(listOf(
-            mapOf("name" to "big", "nodes" to (1..20).map { "Node$it" }, "edges" to emptyList<String>())
-        ))
+        createGraphifyOut(
+            listOf(
+                mapOf("name" to "big", "nodes" to (1..20).map { "Node$it" }, "edges" to emptyList<String>()),
+            ),
+        )
 
         project.extensions.extraProperties.set("plantuml.kg.maxNodes", "5")
 
@@ -245,9 +283,11 @@ class GenerateKnowledgeGraphDiagramTaskTest {
 
     @Test
     fun `should use custom outputDir property`() {
-        createGraphifyOut(listOf(
-            mapOf("name" to "test", "nodes" to listOf("A"), "edges" to emptyList<String>())
-        ))
+        createGraphifyOut(
+            listOf(
+                mapOf("name" to "test", "nodes" to listOf("A"), "edges" to emptyList<String>()),
+            ),
+        )
 
         project.extensions.extraProperties.set("plantuml.kg.outputDir", "custom-kg-output")
 
@@ -261,9 +301,11 @@ class GenerateKnowledgeGraphDiagramTaskTest {
 
     @Test
     fun `should name output files with community filter suffix`() {
-        createGraphifyOut(listOf(
-            mapOf("name" to "service layer", "nodes" to listOf("A"), "edges" to emptyList<String>())
-        ))
+        createGraphifyOut(
+            listOf(
+                mapOf("name" to "service layer", "nodes" to listOf("A"), "edges" to emptyList<String>()),
+            ),
+        )
 
         project.extensions.extraProperties.set("plantuml.kg.community", "service")
 
@@ -277,9 +319,11 @@ class GenerateKnowledgeGraphDiagramTaskTest {
 
     @Test
     fun `should name output files with full suffix when no filter`() {
-        createGraphifyOut(listOf(
-            mapOf("name" to "alpha", "nodes" to listOf("A"), "edges" to emptyList<String>())
-        ))
+        createGraphifyOut(
+            listOf(
+                mapOf("name" to "alpha", "nodes" to listOf("A"), "edges" to emptyList<String>()),
+            ),
+        )
 
         task.generateKnowledgeGraph()
 
@@ -294,17 +338,30 @@ class GenerateKnowledgeGraphDiagramTaskTest {
         val graphifyOut = File(tempDir, "graphify-out")
         graphifyOut.mkdirs()
         val graphFile = File(graphifyOut, "graph.json")
-        graphFile.writeText(mapper.writeValueAsString(mapOf(
-            "directed" to true,
-            "multigraph" to false,
-            "nodes" to listOf(
-                mapOf("label" to "LlmService", "file_type" to "code", "id" to "llm_service", "community" to 0, "source_file" to "LlmService.kt"),
-                mapOf("label" to "ApiKeyPool", "file_type" to "code", "id" to "api_key_pool", "community" to 0, "source_file" to "ApiKeyPool.kt")
+        graphFile.writeText(
+            mapper.writeValueAsString(
+                mapOf(
+                    "directed" to true,
+                    "multigraph" to false,
+                    "nodes" to
+                        listOf(
+                            mapOf("label" to "LlmService", "file_type" to "code", "id" to "llm_service", "community" to 0, "source_file" to "LlmService.kt"),
+                            mapOf("label" to "ApiKeyPool", "file_type" to "code", "id" to "api_key_pool", "community" to 0, "source_file" to "ApiKeyPool.kt"),
+                        ),
+                    "links" to
+                        listOf(
+                            mapOf(
+                                "source" to "llm_service",
+                                "target" to "api_key_pool",
+                                "relation" to "contains",
+                                "confidence" to "EXTRACTED",
+                                "confidence_score" to 1.0,
+                                "weight" to 1.0,
+                            ),
+                        ),
+                ),
             ),
-            "links" to listOf(
-                mapOf("source" to "llm_service", "target" to "api_key_pool", "relation" to "contains", "confidence" to "EXTRACTED", "confidence_score" to 1.0, "weight" to 1.0)
-            )
-        )))
+        )
 
         task.generateKnowledgeGraph()
 

@@ -7,8 +7,9 @@ import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import java.io.File
 
-class ConfigurationSteps(private val world: PlantumlWorld) {
-
+class ConfigurationSteps(
+    private val world: PlantumlWorld,
+) {
     @Given("no plantuml-config.yml exists")
     fun noConfigFileExists() {
         world.createGradleProject("nonexistent.yml")
@@ -21,7 +22,7 @@ class ConfigurationSteps(private val world: PlantumlWorld) {
             assertThat(world.buildResult?.output).containsAnyOf(
                 "No plantuml-context.yml",
                 "using defaults",
-                "default configuration"
+                "default configuration",
             )
         }
     }
@@ -30,7 +31,7 @@ class ConfigurationSteps(private val world: PlantumlWorld) {
     fun taskShouldCompleteSuccessfullyWithDefaults() {
         assertThat(world.buildResult?.output).containsAnyOf(
             "BUILD SUCCESSFUL",
-            "No prompt files found"
+            "No prompt files found",
         )
     }
 
@@ -52,7 +53,7 @@ class ConfigurationSteps(private val world: PlantumlWorld) {
                 modelName: "smollm:135m"
               maxIterations: 5
             invalid yaml syntax here: [unclosed bracket
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -62,7 +63,7 @@ class ConfigurationSteps(private val world: PlantumlWorld) {
         assertThat(world.exception?.message).containsAnyOf(
             "Invalid YAML",
             "YAML syntax",
-            "parse error"
+            "parse error",
         )
     }
 
@@ -72,7 +73,7 @@ class ConfigurationSteps(private val world: PlantumlWorld) {
         assertThat(errorMessage).containsAnyOf(
             "line",
             "column",
-            "position"
+            "position",
         )
     }
 
@@ -99,7 +100,7 @@ class ConfigurationSteps(private val world: PlantumlWorld) {
                 baseUrl: "http://localhost:11438"
                 modelName: "smollm:135m"
               maxIterations: 5
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         // Create the custom prompts directory and a prompt file
@@ -146,7 +147,7 @@ class ConfigurationSteps(private val world: PlantumlWorld) {
                 baseUrl: "http://localhost:11438"
                 modelName: "smollm:135m"
               maxIterations: 5
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -160,7 +161,7 @@ class ConfigurationSteps(private val world: PlantumlWorld) {
     fun openAiShouldBeUsedInsteadOfOllama() {
         assertThat(world.buildResult?.output).containsAnyOf(
             "BUILD SUCCESSFUL",
-            "Processing"
+            "Processing",
         )
     }
 
@@ -183,58 +184,60 @@ class ConfigurationSteps(private val world: PlantumlWorld) {
                 baseUrl: "http://localhost:11438"
                 modelName: "smollm:135m"
               maxIterations: $maxIterations
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
     @When("I run generatePlantumlDiagrams task with -Pplantuml.langchain4j.maxIterations={int}")
-    fun runGeneratePlantumlDiagramsTaskWithCliOverride(maxIterations: Int) = runBlocking {
-        val properties = mutableMapOf<String, String>()
-        world.mockServerPort?.let {
-            properties["plantuml.langchain4j.model"] = "ollama"
-            properties["plantuml.langchain4j.ollama.baseUrl"] = "http://localhost:$it"
-            properties["plantuml.langchain4j.ollama.modelName"] = "smollm:135m"
-        }
-        val systemProperties = mutableMapOf<String, String>()
-        world.projectDir?.let {
-            systemProperties["plugin.project.dir"] = it.absolutePath
-        }
-        properties["plantuml.langchain4j.maxIterations"] = maxIterations.toString()
-        properties["plantuml.test.mode"] = "true"
+    fun runGeneratePlantumlDiagramsTaskWithCliOverride(maxIterations: Int) =
+        runBlocking {
+            val properties = mutableMapOf<String, String>()
+            world.mockServerPort?.let {
+                properties["plantuml.langchain4j.model"] = "ollama"
+                properties["plantuml.langchain4j.ollama.baseUrl"] = "http://localhost:$it"
+                properties["plantuml.langchain4j.ollama.modelName"] = "smollm:135m"
+            }
+            val systemProperties = mutableMapOf<String, String>()
+            world.projectDir?.let {
+                systemProperties["plugin.project.dir"] = it.absolutePath
+            }
+            properties["plantuml.langchain4j.maxIterations"] = maxIterations.toString()
+            properties["plantuml.test.mode"] = "true"
 
-        try {
-            world.executeGradle("generatePlantumlDiagrams", properties = properties, systemProperties = systemProperties)
-        } catch (e: Exception) {
-            world.exception = e
+            try {
+                world.executeGradle("generatePlantumlDiagrams", properties = properties, systemProperties = systemProperties)
+            } catch (e: Exception) {
+                world.exception = e
+            }
         }
-    }
 
     @When("I run generatePlantumlDiagrams task")
-    fun runGeneratePlantumlDiagramsTask() = runBlocking {
-        val properties = mutableMapOf<String, String>()
-        world.mockServerPort?.let {
-            properties["plantuml.langchain4j.model"] = "ollama"
-            properties["plantuml.langchain4j.ollama.baseUrl"] = "http://localhost:$it"
-            properties["plantuml.langchain4j.ollama.modelName"] = "smollm:135m"
-        }
-        val systemProperties = mutableMapOf<String, String>()
-        world.projectDir?.let {
-            systemProperties["plugin.project.dir"] = it.absolutePath
-        }
-        properties["plantuml.test.mode"] = "true"
+    fun runGeneratePlantumlDiagramsTask() =
+        runBlocking {
+            val properties = mutableMapOf<String, String>()
+            world.mockServerPort?.let {
+                properties["plantuml.langchain4j.model"] = "ollama"
+                properties["plantuml.langchain4j.ollama.baseUrl"] = "http://localhost:$it"
+                properties["plantuml.langchain4j.ollama.modelName"] = "smollm:135m"
+            }
+            val systemProperties = mutableMapOf<String, String>()
+            world.projectDir?.let {
+                systemProperties["plugin.project.dir"] = it.absolutePath
+            }
+            properties["plantuml.test.mode"] = "true"
 
-        try {
-            world.executeGradle("generatePlantumlDiagrams", properties = properties, systemProperties = systemProperties)
-        } catch (e: Exception) {
-            world.exception = e
+            try {
+                world.executeGradle("generatePlantumlDiagrams", properties = properties, systemProperties = systemProperties)
+            } catch (e: Exception) {
+                world.exception = e
+            }
         }
-    }
 
     @Then("{int} iterations should be allowed")
     fun iterationsShouldBeAllowed(maxIterations: Int) {
         assertThat(world.buildResult?.output).containsAnyOf(
             "BUILD SUCCESSFUL",
-            "Processing"
+            "Processing",
         )
     }
 
@@ -246,7 +249,7 @@ class ConfigurationSteps(private val world: PlantumlWorld) {
             """
             input:
               prompts: "custom-prompts"
-            """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -255,8 +258,7 @@ class ConfigurationSteps(private val world: PlantumlWorld) {
         assertThat(world.buildResult?.output).containsAnyOf(
             "BUILD SUCCESSFUL",
             "No prompt files found",
-            "Processing"
+            "Processing",
         )
     }
-
 }

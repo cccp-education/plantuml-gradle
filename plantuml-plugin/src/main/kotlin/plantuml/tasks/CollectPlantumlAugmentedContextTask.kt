@@ -50,7 +50,6 @@ import java.io.File
  */
 @DisableCachingByDefault(because = "Augmented context collection — governance files, non-cacheable")
 abstract class CollectPlantumlAugmentedContextTask : DefaultTask() {
-
     /** EAGER governance files of the consumer project (missing files skipped). */
     @get:InputFiles
     @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -91,30 +90,33 @@ abstract class CollectPlantumlAugmentedContextTask : DefaultTask() {
 
     @TaskAction
     fun run() {
-        val eager = eagerFiles.files
-            .filter { it.exists() }
-            .sortedBy { it.name }
-            .joinToString("\n\n") { file ->
-                "--- ${file.name} ---\n${file.readText().trim()}"
-            }
+        val eager =
+            eagerFiles.files
+                .filter { it.exists() }
+                .sortedBy { it.name }
+                .joinToString("\n\n") { file ->
+                    "--- ${file.name} ---\n${file.readText().trim()}"
+                }
 
         val budget = ChannelBudget(totalTokenBudget = tokenBudget.get())
 
-        val composite = CompositeContext(
-            eagerSection = eager,
-            ragSection = ragContent.orNull.orEmpty(),
-            graphifySection = graphifyContent.orNull.orEmpty(),
-            docsSection = docsContent.orNull.orEmpty(),
-            config = CompositeContextConfig(),
-        )
+        val composite =
+            CompositeContext(
+                eagerSection = eager,
+                ragSection = ragContent.orNull.orEmpty(),
+                graphifySection = graphifyContent.orNull.orEmpty(),
+                docsSection = docsContent.orNull.orEmpty(),
+                config = CompositeContextConfig(),
+            )
 
         val tracker = ProvenanceTracker()
         trackSources(tracker)
-        val context = PlantumlContextBuilder.build(
-            composite = composite,
-            budget = budget,
-            tracker = tracker,
-        )
+        val context =
+            PlantumlContextBuilder.build(
+                composite = composite,
+                budget = budget,
+                tracker = tracker,
+            )
 
         val output = outputFile.asFile.get()
         output.parentFile.mkdirs()
@@ -157,7 +159,11 @@ abstract class CollectPlantumlAugmentedContextTask : DefaultTask() {
     }
 
     private fun trackSources(tracker: ProvenanceTracker) {
-        val eagerSources = eagerFiles.files.filter { it.exists() }.sortedBy { it.name }.map(::provenanceOf)
+        val eagerSources =
+            eagerFiles.files
+                .filter { it.exists() }
+                .sortedBy { it.name }
+                .map(::provenanceOf)
         tracker.trackChannel(ChannelType.EAGER.name, eagerSources)
 
         val rag = ragContent.orNull.orEmpty()
@@ -176,7 +182,10 @@ abstract class CollectPlantumlAugmentedContextTask : DefaultTask() {
         }
     }
 
-    private fun injected(label: String, content: String): ProvenanceSource =
+    private fun injected(
+        label: String,
+        content: String,
+    ): ProvenanceSource =
         ProvenanceSource(
             fileName = label,
             chars = content.length,

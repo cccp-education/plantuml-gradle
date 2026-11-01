@@ -1,3 +1,7 @@
+import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+import org.gradle.plugin.compatibility.compatibility
+import java.time.Duration
+
 // ── buildscript resolutionStrategy ────────────────────────────────────────────────
 // Gradle 9.5.1 pinne annotations:13.0 (Kotlin embedded) en strictly.
 // koog-agents 0.8.0 → koog-utils/koog-http-client-core/koog-prompt-llm →
@@ -13,27 +17,26 @@ buildscript {
     }
 }
 
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
-import org.gradle.plugin.compatibility.compatibility
-import java.time.Duration
-
 plugins {
     `java-library`
     id("education.cccp.build.gradle-plugin") version "0.0.7"
     id("education.cccp.build.publishing") version "0.0.7"
+    id("education.cccp.build.lint") version "0.0.7"
     alias(libs.plugins.publish)
     alias(libs.plugins.kover)
     alias(libs.plugins.codebase)
 }
 
-    // Apply the BOM
-    dependencies {
-        implementation(platform("education.cccp:workspace-bom:0.0.111"))
-    }
+// Apply the BOM
+dependencies {
+    implementation(platform("education.cccp:workspace-bom:0.0.111"))
+}
 
 group = "education.cccp"
 // MEM-CAT-ROLLOUT-3 (D3) — self version derived from the published workspace catalog.
-version = ws.versions.plantuml.plugin.get()
+version =
+    ws.versions.plantuml.plugin
+        .get()
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
@@ -103,14 +106,15 @@ configurations.configureEach {
     }
 }
 
-
 tasks.withType<Test> {
     useJUnitPlatform {
         // Tests @Tag("real-llm") are excluded by default.
         // To enable them: ./gradlew test -Ptest.tags="real-llm"
-        val runRealLlm = project.findProperty("test.tags")
-            ?.toString()
-            ?.contains("real-llm") == true
+        val runRealLlm =
+            project
+                .findProperty("test.tags")
+                ?.toString()
+                ?.contains("real-llm") == true
 
         if (!runRealLlm) {
             excludeTags("real-llm")
@@ -143,7 +147,6 @@ tasks.named<Test>("test") {
         excludeTestsMatching("plantuml.PlantUmlPluginFunctionalTests")
     }
 }
-
 
 // 1. Create the functionalTest SourceSet
 val functionalTest: SourceSet by sourceSets.creating {
@@ -193,46 +196,47 @@ dependencies {
 }
 
 // 3. Task for functional tests
-val functionalTestTask = tasks.register<Test>("functionalTest") {
-    description = "Runs functional tests."
-    group = "verification"
-    testClassesDirs = functionalTest.output.classesDirs
-    classpath = configurations[functionalTest.runtimeClasspathConfigurationName] + functionalTest.output
-    useJUnitPlatform {
-        val runRealLlm = project.findProperty("test.tags")?.toString()?.contains("real-llm") == true
-        val runFineTune = project.findProperty("test.tags")?.toString()?.contains("fine-tune") == true
-        if (!runRealLlm) {
-            excludeTags("real-llm")
+val functionalTestTask =
+    tasks.register<Test>("functionalTest") {
+        description = "Runs functional tests."
+        group = "verification"
+        testClassesDirs = functionalTest.output.classesDirs
+        classpath = configurations[functionalTest.runtimeClasspathConfigurationName] + functionalTest.output
+        useJUnitPlatform {
+            val runRealLlm = project.findProperty("test.tags")?.toString()?.contains("real-llm") == true
+            val runFineTune = project.findProperty("test.tags")?.toString()?.contains("fine-tune") == true
+            if (!runRealLlm) {
+                excludeTags("real-llm")
+            }
+            if (!runFineTune) {
+                excludeTags("fine-tune")
+            }
         }
-        if (!runFineTune) {
-            excludeTags("fine-tune")
+        testLogging {
+            events("passed", "skipped", "failed")
+            showStandardStreams = true
         }
+        failOnNoDiscoveredTests = false
+
+        // Timeout for functional tests - WireMock mocks prevent real network calls
+        timeout.set(Duration.ofMinutes(5))
+
+        // Forward gradle project property to system property for @EnabledIfSystemProperty
+        project.findProperty("test.tags")?.toString()?.let { tags ->
+            systemProperty("test.tags", tags)
+        }
+
+        // Add system properties for permission tests
+        systemProperty("test.timeout.multiplier", "2")
+
+        // OPTIMIZATION: Parallel tests to reduce execution time
+        // Tests are isolated with @TempDir, no shared state between classes
+        maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
+        forkEvery = 0
+        jvmArgs("-XX:+UseSerialGC")
+        jvmArgs("-XX:MaxMetaspaceSize=256m")
+        jvmArgs("-XX:TieredStopAtLevel=1")
     }
-    testLogging {
-        events("passed", "skipped", "failed")
-        showStandardStreams = true
-    }
-    failOnNoDiscoveredTests = false
-
-    // Timeout for functional tests - WireMock mocks prevent real network calls
-    timeout.set(Duration.ofMinutes(5))
-
-    // Forward gradle project property to system property for @EnabledIfSystemProperty
-    project.findProperty("test.tags")?.toString()?.let { tags ->
-        systemProperty("test.tags", tags)
-    }
-
-    // Add system properties for permission tests
-    systemProperty("test.timeout.multiplier", "2")
-
-    // OPTIMIZATION: Parallel tests to reduce execution time
-    // Tests are isolated with @TempDir, no shared state between classes
-    maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
-    forkEvery = 0
-    jvmArgs("-XX:+UseSerialGC")
-    jvmArgs("-XX:MaxMetaspaceSize=256m")
-    jvmArgs("-XX:TieredStopAtLevel=1")
-}
 
 // CORRECTION: Handle resource duplications for functionalTest
 tasks.named<ProcessResources>(functionalTest.processResourcesTaskName) {
@@ -242,9 +246,8 @@ tasks.named<ProcessResources>(functionalTest.processResourcesTaskName) {
 // 4. Configure source sets for Cucumber (standard test)
 sourceSets.test {
     resources.srcDir("src/test/features")
-    java.srcDir("src/test/scenarios")  // Steps in scenarios/
+    java.srcDir("src/test/scenarios") // Steps in scenarios/
 }
-
 
 // 5. Make testImplementation inherit from functionalTest (not the other way around!)
 configurations.named("testImplementation").configure {
@@ -270,8 +273,16 @@ tasks.named<Test>("test") {
     // INJECTED by Gradle. `PlantumlPluginPublicationTest` must never read the sibling
     // repo working tree (racy between parallel sessions, absent in CI where this repo
     // is checked out alone).
-    systemProperty("plantuml.publishedCatalog.plantumlVersion", ws.versions.plantuml.plugin.get())
-    systemProperty("plantuml.publishedCatalog.bomVersion", ws.versions.workspace.bom.get())
+    systemProperty(
+        "plantuml.publishedCatalog.plantumlVersion",
+        ws.versions.plantuml.plugin
+            .get(),
+    )
+    systemProperty(
+        "plantuml.publishedCatalog.bomVersion",
+        ws.versions.workspace.bom
+            .get(),
+    )
 }
 
 configurations {
@@ -289,82 +300,89 @@ configurations {
 }
 
 // 7. Task dedicated to Cucumber tests
-val cucumberTest = tasks.register<Test>("cucumberTest") {
-    description = "Runs Cucumber BDD tests"
-    group = "verification"
-    testClassesDirs = sourceSets.test.get().output.classesDirs
-    classpath = configurations.testRuntimeClasspath.get() +
+val cucumberTest =
+    tasks.register<Test>("cucumberTest") {
+        description = "Runs Cucumber BDD tests"
+        group = "verification"
+        testClassesDirs =
+            sourceSets.test
+                .get()
+                .output.classesDirs
+        classpath = configurations.testRuntimeClasspath.get() +
             sourceSets.test.get().output +
             sourceSets.main.get().output +
             sourceSets["functionalTest"].output +
             files(tasks.jar.get().archiveFile)
 
-    // FIX: Ensure plugin classes are compiled before running tests
-    dependsOn(tasks.classes)
-    useJUnitPlatform {
-        // CORRECTION: Do not filter by tag here, it filters JUnit engines
-        // Cucumber scenario filtering is done in the runner via FILTER_TAGS_PROPERTY_NAME
-        excludeEngines("junit-jupiter")
-    }
-    systemProperty("cucumber.junit-platform.naming-strategy", "long")
-
-    // Cucumber tag filter via -Pcucumber.tags="..." (default: exclude @wip, @integration, @realllm)
-    val cucumberTags = project.findProperty("cucumber.tags")?.toString()
-        ?: "not @wip and not @integration and not @realllm"
-    systemProperty("cucumber.filter.tags", cucumberTags)
-
-    // FIX: Disable Gradle daemon for tests to avoid startup overhead and memory leaks
-    systemProperty("org.gradle.daemon", "false")
-
-    // Memory leak prevention: limit heap size
-    maxHeapSize = "1g"
-
-    testLogging {
-        events("passed", "skipped", "failed")
-        showStandardStreams = true
-        exceptionFormat = FULL
-    }
-    outputs.upToDateWhen { false }
-    // Ensure main is compiled before
-    dependsOn(tasks.classes)
-
-    // OPTIMIZATION: Single JVM worker for Cucumber tests
-    maxParallelForks = 1 // ← Single JVM for shared state
-    forkEvery = 1 // ← Restart JVM after each test to prevent memory leaks
-    jvmArgs("-XX:+UseSerialGC")
-    jvmArgs("-XX:MaxMetaspaceSize=256m")
-    jvmArgs("-XX:TieredStopAtLevel=1")
-
-    // FIX: Timeout per test to prevent hanging
-    timeout.set(Duration.ofMinutes(15))
-
-    // Cleanup after test execution
-    doLast {
-        println("=== Cucumber Test Cleanup ===")
-        println("Cleaning temporary test directories...")
-
-        // Clean old gradle-test-* directories (> 1 hour)
-        val tempDir = File(System.getProperty("java.io.tmpdir"))
-        val oneHourAgo = System.currentTimeMillis() - (60 * 60 * 1000)
-
-        tempDir.listFiles { file ->
-            file.isDirectory && file.name.startsWith("gradle-test-") &&
-            file.lastModified() < oneHourAgo
-        }?.forEach { oldDir ->
-            try {
-                if (oldDir.deleteRecursively()) {
-                    println("  ✓ Cleaned: ${oldDir.name}")
-                } else {
-                    println("  ✗ Failed to clean: ${oldDir.name}")
-                }
-            } catch (e: Exception) {
-                println("  ✗ Error cleaning ${oldDir.name}: ${e.message}")
-            }
+        // FIX: Ensure plugin classes are compiled before running tests
+        dependsOn(tasks.classes)
+        useJUnitPlatform {
+            // CORRECTION: Do not filter by tag here, it filters JUnit engines
+            // Cucumber scenario filtering is done in the runner via FILTER_TAGS_PROPERTY_NAME
+            excludeEngines("junit-jupiter")
         }
+        systemProperty("cucumber.junit-platform.naming-strategy", "long")
 
-        println("=== Cleanup complete ===")
+        // Cucumber tag filter via -Pcucumber.tags="..." (default: exclude @wip, @integration, @realllm)
+        val cucumberTags =
+            project.findProperty("cucumber.tags")?.toString()
+                ?: "not @wip and not @integration and not @realllm"
+        systemProperty("cucumber.filter.tags", cucumberTags)
+
+        // FIX: Disable Gradle daemon for tests to avoid startup overhead and memory leaks
+        systemProperty("org.gradle.daemon", "false")
+
+        // Memory leak prevention: limit heap size
+        maxHeapSize = "1g"
+
+        testLogging {
+            events("passed", "skipped", "failed")
+            showStandardStreams = true
+            exceptionFormat = FULL
+        }
+        outputs.upToDateWhen { false }
+        // Ensure main is compiled before
+        dependsOn(tasks.classes)
+
+        // OPTIMIZATION: Single JVM worker for Cucumber tests
+        maxParallelForks = 1 // ← Single JVM for shared state
+        forkEvery = 1 // ← Restart JVM after each test to prevent memory leaks
+        jvmArgs("-XX:+UseSerialGC")
+        jvmArgs("-XX:MaxMetaspaceSize=256m")
+        jvmArgs("-XX:TieredStopAtLevel=1")
+
+        // FIX: Timeout per test to prevent hanging
+        timeout.set(Duration.ofMinutes(15))
+
+        // Cleanup after test execution
+        doLast {
+            println("=== Cucumber Test Cleanup ===")
+            println("Cleaning temporary test directories...")
+
+            // Clean old gradle-test-* directories (> 1 hour)
+            val tempDir = File(System.getProperty("java.io.tmpdir"))
+            val oneHourAgo = System.currentTimeMillis() - (60 * 60 * 1000)
+
+            tempDir
+                .listFiles { file ->
+                    file.isDirectory &&
+                        file.name.startsWith("gradle-test-") &&
+                        file.lastModified() < oneHourAgo
+                }?.forEach { oldDir ->
+                    try {
+                        if (oldDir.deleteRecursively()) {
+                            println("  ✓ Cleaned: ${oldDir.name}")
+                        } else {
+                            println("  ✗ Failed to clean: ${oldDir.name}")
+                        }
+                    } catch (e: Exception) {
+                        println("  ✗ Error cleaning ${oldDir.name}: ${e.message}")
+                    }
+                }
+
+            println("=== Cleanup complete ===")
+        }
     }
-}
 
 tasks.withType<Test>().configureEach {
     // Allows hiding the warning about dynamic agent loading
@@ -380,11 +398,13 @@ tasks.check {
 //  Fine-tuning model download (pre-requisite for real fine-tune test) //
 // ------------------------------------------------------------------ //
 
-val fineTuningModelDir = layout.projectDirectory
-    .dir("src/functionalTest/resources/models/SmolLM2-135M-Instruct")
+val fineTuningModelDir =
+    layout.projectDirectory
+        .dir("src/functionalTest/resources/models/SmolLM2-135M-Instruct")
 
-val pythonResourceDir = layout.projectDirectory
-    .dir("src/functionalTest/resources/python")
+val pythonResourceDir =
+    layout.projectDirectory
+        .dir("src/functionalTest/resources/python")
 
 val buildFineTuningImage by tasks.registering {
     description = "Builds the Docker image for SmolLM2 fine-tuning tests"
@@ -392,23 +412,28 @@ val buildFineTuningImage by tasks.registering {
 
     inputs.dir(pythonResourceDir)
     outputs.upToDateWhen {
-        val result = ProcessBuilder("docker", "image", "inspect", "plantuml-fine-tune:latest")
-            .redirectErrorStream(true)
-            .start()
-            .inputStream
-            .bufferedReader()
-            .use { it.readText() }
+        val result =
+            ProcessBuilder("docker", "image", "inspect", "plantuml-fine-tune:latest")
+                .redirectErrorStream(true)
+                .start()
+                .inputStream
+                .bufferedReader()
+                .use { it.readText() }
         result.contains("plantuml-fine-tune:latest")
     }
 
     doLast {
         val dockerfile = pythonResourceDir.asFile.resolve("Dockerfile")
-        val pb = ProcessBuilder(
-            "docker", "build",
-            "-t", "plantuml-fine-tune:latest",
-            "-f", dockerfile.absolutePath,
-            dockerfile.parent,
-        ).inheritIO()
+        val pb =
+            ProcessBuilder(
+                "docker",
+                "build",
+                "-t",
+                "plantuml-fine-tune:latest",
+                "-f",
+                dockerfile.absolutePath,
+                dockerfile.parent,
+            ).inheritIO()
         val exit = pb.start().waitFor()
         if (exit != 0) {
             throw GradleException("Docker build failed with exit code $exit")
@@ -433,7 +458,8 @@ val downloadFineTuningModel by tasks.registering {
         modelDir.mkdirs()
 
         val downloadScript = File(temporaryDir, "download.py")
-        downloadScript.writeText("""
+        downloadScript.writeText(
+            """
 import sys, time
 from huggingface_hub import snapshot_download
 for attempt in range(1, 4):
@@ -453,19 +479,28 @@ for attempt in range(1, 4):
         if attempt == 3:
             sys.exit(1)
         time.sleep(5)
-        """.trimIndent())
+            """.trimIndent(),
+        )
 
         val hfCache = File(temporaryDir, "hf-cache").also { it.mkdirs() }
 
-        val dockerCmd = listOf(
-            "docker", "run", "--rm",
-            "-v", "${modelDir.absolutePath}:/out",
-            "-v", "${hfCache.absolutePath}:/root/.cache/huggingface",
-            "-v", "${downloadScript.absolutePath}:/scripts/download.py:ro",
-            "-e", "HF_HUB_ENABLE_HF_TRANSFER=1",
-            "plantuml-fine-tune:latest",
-            "python3", "/scripts/download.py",
-        )
+        val dockerCmd =
+            listOf(
+                "docker",
+                "run",
+                "--rm",
+                "-v",
+                "${modelDir.absolutePath}:/out",
+                "-v",
+                "${hfCache.absolutePath}:/root/.cache/huggingface",
+                "-v",
+                "${downloadScript.absolutePath}:/scripts/download.py:ro",
+                "-e",
+                "HF_HUB_ENABLE_HF_TRANSFER=1",
+                "plantuml-fine-tune:latest",
+                "python3",
+                "/scripts/download.py",
+            )
 
         val pb = ProcessBuilder(dockerCmd).inheritIO()
         val exit = pb.start().waitFor()
@@ -483,9 +518,11 @@ for attempt in range(1, 4):
 // default), so downloading a ~270 MB model and building a Docker image on every
 // `check`/CI run is pure waste (Loi de l'Économie d'Encre) and breaks CI (no
 // Docker/creds). Enabler: `-Ptest.tags="fine-tune"`.
-val runFineTuning = providers.gradleProperty("test.tags")
-    .map { it.contains("fine-tune") }
-    .orElse(false)
+val runFineTuning =
+    providers
+        .gradleProperty("test.tags")
+        .map { it.contains("fine-tune") }
+        .orElse(false)
 
 tasks.named("functionalTest") {
     if (runFineTuning.get()) {
@@ -497,7 +534,6 @@ tasks.named(functionalTest.processResourcesTaskName) {
         dependsOn(buildFineTuningImage, downloadFineTuningModel)
     }
 }
-
 
 kover {
     currentProject {
@@ -525,7 +561,11 @@ tasks.register("koverThresholdCheck") {
     // bug masked by a dead CI, surfaced by S-222 CI resurrection).
     dependsOn("koverXmlReport")
     doLast {
-        val reportFile = layout.buildDirectory.file("reports/kover/xml/report.xml").get().asFile
+        val reportFile =
+            layout.buildDirectory
+                .file("reports/kover/xml/report.xml")
+                .get()
+                .asFile
         if (!reportFile.exists()) {
             throw GradleException("Kover report not found. Run 'koverXmlReport' first.")
         }
@@ -545,9 +585,9 @@ tasks.register("koverThresholdCheck") {
             "Instruction coverage: ${
                 String.format(
                     "%.2f",
-                    coverage
+                    coverage,
                 )
-            }% (missed=$totalMissed, covered=$totalCovered)"
+            }% (missed=$totalMissed, covered=$totalCovered)",
         )
         if (coverage < 75.0) {
             throw GradleException("Coverage ${String.format("%.2f", coverage)}% is below threshold 75%")
@@ -562,7 +602,10 @@ gradlePlugin {
         vcsUrl = "https://github.com/cheroliv/plantuml-gradle.git"
         website = "https://cheroliv.com"
         create("plantuml") {
-            id = libs.plugins.plantuml.get().pluginId
+            id =
+                libs.plugins.plantuml
+                    .get()
+                    .pluginId
             implementationClass = "plantuml.PlantumlPlugin"
             displayName = "Plantuml Plugin"
             description = "Gradle plugin for plantuml generation."
@@ -571,7 +614,7 @@ gradlePlugin {
                 "jgit",
                 "langchain4j",
                 "ollama",
-                "kotlin-DSL"
+                "kotlin-DSL",
             ).run(tags::set)
 
             @Suppress("UnstableApiUsage")

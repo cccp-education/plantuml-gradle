@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
 
 class ClassifiedTextTest {
-
     @Test
     fun `should hold translatable text and recommended strategy`() {
         val translatable = TranslatableText("Classes", TranslationCategory.PRESENTATION)

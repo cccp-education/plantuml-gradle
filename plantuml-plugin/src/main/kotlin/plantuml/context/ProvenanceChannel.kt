@@ -17,7 +17,6 @@ data class ProvenanceChannel(
     val channel: String,
     val sources: List<ProvenanceSource> = emptyList(),
 ) {
-
     /** Sum of the [ProvenanceSource.chars] of all [sources]. */
     fun totalChars(): Int = sources.sumOf { it.chars }
 

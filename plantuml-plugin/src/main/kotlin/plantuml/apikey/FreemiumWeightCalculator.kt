@@ -13,7 +13,7 @@ package plantuml.apikey
  */
 class FreemiumWeightCalculator(
     private val freemiumRatio: Double = 0.0,
-    private val quotaTracker: QuotaTracker
+    private val quotaTracker: QuotaTracker,
 ) {
     init {
         require(freemiumRatio in 0.0..1.0) {
@@ -35,10 +35,11 @@ class FreemiumWeightCalculator(
 
         val usagePct = quotaTracker.getUsagePercentage(entry)
         val remainingRatio = (1.0 - usagePct / 100.0).coerceIn(0.0, 1.0)
-        val tierMultiplier = when (entry.tier) {
-            KeyTier.FREE -> freemiumRatio
-            else -> 1.0 - freemiumRatio
-        }
+        val tierMultiplier =
+            when (entry.tier) {
+                KeyTier.FREE -> freemiumRatio
+                else -> 1.0 - freemiumRatio
+            }
         return (entry.weight * remainingRatio * tierMultiplier).toInt().coerceAtLeast(0)
     }
 }

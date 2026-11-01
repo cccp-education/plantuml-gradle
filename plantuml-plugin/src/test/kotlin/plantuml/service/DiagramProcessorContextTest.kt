@@ -1,5 +1,6 @@
 package plantuml.service
 
+import contracts.plantuml.SyntaxValidationResult
 import dev.langchain4j.model.chat.ChatModel
 import org.junit.jupiter.api.Test
 import org.mockito.ArgumentCaptor
@@ -10,7 +11,6 @@ import org.mockito.kotlin.any
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import plantuml.PlantumlConfig
-import contracts.plantuml.SyntaxValidationResult
 import kotlin.test.assertTrue
 
 /**
@@ -22,7 +22,6 @@ import kotlin.test.assertTrue
  * leaves the prompt unchanged (offline fallback, D-3).
  */
 class DiagramProcessorContextTest {
-
     private val logger: Logger = LoggerFactory.getLogger(DiagramProcessorContextTest::class.java)
 
     private fun processorWith(context: String): Pair<DiagramProcessor, ChatModel> {
@@ -32,13 +31,14 @@ class DiagramProcessorContextTest {
             .thenReturn("@startuml\nclass X\n@enduml")
         `when`(mockPlantumlService.validateSyntax(any<String>()))
             .thenReturn(SyntaxValidationResult.Valid)
-        val processor = DiagramProcessor(
-            mockPlantumlService,
-            mockChatModel,
-            PlantumlConfig(),
-            null,
-            context,
-        )
+        val processor =
+            DiagramProcessor(
+                mockPlantumlService,
+                mockChatModel,
+                PlantumlConfig(),
+                null,
+                context,
+            )
         return processor to mockChatModel
     }
 

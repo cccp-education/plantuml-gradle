@@ -16,7 +16,6 @@ package plantuml.boundary
  * Pure domain: no I/O, no LLM.
  */
 object PlantumlLabelBatch {
-
     /**
      * A non-linguistic sentinel on its own line. Chosen so a translator is unlikely
      * to translate, merge or reflow it, while being trivially splittable.

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
 
 class GlossaryEntryTest {
-
     @Test
     fun `should hold translation and strategy`() {
         val entry = GlossaryEntry("injection de dépendances", TranslationStrategy.TRANSLATE)

@@ -1,6 +1,12 @@
 package plantuml
 
-import com.github.tomakehurst.wiremock.client.WireMock.*
+import com.github.tomakehurst.wiremock.client.WireMock.aResponse
+import com.github.tomakehurst.wiremock.client.WireMock.equalTo
+import com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath
+import com.github.tomakehurst.wiremock.client.WireMock.post
+import com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor
+import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
+import com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import org.gradle.api.Project
@@ -11,13 +17,12 @@ import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.io.TempDir
 import plantuml.tasks.GeneratePlantumlDiagramsTask
 import java.io.File
-import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 /**
  * Unit tests for GeneratePlantumlDiagramsTask
- * 
+ *
  * Tests covered:
  * - Early exit when prompts directory does not exist
  * - Early exit when no .prompt files are found
@@ -26,28 +31,31 @@ import kotlin.test.assertTrue
  * - Override of plantuml.langchain4j.model
  */
 class GeneratePlantumlDiagramsTaskTest {
-
     @TempDir
     lateinit var tempDir: File
 
     @Suppress("JUnitMalformedDeclaration")
     @RegisterExtension
-    val wireMock: WireMockExtension = WireMockExtension.newInstance()
-        .options(WireMockConfiguration.wireMockConfig().dynamicPort())
-        .build()
+    val wireMock: WireMockExtension =
+        WireMockExtension
+            .newInstance()
+            .options(WireMockConfiguration.wireMockConfig().dynamicPort())
+            .build()
 
     private lateinit var project: Project
     private lateinit var task: GeneratePlantumlDiagramsTask
 
     @BeforeEach
     fun setup() {
-        project = ProjectBuilder.builder()
-            .withProjectDir(tempDir)
-            .build()
-        
+        project =
+            ProjectBuilder
+                .builder()
+                .withProjectDir(tempDir)
+                .build()
+
         project.pluginManager.apply("education.cccp.plantuml")
         task = project.tasks.getByName("generatePlantumlDiagrams") as GeneratePlantumlDiagramsTask
-        
+
         // Configure WireMock to return a valid response
         wireMock.stubFor(
             post(urlEqualTo("/api/chat"))
@@ -58,7 +66,7 @@ class GeneratePlantumlDiagramsTaskTest {
                         .withBody(ollamaChatJsonResponse("@startuml\nclass WireMockedClass\n@enduml")),
                 ),
         )
-        
+
         // Configure syntax validation to return valid
         wireMock.stubFor(
             post(urlPathMatching("/validate.*"))
@@ -73,10 +81,10 @@ class GeneratePlantumlDiagramsTaskTest {
     @Test
     fun `should exit early when prompts directory does not exist`() {
         // Given: prompts directory does not exist (not created)
-        
+
         // When: execute the task
         task.processPrompts()
-        
+
         // Then: no WireMock call (early exit)
         wireMock.verify(0, postRequestedFor(urlEqualTo("/api/chat")))
         assertTrue(true, "Task should complete without throwing exception")
@@ -87,13 +95,13 @@ class GeneratePlantumlDiagramsTaskTest {
         // Given: empty prompts directory
         val promptsDir = File(tempDir, "prompts")
         promptsDir.mkdirs()
-        
+
         // Non-.prompt file (should be ignored)
         File(promptsDir, "readme.txt").writeText("This is not a prompt file")
-        
+
         // When: execute the task
         task.processPrompts()
-        
+
         // Then: no WireMock call (no .prompt files)
         wireMock.verify(0, postRequestedFor(urlEqualTo("/api/chat")))
         assertTrue(true, "Task should complete without processing non-prompt files")
@@ -108,17 +116,17 @@ class GeneratePlantumlDiagramsTaskTest {
         val promptFile2 = File(promptsDir, "test2.prompt")
         promptFile1.writeText("Create a class diagram")
         promptFile2.writeText("Create a sequence diagram")
-        
+
         // Configure with WireMock
         setupProjectConfig()
-        
+
         // When: execute the task
         task.processPrompts()
-        
+
         // Then: prompt files have been deleted
         assertFalse(promptFile1.exists(), "First prompt should be deleted")
         assertFalse(promptFile2.exists(), "Second prompt should be deleted")
-        
+
         // And: WireMock called 2 times
         wireMock.verify(2, postRequestedFor(urlEqualTo("/api/chat")))
     }
@@ -130,16 +138,16 @@ class GeneratePlantumlDiagramsTaskTest {
         customPromptsDir.mkdirs()
         val promptFile = File(customPromptsDir, "test.prompt")
         promptFile.writeText("Create a class diagram")
-        
+
         // Override prompts directory
         project.extensions.extraProperties.set("plantuml.prompts.dir", "custom-prompts")
-        
+
         // Configure with WireMock
         setupProjectConfig()
-        
+
         // When: execute the task
         task.processPrompts()
-        
+
         // Then: file has been processed (deleted)
         assertFalse(promptFile.exists(), "Custom prompt should be processed")
         wireMock.verify(1, postRequestedFor(urlEqualTo("/api/chat")))
@@ -149,7 +157,8 @@ class GeneratePlantumlDiagramsTaskTest {
     fun `should override LLM model name from command line property`() {
         // Given: configuration with ollama as default model
         val configPath = File(tempDir, "plantuml-context.yml")
-        configPath.writeText("""
+        configPath.writeText(
+            """
             langchain4j:
               model: "ollama"
               maxIterations: 1
@@ -157,25 +166,26 @@ class GeneratePlantumlDiagramsTaskTest {
               ollama:
                 baseUrl: "http://localhost:${wireMock.port}"
                 modelName: "smollm:135m"
-        """.trimIndent())
-        
+            """.trimIndent(),
+        )
+
         // Given: a prompt file
         val promptsDir = File(tempDir, "prompts")
         promptsDir.mkdirs()
         val promptFile = File(promptsDir, "test.prompt")
         promptFile.writeText("Create a diagram")
-        
+
         // Override ollama model name
         // Must be done AFTER writing the YAML file
         project.extensions.extraProperties.set("plantuml.langchain4j.ollama.modelName", "llama2")
-        
+
         // When: execute the task
         task.processPrompts()
-        
+
         // Then: file has been processed
         assertFalse(promptFile.exists(), "Prompt should be processed with model override")
         wireMock.verify(1, postRequestedFor(urlEqualTo("/api/chat")))
-        
+
         // And: the model sent is "llama2" (override)
         wireMock.verify(
             postRequestedFor(urlEqualTo("/api/chat"))
@@ -189,7 +199,8 @@ class GeneratePlantumlDiagramsTaskTest {
 
     private fun setupProjectConfig() {
         val configPath = File(tempDir, "plantuml-context.yml")
-        configPath.writeText("""
+        configPath.writeText(
+            """
             langchain4j:
               model: "ollama"
               maxIterations: 1
@@ -197,10 +208,12 @@ class GeneratePlantumlDiagramsTaskTest {
               ollama:
                 baseUrl: "http://localhost:${wireMock.port}"
                 modelName: "smollm:135m"
-        """.trimIndent())
+            """.trimIndent(),
+        )
     }
 
-    private fun ollamaChatJsonResponse(plantumlCode: String) = """
+    private fun ollamaChatJsonResponse(plantumlCode: String) =
+        """
         {
           "model": "smollm:135m",
           "message": {
@@ -209,5 +222,5 @@ class GeneratePlantumlDiagramsTaskTest {
           },
           "done": true
         }
-    """.trimIndent()
+        """.trimIndent()
 }

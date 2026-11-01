@@ -8,8 +8,9 @@ import org.assertj.core.api.Assertions.assertThat
 import java.io.File
 import java.security.MessageDigest
 
-class IncrementalProcessingSteps(private val world: PlantumlWorld) {
-
+class IncrementalProcessingSteps(
+    private val world: PlantumlWorld,
+) {
     private fun startIncrementalMockLlm() {
         world.startMockLlm(
             """
@@ -19,7 +20,7 @@ class IncrementalProcessingSteps(private val world: PlantumlWorld) {
                 "description": "Generated diagram"
               }
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -37,7 +38,7 @@ class IncrementalProcessingSteps(private val world: PlantumlWorld) {
             plantuml:
               code: "@startuml\nactor User\n@enduml"
             status: success
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         val imagesDir = File(world.projectDir, "generated/images").apply { mkdirs() }
@@ -59,25 +60,26 @@ class IncrementalProcessingSteps(private val world: PlantumlWorld) {
     }
 
     @When("I run generatePlantumlDiagrams task again")
-    fun runGeneratePlantumlDiagramsTaskAgain() = runBlocking {
-        val properties = mutableMapOf<String, String>()
-        world.mockServerPort?.let {
-            properties["plantuml.langchain4j.model"] = "ollama"
-            properties["plantuml.langchain4j.ollama.baseUrl"] = "http://localhost:$it"
-            properties["plantuml.langchain4j.ollama.modelName"] = "smollm:135m"
-        }
-        val systemProperties = mutableMapOf<String, String>()
-        world.projectDir?.let {
-            systemProperties["plugin.project.dir"] = it.absolutePath
-        }
-        properties["plantuml.test.mode"] = "true"
+    fun runGeneratePlantumlDiagramsTaskAgain() =
+        runBlocking {
+            val properties = mutableMapOf<String, String>()
+            world.mockServerPort?.let {
+                properties["plantuml.langchain4j.model"] = "ollama"
+                properties["plantuml.langchain4j.ollama.baseUrl"] = "http://localhost:$it"
+                properties["plantuml.langchain4j.ollama.modelName"] = "smollm:135m"
+            }
+            val systemProperties = mutableMapOf<String, String>()
+            world.projectDir?.let {
+                systemProperties["plugin.project.dir"] = it.absolutePath
+            }
+            properties["plantuml.test.mode"] = "true"
 
-        try {
-            world.executeGradle("generatePlantumlDiagrams", properties = properties, systemProperties = systemProperties)
-        } catch (e: Exception) {
-            world.exception = e
+            try {
+                world.executeGradle("generatePlantumlDiagrams", properties = properties, systemProperties = systemProperties)
+            } catch (e: Exception) {
+                world.exception = e
+            }
         }
-    }
 
     @Then("the prompt should be skipped")
     fun promptShouldBeSkipped() {
@@ -87,7 +89,7 @@ class IncrementalProcessingSteps(private val world: PlantumlWorld) {
             "skipped",
             "Skipped",
             "no changes",
-            "No changes"
+            "No changes",
         )
     }
 
@@ -110,7 +112,7 @@ class IncrementalProcessingSteps(private val world: PlantumlWorld) {
             plantuml:
               code: "@startuml\nactor User\n@enduml"
             status: success
-            """.trimIndent()
+            """.trimIndent(),
         )
         startIncrementalMockLlm()
     }
@@ -129,7 +131,7 @@ class IncrementalProcessingSteps(private val world: PlantumlWorld) {
                 "description": "Generated different diagram"
               }
             }
-        """.trimIndent()
+            """.trimIndent(),
         )
     }
 
@@ -139,7 +141,7 @@ class IncrementalProcessingSteps(private val world: PlantumlWorld) {
             "Processing",
             "processing",
             "Processed",
-            "processed"
+            "processed",
         )
     }
 
@@ -170,7 +172,7 @@ class IncrementalProcessingSteps(private val world: PlantumlWorld) {
                 plantuml:
                   code: "@startuml\nclass Class$i\n@enduml"
                 status: success
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             val imageFile = File(imagesDir, "prompt-$i.png")
@@ -237,7 +239,7 @@ class IncrementalProcessingSteps(private val world: PlantumlWorld) {
             "Checksum",
             "CHECKSUM",
             "unchanged",
-            "Unchanged"
+            "Unchanged",
         )
     }
 
@@ -247,7 +249,7 @@ class IncrementalProcessingSteps(private val world: PlantumlWorld) {
             "UP-TO-DATE",
             "up-to-date",
             "skipped",
-            "Skipped"
+            "Skipped",
         )
     }
 
@@ -268,7 +270,7 @@ class IncrementalProcessingSteps(private val world: PlantumlWorld) {
                 plantuml:
                   code: "@startuml\nclass Class$i\n@enduml"
                 status: success
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             val imageFile = File(imagesDir, "rerun-test-$i.png")
@@ -278,25 +280,26 @@ class IncrementalProcessingSteps(private val world: PlantumlWorld) {
     }
 
     @When("I run generatePlantumlDiagrams task with --rerun-tasks")
-    fun runGeneratePlantumlDiagramsTaskWithRerunTasks() = runBlocking {
-        val properties = mutableMapOf<String, String>()
-        world.mockServerPort?.let {
-            properties["plantuml.langchain4j.model"] = "ollama"
-            properties["plantuml.langchain4j.ollama.baseUrl"] = "http://localhost:$it"
-            properties["plantuml.langchain4j.ollama.modelName"] = "smollm:135m"
-        }
-        val systemProperties = mutableMapOf<String, String>()
-        world.projectDir?.let {
-            systemProperties["plugin.project.dir"] = it.absolutePath
-        }
-        properties["plantuml.test.mode"] = "true"
+    fun runGeneratePlantumlDiagramsTaskWithRerunTasks() =
+        runBlocking {
+            val properties = mutableMapOf<String, String>()
+            world.mockServerPort?.let {
+                properties["plantuml.langchain4j.model"] = "ollama"
+                properties["plantuml.langchain4j.ollama.baseUrl"] = "http://localhost:$it"
+                properties["plantuml.langchain4j.ollama.modelName"] = "smollm:135m"
+            }
+            val systemProperties = mutableMapOf<String, String>()
+            world.projectDir?.let {
+                systemProperties["plugin.project.dir"] = it.absolutePath
+            }
+            properties["plantuml.test.mode"] = "true"
 
-        try {
-            world.executeGradle("generatePlantumlDiagrams", "--rerun-tasks", properties = properties, systemProperties = systemProperties)
-        } catch (e: Exception) {
-            world.exception = e
+            try {
+                world.executeGradle("generatePlantumlDiagrams", "--rerun-tasks", properties = properties, systemProperties = systemProperties)
+            } catch (e: Exception) {
+                world.exception = e
+            }
         }
-    }
 
     @Then("all prompts should be reprocessed regardless of change status")
     fun allPromptsShouldBeReprocessedRegardlessOfChangeStatus() {
@@ -304,7 +307,7 @@ class IncrementalProcessingSteps(private val world: PlantumlWorld) {
             "Processing",
             "processing",
             "Processed",
-            "processed"
+            "processed",
         )
     }
 

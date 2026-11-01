@@ -11,7 +11,6 @@ import java.io.File
 import kotlin.test.assertTrue
 
 class CollectPlantumlIndexIntegrationTest {
-
     @TempDir
     lateinit var tempDir: File
 
@@ -23,9 +22,11 @@ class CollectPlantumlIndexIntegrationTest {
         System.setProperty("plantuml.test.rag.mode", "simulation")
         System.setProperty("plantuml.test.embedding.model.class", "plantuml.StubEmbeddingModel")
 
-        project = ProjectBuilder.builder()
-            .withProjectDir(tempDir)
-            .build()
+        project =
+            ProjectBuilder
+                .builder()
+                .withProjectDir(tempDir)
+                .build()
 
         project.pluginManager.apply("education.cccp.plantuml")
         task = project.tasks.getByName("collectPlantumlIndex") as CollectPlantumlIndexTask
@@ -43,61 +44,64 @@ class CollectPlantumlIndexIntegrationTest {
         val ragDir = File(tempDir, "rag-integration")
         ragDir.mkdirs()
 
-        val diagram1 = File(ragDir, "class-diagram.puml").apply {
-            writeText(
-                """
-                @startuml
-                class User {
-                  +id: Long
-                  +name: String
-                  +email: String
-                }
-                class Order {
-                  +id: Long
-                  +user: User
-                  +items: List<OrderItem>
-                }
-                User "1" --> "0..*" Order
-                @enduml
-                """.trimIndent()
-            )
-        }
+        val diagram1 =
+            File(ragDir, "class-diagram.puml").apply {
+                writeText(
+                    """
+                    @startuml
+                    class User {
+                      +id: Long
+                      +name: String
+                      +email: String
+                    }
+                    class Order {
+                      +id: Long
+                      +user: User
+                      +items: List<OrderItem>
+                    }
+                    User "1" --> "0..*" Order
+                    @enduml
+                    """.trimIndent(),
+                )
+            }
 
-        val diagram2 = File(ragDir, "sequence-diagram.puml").apply {
-            writeText(
-                """
-                @startuml
-                participant User
-                participant Controller
-                participant Service
-                User -> Controller: createOrder()
-                Controller -> Service: processOrder()
-                Service --> Controller: OrderCreated
-                Controller --> User: Success
-                @enduml
-                """.trimIndent()
-            )
-        }
+        val diagram2 =
+            File(ragDir, "sequence-diagram.puml").apply {
+                writeText(
+                    """
+                    @startuml
+                    participant User
+                    participant Controller
+                    participant Service
+                    User -> Controller: createOrder()
+                    Controller -> Service: processOrder()
+                    Service --> Controller: OrderCreated
+                    Controller --> User: Success
+                    @enduml
+                    """.trimIndent(),
+                )
+            }
 
-        val historyFile = File(ragDir, "attempt-history-001.json").apply {
-            writeText(
-                """
-                {
-                  "prompt": "Create a class diagram for User and Order",
-                  "attempts": 2,
-                  "finalDiagram": "@startuml\nclass User\n@enduml",
-                  "validationFeedback": []
-                }
-                """.trimIndent()
-            )
-        }
+        val historyFile =
+            File(ragDir, "attempt-history-001.json").apply {
+                writeText(
+                    """
+                    {
+                      "prompt": "Create a class diagram for User and Order",
+                      "attempts": 2,
+                      "finalDiagram": "@startuml\nclass User\n@enduml",
+                      "validationFeedback": []
+                    }
+                    """.trimIndent(),
+                )
+            }
 
         val configPath = File(tempDir, "plantuml-context.yml")
         configPath.writeText(
             """
             output:
               rag: "${ragDir.absolutePath}"
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         task.reindexRag()
@@ -117,7 +121,7 @@ class CollectPlantumlIndexIntegrationTest {
             """
             output:
               rag: "${ragDir.absolutePath}"
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         task.reindexRag()
@@ -130,33 +134,35 @@ class CollectPlantumlIndexIntegrationTest {
         val ragDir = File(tempDir, "rag-large")
         ragDir.mkdirs()
 
-        val largeDiagram = File(ragDir, "large-system.puml").apply {
-            val content = buildString {
-                appendLine("@startuml")
-                appendLine("package com.example {")
-                for (i in 1..50) {
-                    appendLine("  class Class$i {")
-                    appendLine("    +field1: String")
-                    appendLine("    +field2: Int")
-                    appendLine("    +method1(): Void")
-                    appendLine("    +method2(): String")
-                    appendLine("  }")
-                }
-                for (i in 1..49) {
-                    appendLine("  Class$i --> Class${i + 1}")
-                }
-                appendLine("}")
-                appendLine("@enduml")
+        val largeDiagram =
+            File(ragDir, "large-system.puml").apply {
+                val content =
+                    buildString {
+                        appendLine("@startuml")
+                        appendLine("package com.example {")
+                        for (i in 1..50) {
+                            appendLine("  class Class$i {")
+                            appendLine("    +field1: String")
+                            appendLine("    +field2: Int")
+                            appendLine("    +method1(): Void")
+                            appendLine("    +method2(): String")
+                            appendLine("  }")
+                        }
+                        for (i in 1..49) {
+                            appendLine("  Class$i --> Class${i + 1}")
+                        }
+                        appendLine("}")
+                        appendLine("@enduml")
+                    }
+                writeText(content)
             }
-            writeText(content)
-        }
 
         val configPath = File(tempDir, "plantuml-context.yml")
         configPath.writeText(
             """
             output:
               rag: "${ragDir.absolutePath}"
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         task.reindexRag()
@@ -170,27 +176,28 @@ class CollectPlantumlIndexIntegrationTest {
         val ragDir = File(tempDir, "rag-unicode")
         ragDir.mkdirs()
 
-        val unicodeDiagram = File(ragDir, "unicode-diagram.puml").apply {
-            writeText(
-                """
-                @startuml
-                class User {
-                  +name: String
-                  +firstName: String
-                  +email: String
-                }
-                note "User creation\nwith special characters: é à ü ñ 中文 🎉"
-                @enduml
-                """.trimIndent()
-            )
-        }
+        val unicodeDiagram =
+            File(ragDir, "unicode-diagram.puml").apply {
+                writeText(
+                    """
+                    @startuml
+                    class User {
+                      +name: String
+                      +firstName: String
+                      +email: String
+                    }
+                    note "User creation\nwith special characters: é à ü ñ 中文 🎉"
+                    @enduml
+                    """.trimIndent(),
+                )
+            }
 
         val configPath = File(tempDir, "plantuml-context.yml")
         configPath.writeText(
             """
             output:
               rag: "${ragDir.absolutePath}"
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         task.reindexRag()
@@ -214,7 +221,7 @@ class CollectPlantumlIndexIntegrationTest {
                       "finalDiagram": "@startuml\nclass Test$i\n@enduml",
                       "validationFeedback": []
                     }
-                    """.trimIndent()
+                    """.trimIndent(),
                 )
             }
         }
@@ -224,7 +231,7 @@ class CollectPlantumlIndexIntegrationTest {
             """
             output:
               rag: "${ragDir.absolutePath}"
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         task.reindexRag()
@@ -242,13 +249,20 @@ class CollectPlantumlIndexIntegrationTest {
 
         val promptFiles = mutableListOf<File>()
         for (i in 1..10) {
-            val promptFile = File(ragDir, "prompt-$i.prompt").apply {
-                writeText(
-                    """
-                    Create a ${if (i % 3 == 0) "sequence" else if (i % 3 == 1) "class" else "component"} diagram for system component $i
-                    """.trimIndent()
-                )
-            }
+            val promptFile =
+                File(ragDir, "prompt-$i.prompt").apply {
+                    writeText(
+                        """
+                        Create a ${if (i % 3 == 0) {
+                            "sequence"
+                        } else if (i % 3 == 1) {
+                            "class"
+                        } else {
+                            "component"
+                        }} diagram for system component $i
+                        """.trimIndent(),
+                    )
+                }
             promptFiles.add(promptFile)
 
             File(ragDir, "diagram-$i.puml").apply {
@@ -261,30 +275,31 @@ class CollectPlantumlIndexIntegrationTest {
                       +version: String
                     }
                     @enduml
-                    """.trimIndent()
+                    """.trimIndent(),
                 )
             }
         }
 
-        val historyFile = File(ragDir, "attempt-history-001.json").apply {
-            writeText(
-                """
-                {
-                  "prompt": "Multiple component diagrams",
-                  "attempts": 1,
-                  "finalDiagram": "@startuml\nclass Component\n@enduml",
-                  "validationFeedback": []
-                }
-                """.trimIndent()
-            )
-        }
+        val historyFile =
+            File(ragDir, "attempt-history-001.json").apply {
+                writeText(
+                    """
+                    {
+                      "prompt": "Multiple component diagrams",
+                      "attempts": 1,
+                      "finalDiagram": "@startuml\nclass Component\n@enduml",
+                      "validationFeedback": []
+                    }
+                    """.trimIndent(),
+                )
+            }
 
         val configPath = File(tempDir, "plantuml-context.yml")
         configPath.writeText(
             """
             output:
               rag: "${ragDir.absolutePath}"
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         task.reindexRag()
@@ -317,7 +332,7 @@ class CollectPlantumlIndexIntegrationTest {
                   +deleteUser(id: Long)
                 }
                 @enduml
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
 
@@ -330,7 +345,7 @@ class CollectPlantumlIndexIntegrationTest {
                   +cancelOrder(id: Long)
                 }
                 @enduml
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
 
@@ -341,29 +356,30 @@ class CollectPlantumlIndexIntegrationTest {
                 class User { +id: Long }
                 class Order { +id: Long }
                 @enduml
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
 
-        val historyFile = File(baseRagDir, "attempt-history-001.json").apply {
-            writeText(
-                """
-                {
-                  "prompt": "Nested architecture diagrams",
-                  "attempts": 1,
-                  "finalDiagram": "@startuml\nclass Architecture\n@enduml",
-                  "validationFeedback": []
-                }
-                """.trimIndent()
-            )
-        }
+        val historyFile =
+            File(baseRagDir, "attempt-history-001.json").apply {
+                writeText(
+                    """
+                    {
+                      "prompt": "Nested architecture diagrams",
+                      "attempts": 1,
+                      "finalDiagram": "@startuml\nclass Architecture\n@enduml",
+                      "validationFeedback": []
+                    }
+                    """.trimIndent(),
+                )
+            }
 
         val configPath = File(tempDir, "plantuml-context.yml")
         configPath.writeText(
             """
             output:
               rag: "${baseRagDir.absolutePath}"
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         task.reindexRag()
@@ -389,37 +405,39 @@ class CollectPlantumlIndexIntegrationTest {
                       +method(): Void
                     }
                     @enduml
-                    """.trimIndent()
+                    """.trimIndent(),
                 )
             }
         }
 
-        val historyFile = File(ragDir, "attempt-history-001.json").apply {
-            writeText(
-                """
-                {
-                  "prompt": "Concurrent indexing test",
-                  "attempts": 1,
-                  "finalDiagram": "@startuml\nclass Concurrent\n@enduml",
-                  "validationFeedback": []
-                }
-                """.trimIndent()
-            )
-        }
+        val historyFile =
+            File(ragDir, "attempt-history-001.json").apply {
+                writeText(
+                    """
+                    {
+                      "prompt": "Concurrent indexing test",
+                      "attempts": 1,
+                      "finalDiagram": "@startuml\nclass Concurrent\n@enduml",
+                      "validationFeedback": []
+                    }
+                    """.trimIndent(),
+                )
+            }
 
         val configPath = File(tempDir, "plantuml-context.yml")
         configPath.writeText(
             """
             output:
               rag: "${ragDir.absolutePath}"
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         val threads = mutableListOf<Thread>()
         for (i in 1..3) {
-            val thread = Thread {
-                task.reindexRag()
-            }
+            val thread =
+                Thread {
+                    task.reindexRag()
+                }
             threads.add(thread)
             thread.start()
         }
@@ -445,7 +463,7 @@ class CollectPlantumlIndexIntegrationTest {
                   +field: String
                 }
                 @enduml
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
 
@@ -456,29 +474,30 @@ class CollectPlantumlIndexIntegrationTest {
                 class InvalidClass {
                   +field: String
                 // Missing @enduml - invalid syntax
-                """.trimIndent()
+                """.trimIndent(),
             )
         }
 
-        val historyFile = File(ragDir, "attempt-history-001.json").apply {
-            writeText(
-                """
-                {
-                  "prompt": "Partial failure test",
-                  "attempts": 1,
-                  "finalDiagram": "@startuml\nclass Valid\n@enduml",
-                  "validationFeedback": []
-                }
-                """.trimIndent()
-            )
-        }
+        val historyFile =
+            File(ragDir, "attempt-history-001.json").apply {
+                writeText(
+                    """
+                    {
+                      "prompt": "Partial failure test",
+                      "attempts": 1,
+                      "finalDiagram": "@startuml\nclass Valid\n@enduml",
+                      "validationFeedback": []
+                    }
+                    """.trimIndent(),
+                )
+            }
 
         val configPath = File(tempDir, "plantuml-context.yml")
         configPath.writeText(
             """
             output:
               rag: "${ragDir.absolutePath}"
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         task.reindexRag()
@@ -493,50 +512,53 @@ class CollectPlantumlIndexIntegrationTest {
         val ragDir = File(tempDir, "rag-very-large")
         ragDir.mkdirs()
 
-        val largeDiagram = File(ragDir, "very-large-system.puml").apply {
-            val content = buildString {
-                appendLine("@startuml")
-                appendLine("package com.example.largesystem {")
-                for (i in 1..100) {
-                    appendLine("  class LargeClass$i {")
-                    appendLine("    +field1: String")
-                    appendLine("    +field2: Int")
-                    appendLine("    +field3: Long")
-                    appendLine("    +field4: Boolean")
-                    appendLine("    +method1(): Void")
-                    appendLine("    +method2(): String")
-                    appendLine("    +method3(): Int")
-                    appendLine("    +method4(): Boolean")
-                    appendLine("  }")
-                }
-                for (i in 1..99) {
-                    appendLine("  LargeClass$i --> LargeClass${i + 1}")
-                }
-                appendLine("}")
-                appendLine("@enduml")
+        val largeDiagram =
+            File(ragDir, "very-large-system.puml").apply {
+                val content =
+                    buildString {
+                        appendLine("@startuml")
+                        appendLine("package com.example.largesystem {")
+                        for (i in 1..100) {
+                            appendLine("  class LargeClass$i {")
+                            appendLine("    +field1: String")
+                            appendLine("    +field2: Int")
+                            appendLine("    +field3: Long")
+                            appendLine("    +field4: Boolean")
+                            appendLine("    +method1(): Void")
+                            appendLine("    +method2(): String")
+                            appendLine("    +method3(): Int")
+                            appendLine("    +method4(): Boolean")
+                            appendLine("  }")
+                        }
+                        for (i in 1..99) {
+                            appendLine("  LargeClass$i --> LargeClass${i + 1}")
+                        }
+                        appendLine("}")
+                        appendLine("@enduml")
+                    }
+                writeText(content)
             }
-            writeText(content)
-        }
 
-        val historyFile = File(ragDir, "attempt-history-001.json").apply {
-            writeText(
-                """
-                {
-                  "prompt": "Very large system diagram with 100+ classes",
-                  "attempts": 1,
-                  "finalDiagram": "@startuml\nclass Large\n@enduml",
-                  "validationFeedback": []
-                }
-                """.trimIndent()
-            )
-        }
+        val historyFile =
+            File(ragDir, "attempt-history-001.json").apply {
+                writeText(
+                    """
+                    {
+                      "prompt": "Very large system diagram with 100+ classes",
+                      "attempts": 1,
+                      "finalDiagram": "@startuml\nclass Large\n@enduml",
+                      "validationFeedback": []
+                    }
+                    """.trimIndent(),
+                )
+            }
 
         val configPath = File(tempDir, "plantuml-context.yml")
         configPath.writeText(
             """
             output:
               rag: "${ragDir.absolutePath}"
-            """.trimIndent()
+            """.trimIndent(),
         )
 
         task.reindexRag()

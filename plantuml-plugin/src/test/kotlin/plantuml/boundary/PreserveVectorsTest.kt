@@ -17,7 +17,6 @@ import kotlin.test.assertTrue
  * checkout is absent (isolated CI), never silently passed.
  */
 class PreserveVectorsTest {
-
     private val vectors: List<Vector> = loadVectors()
 
     @Test
@@ -52,7 +51,8 @@ class PreserveVectorsTest {
             .takeIf { it.isFile }
 
     private fun loadVectors(): List<Vector> =
-        vectorsFile().readLines()
+        vectorsFile()
+            .readLines()
             .map { it.trim() }
             .filter { it.isNotEmpty() && !it.startsWith("#") }
             .map { line ->
@@ -61,8 +61,9 @@ class PreserveVectorsTest {
             }
 
     private fun vectorsFile(): File {
-        val url = javaClass.classLoader.getResource("plantuml/boundary/preserve-vectors.tsv")
-            ?: error("preserve-vectors.tsv missing")
+        val url =
+            javaClass.classLoader.getResource("plantuml/boundary/preserve-vectors.tsv")
+                ?: error("preserve-vectors.tsv missing")
         return File(url.toURI())
     }
 

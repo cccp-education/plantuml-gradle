@@ -11,7 +11,6 @@ import plantuml.service.PlantumlService
 import java.io.File
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
 /**
@@ -19,7 +18,6 @@ import kotlin.test.assertTrue
  * Tests use reflection to access private methods.
  */
 class DiagramProcessorPrivateMethodsTest {
-
     @TempDir
     lateinit var tempDir: File
 
@@ -44,10 +42,11 @@ class DiagramProcessorPrivateMethodsTest {
 
     @Test
     fun `buildHistoryContext should format history entries correctly`() {
-        val history = listOf(
-            AttemptEntry("Initial prompt", "@startuml\nTest\n@enduml", 0, true),
-            AttemptEntry("Correction #1", "@startuml\nFixed\n@enduml", 1, false, "Syntax error")
-        )
+        val history =
+            listOf(
+                AttemptEntry("Initial prompt", "@startuml\nTest\n@enduml", 0, true),
+                AttemptEntry("Correction #1", "@startuml\nFixed\n@enduml", 1, false, "Syntax error"),
+            )
 
         val result = callPrivateMethod(processor, "buildHistoryContext", listOf(history)) as String
 
@@ -80,12 +79,13 @@ class DiagramProcessorPrivateMethodsTest {
 
     @Test
     fun `fixCommonPlantUmlIssues should add missing startuml tag`() {
-        val codeWithoutStart = """
+        val codeWithoutStart =
+            """
             class Test {
               +method()
             }
             @enduml
-        """.trimIndent()
+            """.trimIndent()
 
         val result = callPrivateMethod(processor, "fixCommonPlantUmlIssues", listOf(codeWithoutStart)) as String
 
@@ -95,12 +95,13 @@ class DiagramProcessorPrivateMethodsTest {
 
     @Test
     fun `fixCommonPlantUmlIssues should add missing enduml tag`() {
-        val codeWithoutEnd = """
+        val codeWithoutEnd =
+            """
             @startuml
             class Test {
               +method()
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val result = callPrivateMethod(processor, "fixCommonPlantUmlIssues", listOf(codeWithoutEnd)) as String
 
@@ -110,11 +111,12 @@ class DiagramProcessorPrivateMethodsTest {
 
     @Test
     fun `fixCommonPlantUmlIssues should add both tags when missing`() {
-        val codeWithoutTags = """
+        val codeWithoutTags =
+            """
             class Test {
               +method()
             }
-        """.trimIndent()
+            """.trimIndent()
 
         val result = callPrivateMethod(processor, "fixCommonPlantUmlIssues", listOf(codeWithoutTags)) as String
 
@@ -124,16 +126,17 @@ class DiagramProcessorPrivateMethodsTest {
 
     @Test
     fun `convertHistoryToJson should produce valid JSON structure`() {
-        val history = listOf(
-            AttemptEntry(
-                "Initial prompt",
-                "@startuml\nTest\n@enduml",
-                0,
-                true,
-                null,
-                LocalDateTime.of(2024, 1, 1, 10, 0)
+        val history =
+            listOf(
+                AttemptEntry(
+                    "Initial prompt",
+                    "@startuml\nTest\n@enduml",
+                    0,
+                    true,
+                    null,
+                    LocalDateTime.of(2024, 1, 1, 10, 0),
+                ),
             )
-        )
 
         val result = callPrivateMethod(processor, "convertHistoryToJson", listOf(history)) as String
 
@@ -146,16 +149,19 @@ class DiagramProcessorPrivateMethodsTest {
 
     @Test
     fun `archiveAttemptHistory should handle exception gracefully`() {
-        val history = listOf(
-            AttemptEntry("Test prompt", "@startuml\nTest\n@enduml", 0, false),
-            AttemptEntry("Correction", "@startuml\nFixed\n@enduml", 1, true)
-        )
-
-        val configWithInvalidPath = PlantumlConfig(
-            output = OutputConfig(
-                rag = "/root/invalid-path-that-will-fail/rag"
+        val history =
+            listOf(
+                AttemptEntry("Test prompt", "@startuml\nTest\n@enduml", 0, false),
+                AttemptEntry("Correction", "@startuml\nFixed\n@enduml", 1, true),
             )
-        )
+
+        val configWithInvalidPath =
+            PlantumlConfig(
+                output =
+                    OutputConfig(
+                        rag = "/root/invalid-path-that-will-fail/rag",
+                    ),
+            )
         val processorWithConfig = DiagramProcessor(plantumlService, null, configWithInvalidPath)
 
         callPrivateMethod(processorWithConfig, "archiveAttemptHistory", listOf(history, logger))
@@ -167,9 +173,14 @@ class DiagramProcessorPrivateMethodsTest {
 /**
  * Helper function to call private methods using reflection
  */
-fun callPrivateMethod(instance: Any, methodName: String, args: List<Any?>): Any? {
-    val method = instance.javaClass.declaredMethods.find { it.name == methodName }
-        ?: throw NoSuchMethodException("Method $methodName not found")
+fun callPrivateMethod(
+    instance: Any,
+    methodName: String,
+    args: List<Any?>,
+): Any? {
+    val method =
+        instance.javaClass.declaredMethods.find { it.name == methodName }
+            ?: throw NoSuchMethodException("Method $methodName not found")
     method.isAccessible = true
     return if (args.isEmpty()) {
         method.invoke(instance)

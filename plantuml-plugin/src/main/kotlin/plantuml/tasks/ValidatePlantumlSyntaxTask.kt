@@ -1,5 +1,6 @@
 package plantuml.tasks
 
+import contracts.plantuml.SyntaxValidationResult
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.provider.Property
@@ -10,7 +11,6 @@ import org.gradle.work.DisableCachingByDefault
 import plantuml.PlantumlManager
 import plantuml.PlantumlMessages
 import plantuml.service.PlantumlService
-import contracts.plantuml.SyntaxValidationResult
 
 /**
  * Gradle task: `validatePlantumlSyntax`
@@ -32,7 +32,6 @@ import contracts.plantuml.SyntaxValidationResult
  */
 @DisableCachingByDefault(because = "Validation results depend on file content which may change")
 abstract class ValidatePlantumlSyntaxTask : DefaultTask() {
-
     private val lang: String = PlantumlManager.resolveLanguage(project)
 
     init {
@@ -54,8 +53,9 @@ abstract class ValidatePlantumlSyntaxTask : DefaultTask() {
      */
     @TaskAction
     fun validateSyntax() {
-        val diagramPath = project.findProperty("plantuml.diagram") as? String
-            ?: diagramFile.orNull
+        val diagramPath =
+            project.findProperty("plantuml.diagram") as? String
+                ?: diagramFile.orNull
 
         if (diagramPath.isNullOrEmpty()) {
             logger.lifecycle(PlantumlMessages.get("validate.no_file", lang))

@@ -23,7 +23,7 @@ import java.io.File
  * @param graphFile Path to the graph JSON file (typically `graphify-out/graph.json`)
  */
 class KnowledgeGraphParser(
-    private val graphFile: File
+    private val graphFile: File,
 ) {
     private val mapper = ObjectMapper()
 
@@ -48,20 +48,22 @@ class KnowledgeGraphParser(
      */
     fun parseEither(): Either<KnowledgeGraphParseError, KnowledgeGraph> {
         if (!graphFile.exists()) {
-            return KnowledgeGraphParseError.FileNotFound(
-                path = graphFile.absolutePath,
-                message = PlantumlMessages.format("kgparser.file_not_found", "en", graphFile.absolutePath),
-            ).left()
+            return KnowledgeGraphParseError
+                .FileNotFound(
+                    path = graphFile.absolutePath,
+                    message = PlantumlMessages.format("kgparser.file_not_found", "en", graphFile.absolutePath),
+                ).left()
         }
 
         val root: com.fasterxml.jackson.databind.JsonNode =
             when (val read = Either.catch { mapper.readTree(graphFile) }) {
                 is Either.Left -> {
                     val throwable = read.value
-                    return KnowledgeGraphParseError.Malformed(
-                        cause = throwable,
-                        message = throwable.message ?: "malformed knowledge graph JSON",
-                    ).left()
+                    return KnowledgeGraphParseError
+                        .Malformed(
+                            cause = throwable,
+                            message = throwable.message ?: "malformed knowledge graph JSON",
+                        ).left()
                 }
                 is Either.Right -> read.value
             }
@@ -73,8 +75,9 @@ class KnowledgeGraphParser(
         val communitiesNode = root.get("communities")
         val hasGraphifyLinks = root.has("links")
         val firstNode = root.get("nodes")?.firstOrNull()
-        val hasGraphifyNodes = firstNode?.isObject == true &&
-            (firstNode?.has("label") == true || firstNode?.has("community") == true)
+        val hasGraphifyNodes =
+            firstNode?.isObject == true &&
+                (firstNode?.has("label") == true || firstNode?.has("community") == true)
         val hasCommunitiesArray = communitiesNode?.isArray == true
         val isGraphifyFormat = !hasCommunitiesArray && (hasGraphifyLinks || hasGraphifyNodes)
 
@@ -89,7 +92,7 @@ class KnowledgeGraphParser(
         return KnowledgeGraph(
             nodes = nodes,
             edges = edges,
-            communities = communities
+            communities = communities,
         ).right()
     }
 
@@ -104,7 +107,7 @@ class KnowledgeGraphParser(
         root: com.fasterxml.jackson.databind.JsonNode,
         nodes: MutableList<KnowledgeGraphNode>,
         edges: MutableList<KnowledgeGraphEdge>,
-        communities: MutableList<KnowledgeGraphCommunity>
+        communities: MutableList<KnowledgeGraphCommunity>,
     ) {
         val communitiesNode = root.get("communities")!!
         for (communityNode in communitiesNode) {
@@ -134,8 +137,8 @@ class KnowledgeGraphParser(
                 KnowledgeGraphCommunity(
                     name = communityName,
                     nodes = communityNodeNames,
-                    edges = communityEdges
-                )
+                    edges = communityEdges,
+                ),
             )
         }
 
@@ -167,7 +170,7 @@ class KnowledgeGraphParser(
         root: com.fasterxml.jackson.databind.JsonNode,
         nodes: MutableList<KnowledgeGraphNode>,
         edges: MutableList<KnowledgeGraphEdge>,
-        communities: MutableList<KnowledgeGraphCommunity>
+        communities: MutableList<KnowledgeGraphCommunity>,
     ) {
         val communityMap = mutableMapOf<Int, MutableList<KnowledgeGraphNode>>()
         val idToLabel = mutableMapOf<String, String>()
@@ -180,22 +183,29 @@ class KnowledgeGraphParser(
                 val nodeId = nodeEntry.get("id")?.asText()
                 val type = nodeEntry.get("file_type")?.asText() ?: nodeEntry.get("type")?.asText() ?: "class"
                 val communityInt = nodeEntry.get("community")?.asInt()
-                val communityStr = if (communityInt != null) "community_$communityInt" else
-                    nodeEntry.get("community")?.asText() ?: ""
-                val attributes = nodeEntry.get("attributes")
-                    ?.map { it.asText() }
-                    ?.toList() ?: emptyList()
+                val communityStr =
+                    if (communityInt != null) {
+                        "community_$communityInt"
+                    } else {
+                        nodeEntry.get("community")?.asText() ?: ""
+                    }
+                val attributes =
+                    nodeEntry
+                        .get("attributes")
+                        ?.map { it.asText() }
+                        ?.toList() ?: emptyList()
 
                 if (nodeId != null) {
                     idToLabel[nodeId] = label
                 }
 
-                val knNode = KnowledgeGraphNode(
-                    name = label,
-                    type = type,
-                    community = communityStr,
-                    attributes = attributes
-                )
+                val knNode =
+                    KnowledgeGraphNode(
+                        name = label,
+                        type = type,
+                        community = communityStr,
+                        attributes = attributes,
+                    )
                 nodes.add(knNode)
 
                 if (communityInt != null) {
@@ -212,22 +222,26 @@ class KnowledgeGraphParser(
                 val target = edgeNode.get("target")?.asText() ?: continue
                 val resolvedSource = idToLabel[source] ?: source
                 val resolvedTarget = idToLabel[target] ?: target
-                val label = edgeNode.get("relation")?.asText()
-                    ?: edgeNode.get("label")?.asText() ?: ""
-                val typeStr = edgeNode.get("confidence")?.asText()
-                    ?: edgeNode.get("type")?.asText() ?: "EXTRACTED"
-                val confidence = edgeNode.get("confidence_score")?.asDouble()
-                    ?: (if (edgeNode.has("confidence") && edgeNode.get("confidence").isNumber) edgeNode.get("confidence").asDouble() else null)
-                    ?: edgeNode.get("weight")?.asDouble()
-                    ?: 1.0
+                val label =
+                    edgeNode.get("relation")?.asText()
+                        ?: edgeNode.get("label")?.asText() ?: ""
+                val typeStr =
+                    edgeNode.get("confidence")?.asText()
+                        ?: edgeNode.get("type")?.asText() ?: "EXTRACTED"
+                val confidence =
+                    edgeNode.get("confidence_score")?.asDouble()
+                        ?: (if (edgeNode.has("confidence") && edgeNode.get("confidence").isNumber) edgeNode.get("confidence").asDouble() else null)
+                        ?: edgeNode.get("weight")?.asDouble()
+                        ?: 1.0
 
-                val edge = KnowledgeGraphEdge(
-                    source = resolvedSource,
-                    target = resolvedTarget,
-                    label = label,
-                    type = parseEdgeType(typeStr),
-                    confidence = confidence
-                )
+                val edge =
+                    KnowledgeGraphEdge(
+                        source = resolvedSource,
+                        target = resolvedTarget,
+                        label = label,
+                        type = parseEdgeType(typeStr),
+                        confidence = confidence,
+                    )
                 if (edges.none { it.source == edge.source && it.target == edge.target && it.type == edge.type }) {
                     edges.add(edge)
                 }
@@ -243,8 +257,8 @@ class KnowledgeGraphParser(
                 KnowledgeGraphCommunity(
                     name = communityName,
                     nodes = nodeNames.toList(),
-                    edges = communityEdges
-                )
+                    edges = communityEdges,
+                ),
             )
         }
     }
@@ -261,7 +275,7 @@ class KnowledgeGraphParser(
                 target = target,
                 label = label,
                 type = parseEdgeType(typeStr),
-                confidence = confidence
+                confidence = confidence,
             )
         } else if (edgeNode.isTextual) {
             return parseEdgeString(edgeNode.asText())
@@ -274,14 +288,16 @@ class KnowledgeGraphParser(
             val name = nodeEntry.get("name")?.asText() ?: return null
             val type = nodeEntry.get("type")?.asText() ?: "class"
             val community = nodeEntry.get("community")?.asText() ?: ""
-            val attributes = nodeEntry.get("attributes")
-                ?.map { it.asText() }
-                ?.toList() ?: emptyList()
+            val attributes =
+                nodeEntry
+                    .get("attributes")
+                    ?.map { it.asText() }
+                    ?.toList() ?: emptyList()
             return KnowledgeGraphNode(
                 name = name,
                 type = type,
                 community = community,
-                attributes = attributes
+                attributes = attributes,
             )
         } else if (nodeEntry.isTextual) {
             return KnowledgeGraphNode(name = nodeEntry.asText())
@@ -289,14 +305,13 @@ class KnowledgeGraphParser(
         return null
     }
 
-    private fun parseEdgeType(typeStr: String): EdgeType {
-        return when (typeStr.uppercase()) {
+    private fun parseEdgeType(typeStr: String): EdgeType =
+        when (typeStr.uppercase()) {
             "EXTRACTED" -> EdgeType.EXTRACTED
             "INFERRED" -> EdgeType.INFERRED
             "AMBIGUOUS" -> EdgeType.AMBIGUOUS
             else -> EdgeType.EXTRACTED
         }
-    }
 
     private fun parseEdgeString(edgeStr: String): KnowledgeGraphEdge? {
         val arrowPatterns = listOf("--x", "..>", "-->", "->")
@@ -309,11 +324,12 @@ class KnowledgeGraphParser(
                     val labelParts = targetAndLabel.split(":", limit = 2)
                     val target = labelParts[0].trim()
                     val label = if (labelParts.size > 1) labelParts[1].trim() else ""
-                    val type = when (arrow) {
-                        "..>" -> EdgeType.INFERRED
-                        "--x" -> EdgeType.AMBIGUOUS
-                        else -> EdgeType.EXTRACTED
-                    }
+                    val type =
+                        when (arrow) {
+                            "..>" -> EdgeType.INFERRED
+                            "--x" -> EdgeType.AMBIGUOUS
+                            else -> EdgeType.EXTRACTED
+                        }
                     return KnowledgeGraphEdge(source = source, target = target, label = label, type = type)
                 }
             }
@@ -324,7 +340,7 @@ class KnowledgeGraphParser(
     private fun parseFlatFormat(
         root: com.fasterxml.jackson.databind.JsonNode,
         nodes: MutableList<KnowledgeGraphNode>,
-        edges: MutableList<KnowledgeGraphEdge>
+        edges: MutableList<KnowledgeGraphEdge>,
     ) {
         val rootNodesNode = root.get("nodes")
         if (rootNodesNode != null && rootNodesNode.isArray) {

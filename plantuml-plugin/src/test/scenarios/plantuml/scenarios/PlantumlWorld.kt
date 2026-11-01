@@ -3,8 +3,13 @@ package plantuml.scenarios
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.sun.net.httpserver.HttpServer
 import com.sun.net.httpserver.HttpServer.create
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers.Default
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.cancel
 import org.assertj.core.api.Assertions.assertThat
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
@@ -55,7 +60,7 @@ class PlantumlWorld {
     var apiKeyPoolVersion: String = "1.0"
 
     private val asyncJobs = mutableListOf<Deferred<BuildResult>>()
-    
+
     private val version: String = System.getProperty("plugin.version", "0.0.0")
 
     companion object {
@@ -64,7 +69,8 @@ class PlantumlWorld {
             val projectRoot = File(System.getProperty("user.dir"))
             val tomlFile = File(projectRoot, "gradle/libs.versions.toml")
             check(tomlFile.exists()) { "Cannot find libs.versions.toml at ${tomlFile.absolutePath}" }
-            tomlFile.readLines()
+            tomlFile
+                .readLines()
                 .firstOrNull { it.startsWith("plantuml =") }
                 ?.substringAfter("=")
                 ?.trim()
@@ -96,7 +102,7 @@ class PlantumlWorld {
                 }
                 includeBuild("${pluginRoot.absolutePath.replace("\\", "\\\\")}")
                 rootProject.name = "plantuml-test-template"
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             File(templateDir, "build.gradle.kts").writeText(
@@ -108,7 +114,7 @@ class PlantumlWorld {
                 plantuml {
                     configPath = "plantuml-context.yml"
                 }
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             File(templateDir, "plantuml-context.yml").writeText(
@@ -126,7 +132,7 @@ class PlantumlWorld {
                     baseUrl: "http://localhost:11438"
                     modelName: "smollm:135m"
                   maxIterations: 5
-                """.trimIndent()
+                """.trimIndent(),
             )
 
             templateDir.deleteOnExit()
@@ -147,13 +153,16 @@ class PlantumlWorld {
     private var mockServer: HttpServer? = null
     private var mockResponseQueue: List<String>? = null
     private var mockResponseIndex: Int = 0
-    
+
     private var portConflictServer: java.net.ServerSocket? = null
 
     /**
      * Starts a mock LLM server with custom handler logic.
      */
-    fun startMockLlmServer(server: HttpServer, port: Int) {
+    fun startMockLlmServer(
+        server: HttpServer,
+        port: Int,
+    ) {
         mockServerPort = port
         mockServer = server
         log.info("Custom mock LLM server started on port $port")
@@ -178,13 +187,14 @@ class PlantumlWorld {
         }
     }
 
-    private fun isOllamaLocal(): Boolean = runCatching {
-        val conn = URI("http://localhost:11438/api/tags").toURL().openConnection() as HttpURLConnection
-        conn.connectTimeout = 5_000
-        conn.readTimeout = 5_000
-        conn.requestMethod = "GET"
-        conn.responseCode == 200
-    }.getOrDefault(false)
+    private fun isOllamaLocal(): Boolean =
+        runCatching {
+            val conn = URI("http://localhost:11438/api/tags").toURL().openConnection() as HttpURLConnection
+            conn.connectTimeout = 5_000
+            conn.readTimeout = 5_000
+            conn.requestMethod = "GET"
+            conn.responseCode == 200
+        }.getOrDefault(false)
 
     /**
      * Starts a minimal Ollama-compatible HTTP server that always returns
@@ -216,14 +226,15 @@ class PlantumlWorld {
             if (mockResponseQueue != null && mockResponseIndex < mockResponseQueue!!.size - 1) {
                 mockResponseIndex++
             }
-            
-            val ollamaResponse = """
+
+            val ollamaResponse =
+                """
                 {
                   "model": "smollm:135m",
                   "message": { "role": "assistant", "content": ${escapeJson(responseBody)} },
                   "done": true
                 }
-            """.trimIndent().toByteArray()
+                """.trimIndent().toByteArray()
 
             exchange.sendResponseHeaders(200, ollamaResponse.size.toLong())
             exchange.responseBody.use { it.write(ollamaResponse) }
@@ -234,8 +245,9 @@ class PlantumlWorld {
             if (mockResponseQueue != null && mockResponseIndex < mockResponseQueue!!.size - 1) {
                 mockResponseIndex++
             }
-            
-            val openaiResponse = """
+
+            val openaiResponse =
+                """
                 {
                   "id": "chatcmpl-mock",
                   "object": "chat.completion",
@@ -255,7 +267,7 @@ class PlantumlWorld {
                     "total_tokens": 30
                   }
                 }
-            """.trimIndent().toByteArray()
+                """.trimIndent().toByteArray()
 
             exchange.sendResponseHeaders(200, openaiResponse.size.toLong())
             exchange.responseBody.use { it.write(openaiResponse) }
@@ -272,8 +284,9 @@ class PlantumlWorld {
             if (mockResponseQueue != null && mockResponseIndex < mockResponseQueue!!.size - 1) {
                 mockResponseIndex++
             }
-            
-            val geminiResponse = """
+
+            val geminiResponse =
+                """
                 {
                   "candidates": [{
                     "content": {
@@ -291,7 +304,7 @@ class PlantumlWorld {
                     "totalTokenCount": 30
                   }
                 }
-            """.trimIndent().toByteArray()
+                """.trimIndent().toByteArray()
 
             exchange.sendResponseHeaders(200, geminiResponse.size.toLong())
             exchange.responseBody.use { it.write(geminiResponse) }
@@ -302,8 +315,9 @@ class PlantumlWorld {
             if (mockResponseQueue != null && mockResponseIndex < mockResponseQueue!!.size - 1) {
                 mockResponseIndex++
             }
-            
-            val mistralResponse = """
+
+            val mistralResponse =
+                """
                 {
                   "id": "mistral-mock",
                   "object": "chat.completion",
@@ -318,7 +332,7 @@ class PlantumlWorld {
                     "finish_reason": "stop"
                   }]
                 }
-            """.trimIndent().toByteArray()
+                """.trimIndent().toByteArray()
 
             exchange.sendResponseHeaders(200, mistralResponse.size.toLong())
             exchange.responseBody.use { it.write(mistralResponse) }
@@ -329,8 +343,9 @@ class PlantumlWorld {
             if (mockResponseQueue != null && mockResponseIndex < mockResponseQueue!!.size - 1) {
                 mockResponseIndex++
             }
-            
-            val anthropicResponse = """
+
+            val anthropicResponse =
+                """
                 {
                   "id": "msg_mock",
                   "type": "message",
@@ -342,7 +357,7 @@ class PlantumlWorld {
                   "model": "mock-claude",
                   "stop_reason": "end_turn"
                 }
-            """.trimIndent().toByteArray()
+                """.trimIndent().toByteArray()
 
             exchange.sendResponseHeaders(200, anthropicResponse.size.toLong())
             exchange.responseBody.use { it.write(anthropicResponse) }
@@ -355,9 +370,8 @@ class PlantumlWorld {
     }
 
     private val objectMapper = ObjectMapper()
-    
-    private fun escapeJson(value: String): String =
-        objectMapper.writeValueAsString(value)
+
+    private fun escapeJson(value: String): String = objectMapper.writeValueAsString(value)
 
     fun stopMockLlm() {
         mockServer?.stop(0)
@@ -374,25 +388,28 @@ class PlantumlWorld {
     ): Deferred<BuildResult> {
         require(projectDir != null) { "Project directory must be initialized" }
         val propArgs = properties.map { (k, v) -> "-P$k=$v" }
-        val allArgs = tasks.toList() + propArgs + 
-            "-Pplantuml.output.rag=${projectDir!!.absolutePath}/build/plantuml-plugin/generated/rag"
+        val allArgs =
+            tasks.toList() + propArgs +
+                "-Pplantuml.output.rag=${projectDir!!.absolutePath}/build/plantuml-plugin/generated/rag"
         log.info("Starting async Gradle execution: $allArgs")
-        return scope.async {
-            try {
-                GradleRunner.create()
-                    .withProjectDir(projectDir!!)
-                    .withArguments(allArgs)
-                    .withTestKitDir(File(System.getProperty("user.home"), ".gradle/testkit"))
-                    .withGradleVersion("9.4.1")
-                    .forwardStdOutput(System.out.writer())
-                    .forwardStdError(System.err.writer())
-                    .build()
-            } catch (e: Exception) {
-                log.error("Gradle build failed", e)
-                exception = e
-                throw e
-            }
-        }.also { asyncJobs.add(it) }
+        return scope
+            .async {
+                try {
+                    GradleRunner
+                        .create()
+                        .withProjectDir(projectDir!!)
+                        .withArguments(allArgs)
+                        .withTestKitDir(File(System.getProperty("user.home"), ".gradle/testkit"))
+                        .withGradleVersion("9.4.1")
+                        .forwardStdOutput(System.out.writer())
+                        .forwardStdError(System.err.writer())
+                        .build()
+                } catch (e: Exception) {
+                    log.error("Gradle build failed", e)
+                    exception = e
+                    throw e
+                }
+            }.also { asyncJobs.add(it) }
     }
 
     fun executeGradle(
@@ -403,28 +420,31 @@ class PlantumlWorld {
         require(projectDir != null) { "Project directory must be initialized" }
         val propArgs = properties.map { (k, v) -> "-P$k=$v" }
         val systemPropArgs = systemProperties.map { (k, v) -> "-D$k=$v" }
-        val allArgs = tasks.toList() + propArgs + systemPropArgs + 
-            "-Pplantuml.output.rag=${projectDir!!.absolutePath}/build/plantuml-plugin/generated/rag"
+        val allArgs =
+            tasks.toList() + propArgs + systemPropArgs +
+                "-Pplantuml.output.rag=${projectDir!!.absolutePath}/build/plantuml-plugin/generated/rag"
         log.info("Starting sync Gradle execution: $allArgs")
-        
+
         val gradleEnvironment = mutableMapOf<String, String>()
         environmentVariables.forEach { (key, value) ->
             gradleEnvironment[key] = value
         }
-        
+
         return try {
-            var runner = GradleRunner.create()
-                .withProjectDir(projectDir!!)
-                .withArguments(allArgs)
-                .withTestKitDir(File(System.getProperty("user.home"), ".gradle/testkit"))
-                .withGradleVersion("9.4.1")
-                .forwardStdOutput(System.out.writer())
-                .forwardStdError(System.err.writer())
-            
+            var runner =
+                GradleRunner
+                    .create()
+                    .withProjectDir(projectDir!!)
+                    .withArguments(allArgs)
+                    .withTestKitDir(File(System.getProperty("user.home"), ".gradle/testkit"))
+                    .withGradleVersion("9.4.1")
+                    .forwardStdOutput(System.out.writer())
+                    .forwardStdError(System.err.writer())
+
             if (gradleEnvironment.isNotEmpty()) {
                 runner = runner.withEnvironment(gradleEnvironment)
             }
-            
+
             runner.build().also { buildResult = it }
         } catch (e: Exception) {
             log.error("Gradle build failed", e)
@@ -447,13 +467,17 @@ class PlantumlWorld {
      * Creates a temporary Gradle project for testing by copying from template.
      * This is faster than creating from scratch.
      */
-    fun createGradleProject(configFileName: String = "plantuml-context.yml", gradleProperties: Map<String, String>? = null): File {
+    fun createGradleProject(
+        configFileName: String = "plantuml-context.yml",
+        gradleProperties: Map<String, String>? = null,
+    ): File {
         val templateDir = templateProjectDir ?: createBaseTemplateProject().also { templateProjectDir = it }
 
-        val testDir = createTempFile("gradle-test-", "").apply {
-            delete()
-            mkdirs()
-        }
+        val testDir =
+            createTempFile("gradle-test-", "").apply {
+                delete()
+                mkdirs()
+            }
 
         templateDir.copyRecursively(testDir, overwrite = true)
 
@@ -463,17 +487,17 @@ class PlantumlWorld {
                 configFile.createNewFile()
             }
         }
-        
+
         // Write gradle.properties if provided
         if (gradleProperties != null && gradleProperties.isNotEmpty()) {
             val gradleProps = File(testDir, "gradle.properties")
             gradleProps.writeText(
-                gradleProperties.entries.joinToString("\n") { (k, v) -> "$k=$v" }
+                gradleProperties.entries.joinToString("\n") { (k, v) -> "$k=$v" },
             )
         }
 
         projectDir = testDir
-        
+
         // Track for automatic cleanup
         try {
             val cleanupExtension = TestCleanupExtension()
@@ -481,18 +505,22 @@ class PlantumlWorld {
         } catch (e: Exception) {
             log.warn("Failed to track temp directory: ${e.message}")
         }
-        
+
         return testDir
     }
 
     /**
      * Creates a prompt file in the project's prompts directory.
      */
-    fun createPromptFile(fileName: String, content: String): File {
+    fun createPromptFile(
+        fileName: String,
+        content: String,
+    ): File {
         require(projectDir != null) { "Project directory must be initialized first" }
-        val promptsDir = File(projectDir, "prompts").apply { 
-            if (!exists()) mkdirs() 
-        }
+        val promptsDir =
+            File(projectDir, "prompts").apply {
+                if (!exists()) mkdirs()
+            }
         val promptFile = File(promptsDir, fileName)
         promptFile.writeText(content)
         return promptFile
@@ -501,11 +529,16 @@ class PlantumlWorld {
     /**
      * Creates a PlantUML file in the specified directory.
      */
-    fun createPlantUmlFile(fileName: String, content: String, directory: String = "test-diagrams"): File {
+    fun createPlantUmlFile(
+        fileName: String,
+        content: String,
+        directory: String = "test-diagrams",
+    ): File {
         require(projectDir != null) { "Project directory must be initialized first" }
-        val targetDir = File(projectDir, directory).apply { 
-            if (!exists()) mkdirs() 
-        }
+        val targetDir =
+            File(projectDir, directory).apply {
+                if (!exists()) mkdirs()
+            }
         val plantumlFile = File(targetDir, fileName)
         plantumlFile.writeText(content)
         return plantumlFile
@@ -514,7 +547,10 @@ class PlantumlWorld {
     /**
      * Verifies that a file exists in the project directory.
      */
-    fun verifyFileExists(relativePath: String, message: String = "File should exist") {
+    fun verifyFileExists(
+        relativePath: String,
+        message: String = "File should exist",
+    ) {
         val file = File(projectDir, relativePath)
         assertThat(file).`as`(message).exists()
     }
@@ -522,7 +558,10 @@ class PlantumlWorld {
     /**
      * Verifies that a file does not exist in the project directory.
      */
-    fun verifyFileNotExists(relativePath: String, message: String = "File should not exist") {
+    fun verifyFileNotExists(
+        relativePath: String,
+        message: String = "File should not exist",
+    ) {
         val file = File(projectDir, relativePath)
         assertThat(file).`as`(message).doesNotExist()
     }
@@ -531,9 +570,9 @@ class PlantumlWorld {
      * Verifies that a directory contains files matching a pattern.
      */
     fun verifyDirectoryContainsFiles(
-        relativePath: String, 
-        extension: String, 
-        message: String = "Directory should contain files"
+        relativePath: String,
+        extension: String,
+        message: String = "Directory should contain files",
     ): Array<File> {
         val dir = File(projectDir, relativePath)
         assertThat(dir).`as`("Directory $relativePath should exist").exists()

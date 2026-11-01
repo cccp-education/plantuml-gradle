@@ -19,7 +19,6 @@ import plantuml.repair.PlantumlBlockStatus
  * (anti-collision rule S-088).
  */
 class PlantumlBlockStatusSteps {
-
     private var source: String = ""
     private var status: PlantumlBlockStatus? = null
     private var report: PlantumlBlockReport? = null
@@ -36,18 +35,20 @@ class PlantumlBlockStatusSteps {
 
     @When("the block status is audited against an accepting oracle")
     fun auditedAgainstAnAcceptingOracle() {
-        status = PlantumlBlockClassifier.classify(
-            source,
-            PlantUmlSyntaxValidator { SyntaxValidationResult.Valid },
-        )
+        status =
+            PlantumlBlockClassifier.classify(
+                source,
+                PlantUmlSyntaxValidator { SyntaxValidationResult.Valid },
+            )
     }
 
     @When("the block status is audited against a rejecting oracle")
     fun auditedAgainstARejectingOracle() {
-        status = PlantumlBlockClassifier.classify(
-            source,
-            PlantUmlSyntaxValidator { SyntaxValidationResult.Invalid("syntax error", "trace") },
-        )
+        status =
+            PlantumlBlockClassifier.classify(
+                source,
+                PlantUmlSyntaxValidator { SyntaxValidationResult.Invalid("syntax error", "trace") },
+            )
     }
 
     @Then("the block status is {string}")

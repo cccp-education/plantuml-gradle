@@ -13,11 +13,10 @@ import kotlin.test.assertTrue
 
 /**
  * Unit tests for ValidatePlantumlSyntaxTask
- * 
+ *
  * Tests the PlantUML syntax validation task
  */
 class ValidatePlantumlSyntaxTaskTest {
-
     @TempDir
     lateinit var tempDir: File
 
@@ -26,9 +25,11 @@ class ValidatePlantumlSyntaxTaskTest {
 
     @BeforeEach
     fun setup() {
-        project = ProjectBuilder.builder()
-            .withProjectDir(tempDir)
-            .build()
+        project =
+            ProjectBuilder
+                .builder()
+                .withProjectDir(tempDir)
+                .build()
 
         task = project.tasks.register("validatePlantumlSyntax", ValidatePlantumlSyntaxTask::class.java).get()
     }
@@ -50,9 +51,10 @@ class ValidatePlantumlSyntaxTaskTest {
         project.extensions.extraProperties.set("plantuml.diagram", "nonexistent.puml")
 
         // Act & Assert: Exception thrown
-        val exception = assertFailsWith<GradleException> {
-            task.validateSyntax()
-        }
+        val exception =
+            assertFailsWith<GradleException> {
+                task.validateSyntax()
+            }
         assertTrue(exception.message!!.contains("Diagram file does not exist"))
     }
 
@@ -60,9 +62,10 @@ class ValidatePlantumlSyntaxTaskTest {
     fun `should validate valid PlantUML file`() {
         // Arrange: Valid PlantUML file
         @Suppress("UnusedVariable", "unused")
-        val validDiagram = File(tempDir, "valid.puml").apply {
-            writeText("@startuml\nAlice -> Bob: Hello\n@enduml")
-        }
+        val validDiagram =
+            File(tempDir, "valid.puml").apply {
+                writeText("@startuml\nAlice -> Bob: Hello\n@enduml")
+            }
         project.extensions.extraProperties.set("plantuml.diagram", "valid.puml")
 
         // Act: Should not throw exception for valid syntax
@@ -76,9 +79,10 @@ class ValidatePlantumlSyntaxTaskTest {
     fun `should report invalid PlantUML syntax`() {
         // Arrange: Invalid PlantUML file (missing @enduml)
         @Suppress("UnusedVariable", "unused")
-        val invalidDiagram = File(tempDir, "invalid.puml").apply {
-            writeText("@startuml\nAlice -> Bob")
-        }
+        val invalidDiagram =
+            File(tempDir, "invalid.puml").apply {
+                writeText("@startuml\nAlice -> Bob")
+            }
         project.extensions.extraProperties.set("plantuml.diagram", "invalid.puml")
 
         // Act & Assert: Should not throw exception, but should detect invalid syntax
@@ -93,13 +97,16 @@ class ValidatePlantumlSyntaxTaskTest {
     fun `should respect plantuml diagram property override`() {
         // Arrange: Multiple files, property override
         @Suppress("UnusedVariable", "unused")
-        val file1 = File(tempDir, "diagram1.puml").apply {
-            writeText("@startuml\nAlice -> Bob\n@enduml")
-        }
+        val file1 =
+            File(tempDir, "diagram1.puml").apply {
+                writeText("@startuml\nAlice -> Bob\n@enduml")
+            }
+
         @Suppress("UnusedVariable", "unused")
-        val file2 = File(tempDir, "diagram2.puml").apply {
-            writeText("@startuml\nBob -> Alice\n@enduml")
-        }
+        val file2 =
+            File(tempDir, "diagram2.puml").apply {
+                writeText("@startuml\nBob -> Alice\n@enduml")
+            }
         project.extensions.extraProperties.set("plantuml.diagram", "diagram2.puml")
 
         // Act: Should use diagram2.puml (the overridden file)
