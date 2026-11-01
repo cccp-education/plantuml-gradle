@@ -35,12 +35,8 @@ dependencies {
 group = "education.cccp"
 // MEM-CAT-ROLLOUT-3 (D3) — self version derived from the published workspace catalog.
 version =
-    providers
-        .gradleProperty("plantumlVersion")
-        .orNull
-        ?.takeIf { it.isNotBlank() }
-        ?: ws.versions.plantuml.plugin
-            .get()
+    ws.versions.plantuml.plugin
+        .get()
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))

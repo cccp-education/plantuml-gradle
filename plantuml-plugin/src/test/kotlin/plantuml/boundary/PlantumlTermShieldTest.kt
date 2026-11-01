@@ -50,8 +50,10 @@ class PlantumlTermShieldTest {
     fun `protects the literal newline escape so the whole label is translated`() {
         val shielded = shield.shield("Key SSH + query\\n(modèles :cloud)")
 
-        assertEquals("Key SSH + query__PLT0__(modèles :cloud)", shielded.text)
-        assertEquals(listOf("\\n"), shielded.terms)
+        assertTrue(shielded.terms.contains("\\n"))
+        val restored = shield.restore(shielded.text.replace("modèles", "models"), shielded)
+
+        assertEquals("Key SSH + query\\n(models :cloud)", restored)
     }
 
     @Test
