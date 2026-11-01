@@ -1,7 +1,6 @@
 package plantuml
 
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
 import plantuml.apikey.ApiKeyEntry
@@ -65,11 +64,9 @@ class CrossProviderFallbackFunctionalTest {
                 fallbackOrder = listOf("gemini", "mistral", "ollama"),
             )
 
-        val selected = orchestrator.selectKey()
-
-        assertNotNull(selected)
-        assertEquals("gemini-1", selected!!.id)
-        assertEquals(Provider.GOOGLE, selected!!.provider)
+        val selected = requireNotNull(orchestrator.selectKey())
+        assertEquals("gemini-1", selected.id)
+        assertEquals(Provider.GOOGLE, selected.provider)
     }
 
     @Test
@@ -86,11 +83,9 @@ class CrossProviderFallbackFunctionalTest {
         gemini.getNextKey()
         gemini.getNextKey()
 
-        val selected = orchestrator.selectKey()
-
-        assertNotNull(selected)
-        assertEquals("mistral-1", selected!!.id)
-        assertEquals(Provider.MISTRAL, selected!!.provider)
+        val selected = requireNotNull(orchestrator.selectKey())
+        assertEquals("mistral-1", selected.id)
+        assertEquals(Provider.MISTRAL, selected.provider)
     }
 
     @Test
@@ -109,11 +104,9 @@ class CrossProviderFallbackFunctionalTest {
         mistral.getNextKey()
         mistral.getNextKey()
 
-        val selected = orchestrator.selectKey()
-
-        assertNotNull(selected)
-        assertEquals("ollama-1", selected!!.id)
-        assertEquals(Provider.OLLAMA, selected!!.provider)
+        val selected = requireNotNull(orchestrator.selectKey())
+        assertEquals("ollama-1", selected.id)
+        assertEquals(Provider.OLLAMA, selected.provider)
     }
 
     @Test
@@ -148,9 +141,7 @@ class CrossProviderFallbackFunctionalTest {
                 fallbackOrder = listOf("gemini", "mistral", "ollama"),
             )
 
-        val selected = orchestrator.selectKey()
-
-        assertNotNull(selected)
-        assertEquals("ollama-1", selected!!.id)
+        val selected = requireNotNull(orchestrator.selectKey())
+        assertEquals("ollama-1", selected.id)
     }
 }
