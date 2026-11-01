@@ -22,8 +22,6 @@ cucumber = "7.34.3"
 junit_platform = "1.14.3"
 jackson = "2.21.1"
 coroutines = "1.10.2"
-arrow = "2.2.2"
-arrow-jackson = "0.15.1"
 langchain4j = "1.14.1"
 langchain4j-beta = "1.14.1-beta24"
 docker-java = "3.7.0"
@@ -70,9 +68,6 @@ jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-d
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-coroutines-jdk8 = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8", version.ref = "coroutines" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
-arrow-core = { module = "io.arrow-kt:arrow-core", version.ref = "arrow" }
-arrow-coroutines = { module = "io.arrow-kt:arrow-fx-coroutines", version.ref = "arrow" }
-arrow-jackson = { module = "io.arrow-kt:arrow-integrations-jackson-module", version.ref = "arrow-jackson" }
 langchain4j = { module = "dev.langchain4j:langchain4j", version.ref = "langchain4j" }
 langchain4j-ollama = { module = "dev.langchain4j:langchain4j-ollama", version.ref = "langchain4j" }
 langchain4j-open-ai = { module = "dev.langchain4j:langchain4j-open-ai", version.ref = "langchain4j" }
@@ -139,9 +134,6 @@ plantuml = [
     "plantuml-engine",
     "jackson-module-kotlin",
     "jackson-dataformat-yaml",
-    "arrow-core",
-    "arrow-coroutines",
-    "arrow-jackson",
     "docker-java",
     "docker-java-transport-httpclient5"
 ]
