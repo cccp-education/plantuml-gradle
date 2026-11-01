@@ -51,6 +51,48 @@ class PlantumlServiceTest {
         assertTrue(result is SyntaxValidationResult.Invalid)
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = ["mindmap", "wbs"])
+    fun `should validate non-uml diagram types wrapped in their own delimiters`(type: String) {
+        // Given — CHE-I18N-COMPLETION S-084: a mindmap is valid PlantUML; the
+        // previous `contains("@startuml")` gate rejected every translated mindmap.
+        val code =
+            when (type) {
+                "mindmap" -> "@startmindmap\n* Root\n** Branch\n@endmindmap"
+                else -> "@startwbs\n* Root\n** Branch\n@endwbs"
+            }
+
+        // When
+        val result = plantumlService.validateSyntax(code)
+
+        // Then
+        assertTrue(result is SyntaxValidationResult.Valid)
+    }
+
+    @Test
+    fun `should reject code without diagram delimiters`() {
+        // Given — plain prose is not a diagram.
+        val code = "This is not a diagram"
+
+        // When
+        val result = plantumlService.validateSyntax(code)
+
+        // Then
+        assertTrue(result is SyntaxValidationResult.Invalid)
+    }
+
+    @Test
+    fun `should reject mismatched diagram delimiters`() {
+        // Given — a mindmap closed by @enduml is structurally wrong.
+        val code = "@startmindmap\n* Root\n@enduml"
+
+        // When
+        val result = plantumlService.validateSyntax(code)
+
+        // Then
+        assertTrue(result is SyntaxValidationResult.Invalid)
+    }
+
     @Test
     fun `should generate image from plantuml code`() {
         // Given
