@@ -75,7 +75,7 @@ class GenerateDiagramDocsTaskTest {
         assertTrue(promptsDir.exists())
         val promptFiles = promptsDir.listFiles { f -> f.extension == "prompt" }
         assertTrue(promptFiles != null && promptFiles.isNotEmpty())
-        val content = promptFiles!!.first().readText()
+        val content = promptFiles.first().readText()
         assertTrue(content.contains("service layer"))
         assertTrue(content.contains("LlmService"))
     }
@@ -103,7 +103,7 @@ class GenerateDiagramDocsTaskTest {
         val promptsDir = File(tempDir, "prompts")
         val promptFiles = promptsDir.listFiles { f -> f.extension == "prompt" }
         assertTrue(promptFiles != null && promptFiles.isNotEmpty())
-        val content = promptFiles!!.first().readText()
+        val content = promptFiles.first().readText()
         assertTrue(content.contains("config layer"))
     }
 

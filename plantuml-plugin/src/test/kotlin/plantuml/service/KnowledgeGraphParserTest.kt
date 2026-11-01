@@ -688,7 +688,7 @@ class KnowledgeGraphParserTest {
         assertTrue(error is KnowledgeGraphParseError.FileNotFound)
         assertEquals(
             PlantumlMessages.format("kgparser.file_not_found", "en", File(tempDir, "absent.json").absolutePath),
-            error?.message,
+            error.message,
         )
     }
 
@@ -700,7 +700,7 @@ class KnowledgeGraphParserTest {
 
         val error = result.leftOrNull()
         assertTrue(error is KnowledgeGraphParseError.Malformed)
-        assertTrue(error is KnowledgeGraphParseError.Malformed && error.cause is com.fasterxml.jackson.core.JsonParseException)
+        assertTrue(error.cause is com.fasterxml.jackson.core.JsonParseException)
     }
 
     @Test

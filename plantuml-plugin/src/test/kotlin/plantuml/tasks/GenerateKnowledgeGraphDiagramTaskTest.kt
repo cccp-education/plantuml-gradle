@@ -130,7 +130,7 @@ class GenerateKnowledgeGraphDiagramTaskTest {
         val pumlFiles = outputDir.listFiles { f -> f.extension == "puml" }
         assertTrue(pumlFiles != null && pumlFiles.isNotEmpty())
 
-        val content = pumlFiles!!.first().readText()
+        val content = pumlFiles.first().readText()
         assertTrue(content.contains("@startuml"))
         assertTrue(content.contains("@enduml"))
         assertTrue(content.contains("service layer"))
@@ -152,7 +152,7 @@ class GenerateKnowledgeGraphDiagramTaskTest {
         val pumlFiles = outputDir.listFiles { f -> f.extension == "puml" }
         assertTrue(pumlFiles != null && pumlFiles.isNotEmpty())
 
-        val content = pumlFiles!!.first().readText()
+        val content = pumlFiles.first().readText()
         assertTrue(content.contains("-->"))
         assertTrue(content.contains("..>"))
         assertTrue(content.contains("service layer"))
@@ -173,7 +173,7 @@ class GenerateKnowledgeGraphDiagramTaskTest {
         val pumlFiles = File(tempDir, "diagrams/knowledge-graph").listFiles { f -> f.extension == "puml" }
         assertTrue(pumlFiles != null && pumlFiles.isNotEmpty())
 
-        val content = pumlFiles!!.first().readText()
+        val content = pumlFiles.first().readText()
         assertTrue(content.contains("service layer"))
         assertTrue(content.contains("LlmService"))
     }
@@ -198,7 +198,7 @@ class GenerateKnowledgeGraphDiagramTaskTest {
         val pumlFiles = outputDir.listFiles { f -> f.extension == "puml" }
         assertTrue(pumlFiles != null && pumlFiles.isNotEmpty())
 
-        val pumlContent = pumlFiles!!.first().readText()
+        val pumlContent = pumlFiles.first().readText()
         assertTrue(pumlContent.contains("@startuml"))
         assertTrue(pumlContent.contains("NodeA"))
         assertTrue(pumlContent.contains("NodeB"))
@@ -218,7 +218,7 @@ class GenerateKnowledgeGraphDiagramTaskTest {
         val pumlFiles = File(tempDir, "diagrams/knowledge-graph").listFiles { f -> f.extension == "puml" }
         assertTrue(pumlFiles != null && pumlFiles.isNotEmpty())
 
-        val content = pumlFiles!!.first().readText()
+        val content = pumlFiles.first().readText()
         assertTrue(content.contains("alpha"))
         assertTrue(content.contains("beta"))
     }
@@ -237,7 +237,7 @@ class GenerateKnowledgeGraphDiagramTaskTest {
         val pumlFiles = File(tempDir, "diagrams/knowledge-graph").listFiles { f -> f.extension == "puml" }
         assertTrue(pumlFiles != null && pumlFiles.isNotEmpty())
 
-        val content = pumlFiles!!.first().readText()
+        val content = pumlFiles.first().readText()
         assertTrue(content.contains("-->"))
         assertTrue(!content.contains("..>"))
     }
@@ -256,7 +256,7 @@ class GenerateKnowledgeGraphDiagramTaskTest {
         val pumlFiles = File(tempDir, "diagrams/knowledge-graph").listFiles { f -> f.extension == "puml" }
         assertTrue(pumlFiles != null && pumlFiles.isNotEmpty())
 
-        val content = pumlFiles!!.first().readText()
+        val content = pumlFiles.first().readText()
         assertTrue(content.contains("LlmService"))
         assertTrue(!content.contains("reads config"))
     }
@@ -276,7 +276,7 @@ class GenerateKnowledgeGraphDiagramTaskTest {
         val pumlFiles = File(tempDir, "diagrams/knowledge-graph").listFiles { f -> f.extension == "puml" }
         assertTrue(pumlFiles != null && pumlFiles.isNotEmpty())
 
-        val content = pumlFiles!!.first().readText()
+        val content = pumlFiles.first().readText()
         assertTrue(content.contains("Node1"))
         assertTrue(!content.contains("Node6"))
     }
@@ -314,7 +314,7 @@ class GenerateKnowledgeGraphDiagramTaskTest {
         val outputDir = File(tempDir, "diagrams/knowledge-graph")
         val pumlFiles = outputDir.listFiles { f -> f.extension == "puml" }
         assertTrue(pumlFiles != null && pumlFiles.isNotEmpty())
-        assertTrue(pumlFiles!!.first().name.contains("service"))
+        assertTrue(pumlFiles.first().name.contains("service"))
     }
 
     @Test
@@ -330,7 +330,7 @@ class GenerateKnowledgeGraphDiagramTaskTest {
         val outputDir = File(tempDir, "diagrams/knowledge-graph")
         val pumlFiles = outputDir.listFiles { f -> f.extension == "puml" }
         assertTrue(pumlFiles != null && pumlFiles.isNotEmpty())
-        assertTrue(pumlFiles!!.first().name == "knowledge-graph-full.puml")
+        assertTrue(pumlFiles.first().name == "knowledge-graph-full.puml")
     }
 
     @Test
@@ -369,7 +369,7 @@ class GenerateKnowledgeGraphDiagramTaskTest {
         assertTrue(outputDir.exists())
         val pumlFiles = outputDir.listFiles { f -> f.extension == "puml" }
         assertTrue(pumlFiles != null && pumlFiles.isNotEmpty())
-        val content = pumlFiles!!.first().readText()
+        val content = pumlFiles.first().readText()
         assertTrue(content.contains("community_0"))
         assertTrue(content.contains("LlmService"))
         assertTrue(content.contains("ApiKeyPool"))
@@ -388,7 +388,7 @@ class GenerateKnowledgeGraphDiagramTaskTest {
 
         val pumlFiles = File(tempDir, "diagrams/knowledge-graph").listFiles { f -> f.extension == "puml" }
         assertTrue(pumlFiles != null && pumlFiles.isNotEmpty())
-        val content = pumlFiles!!.first().readText()
+        val content = pumlFiles.first().readText()
         assertTrue(content.contains("@startuml"))
     }
 }

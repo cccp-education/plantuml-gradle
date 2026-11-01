@@ -47,7 +47,7 @@ class TestCleanupExtension {
         activeContainers.forEach { containerId ->
             try {
                 log.info("Stopping container $containerId")
-                Runtime.getRuntime().exec("docker stop $containerId")
+                Runtime.getRuntime().exec(arrayOf("docker", "stop", containerId))
             } catch (e: Exception) {
                 log.warn("Failed to stop container $containerId: ${e.message}")
             }
@@ -155,7 +155,7 @@ class TestCleanupExtension {
             containerIds.forEach { containerId ->
                 try {
                     log.info("Removing orphaned container: $containerId")
-                    Runtime.getRuntime().exec("docker rm -f $containerId")
+                    Runtime.getRuntime().exec(arrayOf("docker", "rm", "-f", containerId))
                 } catch (e: Exception) {
                     log.warn("Failed to remove container $containerId: ${e.message}")
                 }
