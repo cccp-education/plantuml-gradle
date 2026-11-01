@@ -124,7 +124,8 @@ object ConfigMerger {
 
     internal fun loadFromEnvironment(): PlantumlConfig {
         val env = System.getenv()
-        val sysProps = System.getProperties().orEmpty() as Map<String, String>
+        val sysProps: Map<String, String> =
+            System.getProperties().stringPropertyNames().associateWith { System.getProperty(it) ?: "" }
 
         return PlantumlConfig(
             input =

@@ -265,7 +265,7 @@ class DiagramProcessor(
                         currentCode,
                         iterations,
                         false, // Will be updated if valid
-                        if (validationResult is SyntaxValidationResult.Invalid) validationResult.errorMessage else parseError,
+                        validationResult.errorMessage,
                     ),
                 )
             } else {

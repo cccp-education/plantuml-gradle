@@ -89,7 +89,7 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
         // Check for test mode port conflict simulation FIRST, before determining RAG mode
         val simulatePortConflict =
             System.getProperty("plantuml.test.simulate.port.conflict") == "true" ||
-                project.properties["plantuml.test.simulate.port.conflict"]?.toString() == "true"
+                project.findProperty("plantuml.test.simulate.port.conflict")?.toString() == "true"
         if (simulatePortConflict) {
             val message = PlantumlMessages.get("collect.port_conflict", lang)
             logger.error(message)
@@ -98,10 +98,10 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
 
         // Extract CLI parameters from project properties and strip "plantuml." prefix
         val cliParams =
-            project.properties
-                .filterKeys { it.startsWith("plantuml.") }
+            project.providers
+                .gradlePropertiesPrefixedBy("plantuml.")
+                .get()
                 .mapKeys { it.key.removePrefix("plantuml.") }
-                .mapValues { it.value }
 
         // Load configuration with CLI overrides
         val config = PlantumlManager.Configuration.load(project, cliParams)
@@ -189,7 +189,11 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
             }
 
         val promptsDir = project.file(config.input.prompts)
-        val checksumsDir = File(project.buildDir, config.incremental.checksumsDir.removePrefix("build/"))
+        val buildRoot =
+            project.layout.buildDirectory
+                .get()
+                .asFile
+        val checksumsDir = File(buildRoot, config.incremental.checksumsDir.removePrefix("build/"))
         val incrementalProcessor = IncrementalProcessor(checksumsDir)
 
         val (toReindex, skipped) =
@@ -268,14 +272,14 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
             return RagMode.valueOf(envMode.uppercase())
         }
 
-        val gradlePropMode = project.properties["rag.mode"]?.toString()?.lowercase()
+        val gradlePropMode = project.findProperty("rag.mode")?.toString()?.lowercase()
         if (gradlePropMode != null) {
             logger.lifecycle(PlantumlMessages.format("collect.rag_mode_prop", lang, gradlePropMode))
             return RagMode.valueOf(gradlePropMode.uppercase())
         }
 
         val testMode =
-            project.properties["plantuml.test.rag.mode"]?.toString()?.lowercase()
+            project.findProperty("plantuml.test.rag.mode")?.toString()?.lowercase()
                 ?: System.getProperty("plantuml.test.rag.mode")?.lowercase()
         if (testMode != null) {
             logger.lifecycle(PlantumlMessages.format("collect.rag_mode_test", lang, testMode))
@@ -530,7 +534,11 @@ abstract class CollectPlantumlIndexTask : DefaultTask() {
      */
     private fun cleanupPartialOutputs() {
         try {
-            val buildDir = File(project.buildDir, "plantuml-plugin")
+            val buildRoot =
+                project.layout.buildDirectory
+                    .get()
+                    .asFile
+            val buildDir = File(buildRoot, "plantuml-plugin")
             if (buildDir.exists()) {
                 logger.lifecycle(PlantumlMessages.format("collect.cleaning", lang, buildDir.absolutePath))
                 buildDir.deleteRecursively()

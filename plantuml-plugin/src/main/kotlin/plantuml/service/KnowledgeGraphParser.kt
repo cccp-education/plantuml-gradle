@@ -77,7 +77,7 @@ class KnowledgeGraphParser(
         val firstNode = root.get("nodes")?.firstOrNull()
         val hasGraphifyNodes =
             firstNode?.isObject == true &&
-                (firstNode?.has("label") == true || firstNode?.has("community") == true)
+                (firstNode.has("label") || firstNode.has("community"))
         val hasCommunitiesArray = communitiesNode?.isArray == true
         val isGraphifyFormat = !hasCommunitiesArray && (hasGraphifyLinks || hasGraphifyNodes)
 

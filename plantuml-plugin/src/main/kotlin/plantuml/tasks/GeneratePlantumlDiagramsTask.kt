@@ -149,13 +149,21 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
             )
 
         // Incremental processing: checksum-based skip + orphan cleanup
-        val checksumsDir = File(project.buildDir, config.incremental.checksumsDir.removePrefix("build/"))
+        val buildRoot =
+            project.layout.buildDirectory
+                .get()
+                .asFile
+        val checksumsDir = File(buildRoot, config.incremental.checksumsDir.removePrefix("build/"))
         val incrementalProcessor = IncrementalProcessor(checksumsDir)
         val forceReprocess = project.gradle.startParameter.isRerunTasks
 
         // Audit log: wire IncrementalAuditLogger as event listener if enabled
         if (config.incremental.auditEnabled) {
-            val auditLogFile = File(project.buildDir, config.incremental.auditLog.removePrefix("build/"))
+            val auditBuildRoot =
+                project.layout.buildDirectory
+                    .get()
+                    .asFile
+            val auditLogFile = File(auditBuildRoot, config.incremental.auditLog.removePrefix("build/"))
             val auditLogger = plantuml.incremental.IncrementalAuditLogger(auditLogFile)
             incrementalProcessor.onEvent(auditLogger::log)
         }
@@ -457,7 +465,11 @@ abstract class GeneratePlantumlDiagramsTask : DefaultTask() {
      */
     private fun cleanupPartialOutputs() {
         try {
-            val buildDir = File(project.buildDir, "plantuml-plugin")
+            val buildRoot =
+                project.layout.buildDirectory
+                    .get()
+                    .asFile
+            val buildDir = File(buildRoot, "plantuml-plugin")
             if (buildDir.exists()) {
                 logger.lifecycle(PlantumlMessages.format("generate.cleaning", lang, buildDir.absolutePath))
                 buildDir.deleteRecursively()
