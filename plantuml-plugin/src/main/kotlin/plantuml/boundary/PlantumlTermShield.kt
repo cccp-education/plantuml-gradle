@@ -247,6 +247,13 @@ class PlantumlTermShield(
 
         private val TERM_PATTERNS =
             listOf(
+                // CHE-I18N-COMPLETION P1 — PlantUML's literal newline escape (`\n`)
+                // is a structural marker, not prose. Masking it makes the provider
+                // see ONE label and translate every segment; restoring it after the
+                // call keeps a valid diagram. Without this, the model translated
+                // only the first segment (`query` stayed English, `modèles` stayed
+                // French) and the second segment was frozen.
+                Regex("""\\n"""),
                 // whole backticked code span
                 Regex("""`[^`\n]+`"""),
                 Regex("""https?://\S+"""),

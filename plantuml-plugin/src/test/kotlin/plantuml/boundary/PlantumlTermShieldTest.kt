@@ -47,6 +47,14 @@ class PlantumlTermShieldTest {
     }
 
     @Test
+    fun `protects the literal newline escape so the whole label is translated`() {
+        val shielded = shield.shield("Key SSH + query\\n(modèles :cloud)")
+
+        assertEquals("Key SSH + query__PLT0__(modèles :cloud)", shielded.text)
+        assertEquals(listOf("\\n"), shielded.terms)
+    }
+
+    @Test
     fun `protects an asciidoc macro from the shared catalog`() {
         val shielded = shield.shield("Voir toc::[] pour la table")
 
