@@ -1,5 +1,8 @@
 package plantuml.service
 
+import arrow.core.Either
+import arrow.core.left
+import arrow.core.right
 import com.fasterxml.jackson.databind.ObjectMapper
 import plantuml.EdgeType
 import plantuml.KnowledgeGraph
@@ -30,14 +33,38 @@ class KnowledgeGraphParser(
      * @return The parsed knowledge graph
      * @throws IllegalArgumentException if the graph file does not exist
      */
-    fun parse(): KnowledgeGraph {
+    fun parse(): KnowledgeGraph =
+        parseEither().fold(
+            ifLeft = { error -> throw error.toException() },
+            ifRight = { graph -> graph },
+        )
+
+    /**
+     * XB-FP-5 (arrow-kt adoption): the parse is a value —
+     * `Either<KnowledgeGraphParseError, KnowledgeGraph>`. A missing file and a
+     * malformed JSON are `Left`; the historical exceptions are rebuilt exactly
+     * once by [parse] (same messages, same `JsonParseException` for malformed
+     * input).
+     */
+    fun parseEither(): Either<KnowledgeGraphParseError, KnowledgeGraph> {
         if (!graphFile.exists()) {
-            throw IllegalArgumentException(
-                PlantumlMessages.format("kgparser.file_not_found", "en", graphFile.absolutePath)
-            )
+            return KnowledgeGraphParseError.FileNotFound(
+                path = graphFile.absolutePath,
+                message = PlantumlMessages.format("kgparser.file_not_found", "en", graphFile.absolutePath),
+            ).left()
         }
 
-        val root = mapper.readTree(graphFile)
+        val root: com.fasterxml.jackson.databind.JsonNode =
+            when (val read = Either.catch { mapper.readTree(graphFile) }) {
+                is Either.Left -> {
+                    val throwable = read.value
+                    return KnowledgeGraphParseError.Malformed(
+                        cause = throwable,
+                        message = throwable.message ?: "malformed knowledge graph JSON",
+                    ).left()
+                }
+                is Either.Right -> read.value
+            }
 
         val nodes = mutableListOf<KnowledgeGraphNode>()
         val edges = mutableListOf<KnowledgeGraphEdge>()
@@ -63,8 +90,15 @@ class KnowledgeGraphParser(
             nodes = nodes,
             edges = edges,
             communities = communities
-        )
+        ).right()
     }
+
+    /** Rebuilds the historical exception contract from the typed error. */
+    private fun KnowledgeGraphParseError.toException(): Throwable =
+        when (this) {
+            is KnowledgeGraphParseError.FileNotFound -> IllegalArgumentException(message)
+            is KnowledgeGraphParseError.Malformed -> cause ?: IllegalArgumentException(message)
+        }
 
     private fun parseLegacyFormat(
         root: com.fasterxml.jackson.databind.JsonNode,

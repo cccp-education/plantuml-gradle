@@ -544,4 +544,47 @@ class KnowledgeGraphParserTest {
 
         assertEquals(1, graph.edges.size)
     }
+
+    // ── XB-FP-5 — parseEither: failures are values, not exceptions ─────────────
+
+    @Test
+    fun `parseEither returns FileNotFound for a missing file`() {
+        val missing = KnowledgeGraphParser(File(tempDir, "absent.json"))
+
+        val result = missing.parseEither()
+
+        val error = result.leftOrNull()
+        assertTrue(error is KnowledgeGraphParseError.FileNotFound)
+        assertEquals(
+            PlantumlMessages.format("kgparser.file_not_found", "en", File(tempDir, "absent.json").absolutePath),
+            error?.message,
+        )
+    }
+
+    @Test
+    fun `parseEither returns Malformed carrying the Jackson cause`() {
+        graphFile.writeText("{invalid json!!!")
+
+        val result = parser.parseEither()
+
+        val error = result.leftOrNull()
+        assertTrue(error is KnowledgeGraphParseError.Malformed)
+        assertTrue(error is KnowledgeGraphParseError.Malformed && error.cause is com.fasterxml.jackson.core.JsonParseException)
+    }
+
+    @Test
+    fun `parseEither returns Right for a valid graph`() {
+        val json = mapper.writeValueAsString(mapOf(
+            "nodes" to listOf("A", "B"),
+            "edges" to listOf(
+                mapOf("source" to "A", "target" to "B", "type" to "EXTRACTED", "confidence" to 1.0)
+            )
+        ))
+        graphFile.writeText(json)
+
+        val graph = parser.parseEither().getOrNull()
+
+        assertEquals(2, graph?.nodes?.size)
+        assertEquals(1, graph?.edges?.size)
+    }
 }
