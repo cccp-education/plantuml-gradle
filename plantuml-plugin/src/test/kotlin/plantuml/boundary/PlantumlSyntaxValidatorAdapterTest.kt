@@ -19,7 +19,7 @@ class PlantumlSyntaxValidatorAdapterTest {
         val result = validator.validate("@startuml\nA --> B")
         assertTrue(result is SyntaxValidationResult.Invalid)
         assertEquals(
-            "Missing @startuml or @enduml tags",
+            "Missing or mismatched diagram delimiters",
             (result as SyntaxValidationResult.Invalid).errorMessage,
         )
     }
