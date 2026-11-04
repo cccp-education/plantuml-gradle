@@ -19,11 +19,11 @@ buildscript {
 
 plugins {
     `java-library`
-    id("education.cccp.build.gradle-plugin") version "0.0.10"
-    id("education.cccp.build.publishing") version "0.0.10"
-    id("education.cccp.build.lint") version "0.0.10"
+    id("education.cccp.build.gradle-plugin") version "0.0.11"
+    id("education.cccp.build.publishing") version "0.0.11"
+    id("education.cccp.build.lint") version "0.0.11"
+    id("education.cccp.build.kover") version "0.0.11"
     alias(libs.plugins.publish)
-    alias(libs.plugins.kover)
     alias(libs.plugins.codebase)
 }
 
@@ -535,67 +535,13 @@ tasks.named(functionalTest.processResourcesTaskName) {
     }
 }
 
-kover {
-    currentProject {
-        sources {
-            includedSourceSets.add("main")
-        }
-    }
-    reports {
-        total {
-            html {
-                onCheck.set(true)
-                htmlDir.set(layout.buildDirectory.dir("reports/kover/html"))
-            }
-            xml {
-                onCheck.set(true)
-                xmlFile.set(layout.buildDirectory.file("reports/kover/xml/report.xml"))
-            }
-        }
-    }
+koverConventions {
+    enabled = true
+    includedSourceSets = listOf("main")
+    htmlDir = "reports/kover/html"
+    xmlFile = "reports/kover/xml/report.xml"
+    threshold = 75.0
 }
-
-// Kover verification - fail build if coverage < 75%
-tasks.register("koverThresholdCheck") {
-    // The check reads the XML report — it must be generated first (latent wiring
-    // bug masked by a dead CI, surfaced by S-222 CI resurrection).
-    dependsOn("koverXmlReport")
-    doLast {
-        val reportFile =
-            layout.buildDirectory
-                .file("reports/kover/xml/report.xml")
-                .get()
-                .asFile
-        if (!reportFile.exists()) {
-            throw GradleException("Kover report not found. Run 'koverXmlReport' first.")
-        }
-        val xml = reportFile.readText()
-        // Aggregate all INSTRUCTION counters from the report
-        val coverageRegex = Regex("""<counter type="INSTRUCTION" missed="(\d+)" covered="(\d+)"/>""")
-        val matches = coverageRegex.findAll(xml)
-        var totalMissed = 0L
-        var totalCovered = 0L
-        for (match in matches) {
-            totalMissed += match.groupValues[1].toLong()
-            totalCovered += match.groupValues[2].toLong()
-        }
-        val total = totalMissed + totalCovered
-        val coverage = if (total > 0) (totalCovered.toDouble() / total) * 100 else 0.0
-        println(
-            "Instruction coverage: ${
-                String.format(
-                    "%.2f",
-                    coverage,
-                )
-            }% (missed=$totalMissed, covered=$totalCovered)",
-        )
-        if (coverage < 75.0) {
-            throw GradleException("Coverage ${String.format("%.2f", coverage)}% is below threshold 75%")
-        }
-    }
-}
-
-tasks.check { dependsOn("koverThresholdCheck") }
 
 gradlePlugin {
     plugins {
