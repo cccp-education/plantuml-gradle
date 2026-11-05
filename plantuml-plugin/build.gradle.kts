@@ -19,10 +19,10 @@ buildscript {
 
 plugins {
     `java-library`
-    id("education.cccp.build.gradle-plugin") version "0.0.13"
-    id("education.cccp.build.publishing") version "0.0.13"
-    id("education.cccp.build.lint") version "0.0.13"
-    id("education.cccp.build.kover") version "0.0.13"
+    id("education.cccp.build.gradle-plugin") version "0.0.14"
+    id("education.cccp.build.publishing") version "0.0.14"
+    id("education.cccp.build.lint") version "0.0.14"
+    id("education.cccp.build.kover") version "0.0.14"
     alias(libs.plugins.publish)
     alias(libs.plugins.codebase)
 }
