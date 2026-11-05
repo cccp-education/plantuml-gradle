@@ -1,5 +1,27 @@
 = Historique des Sessions
 
+== Session 246 (2026-11-05) — PLT-OUT-1 : gate de corpus PlantUML ✅
+
+Le validateur de syntaxe devient une **gate bloquante sur le corpus réel** (EPIC
+PLT-I18N-OUTPUT, 1/4 US). Domaine pur `plantuml.corpus` : `AsciiDocPlantumlCorpusScanner`
+(machine à états — `[plantuml,…]` / `[plantuml#id]`, délimiteurs `----`/`….`, ids quotes,
+ancre précédente, repli `line-<n>` ; ignore `[source,plantuml]`, littéraux, fences `////`,
+lignes commentées), `CorpusLanguageResolver` (langue depuis le chemin via `LanguageCatalog`
+N0), `PlantumlCorpusGate` (chaque bloc de chaque document, tri déterministe,
+exception validateur = finding), `PlantumlCorpusBaseline` (clé exacte ou document+bloc),
+`PlantumlCorpusReport` (reproductible + suggestions). Tâche `validatePlantumlCorpus`
+(`-Pplantuml.corpusDir` défaut `docs`, `-Pplantuml.corpusBaseline`, `-Pplantuml.corpusStrict`),
+rapport écrit **avant** l'échec, `@DisableCachingByDefault`, câblée à `check`, i18n 10 langues.
+Tests : **24 unit** (14 scanner + 10 gate) + **7 functional TestKit** + **5 scénarios BDD**
+`@plantuml-corpus` + `PlantumlCorpusSteps`. Dogfooding consommateur `/tmp` : échec nommé
+`en/broken.adoc [en] broken-diagram:3 — Missing or mismatched diagram delimiters`, baseline
+verte, UP-TO-DATE — le smoke a révélé et fait corriger un bug de groupe de capture regex.
+Réalité versions réintégrée dans la gouvernance : Central `0.0.13`/`0.0.14`/`0.0.15`/`0.0.16`
+(HTTP 200), `0.0.14` PLT-I18N-PRESERVE, `0.0.15` correctifs S-083, **`0.0.16` courante** (commit
+`24a0d41`, pin catalogue/BOM `0.0.121`). Gates locaux (Local = Build) : compile ×3, `assemble`,
+`validatePlugins`, `ktlintCheck`, `publishToMavenLocal` VERT ; zéro test local, zéro secret,
+zéro publication. Rapport `.agents/sessions/246-plt-out-1-corpus-gate.adoc`.
+
 == Session 243 (2026-10-26) — PLT-TERM-PROTECTION + releases 0.0.11→0.0.13 ✅
 
 Traduction PlantUML des articles : bouclier `PlantumlTermShield` (`__PLTn__`,

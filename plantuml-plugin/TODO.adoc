@@ -3,6 +3,16 @@
 _Voir BACKLOG.adoc section "Prochains EPICs — pistes consolidées" pour le
 détail priorisé et les sources (code review, audit code)._
 
+== 🟡 EPIC PLT-I18N-OUTPUT (PLT-OUT-1 ✅ S-246, reste 3 US)
+
+Contrat de sortie : le validateur de syntaxe devient une gate de corpus
+(`i18n_review.adoc` S-263, mesure cheroliv S-076). BACKLOG § PLT-I18N-OUTPUT.
+
+. [x] **PLT-OUT-1** — tâche `validatePlantumlCorpus` : scan pur des vrais `[plantuml]` (ignore `[source,plantuml]`/littéraux/commentaires), validation N0 de chaque bloc, rapport déterministe langue+article+id+raison, baseline nommée, câblage `check`, i18n 10 langues. 24 unit + 7 FT + 5 BDD `@plantuml-corpus`. ✅ S-246.
+. [ ] **PLT-OUT-2** — notes non quotées/multi-lignes corrigées **avant** écriture ; round-trip `\n` prouvé ; bloc non corrigeable `PRESERVE` (jamais publié cassé).
+. [ ] **PLT-OUT-3** — shield + langue : placeholder perdu ⇒ `PRESERVE` ; label resté français détecté (jamais de faux `TRANSLATED`) ; retry borné.
+. [ ] **PLT-OUT-4** — preuve corpus : reprise ciblée des 69 blocs EN S-076 pilotée par la gate ; zéro `@startuml` brut dans le HTML baké (hors `[source,plantuml]`).
+
 == ✅ EPIC PLT-CONTEXT (cadré S-231, TERMINÉ S-235, 4/4)
 
 Contexte augmenté de génération via codebase N1 (contrat N0 `contracts.context.*`,

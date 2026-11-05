@@ -1,0 +1,17 @@
+= COMPLETED_TASKS_ARCHIVE — 2026-11
+
+== Session 246 (2026-11-05) — PLT-OUT-1 : gate de corpus PlantUML ✅
+
+=== Fait
+- [x] Domaine pur `plantuml.corpus` : `AsciiDocPlantumlCorpusScanner` (vrais `[plantuml]`, ignore `[source,plantuml]`/littéraux/commentaires), `CorpusLanguageResolver`, `PlantumlCorpusGate`, `PlantumlCorpusBaseline`, `PlantumlCorpusReport` ✅
+- [x] Tâche `validatePlantumlCorpus` (`-Pplantuml.corpusDir`/`corpusBaseline`/`corpusStrict`), rapport écrit avant échec, suggestions de baseline, `@DisableCachingByDefault`, câblage `check` ✅
+- [x] i18n `task.corpus.*` + `corpus.*` dans les 10 langues ✅
+- [x] Tests : 24 unit (14 scanner + 10 gate) + 7 functional TestKit + 5 scénarios BDD `@plantuml-corpus` + `PlantumlCorpusSteps` ✅
+- [x] Dogfooding consommateur `/tmp` (mavenLocal) : échec nommé article/langue/id/ligne/raison, baseline verte, UP-TO-DATE ; bug regex de groupe de capture trouvé et corrigé ✅
+- [x] Réalité versions réintégrée : Central `0.0.13`→`0.0.16` HTTP 200 ; `0.0.14` PRESERVE, `0.0.15` S-083, `0.0.16` courante (`24a0d41`, pin `0.0.121`) ✅
+- [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 247 + TEST_COVERAGE + archive 2026-11 + BACKLOG + TODO + AGENTS racine ✅
+- [x] Gate local = Build (compile ×3 + `ktlintCheck` + `assemble` + `validatePlugins` + `publishToMavenLocal` VERT) ; zéro test local, zéro secret, zéro publication ✅
+
+=== Prochaine session (247)
+- **PLT-OUT-2** : notes non quotées corrigées avant écriture (multi-lignes, round-trip, `PRESERVE` si non corrigeable)
+- **Fichier à lire en priorité** : `BACKLOG.adoc` § PLT-I18N-OUTPUT + `PROMPT_REPRISE.adoc`

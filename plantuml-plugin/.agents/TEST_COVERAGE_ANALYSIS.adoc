@@ -1,6 +1,29 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 243 (26 octobre 2026) — PLT-TERM-PROTECTION
+_Dernière mise à jour_ : Session 246 (5 novembre 2026) — PLT-OUT-1 (gate de corpus)
+
+=== Session 246 — PLT-OUT-1 (gate de corpus)
+
+* **+** `src/test/kotlin/plantuml/corpus/AsciiDocPlantumlCorpusScannerTest.kt`
+  (14 unit : id explicite/quote/hash, repli ligne, délimiteur `.`, ancre
+  précédente, blocs multiples, `[source,plantuml]` ignoré, littéral, fence
+  `////`, ligne commentée, bloc non terminé, attribut homonyme, document vide).
+* **+** `src/test/kotlin/plantuml/corpus/PlantumlCorpusGateTest.kt`
+  (10 unit : corpus valide, finding bloquante nommée, rendu, baseline exacte,
+  baseline document+bloc, nouvelle finding non masquée, ordre déterministe,
+  échec du validateur, source listing ignoré, parsing de baseline).
+* **+** `src/functionalTest/kotlin/plantuml/ValidatePlantumlCorpusFunctionalTest.kt`
+  (7 FT TestKit : enregistrement, corpus valide + rapport, échec nommant
+  article/id/raison, baseline nommée, listing ignoré, `strict=false`,
+  UP-TO-DATE).
+* **+** BDD `36_plantuml_corpus.feature` (5 scénarios `@plantuml-corpus`) +
+  `PlantumlCorpusSteps` (préfixes `corpus`, anti-collision S-088).
+* Couverture des nouveaux domaines : `PlantumlCorpusGate` (branches
+  valide/invalide/baseline/exception), `AsciiDocPlantumlCorpusScanner`
+  (états attribut/délimiteur/ancre/commentaire/littéral), `PlantumlCorpusBaseline`
+  (clé exacte, paire, commentaires), `CorpusLanguageResolver` (chemin).
+* Local = Build (compile ×3 + `ktlintCheck` + `assemble` + `validatePlugins` +
+  `publishToMavenLocal` VERT) ; preuve = CI du commit poussé.
 
 === Session 243 — PLT-TERM-PROTECTION (term shield + prose)
 

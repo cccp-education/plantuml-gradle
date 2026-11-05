@@ -1,44 +1,52 @@
-= PROMPT_REPRISE — Plantuml — Session 244
-:session: 245
-:date: 2026-10-26
+= PROMPT_REPRISE — Plantuml — Session 247
+:session: 247
+:date: 2026-11-05
 
-== État S-244 — PLT-I18N-PRESERVE (code)
+== État S-246 — PLT-OUT-1 (gate de corpus) ✅
 
-* `PlantumlTermShield` consomme `contracts.i18n.PreserveRule` (i18n-contracts
-  0.0.5) : macro, ancre, URL, code inline, fence, référence d'attribut protégés par
-  le catalogue N0 ; placeholders `__PLTn__` conservés (restauration nulle = label
-  non écrit). 2 UT (11/11). **Release 0.0.14 à publier.**
+* Domaine pur `plantuml.corpus` : `AsciiDocPlantumlCorpusScanner` (vrais
+  `[plantuml]` uniquement ; `[source,plantuml]`, littéraux et commentaires
+  ignorés), `CorpusLanguageResolver`, `PlantumlCorpusGate` (chaque bloc, tri
+  déterministe), `PlantumlCorpusBaseline` (clé exacte ou document+bloc),
+  `PlantumlCorpusReport`.
+* Tâche `validatePlantumlCorpus` : `-Pplantuml.corpusDir` (défaut `docs`),
+  `-Pplantuml.corpusBaseline` (défaut `plantuml-corpus-baseline.txt`),
+  `-Pplantuml.corpusStrict` (défaut `true`) ; rapport avant échec ;
+  suggestions de baseline ; câblée à `check` ; i18n 10 langues.
+* Tests : 24 unit + 7 functional TestKit + 5 scénarios BDD
+  `@plantuml-corpus`. Preuve réelle consommateur `/tmp` : échec nommé,
+  baseline verte, UP-TO-DATE.
+* Gates locaux : compile ×3, `assemble`, `validatePlugins`, `ktlintCheck`,
+  `publishToMavenLocal` VERT. Tests = CI.
 
-== État — PLT-TERM-PROTECTION livré ; releases 0.0.11→0.0.13
+== Réalité versions (réintégrée S-246)
 
-* `PlantumlTermShield` (types/code/identifiants protégés, `__PLTn__`, fallback),
-  `PlantumlProseLabelExtractor` (séquence, activité, état, use case, mindmap),
-  `PlantumlTranslationPortAdapter` (labels + notes + prose, batching, multi-label
-  par ligne).
-* Tests unit + functional + BDD `@plantuml-term-protection` ; CI `40284555439` ✅.
-* Releases Central : `0.0.11` (`8c771e74`), `0.0.12` (`68096e17`),
-  `0.0.13` (`cc5330d8`).
-* DAG consommateurs : MEMPHIS BOM/catalog `0.0.105`, bakery `0.0.29`, runner
-  `0.0.105`, document/bakery pins `0.0.105`. CI vertes.
-* Audit pilote `bakery-plugin/.agents/i18n_review.adoc` intégré : le prochain
-  chantier est le **contrat de sortie** (mesurer l'artefact, pas le store).
+* Central (`repo1` HTTP 200) : `0.0.13`, `0.0.14`, `0.0.15`, `0.0.16`.
+* `0.0.14` PLT-I18N-PRESERVE (S-244) ; `0.0.15` correctifs S-083 (`\n`, version
+  dérivée) ; **`0.0.16` courante** (commit `24a0d41`, pin catalogue/BOM
+  `0.0.121`). Catalogue workspace courant `0.0.128` — pin plantuml non
+  réaligné (dette assumée).
 
-== Mission Session 244 — P0.3 gate rendu diagramme (cross-borough)
+== Mission Session 247 — PLT-OUT-2 (notes non quotées)
 
-* Définir la mesure : zéro `@startuml` brut dans les variantes bakées hors
-  `[source,plantuml]`, SVG non blancs (σ>0), ids de diagrammes conservés.
-* Cible : cheroliv.com (rendu réel) + document/plantuml (validateur bloquant).
-* Ne pas relancer de run LLM global avant P0.3/P0.2.
-* Puis P0.2 (langue + sentinelles + preserve-rule) et P0.1 (intégrité AST).
+* `PlantumlNoteExtractor` doit couvrir les notes **multi-lignes** et **non
+  quotées** avant écriture ; round-trip `\n`/échappements prouvé ; un bloc non
+  corrigeable est `PRESERVE` (jamais publié cassé).
+* Baby-step DDD/TDD/BDD : unit + functional + scénarios `@plantuml-notes` /
+  `@plantuml-corpus` selon le seam choisi.
+* Vérifier l'interaction avec la gate `validatePlantumlCorpus` (un bloc
+  `PRESERVE` reste valide, une note corrigée ne régresse pas).
+* Puis `PLT-OUT-3` (shield + langue) et `PLT-OUT-4` (preuve corpus S-076).
 
 == Résiduel
 
-* Site cheroliv.com : 69 blocs EN détectés (0108 duplication, mindmap 0077,
-  prose 0119) ; 20 autres langues non re-traduites.
-* Le modèle `deepseek-v4.1-flash` préserve parfois un label court : prévoir un
-  retry borné ou un gate de langue, jamais un faux `TRANSLATED`.
+* Gate P0.3 cross-borough (re-bake cheroliv.com) : pilotée hors plantuml
+  (cheroliv/document/bakery). Les 69 blocs EN mesurés S-076 restent à traiter
+  par `PLT-OUT-4`.
+* `deepseek-v4.1-flash` préserve parfois un label court : `PLT-OUT-3` doit
+  détecter (jamais de faux `TRANSLATED`).
 
 == Rappels
 
-* Plantuml `0.0.13` (catalog ws `0.0.105`), N0 `plantuml-contracts:0.0.1`.
 * Local = Build, Tests = CI ; un borough par session ; zéro Python ; zéro secret.
+* `publishToMavenLocal` après toute modification source avant test consommateur.

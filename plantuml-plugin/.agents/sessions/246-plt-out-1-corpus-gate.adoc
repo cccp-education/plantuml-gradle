@@ -1,0 +1,96 @@
+= Session 246 — PLT-OUT-1 : gate de corpus PlantUML
+:session: 246
+:date: 2026-11-05
+:statut: ✅ TERMINÉ — PLT-I18N-OUTPUT 1/4 US
+
+== Contexte
+
+Le `PROMPT_REPRISE` visait P0.3 (« gate rendu diagramme », cross-borough
+cheroliv/document/plantuml). La partie purement plantuml de cette gate est
+`PLT-OUT-1` du backlog (`EPIC PLT-I18N-OUTPUT`) : transformer le validateur de
+syntaxe, jusqu'ici garde unitaire, en **gate bloquante sur le corpus réel**.
+Les releases postérieures à S-244 (`0.0.14` → `0.0.15` → `0.0.16`) et les
+correctifs S-083 (échappement `\n`, tous types de diagrammes) étaient présents
+dans le dépôt mais absents de la gouvernance locale ; cette clôture les
+réintègre.
+
+== Livré (baby-step DDD/TDD/BDD)
+
+=== Domaine pur `plantuml.corpus`
+
+* `PlantumlCorpusBlock` — bloc `[plantuml]` (document, id, ligne, source).
+* `CorpusLanguageResolver` — langue dérivée du chemin (premier segment égal à
+  un code du N0 `LanguageCatalog` ; sinon `source` pour le pivot).
+* `AsciiDocPlantumlCorpusScanner` — machine à états pure : `[plantuml,…]`,
+  `[plantuml#id]`, délimiteurs `----` et `....`, ids quotes, ancre
+  `[[id]]` précédente, id de repli `line-<n>` ; **ignore** `[source,plantuml]`,
+  les blocs littéraux, les fences `////` et les lignes commentées.
+* `PlantumlCorpusGate` — applique le port N0 `PlantUmlSyntaxValidator` à
+  **chaque** bloc de **chaque** document ; tri déterministe
+  (document, ligne, id) ; une exception du validateur devient une finding.
+* `PlantumlCorpusBaseline` — baseline nommée : clé exacte
+  `document\tblockId\treason` ou paire `document\tblockId` (raison libre),
+  commentaires `#` ignorés.
+* `PlantumlCorpusReport` — rapport reproductible (documents, blocs, invalides,
+  baselinés, bloquants) + section « suggested baseline ».
+
+=== Tâche Gradle `validatePlantumlCorpus`
+
+* `ValidatePlantumlCorpusTask` : `-Pplantuml.corpusDir` (défaut `docs`),
+  `-Pplantuml.corpusBaseline` (défaut `plantuml-corpus-baseline.txt`),
+  `-Pplantuml.corpusStrict` (défaut `true`).
+* Artefacts : `build/plantuml/plantuml-corpus-report.txt` (écrit **avant**
+  l'échec) et `build/plantuml/plantuml-corpus-baseline.txt` (suggestions).
+* Inputs/outputs Gradle déclarés → **UP-TO-DATE** prouvé ; `@DisableCachingByDefault`
+  interdit le rejeu d'un rapport périmé.
+* Enregistrée dans `PlantumlManager.Tasks` et **câblée à `check`** (gate réelle) ;
+  i18n `task.corpus.*` + `corpus.*` dans les 10 langues.
+
+=== Tests (3 niveaux)
+
+* Unit (24) : `AsciiDocPlantumlCorpusScannerTest` (14) +
+  `PlantumlCorpusGateTest` (10).
+* Functional TestKit (7) : `ValidatePlantumlCorpusFunctionalTest` — enregistrement,
+  corpus valide, échec nommant article/id/raison, baseline, listing ignoré,
+  `strict=false`, UP-TO-DATE.
+* BDD (5 scénarios) : `36_plantuml_corpus.feature` (`@plantuml-corpus`) +
+  `PlantumlCorpusSteps` (préfixes `corpus`, règle S-088).
+
+== Preuve réelle (dogfooding consommateur, Règle 2)
+
+Consommateur transitoire `/tmp/opencode/plantuml-corpus-consumer`
+(`includeBuild` non requis : artefact `publishToMavenLocal`) :
+
+* corpus 2 documents / 2 blocs, 1 cassé → **BUILD FAILED** avec
+  `en/broken.adoc [en] broken-diagram:3 — Missing or mismatched diagram delimiters` ;
+* baseline appliquée → **BUILD SUCCESSFUL** `invalid: 1, baselined: 1, blocking: 0` ;
+* relance sans changement → **UP-TO-DATE**.
+
+Le smoke a trouvé un bug réel (groupe de capture non capturant dans le regex
+d'attribut) corrigé avant clôture — la valeur du dogfooding est démontrée.
+
+== Gates locaux (Local = Build, Tests = CI)
+
+* `compileKotlin` / `compileTestKotlin` / `compileFunctionalTestKotlin` VERT.
+* `assemble` + `validatePlugins` VERT.
+* `ktlintCheck` VERT.
+* `publishToMavenLocal` VERT (artefact signé).
+* Aucun `test` / `functionalTest` / `cucumberTest` / `check` local (règle EAGER) :
+  la preuve est le run CI du commit poussé.
+
+== État réel réintégré dans la gouvernance
+
+* Releases Central vérifiées repo1 : `0.0.13`, `0.0.14`, `0.0.15`, `0.0.16` = HTTP 200.
+* `0.0.14` = PLT-I18N-PRESERVE (S-244) ; `0.0.15` = correctifs S-083 (P1
+  échappement `\n`, version dérivée) ; `0.0.16` = types de diagrammes
+  (`@startmindmap…`) + publication finale (commit `24a0d41`, pin catalogue/BOM
+  `0.0.121`).
+* Le catalogue workspace courant est `0.0.128` ; plantuml reste volontairement
+  pinné `0.0.121` (dette de pin hors périmètre de cette session).
+
+== Prochaine session
+
+`PLT-OUT-2` — notes non quotées corrigées avant écriture (multi-lignes,
+round-trip, `PRESERVE` si non corrigeable), puis `PLT-OUT-3` (shield + langue)
+et `PLT-OUT-4` (preuve corpus S-076). La gate P0.3 cross-borough (re-bake
+cheroliv) reste pilotée hors plantuml.

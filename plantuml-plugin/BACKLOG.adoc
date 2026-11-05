@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-10-13 (Session 242 — **PLT-MAINTAIN** : découplage test/prod via `plantuml.runtime.RuntimeEnvironment`, `ConfigMerger` helpers de précédence, purge de stubs morts ; README + ROADMAP réalignés ; 5 workflows CI cassés désactivés ; synchronisation backlog. Historique : S-235 PLT-CONTEXT ✅ 4/4, S-230 PLT-AGENT ✅ 7/7.)
+:last_update: 2026-11-05 (Session 246 — **PLT-OUT-1** : gate de corpus `validatePlantumlCorpus` — domaine pur `plantuml.corpus`, scanner `[plantuml]` réel, baseline nommée, rapport déterministe, câblage `check`, i18n 10 langues, 24 unit + 7 functional + 5 BDD `@plantuml-corpus`. Réalité versions réintégrée : Central `0.0.13`→`0.0.16`. Historique : S-235 PLT-CONTEXT ✅ 4/4, S-230 PLT-AGENT ✅ 7/7.)
 
 '''
 
@@ -106,7 +106,7 @@ toolchain (`PlantUmlToolchain`). Additif, backward compat.
 
 '''
 
-== 🟡 EPIC GBL-010 — Arbre de traduction (feuille PlantUML)
+== ✅ EPIC GBL-010 — Arbre de traduction (feuille PlantUML — TERMINÉ S-239)
 
 *GBL* : EPIC transverse **GBL-010** (`CADRAGE_EPIC_GBL_010_ARBRE_TRADUCTION_SITE.adoc`,
 racine workspace). Demande pilote S-069 : la traduction d'un site est un **arbre à
@@ -158,7 +158,7 @@ garde anti-drift local↔CI préservée.
 *Dépend de* : `plantuml-contracts` (N0 ✅ 0.0.1). *Relie* : `PLT-DIAGRAM-OWNERSHIP`,
 `PLT-CR3-2` (`DiagramOutputProbe` ✅).
 
-== 🟡 EPIC PLT-I18N-OUTPUT — Le validateur de syntaxe devient une gate de corpus (CADRÉ S-077, revue i18n S-263)
+== 🟡 EPIC PLT-I18N-OUTPUT — Le validateur de syntaxe devient une gate de corpus (EN COURS S-246, 1/4 US)
 
 *Source* : revue externe `foundry/public/bakery-gradle/bakery-plugin/.agents/i18n_review.adoc`
 (S-263) ; mesure cheroliv.com S-077 (`diagram-count-drift` 125, 69 blocs EN
@@ -188,7 +188,7 @@ validation + version). document/bakery ne réimplémentent rien.
   de chaque variante passe `PlantumlSyntaxValidator` ; rapport déterministe
   (langue + article + id + raison) + baseline nommée ; BDD `@plantuml-corpus`
 | 3
-| 🟡 À FAIRE
+| ✅ TERMINÉ S-246 — domaine pur `plantuml.corpus` (`AsciiDocPlantumlCorpusScanner`, `CorpusLanguageResolver`, `PlantumlCorpusGate`, `PlantumlCorpusBaseline`, `PlantumlCorpusReport`) + tâche `validatePlantumlCorpus` (`-Pplantuml.corpusDir`/`corpusBaseline`/`corpusStrict`, rapport avant échec, suggestions, `check`), i18n 10 langues. 24 unit + 7 FT TestKit + 5 BDD `@plantuml-corpus` ; dogfooding `/tmp` (échec nommé, baseline verte, UP-TO-DATE). Rapport `.agents/sessions/246-plt-out-1-corpus-gate.adoc`
 
 | PLT-OUT-2
 | **Notes non quotées corrigées avant écriture** — `PlantumlNoteExtractor` couvre
@@ -326,8 +326,20 @@ US (~3) :
 * `0.0.10` — S-242 : PLT-MAINTAIN (découplage test/prod + hygiène) ; pins catalog/BOM `0.0.87`.
 * `0.0.11` — S-244 : PLT-TERM-PROTECTION (term shield + prose non quotée) ; pins catalog/BOM `0.0.102`.
 * `0.0.12` — S-244 : use cases + mindmaps + appels de fonction ; pins catalog/BOM `0.0.104`.
-* **`0.0.13` — version courante** (S-244) : multi-label par ligne (use cases) ; pins catalog/BOM `0.0.105`.
-* Source de vérité : `gradle/libs.versions.toml` (`plantuml = "0.0.13"`) ↔ catalogue ws `0.0.105`.
+* `0.0.13` — S-244 : multi-label par ligne (use cases) ; pins catalog/BOM `0.0.105`.
+* `0.0.14` — S-244 : `PlantumlTermShield` consomme `contracts.i18n.PreserveRule`
+  (`i18n-contracts 0.0.5` : macro, ancre, URL, code inline, fence, attribut) ;
+  vecteurs partagés `@preserve`.
+* `0.0.15` — correctifs S-083 : le shield masque l'échappement littéral `\n`
+  (tous les segments d'un label traduits) ; version de publication dérivée du
+  catalogue (garde D5).
+* **`0.0.16` — version courante** (`24a0d41`) : la gate de syntaxe accepte tous
+  les types de diagrammes (`@startmindmap…`), assertion du message de délimiteur
+  réalignée, pin catalogue/BOM `0.0.121`. Propagation repo1 HTTP 200 vérifiée
+  S-246 (`0.0.13`→`0.0.16`).
+* Source de vérité : `gradle/libs.versions.toml` (`plantuml = "0.0.16"`) ↔
+  catalogue ws `0.0.121` (catalogue workspace courant `0.0.128`, pin non
+  réaligné — dette assumée hors S-246).
 
 '''
 == ✅ EPIC 13 : Multi-provider API Pool — Rotation par tiers + Cross-provider

@@ -12,6 +12,7 @@ import plantuml.tasks.GenerateDiagramDocsTask
 import plantuml.tasks.GenerateKnowledgeGraphDiagramTask
 import plantuml.tasks.GeneratePlantumlDiagramsTask
 import plantuml.tasks.PreflightPlantumlDescriptionTask
+import plantuml.tasks.ValidatePlantumlCorpusTask
 import plantuml.tasks.ValidatePlantumlSyntaxTask
 import java.io.File
 
@@ -127,7 +128,65 @@ object PlantumlManager {
             project.tasks.register("generateKnowledgeGraphDiagram", GenerateKnowledgeGraphDiagramTask::class.java)
             project.tasks.register("preflightPlantumlDescription", PreflightPlantumlDescriptionTask::class.java)
             registerCollectAugmentedContextTask(project)
+            registerValidateCorpusTask(project)
         }
+
+        /**
+         * Registers `validatePlantumlCorpus` (EPIC PLT-I18N-OUTPUT, PLT-OUT-1).
+         *
+         * The gate scans the consumer content tree (`-Pplantuml.corpusDir`,
+         * default `docs`) and validates every `[plantuml]` block with the N0
+         * validator. A named baseline (`plantuml-corpus-baseline.txt`) tolerates
+         * the known debt; any new finding fails `check`.
+         */
+        private fun registerValidateCorpusTask(project: Project) {
+            project.tasks.register(
+                "validatePlantumlCorpus",
+                ValidatePlantumlCorpusTask::class.java,
+            ) { task ->
+                val lang = PlantumlManager.resolveLanguage(project)
+                task.group = PlantumlMessages.get("task.corpus.group", lang)
+                task.description = PlantumlMessages.get("task.corpus.description", lang)
+
+                val corpusRoot =
+                    project.findProperty("plantuml.corpusDir")?.toString()
+                        ?: CORPUS_DEFAULT_DIR
+                task.corpusRoot.set(corpusRoot)
+                task.corpusFiles.from(
+                    project.fileTree(project.file(corpusRoot)).apply {
+                        include("**/*.adoc", "**/*.asciidoc", "**/*.ad")
+                        exclude("**/build/**")
+                    },
+                )
+
+                val baselinePath =
+                    project.findProperty("plantuml.corpusBaseline")?.toString()
+                        ?: CORPUS_DEFAULT_BASELINE
+                task.baselineFiles.from(
+                    project.provider {
+                        listOf(project.file(baselinePath)).filter { it.exists() }
+                    },
+                )
+                task.strict.set(
+                    project.findProperty("plantuml.corpusStrict")?.toString()?.toBooleanStrictOrNull()
+                        ?: true,
+                )
+                task.reportFile.set(
+                    project.layout.buildDirectory.file("plantuml/plantuml-corpus-report.txt"),
+                )
+                task.suggestedBaselineFile.set(
+                    project.layout.buildDirectory.file("plantuml/plantuml-corpus-baseline.txt"),
+                )
+            }
+            project.tasks.configureEach { check ->
+                if (check.name == "check") {
+                    check.dependsOn("validatePlantumlCorpus")
+                }
+            }
+        }
+
+        private const val CORPUS_DEFAULT_DIR = "docs"
+        private const val CORPUS_DEFAULT_BASELINE = "plantuml-corpus-baseline.txt"
 
         /**
          * Registers `collectPlantumlAugmentedContext` (EPIC PLT-CONTEXT, CTX-03).
