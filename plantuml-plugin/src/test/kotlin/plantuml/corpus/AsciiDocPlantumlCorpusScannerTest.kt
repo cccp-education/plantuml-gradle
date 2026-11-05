@@ -26,7 +26,7 @@ class AsciiDocPlantumlCorpusScannerTest {
 
         assertEquals(1, blocks.size)
         assertEquals("session-evolution", blocks.single().id)
-        assertEquals(4, blocks.single().line)
+        assertEquals(3, blocks.single().line)
         assertEquals("@startuml\nA --> B\n@enduml", blocks.single().source)
     }
 
