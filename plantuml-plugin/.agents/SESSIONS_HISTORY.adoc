@@ -20,7 +20,9 @@ Réalité versions réintégrée dans la gouvernance : Central `0.0.13`/`0.0.14`
 (HTTP 200), `0.0.14` PLT-I18N-PRESERVE, `0.0.15` correctifs S-083, **`0.0.16` courante** (commit
 `24a0d41`, pin catalogue/BOM `0.0.121`). Gates locaux (Local = Build) : compile ×3, `assemble`,
 `validatePlugins`, `ktlintCheck`, `publishToMavenLocal` VERT ; zéro test local, zéro secret,
-zéro publication. Rapport `.agents/sessions/246-plt-out-1-corpus-gate.adoc`.
+zéro publication. **CI VERTE run `42102198075`** (commit `dd6c229`, 13m10s, `check` ✓ ;
+premier run `42099810732` rouge sur une assertion de test ligne 4 vs 3, corrigée sans
+toucher la production). Rapport `.agents/sessions/246-plt-out-1-corpus-gate.adoc`.
 
 == Session 243 (2026-10-26) — PLT-TERM-PROTECTION + releases 0.0.11→0.0.13 ✅
 

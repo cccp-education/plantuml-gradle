@@ -17,7 +17,8 @@
   `@plantuml-corpus`. Preuve réelle consommateur `/tmp` : échec nommé,
   baseline verte, UP-TO-DATE.
 * Gates locaux : compile ×3, `assemble`, `validatePlugins`, `ktlintCheck`,
-  `publishToMavenLocal` VERT. Tests = CI.
+  `publishToMavenLocal` VERT. **CI VERTE run `42102198075`** (commit `dd6c229`,
+  `check` ✓ ; run initial rouge sur une assertion de test, corrigée).
 
 == Réalité versions (réintégrée S-246)
 

@@ -10,7 +10,7 @@
 - [x] Dogfooding consommateur `/tmp` (mavenLocal) : échec nommé article/langue/id/ligne/raison, baseline verte, UP-TO-DATE ; bug regex de groupe de capture trouvé et corrigé ✅
 - [x] Réalité versions réintégrée : Central `0.0.13`→`0.0.16` HTTP 200 ; `0.0.14` PRESERVE, `0.0.15` S-083, `0.0.16` courante (`24a0d41`, pin `0.0.121`) ✅
 - [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 247 + TEST_COVERAGE + archive 2026-11 + BACKLOG + TODO + AGENTS racine ✅
-- [x] Gate local = Build (compile ×3 + `ktlintCheck` + `assemble` + `validatePlugins` + `publishToMavenLocal` VERT) ; zéro test local, zéro secret, zéro publication ✅
+- [x] Gate local = Build (compile ×3 + `ktlintCheck` + `assemble` + `validatePlugins` + `publishToMavenLocal` VERT) ; **CI VERTE run `42102198075`** (commit `dd6c229`, 13m10s, `check` ✓ ; run initial `42099810732` rouge sur une assertion de test ligne 4 vs 3, corrigée) ; zéro test local, zéro secret, zéro publication ✅
 
 === Prochaine session (247)
 - **PLT-OUT-2** : notes non quotées corrigées avant écriture (multi-lignes, round-trip, `PRESERVE` si non corrigeable)

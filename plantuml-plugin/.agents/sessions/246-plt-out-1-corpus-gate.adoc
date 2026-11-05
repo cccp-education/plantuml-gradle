@@ -77,6 +77,11 @@ d'attribut) corrigé avant clôture — la valeur du dogfooding est démontrée.
 * `publishToMavenLocal` VERT (artefact signé).
 * Aucun `test` / `functionalTest` / `cucumberTest` / `check` local (règle EAGER) :
   la preuve est le run CI du commit poussé.
+* **CI VERTE run `42102198075`** (commit `dd6c229`, `Build & Test` 13m10s,
+  `./gradlew check` ✓). Premier run `42099810732` rouge sur **une assertion de
+  test** (ligne attendue 4 vs ligne réelle 3 de l'attribut) — corrigée
+  (`dd6c229`) sans toucher à la production ; le run vert prouve les 24 unit +
+  7 functional + 5 BDD `@plantuml-corpus`.
 
 == État réel réintégré dans la gouvernance
 
