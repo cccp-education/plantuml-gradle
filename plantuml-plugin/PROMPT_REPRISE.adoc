@@ -18,6 +18,20 @@
 * Gates locaux : compile ×3, `ktlintCheck`, `assemble`, `validatePlugins`,
   `publishToMavenLocal` VERT. Tests = CI.
 
+== Publication — action pilote (bloquée S-247)
+
+* Cible : **Gradle Plugin Portal**, compte **`cccp-education`**
+  (https://plugins.gradle.org/u/cccp-education).
+* `./gradlew publishPlugins --no-daemon` a été **refusé** :
+  `You are not the owner of group education.cccp` — les credentials
+  `GRADLE_PUBLISH_*` locaux ne sont pas ceux du compte propriétaire du groupe.
+  **Aucune version publiée.**
+* Action : générer l'API key/secret depuis le compte `cccp-education`, les
+  exporter en `GRADLE_PUBLISH_KEY`/`GRADLE_PUBLISH_SECRET`, puis relancer.
+* Caveat : `0.0.16` existe sur Central (contenu ancien), pas sur le Portal.
+  Pour une version identique par cible, bump `0.0.17` via MEMPHIS (DAG) avant
+  publication.
+
 == Mission Session 248 — PLT-OUT-3 (shield + langue)
 
 * Un placeholder `__PLT<n>__` perdu ⇒ `PRESERVE` (déjà partiel : le shield

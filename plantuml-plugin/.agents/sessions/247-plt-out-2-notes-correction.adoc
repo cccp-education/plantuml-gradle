@@ -87,8 +87,20 @@ moteur PlantUML réel :
 
 * Cible (décision pilote 2026-11-05, rappelée par le pilote) : **Gradle Plugin
   Portal**, compte **`cccp-education`** — https://plugins.gradle.org/u/cccp-education.
-  La version publiée est dérivée du catalogue workspace (`0.0.16` au moment de
-  cette session) ; la publication est consignée ci-dessous après exécution.
+* Tentative `./gradlew publishPlugins --no-daemon` (2026-11-05) : **REFUSÉE** par
+  le Portal — `You are not the owner of group education.cccp`. Les credentials
+  `GRADLE_PUBLISH_KEY`/`GRADLE_PUBLISH_SECRET` présents localement ne sont pas
+  ceux du compte propriétaire du groupe. **Aucune version publiée.**
+* **Action pilote** : générer la clé API/secret depuis le compte
+  `cccp-education` (Portal → API Keys), les exporter en
+  `GRADLE_PUBLISH_KEY`/`GRADLE_PUBLISH_SECRET`, puis relancer
+  `./gradlew publishPlugins --no-daemon`.
+* **Caveat version** : `0.0.16` existe déjà sur Maven Central (contenu plus
+  ancien) et n'existe pas sur le Portal. La première publication Portal de
+  `0.0.16` aurait donc un contenu différent de Central pour la même version.
+  Si le pilote veut une version strictement identique par cible, il faut un
+  bump `0.0.17` via le catalogue workspace MEMPHIS (DAG N0 → N2) avant de
+  publier.
 
 == Prochaine session
 
