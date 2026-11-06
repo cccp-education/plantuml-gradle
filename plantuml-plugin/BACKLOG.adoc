@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-11-05 (Session 246 — **PLT-OUT-1** : gate de corpus `validatePlantumlCorpus` — domaine pur `plantuml.corpus`, scanner `[plantuml]` réel, baseline nommée, rapport déterministe, câblage `check`, i18n 10 langues, 24 unit + 7 functional + 5 BDD `@plantuml-corpus`. Réalité versions réintégrée : Central `0.0.13`→`0.0.16`. Historique : S-235 PLT-CONTEXT ✅ 4/4, S-230 PLT-AGENT ✅ 7/7.)
+:last_update: 2026-11-05 (Session 247 — **PLT-OUT-2** : notes couvertes et correction avant écriture — note flottante quotée, `escapeQuotes` idempotent, traduction blanche préservée, round-trip note `PRESERVE` ; unit + functional (vrai validateur) + BDD `@plantuml-notes`. Historique : S-246 PLT-OUT-1 ✅, S-235 PLT-CONTEXT ✅ 4/4, S-230 PLT-AGENT ✅ 7/7.)
 
 '''
 
@@ -158,7 +158,7 @@ garde anti-drift local↔CI préservée.
 *Dépend de* : `plantuml-contracts` (N0 ✅ 0.0.1). *Relie* : `PLT-DIAGRAM-OWNERSHIP`,
 `PLT-CR3-2` (`DiagramOutputProbe` ✅).
 
-== 🟡 EPIC PLT-I18N-OUTPUT — Le validateur de syntaxe devient une gate de corpus (EN COURS S-246, 1/4 US)
+== 🟡 EPIC PLT-I18N-OUTPUT — Le validateur de syntaxe devient une gate de corpus (EN COURS S-247, 2/4 US)
 
 *Source* : revue externe `foundry/public/bakery-gradle/bakery-plugin/.agents/i18n_review.adoc`
 (S-263) ; mesure cheroliv.com S-077 (`diagram-count-drift` 125, 69 blocs EN
@@ -195,7 +195,7 @@ validation + version). document/bakery ne réimplémentent rien.
   les notes multi-lignes/non quotées ; round-trip `\n` et échappements prouvés ;
   un bloc non corrigeable est `PRESERVE` (jamais publié cassé)
 | 2
-| 🟡 À FAIRE
+| ✅ TERMINÉ S-247 — `PlantumlNoteExtractor` couvre aussi la note flottante **quotée** (`note "text" as N`, `quoted`, `raw` intérieur exact ; un `:` dans les guillemets n'avale plus le diagramme) ; `PlantumlLabelIntegrity.escapeQuotes` idempotent (guillemet introduit échappé avant écriture, libellés + notes) ; traduction blanche = échec fournisseur (source préservée) ; round-trip note `PRESERVE`. Unit +14, functional 3 (vrai `PlantumlSyntaxValidatorAdapter`), BDD `@plantuml-notes` +3 (`@roundtrip`). Rapport `.agents/sessions/247-plt-out-2-notes-correction.adoc` |
 
 | PLT-OUT-3
 | **Shield + langue** — un placeholder `__PLT<n>__` perdu déclenche le repli

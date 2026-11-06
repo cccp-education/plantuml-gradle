@@ -1,0 +1,97 @@
+= Session 247 — PLT-OUT-2 : notes couvertes et correction avant écriture
+:session: 247
+:date: 2026-11-05
+:statut: ✅ TERMINÉ — PLT-I18N-OUTPUT 2/4 US
+
+== Contexte
+
+`PLT-OUT-2` du backlog (`EPIC PLT-I18N-OUTPUT`) : les notes PlantUML doivent
+être **couvertes** (multi-lignes, non quotées), **corrigées avant écriture**
+(échappements `\n`, guillemets introduits) et un bloc non corrigeable doit être
+`PRESERVE` (jamais publié cassé). L'audit a révélé un défaut réel non couvert :
+la note flottante **quotée** `note "Warning: see below" as N1` était lue comme
+une note multi-lignes — le `:` **dans les guillemets** ouvrait une fausse note
+qui avalait le reste du diagramme.
+
+== Livré (baby-step DDD/TDD/BDD)
+
+=== Domaine `plantuml.repair` — extracteur
+
+* `PlantumlNoteExtractor` reconnaît la forme flottante quotée
+  `note "text" as N` (`QUOTED_START`) **avant** la forme `note … : text` :
+  la note est `singleLine = true`, `quoted = true`, `raw` = texte intérieur
+  (sans guillemets) et `text` = version trimée. Le alias `as N` et les
+  guillemets ne sont jamais touchés ; un `:` dans les guillemets n'ouvre plus
+  de bloc.
+* `PlantumlNote.quoted` (additif, défaut `false`) porte ce discriminant.
+
+=== Domaine `plantuml.repair` — intégrité
+
+* `PlantumlLabelIntegrity.escapeQuotes` : échappe un guillemet introduit par le
+  fournisseur (`"` → `\"`), idempotent sur un guillemet déjà échappé. Un
+  guillemet non échappé fermerait le littéral et casserait le diagramme.
+
+=== Port N0 `PlantumlTranslationPortAdapter`
+
+* Les **libellés quotés** (y compris les notes quotées vues par la surface N0)
+  sont réécrits avec `escapeQuotes(escapeNewlines(...))`.
+* Les **notes** : cible = littéral quoté exact (`"raw"`) pour une note quotée,
+  remplacement quoté et échappé ; alias préservé. Le contrat N0 interdit une
+  traduction blanche (`TranslationResult.Success` exige un texte non blanc) ;
+  un échec fournisseur préserve la source, et le port garde une garde
+  défensive contre un résultat blanc.
+* Round-trip : un bloc dont la traduction ne re-parse pas reste `PRESERVE`
+  (raison « translation breaks PlantUML syntax »).
+
+=== Tests (3 niveaux)
+
+* Unit : `PlantumlNoteExtractorTest` (+5 : note quotée, `:` dans les quotes,
+  raw intérieur exact, échappement `\n` littéral) ; `PlantumlLabelIntegrityTest`
+  (+2 : `escapeQuotes`, idempotence) ; `PlantumlTranslationPortAdapterTest`
+  (+7 : note quotée sans corruption d'alias, `:` quoté, guillemet échappé
+  label/note, contrat N0 rejette une traduction blanche, `\n` littéral restauré,
+  note invalide `PRESERVE`, libellé corrigé validé par le vrai parser).
+* Functional : `PlantumlNoteTranslationFunctionalTest` (3, **vrai**
+  `PlantumlSyntaxValidatorAdapter` : note quotée corrigée et valide, `:` quoté
+  valide, note rejetée → `PRESERVE`).
+* BDD : `34_plantuml_notes.feature` +3 scénarios `@plantuml-notes`
+  (`@roundtrip`) — note quotée non avalante, note invalide jamais publiée,
+  échappement `\n` littéral préservé ; steps `PlantumlNoteSteps` +
+  `RoundTripSteps` (blocs note).
+
+== Preuve réelle (smoke hors suite, aucun test local)
+
+Scripts Kotlin transitoires `/tmp/opencode` sur `build/classes` + contrats N0 +
+moteur PlantUML réel :
+
+* note quotée `"Warning: see below"` → une seule note, diagramme préservé,
+  traduction `Attention : voir ci-dessous`, parse réussi ;
+* guillemet introduit (`Hello "World"`) → `Hello \"World\"`, parse réussi ;
+* échappement littéral `query\nmodèles` → `query\nmodels`, parse réussi.
+
+== Gates locaux (Local = Build, Tests = CI)
+
+* `compileKotlin` / `compileTestKotlin` / `compileFunctionalTestKotlin` VERT.
+* `ktlintCheck`, `assemble`, `validatePlugins`, `publishToMavenLocal` VERT.
+* Aucun `test` / `functionalTest` / `cucumberTest` / `check` local ; la preuve
+  est le run CI du commit poussé.
+* **CI VERTE run `42143833102`** (commit `0f7bb05`, `Build & Test` ✓). Deux
+  runs intermédiaires rouges ont été **corrigés** : `42141418748` (2 functional
+  `NoClassDefFoundError` — le moteur PlantUML manquait du classpath
+  `functionalTest`, corrigé `d78c635` en déclarant `libs.plantuml.engine`) et
+  `42141833633` (1 unit — le test fabriquait un `TranslationResult.Success`
+  blanc que le contrat N0 interdit, corrigé `0f7bb05` en testant la frontière
+  du contrat).
+
+== Publication
+
+* Cible (décision pilote 2026-11-05, rappelée par le pilote) : **Gradle Plugin
+  Portal**, compte **`cccp-education`** — https://plugins.gradle.org/u/cccp-education.
+  La version publiée est dérivée du catalogue workspace (`0.0.16` au moment de
+  cette session) ; la publication est consignée ci-dessous après exécution.
+
+== Prochaine session
+
+`PLT-OUT-3` — shield + langue : placeholder `__PLT<n>__` perdu ⇒ `PRESERVE`,
+label court resté français détecté (jamais de faux `TRANSLATED`), retry borné.
+Puis `PLT-OUT-4` (preuve corpus S-076).

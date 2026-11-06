@@ -1,53 +1,45 @@
-= PROMPT_REPRISE — Plantuml — Session 247
-:session: 247
+= PROMPT_REPRISE — Plantuml — Session 248
+:session: 248
 :date: 2026-11-05
 
-== État S-246 — PLT-OUT-1 (gate de corpus) ✅
+== État S-247 — PLT-OUT-2 (notes) ✅
 
-* Domaine pur `plantuml.corpus` : `AsciiDocPlantumlCorpusScanner` (vrais
-  `[plantuml]` uniquement ; `[source,plantuml]`, littéraux et commentaires
-  ignorés), `CorpusLanguageResolver`, `PlantumlCorpusGate` (chaque bloc, tri
-  déterministe), `PlantumlCorpusBaseline` (clé exacte ou document+bloc),
-  `PlantumlCorpusReport`.
-* Tâche `validatePlantumlCorpus` : `-Pplantuml.corpusDir` (défaut `docs`),
-  `-Pplantuml.corpusBaseline` (défaut `plantuml-corpus-baseline.txt`),
-  `-Pplantuml.corpusStrict` (défaut `true`) ; rapport avant échec ;
-  suggestions de baseline ; câblée à `check` ; i18n 10 langues.
-* Tests : 24 unit + 7 functional TestKit + 5 scénarios BDD
-  `@plantuml-corpus`. Preuve réelle consommateur `/tmp` : échec nommé,
-  baseline verte, UP-TO-DATE.
-* Gates locaux : compile ×3, `assemble`, `validatePlugins`, `ktlintCheck`,
-  `publishToMavenLocal` VERT. **CI VERTE run `42102198075`** (commit `dd6c229`,
-  `check` ✓ ; run initial rouge sur une assertion de test, corrigée).
+* `PlantumlNoteExtractor` couvre la note flottante quotée `note "text" as N`
+  (`quoted`, `singleLine`) : un `:` dans les guillemets n'ouvre plus de bloc et
+  n'avale plus le reste du diagramme ; `raw` = texte intérieur exact.
+* `PlantumlLabelIntegrity.escapeQuotes` (idempotent) : un guillemet introduit
+  par le fournisseur est échappé **avant écriture** (libellé et note quotés).
+* `PlantumlTranslationPortAdapter` : cible quotée exacte, alias préservé,
+  traduction blanche = échec fournisseur (source préservée), round-trip bloquant
+  (`PRESERVE` si le bloc ne re-parse pas).
+* Tests : unit (+14), functional (3, vrai validateur) + BDD `@plantuml-notes`
+  (+3 scénarios `@roundtrip`). Smoke réel `/tmp` : quote/note corrigées et
+  valides, `\n` littéral restauré.
+* Gates locaux : compile ×3, `ktlintCheck`, `assemble`, `validatePlugins`,
+  `publishToMavenLocal` VERT. Tests = CI.
 
-== Réalité versions (réintégrée S-246)
+== Mission Session 248 — PLT-OUT-3 (shield + langue)
 
-* Central (`repo1` HTTP 200) : `0.0.13`, `0.0.14`, `0.0.15`, `0.0.16`.
-* `0.0.14` PLT-I18N-PRESERVE (S-244) ; `0.0.15` correctifs S-083 (`\n`, version
-  dérivée) ; **`0.0.16` courante** (commit `24a0d41`, pin catalogue/BOM
-  `0.0.121`). Catalogue workspace courant `0.0.128` — pin plantuml non
-  réaligné (dette assumée).
-
-== Mission Session 247 — PLT-OUT-2 (notes non quotées)
-
-* `PlantumlNoteExtractor` doit couvrir les notes **multi-lignes** et **non
-  quotées** avant écriture ; round-trip `\n`/échappements prouvé ; un bloc non
-  corrigeable est `PRESERVE` (jamais publié cassé).
-* Baby-step DDD/TDD/BDD : unit + functional + scénarios `@plantuml-notes` /
-  `@plantuml-corpus` selon le seam choisi.
-* Vérifier l'interaction avec la gate `validatePlantumlCorpus` (un bloc
-  `PRESERVE` reste valide, une note corrigée ne régresse pas).
-* Puis `PLT-OUT-3` (shield + langue) et `PLT-OUT-4` (preuve corpus S-076).
+* Un placeholder `__PLT<n>__` perdu ⇒ `PRESERVE` (déjà partiel : le shield
+  retourne `null` ; vérifier que **toutes** les surfaces — labels, notes,
+  prose — préservent au lieu d'écrire un placeholder).
+* Un label court resté **français** après traduction est détecté (jamais de
+  faux `TRANSLATED`) : gate de langue déterministe (ratio de mots FR/EN,
+  dictionnaire minimal, pas de LLM) ; retry borné (1..N) sur échec.
+* Cadrer la détection avant de coder : seuil, faux positifs (noms propres,
+  termes techniques), surface (labels + notes + prose), interaction avec la
+  gate de corpus.
+* Baby-step DDD/TDD/BDD : unit + functional + BDD `@plantuml-language`.
+* Puis `PLT-OUT-4` (preuve corpus S-076, reprise ciblée des 69 blocs EN).
 
 == Résiduel
 
-* Gate P0.3 cross-borough (re-bake cheroliv.com) : pilotée hors plantuml
-  (cheroliv/document/bakery). Les 69 blocs EN mesurés S-076 restent à traiter
-  par `PLT-OUT-4`.
-* `deepseek-v4.1-flash` préserve parfois un label court : `PLT-OUT-3` doit
-  détecter (jamais de faux `TRANSLATED`).
+* Gate P0.3 cross-borough (re-bake cheroliv.com) : pilotée hors plantuml.
+* `deepseek-v4.1-flash` préserve parfois un label court : c'est exactement le
+  faux `TRANSLATED` que `PLT-OUT-3` doit rendre impossible.
 
 == Rappels
 
 * Local = Build, Tests = CI ; un borough par session ; zéro Python ; zéro secret.
 * `publishToMavenLocal` après toute modification source avant test consommateur.
+* Version courante `0.0.16` (pin catalogue/BOM `0.0.121`).

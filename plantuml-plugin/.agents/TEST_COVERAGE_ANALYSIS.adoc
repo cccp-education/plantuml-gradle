@@ -1,6 +1,27 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 246 (5 novembre 2026) — PLT-OUT-1 (gate de corpus)
+_Dernière mise à jour_ : Session 247 (5 novembre 2026) — PLT-OUT-2 (notes)
+
+=== Session 247 — PLT-OUT-2 (notes couvertes et correction avant écriture)
+
+* **+** `PlantumlNoteExtractorTest` (5 unit : note flottante quotée, `:` dans
+  les guillemets, raw intérieur exact, échappement `\n` littéral, non-avalement
+  du diagramme).
+* **+** `PlantumlLabelIntegrityTest` (2 unit : `escapeQuotes`, idempotence).
+* **+** `PlantumlTranslationPortAdapterTest` (7 unit : note quotée sans
+  corruption d'alias, `:` quoté, guillemet échappé label/note, contrat N0 rejette
+  une traduction blanche, `\n` littéral restauré, note invalide `PRESERVE`,
+  libellé corrigé validé par le vrai parser).
+* **+** `PlantumlNoteTranslationFunctionalTest` (3 functional, **vrai**
+  `PlantumlSyntaxValidatorAdapter` : note quotée corrigée et valide, `:` quoté
+  valide, note rejetée → `PRESERVE`).
+* **+** BDD `34_plantuml_notes.feature` (+3 scénarios `@plantuml-notes`
+  `@roundtrip`) + `PlantumlNoteSteps` + `RoundTripSteps` (blocs note).
+* Couverture des branches : forme quotée/colon/multi-lignes de l'extracteur,
+  guillemet introduit (label + note), traduction blanche, placeholder/échappement
+  `\n`, round-trip rejeté.
+* Local = Build (compile ×3 + `ktlintCheck` + `assemble` + `validatePlugins` +
+  `publishToMavenLocal` VERT) ; preuve = CI du commit poussé.
 
 === Session 246 — PLT-OUT-1 (gate de corpus)
 

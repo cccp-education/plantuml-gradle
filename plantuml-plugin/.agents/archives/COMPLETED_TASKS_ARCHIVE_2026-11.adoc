@@ -1,5 +1,21 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-11
 
+== Session 247 (2026-11-05) — PLT-OUT-2 : notes couvertes et correction avant écriture ✅
+
+=== Fait
+- [x] `PlantumlNoteExtractor` : note flottante quotée `note "text" as N` (`quoted`, `singleLine`, `raw` intérieur exact) ; un `:` dans les guillemets n'avale plus le diagramme ✅
+- [x] `PlantumlLabelIntegrity.escapeQuotes` (idempotent) : guillemet introduit échappé avant écriture (libellés + notes quotées) ✅
+- [x] `PlantumlTranslationPortAdapter` : cible quotée exacte + alias préservé, traduction blanche refusée par le contrat N0 (source préservée), round-trip note `PRESERVE` ✅
+- [x] Tests : unit (+14) + functional (3, vrai validateur) + BDD `@plantuml-notes` (+3 scénarios `@roundtrip`) ✅
+- [x] Smoke réel `/tmp` (build + contrats N0 + moteur PlantUML) : note quotée corrigée/valide, diagramme préservé, `\n` littéral restauré ✅
+- [x] **CI VERTE run `42143833102`** (commit `0f7bb05`) après corrections `d78c635` (moteur PlantUML au classpath functionalTest) et `0f7bb05` (contrat N0 : pas de `Success` blanc) ✅
+- [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 248 + TEST_COVERAGE + archive 2026-11 + BACKLOG + TODO + AGENTS racine ✅
+- [x] Gate local = Build (compile ×3 + `ktlintCheck` + `assemble` + `validatePlugins` + `publishToMavenLocal` VERT) ; zéro test local, zéro secret ✅
+
+=== Prochaine session (248)
+- **PLT-OUT-3** : shield + langue (placeholder perdu ⇒ `PRESERVE`, label resté français détecté, retry borné)
+- **Fichier à lire en priorité** : `BACKLOG.adoc` § PLT-I18N-OUTPUT + `PROMPT_REPRISE.adoc`
+
 == Session 246 (2026-11-05) — PLT-OUT-1 : gate de corpus PlantUML ✅
 
 === Fait
