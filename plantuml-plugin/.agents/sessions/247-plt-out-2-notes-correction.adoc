@@ -120,7 +120,14 @@ moteur PlantUML réel :
   scénarios A1/A2 couverts). L'agrégat `cucumberTest` exclut les shards ; le
   `test` unitaire aussi (sinon les runners seraient rejoués).
 * **2 shards functional** (`PlantumlFunctionalSuite` isolé) et **1 job unit +
-  lint** (`test`, `ktlintCheck`, `validatePlugins`).
+  lint** (`test`, `ktlintCheck`, `validatePlugins`). Les jobs de test ne
+  republient plus le plugin en `mavenLocal` (inutile : BDD via le classpath,
+  functional via `withPluginClasspath`).
+* **Monde BDD sans `includeBuild`** : `PlantumlWorld` injecte le plugin du build
+  courant via `GradleRunner.withPluginClasspath()` (métadonnées
+  `pluginUnderTestMetadata` ajoutées au classpath des tâches Cucumber) au lieu
+  de recompiler le plugin dans chaque build imbriqué — c'est le coût fixe qui
+  dominait chaque shard.
 * **Couverture fusionnée** : chaque job téléverse `build/kover/bin-reports/*.ic`
   (`kover-ic-*`), le job `coverage` les télécharge et exécute
   `koverXmlReport koverThresholdCheck` avec `-x` sur **tous** les tests (pattern

@@ -336,7 +336,8 @@ val cucumberTest =
             sourceSets.test.get().output +
             sourceSets.main.get().output +
             sourceSets["functionalTest"].output +
-            files(tasks.jar.get().archiveFile)
+            files(tasks.jar.get().archiveFile) +
+            files(tasks.named("pluginUnderTestMetadata"))
 
         // FIX: Ensure plugin classes are compiled before running tests
         dependsOn(tasks.classes)
@@ -435,7 +436,8 @@ fun registerCucumberShard(spec: CucumberTaskSpec): TaskProvider<Test> =
             sourceSets.test.get().output +
             sourceSets.main.get().output +
             sourceSets["functionalTest"].output +
-            files(tasks.jar.get().archiveFile)
+            files(tasks.jar.get().archiveFile) +
+            files(tasks.named("pluginUnderTestMetadata"))
         dependsOn(tasks.classes)
         useJUnitPlatform {
             excludeEngines("junit-jupiter")

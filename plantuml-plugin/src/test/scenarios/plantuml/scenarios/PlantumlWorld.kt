@@ -99,8 +99,6 @@ class PlantumlWorld {
                 File(System.getProperty("java.io.tmpdir"), "plantuml-test-template-${System.currentTimeMillis()}")
             templateDir.mkdirs()
 
-            val pluginRoot = File(System.getProperty("user.dir"))
-
             File(templateDir, "settings.gradle.kts").writeText(
                 """
                 pluginManagement {
@@ -108,7 +106,6 @@ class PlantumlWorld {
                         gradlePluginPortal()
                     }
                 }
-                includeBuild("${pluginRoot.absolutePath.replace("\\", "\\\\")}")
                 rootProject.name = "plantuml-test-template"
                 """.trimIndent(),
             )
@@ -409,6 +406,7 @@ class PlantumlWorld {
                         .withArguments(allArgs)
                         .withTestKitDir(File(System.getProperty("user.home"), ".gradle/testkit"))
                         .withGradleVersion(gradleTestVersion)
+                        .withPluginClasspath()
                         .forwardStdOutput(System.out.writer())
                         .forwardStdError(System.err.writer())
                         .build()
@@ -446,6 +444,7 @@ class PlantumlWorld {
                     .withArguments(allArgs)
                     .withTestKitDir(File(System.getProperty("user.home"), ".gradle/testkit"))
                     .withGradleVersion(gradleTestVersion)
+                    .withPluginClasspath()
                     .forwardStdOutput(System.out.writer())
                     .forwardStdError(System.err.writer())
 

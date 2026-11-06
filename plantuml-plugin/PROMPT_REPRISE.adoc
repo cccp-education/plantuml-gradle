@@ -28,7 +28,10 @@
   `@bdd-content`/`@bdd-empty`, `B`→`F` par features) et **1 coverage mergée**
   (`kover-ic-*`, `koverXmlReport koverThresholdCheck` sans rejouer les tests).
   Garde `PlantumlCucumberShardCoverageTest` (exhaustif/disjoint). Image pgvector
-  uniquement sur `f-rag`. Objectif mur < 5 min (mesurer le prochain run).
+  uniquement sur `f-rag`. **Monde BDD via `withPluginClasspath`** (plus
+  d'`includeBuild` recompilé par build imbriqué) ; plus de
+  `publishToMavenLocal` dans les jobs de test. Objectif mur < 5 min (mesurer le
+  prochain run).
 
 == Publication — action pilote (bloquée S-247)
 
