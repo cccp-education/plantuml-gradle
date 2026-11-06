@@ -102,6 +102,33 @@ moteur PlantUML réel :
   bump `0.0.17` via le catalogue workspace MEMPHIS (DAG N0 → N2) avant de
   publier.
 
+== CI sharding (CNV-13.6 — budget < 5 min)
+
+* **Mesure du run `42143833102`** : `BUILD SUCCESSFUL in 11m51s` ; la tâche
+  `cucumberTest` pèse **~7 min** (dont `File Edge Cases` 2m12), `functionalTest`
+  ~1m40, `test` quelques secondes ; l'agrégat `./gradlew check` tournait dans un
+  **seul job**.
+* **Défaut d'alignement corrigé** : `PlantumlWorld` forçait
+  `.withGradleVersion("9.4.1")` — chaque build TestKit téléchargeait une
+  distribution non alignée sur le wrapper **9.8.2**. La version est désormais
+  **dérivée du wrapper** (`build.gradle.kts` → `workspace.gradle.version`) et
+  lue par le monde de test (`9.8.2`), plus aucun `9.4.1`.
+* **Partition BDD exhaustive/disjointe** : 7 shards (`cucumberTestShardA1/A2` —
+  `File Edge Cases` scindé par tags `@bdd-content`/`@bdd-empty` — et `B`→`F` par
+  fichiers de features), runners `plantuml.ci.shards.*`, garde
+  `PlantumlCucumberShardCoverageTest` (union = tous les features, zéro doublon,
+  scénarios A1/A2 couverts). L'agrégat `cucumberTest` exclut les shards ; le
+  `test` unitaire aussi (sinon les runners seraient rejoués).
+* **2 shards functional** (`PlantumlFunctionalSuite` isolé) et **1 job unit +
+  lint** (`test`, `ktlintCheck`, `validatePlugins`).
+* **Couverture fusionnée** : chaque job téléverse `build/kover/bin-reports/*.ic`
+  (`kover-ic-*`), le job `coverage` les télécharge et exécute
+  `koverXmlReport koverThresholdCheck` avec `-x` sur **tous** les tests (pattern
+  bakery) — aucun test rejoué.
+* **Workflow** `.github/workflows/test.yml` : matrice parallèle (1 unit + 2
+  functional + 7 BDD + 1 coverage) ; image pgvector chargée uniquement par le
+  shard RAG (`f-rag`). Objectif : mur < 5 min, mesuré au run CI suivant.
+
 == Prochaine session
 
 `PLT-OUT-3` — shield + langue : placeholder `__PLT<n>__` perdu ⇒ `PRESERVE`,

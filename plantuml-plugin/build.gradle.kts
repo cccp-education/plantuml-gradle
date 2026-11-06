@@ -106,7 +106,24 @@ configurations.configureEach {
     }
 }
 
+// CNV-13.6 — the TestKit builds must run the workspace Gradle (the wrapper),
+// never a hardcoded stale version: a `withGradleVersion("9.4.1")` forced CI to
+// download and exercise an untested distribution (9.8.2 is the workspace one).
+val workspaceGradleVersion =
+    layout.projectDirectory
+        .file("gradle/wrapper/gradle-wrapper.properties")
+        .asFile
+        .readText()
+        .lineSequence()
+        .firstOrNull { it.startsWith("distributionUrl") }
+        ?.substringAfter("gradle-")
+        ?.substringBefore("-bin.zip")
+        ?.substringBefore("-all.zip")
+        ?: error("Cannot read the Gradle version from gradle/wrapper/gradle-wrapper.properties")
+
 tasks.withType<Test> {
+    // Single source of truth: the wrapper distribution version (CNV-13.6).
+    systemProperty("workspace.gradle.version", workspaceGradleVersion)
     useJUnitPlatform {
         // Tests @Tag("real-llm") are excluded by default.
         // To enable them: ./gradlew test -Ptest.tags="real-llm"
@@ -143,6 +160,8 @@ tasks.named<Test>("test") {
     filter {
         // Exclude classes in 'plantuml.scenarios' package (Cucumber tests)
         excludeTestsMatching("plantuml.scenarios.**")
+        // CI BDD shard runners are dedicated tasks, never unit tests
+        excludeTestsMatching("plantuml.ci.shards.**")
         // Also exclude functionalTest classes
         excludeTestsMatching("plantuml.PlantUmlPluginFunctionalTests")
     }
@@ -346,6 +365,9 @@ val cucumberTest =
             exceptionFormat = FULL
         }
         outputs.upToDateWhen { false }
+        // The aggregate runs only the historical runner; the CI shard runners
+        // are separate tasks (otherwise every shard would run in the aggregate).
+        filter { excludeTestsMatching("plantuml.ci.shards.*") }
         // Ensure main is compiled before
         dependsOn(tasks.classes)
 
@@ -388,6 +410,157 @@ val cucumberTest =
             println("=== Cleanup complete ===")
         }
     }
+
+// ── CI shards (CNV-13.6 — wall-clock budget < 5 min) ────────────────────────
+// The aggregate `cucumberTest`/`functionalTest` keep the local shape; CI runs
+// the exhaustive, disjoint shards below on parallel machines. The BDD partition
+// is guarded by `plantuml.ci.PlantumlCucumberShardCoverageTest`.
+
+data class CucumberTaskSpec(
+    val taskName: String,
+    val description: String,
+    val runnerClass: String,
+)
+
+fun registerCucumberShard(spec: CucumberTaskSpec): TaskProvider<Test> =
+    tasks.register<Test>(spec.taskName) {
+        description = spec.description
+        group = "verification"
+        testClassesDirs =
+            sourceSets.test
+                .get()
+                .output.classesDirs
+        classpath =
+            configurations.testRuntimeClasspath.get() +
+            sourceSets.test.get().output +
+            sourceSets.main.get().output +
+            sourceSets["functionalTest"].output +
+            files(tasks.jar.get().archiveFile)
+        dependsOn(tasks.classes)
+        useJUnitPlatform {
+            excludeEngines("junit-jupiter")
+        }
+        systemProperty("cucumber.junit-platform.naming-strategy", "long")
+        systemProperty("org.gradle.daemon", "false")
+        // The tag filter lives in the shard runner annotation (FILTER_TAGS_PROPERTY_NAME):
+        // A1/A2 carry a shard tag. A task-level `cucumber.filter.tags` would override
+        // it (system property precedence) and duplicate the scenarios.
+        maxHeapSize = "1g"
+        testLogging {
+            events("passed", "skipped", "failed")
+            showStandardStreams = false
+            exceptionFormat = FULL
+        }
+        outputs.upToDateWhen { false }
+        maxParallelForks = 1
+        forkEvery = 0
+        jvmArgs("-XX:+UseSerialGC")
+        jvmArgs("-XX:MaxMetaspaceSize=256m")
+        jvmArgs("-XX:TieredStopAtLevel=1")
+        timeout.set(Duration.ofMinutes(15))
+        filter { includeTestsMatching(spec.runnerClass) }
+    }
+
+val cucumberShardSpecs =
+    listOf(
+        CucumberTaskSpec(
+            "cucumberTestShardA1",
+            "BDD shard A1 — File Edge Cases (content scenarios).",
+            "plantuml.ci.shards.CucumberShardA1Runner",
+        ),
+        CucumberTaskSpec(
+            "cucumberTestShardA2",
+            "BDD shard A2 — File Edge Cases (empty/whitespace scenarios).",
+            "plantuml.ci.shards.CucumberShardA2Runner",
+        ),
+        CucumberTaskSpec(
+            "cucumberTestShardB",
+            "BDD shard B — diagram types, performance, API key, tiers.",
+            "plantuml.ci.shards.CucumberShardBRunner",
+        ),
+        CucumberTaskSpec(
+            "cucumberTestShardC",
+            "BDD shard C — i18n configuration, tasks, lifecycle, errors, boundary.",
+            "plantuml.ci.shards.CucumberShardCRunner",
+        ),
+        CucumberTaskSpec(
+            "cucumberTestShardD",
+            "BDD shard D — round-trip, toolchain, provider, probe, repair, agent, context.",
+            "plantuml.ci.shards.CucumberShardDRunner",
+        ),
+        CucumberTaskSpec(
+            "cucumberTestShardE",
+            "BDD shard E — block status/correction, notes, term protection, corpus, syntax.",
+            "plantuml.ci.shards.CucumberShardERunner",
+        ),
+        CucumberTaskSpec(
+            "cucumberTestShardF",
+            "BDD shard F — RAG, LLM providers, errors, configuration, incremental, preserve.",
+            "plantuml.ci.shards.CucumberShardFRunner",
+        ),
+    )
+
+val cucumberShardTasks = cucumberShardSpecs.map { registerCucumberShard(it) }
+
+tasks.register("cucumberShards") {
+    description = "Runs every CI BDD shard (exhaustive, disjoint partition)."
+    group = "verification"
+    dependsOn(cucumberShardTasks)
+}
+
+fun registerFunctionalShard(
+    taskName: String,
+    shardDescription: String,
+    configureFilter: Action<TestFilter>,
+): TaskProvider<Test> =
+    tasks.register<Test>(taskName) {
+        description = shardDescription
+        group = "verification"
+        testClassesDirs = functionalTest.output.classesDirs
+        classpath =
+            configurations[functionalTest.runtimeClasspathConfigurationName] +
+            functionalTest.output
+        testLogging {
+            events("passed", "skipped", "failed")
+            showStandardStreams = true
+        }
+        failOnNoDiscoveredTests = false
+        maxParallelForks = 1
+        filter(configureFilter)
+    }
+
+val functionalTestShardA =
+    registerFunctionalShard(
+        "functionalTestShardA",
+        "Functional shard A — plugin suite and knowledge graph.",
+    ) {
+        includeTestsMatching("plantuml.PlantumlFunctionalSuite*")
+        includeTestsMatching("plantuml.KnowledgeGraphDiagramFunctionalTest")
+    }
+
+val functionalTestShardB =
+    registerFunctionalShard(
+        "functionalTestShardB",
+        "Functional shard B — context, notes, corpus, providers, quotas.",
+    ) {
+        includeTestsMatching("plantuml.CollectAugmentedContextFunctionalTest")
+        includeTestsMatching("plantuml.GenerateAugmentedContextWiringFunctionalTest")
+        includeTestsMatching("plantuml.PlantumlNoteTranslationFunctionalTest")
+        includeTestsMatching("plantuml.ValidatePlantumlCorpusFunctionalTest")
+        includeTestsMatching("plantuml.PlantumlTermProtectionFunctionalTest")
+        includeTestsMatching("plantuml.PreflightPlantumlDescriptionFunctionalTest")
+        includeTestsMatching("plantuml.CrossProviderFallbackFunctionalTest")
+        includeTestsMatching("plantuml.QuotaResetFunctionalTest")
+        includeTestsMatching("plantuml.TieredRotationFunctionalTest")
+        includeTestsMatching("plantuml.PlantumlRealLlmFunctionalTest")
+        includeTestsMatching("plantuml.SmolLMFineTuneFunctionalTest")
+    }
+
+tasks.register("functionalShards") {
+    description = "Runs every functionalTest shard (exhaustive, disjoint partition)."
+    group = "verification"
+    dependsOn(functionalTestShardA, functionalTestShardB)
+}
 
 tasks.withType<Test>().configureEach {
     // Allows hiding the warning about dynamic agent loading

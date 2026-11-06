@@ -1,7 +1,7 @@
 @files
 Feature: File Edge Cases
 
-  @files @utf8
+  @files @utf8 @bdd-content
   Scenario: Handle UTF-8 encoded prompt files
     Given a prompt file "utf8-test.prompt" with UTF-8 content:
       """
@@ -11,35 +11,35 @@ Feature: File Edge Cases
     Then the task should complete successfully
     And the generated diagram should preserve UTF-8 characters
 
-  @files @large
+  @files @large @bdd-content
   Scenario: Handle large prompt files
     Given a prompt file "large-test.prompt" with 10000+ characters
     When I run generatePlantumlDiagrams task
     Then the task should complete within reasonable time
     And the generated diagram should reflect all requirements
 
-  @files @special-chars
+  @files @special-chars @bdd-content
   Scenario: Handle filenames with special characters
     Given a prompt file "my-complex diagram (v1.0).prompt" exists
     When I run generatePlantumlDiagrams task
     Then the task should handle the filename correctly
     And output files should use sanitized names
 
-  @files @empty
+  @files @empty @bdd-empty
   Scenario: Handle empty prompt files
     Given an empty prompt file "empty.prompt"
     When I run generatePlantumlDiagrams task
     Then the task should skip the empty file
     And log a warning about empty prompt
 
-  @files @whitespace
+  @files @whitespace @bdd-empty
   Scenario: Handle prompt files with only whitespace
     Given a prompt file containing only spaces and newlines
     When I run generatePlantumlDiagrams task
     Then the task should treat it as empty
     And skip processing
 
-  @files @missing-newline
+  @files @missing-newline @bdd-empty
   Scenario: Handle files without trailing newline
     Given a prompt file without trailing newline
     When I run generatePlantumlDiagrams task

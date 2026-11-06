@@ -6,37 +6,120 @@ on:
   pull_request:
     branches: [main, master]
 
+# CNV-13.6 — the test wall-clock is split into exhaustive, disjoint shards that
+# run on parallel runners (budget < 5 min). The local `check` shape is unchanged;
+# kover binary reports are merged in the final `coverage` job.
+env:
+  CI: "true"
+
 jobs:
-  test:
-    name: Build & Test
+  # ── Unit tests + lint (one fast job) ────────────────────────────────────────
+  unit:
+    name: Unit + Lint
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 20
     defaults:
       run:
         working-directory: plantuml-plugin
-
     steps:
       - uses: actions/checkout@v4
       - name: Verify Gradle wrapper version
         uses: cccp-education/conventions-gradle/.github/actions/verify-gradle-wrapper@main
-
       - name: Set up JDK 25
         uses: actions/setup-java@v4
         with:
           java-version: '25'
           distribution: 'temurin'
           cache: gradle
+      - name: Unit tests + lint
+        run: ./gradlew publishToMavenLocal test ktlintCheck validatePlugins
+      - name: Upload coverage binary report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kover-ic-unit
+          path: plantuml-plugin/build/kover/bin-reports/*.ic
+          if-no-files-found: error
 
-      # The @rag Cucumber scenarios use a testcontainers `pgvector/pgvector:pg15`
-      # container. Cache the `docker save` tar so the image is not re-pulled on
-      # every run (~ a few hundred MB).
+  # ── functionalTest shards (2 parallel runners) ─────────────────────────────
+  functional-shard:
+    name: Functional · ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "A"
+            task: functionalTestShardA
+          - name: "B"
+            task: functionalTestShardB
+    defaults:
+      run:
+        working-directory: plantuml-plugin
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: gradle
+      - name: Publish plugin to Maven Local
+        run: ./gradlew publishToMavenLocal
+      - name: Run functional shard
+        run: ./gradlew ${{ matrix.task }}
+      - name: Upload coverage binary report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kover-ic-${{ matrix.task }}
+          path: plantuml-plugin/build/kover/bin-reports/*.ic
+          if-no-files-found: error
+
+  # ── BDD shards (7 parallel runners) ────────────────────────────────────────
+  bdd-shard:
+    name: BDD · ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "a1-content"
+            task: cucumberTestShardA1
+          - name: "a2-empty"
+            task: cucumberTestShardA2
+          - name: "b-core"
+            task: cucumberTestShardB
+          - name: "c-i18n"
+            task: cucumberTestShardC
+          - name: "d-diagram"
+            task: cucumberTestShardD
+          - name: "e-repair"
+            task: cucumberTestShardE
+          - name: "f-rag"
+            task: cucumberTestShardF
+    defaults:
+      run:
+        working-directory: plantuml-plugin
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: gradle
+      # Only the RAG shard needs the pgvector image (testcontainers).
       - name: Cache pgvector testcontainers image
+        if: matrix.task == 'cucumberTestShardF'
         uses: actions/cache@v4
         with:
           path: ${{ runner.temp }}/pgvector-image.tar
           key: docker-pgvector-pg15-${{ runner.os }}
-
       - name: Load or pull the pgvector image
+        if: matrix.task == 'cucumberTestShardF'
         shell: bash
         run: |
           set -euo pipefail
@@ -49,11 +132,55 @@ jobs:
             docker pull pgvector/pgvector:pg15
             docker save pgvector/pgvector:pg15 -o "$tar"
           fi
-
       - name: Publish plugin to Maven Local
         run: ./gradlew publishToMavenLocal
+      - name: Run BDD shard
+        run: ./gradlew ${{ matrix.task }}
+      - name: Upload coverage binary report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kover-ic-${{ matrix.task }}
+          path: plantuml-plugin/build/kover/bin-reports/*.ic
+          if-no-files-found: error
 
-      - name: Check plantuml-plugin
-        run: ./gradlew check
-        env:
-          CI: "true"
+  # ── Coverage merge (all binary reports) ────────────────────────────────────
+  coverage:
+    name: Coverage (merged)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [unit, functional-shard, bdd-shard]
+    defaults:
+      run:
+        working-directory: plantuml-plugin
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: gradle
+      - name: Download every coverage binary report
+        uses: actions/download-artifact@v4
+        with:
+          pattern: kover-ic-*
+          merge-multiple: true
+          path: plantuml-plugin/build/kover/bin-reports
+      - name: List merged binary reports
+        run: ls -la build/kover/bin-reports
+      - name: Verify merged coverage threshold
+        run: >
+          ./gradlew koverXmlReport koverThresholdCheck
+          -x test -x functionalTest -x cucumberTest
+          -x functionalTestShardA -x functionalTestShardB
+          -x cucumberTestShardA1 -x cucumberTestShardA2 -x cucumberTestShardB
+          -x cucumberTestShardC -x cucumberTestShardD -x cucumberTestShardE
+          -x cucumberTestShardF
+      - name: Upload merged coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kover-merged-report
+          path: plantuml-plugin/build/reports/kover/
+          if-no-files-found: warn

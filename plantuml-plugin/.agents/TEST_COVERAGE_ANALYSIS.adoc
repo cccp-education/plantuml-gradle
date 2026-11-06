@@ -20,8 +20,13 @@ _Dernière mise à jour_ : Session 247 (5 novembre 2026) — PLT-OUT-2 (notes)
 * Couverture des branches : forme quotée/colon/multi-lignes de l'extracteur,
   guillemet introduit (label + note), traduction blanche, placeholder/échappement
   `\n`, round-trip rejeté.
+* **+** `PlantumlCucumberShardCoverageTest` (2 unit) — garde de la partition
+  BDD : union = tous les features, zéro doublon, `File Edge Cases` scindé par
+  tags `@bdd-content`/`@bdd-empty` couvrant tous ses scénarios.
 * Local = Build (compile ×3 + `ktlintCheck` + `assemble` + `validatePlugins` +
-  `publishToMavenLocal` VERT) ; preuve = CI du commit poussé.
+  `publishToMavenLocal` VERT) ; preuve = CI du commit poussé. CI shardée
+  (unit + 2 functional + 7 BDD + coverage mergée) ; TestKit aligné sur le
+  wrapper 9.8.2 (`workspace.gradle.version`).
 
 === Session 246 — PLT-OUT-1 (gate de corpus)
 

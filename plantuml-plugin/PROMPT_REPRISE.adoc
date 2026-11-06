@@ -18,6 +18,18 @@
 * Gates locaux : compile ×3, `ktlintCheck`, `assemble`, `validatePlugins`,
   `publishToMavenLocal` VERT. Tests = CI.
 
+== CI sharding (CNV-13.6)
+
+* TestKit aligné sur le wrapper **9.8.2** (fini le `withGradleVersion("9.4.1")`
+  qui téléchargeait une distribution non alignée) ; version dérivée de
+  `gradle-wrapper.properties` via `workspace.gradle.version`.
+* CI `.github/workflows/test.yml` : **1 unit + lint**, **2 functional shards**,
+  **7 BDD shards** (`cucumberTestShardA1/A2` scindent `File Edge Cases` par tags
+  `@bdd-content`/`@bdd-empty`, `B`→`F` par features) et **1 coverage mergée**
+  (`kover-ic-*`, `koverXmlReport koverThresholdCheck` sans rejouer les tests).
+  Garde `PlantumlCucumberShardCoverageTest` (exhaustif/disjoint). Image pgvector
+  uniquement sur `f-rag`. Objectif mur < 5 min (mesurer le prochain run).
+
 == Publication — action pilote (bloquée S-247)
 
 * Cible : **Gradle Plugin Portal**, compte **`cccp-education`**

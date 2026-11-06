@@ -65,6 +65,14 @@ class PlantumlWorld {
 
     companion object {
         private var templateProjectDir: File? = null
+
+        /**
+         * CNV-13.6 — the TestKit build runs the same Gradle as the wrapper
+         * (injected by `build.gradle.kts` from `gradle-wrapper.properties`).
+         * A hardcoded version here made CI download an untested distribution.
+         */
+        private val gradleTestVersion: String =
+            System.getProperty("workspace.gradle.version") ?: "9.8.2"
         private val pluginVersion: String by lazy {
             val projectRoot = File(System.getProperty("user.dir"))
             val tomlFile = File(projectRoot, "gradle/libs.versions.toml")
@@ -400,7 +408,7 @@ class PlantumlWorld {
                         .withProjectDir(projectDir!!)
                         .withArguments(allArgs)
                         .withTestKitDir(File(System.getProperty("user.home"), ".gradle/testkit"))
-                        .withGradleVersion("9.4.1")
+                        .withGradleVersion(gradleTestVersion)
                         .forwardStdOutput(System.out.writer())
                         .forwardStdError(System.err.writer())
                         .build()
@@ -437,7 +445,7 @@ class PlantumlWorld {
                     .withProjectDir(projectDir!!)
                     .withArguments(allArgs)
                     .withTestKitDir(File(System.getProperty("user.home"), ".gradle/testkit"))
-                    .withGradleVersion("9.4.1")
+                    .withGradleVersion(gradleTestVersion)
                     .forwardStdOutput(System.out.writer())
                     .forwardStdError(System.err.writer())
 
