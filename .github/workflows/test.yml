@@ -65,8 +65,6 @@ jobs:
           java-version: '25'
           distribution: 'temurin'
           cache: gradle
-      - name: Publish plugin to Maven Local
-        run: ./gradlew publishToMavenLocal
       - name: Run functional shard
         run: ./gradlew ${{ matrix.task }}
       - name: Upload coverage binary report
@@ -132,8 +130,6 @@ jobs:
             docker pull pgvector/pgvector:pg15
             docker save pgvector/pgvector:pg15 -o "$tar"
           fi
-      - name: Publish plugin to Maven Local
-        run: ./gradlew publishToMavenLocal
       - name: Run BDD shard
         run: ./gradlew ${{ matrix.task }}
       - name: Upload coverage binary report
