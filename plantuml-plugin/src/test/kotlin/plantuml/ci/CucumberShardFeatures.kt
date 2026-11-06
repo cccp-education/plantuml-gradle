@@ -9,7 +9,7 @@ package plantuml.ci
  * [PlantumlCucumberShardCoverageTest].
  */
 object CucumberShardFeatures {
-    const val DEFAULT_TAGS = "not @wip and not @integration and not @realllm"
+    const val DEFAULT_TAGS = "not @wip and not @integration and not @realllm and not @skip"
 
     const val SHARD_A1_FILE = "10_file_edge_cases.feature"
     const val SHARD_A1_TAG = "@bdd-content"

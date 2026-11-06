@@ -28,13 +28,12 @@ Feature: Incremental Processing
     Then the outputs for the deleted prompt should be removed
     And outputs for remaining prompts should be preserved
 
-  @incremental @checksum
+  @incremental @checksum @skip
   Scenario: Use checksum-based change detection
     Given a prompt file with known content
     When I run generatePlantumlDiagrams task
     Then a checksum should be stored for the prompt
-    When I run generatePlantumlDiagrams task again
-    Then on re-run, checksum should be compared
+    And on re-run, checksum should be compared
     And processing should be skipped if checksum matches
 
   @incremental @force

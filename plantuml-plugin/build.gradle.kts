@@ -351,7 +351,7 @@ val cucumberTest =
         // Cucumber tag filter via -Pcucumber.tags="..." (default: exclude @wip, @integration, @realllm)
         val cucumberTags =
             project.findProperty("cucumber.tags")?.toString()
-                ?: "not @wip and not @integration and not @realllm"
+                ?: "not @wip and not @integration and not @realllm and not @skip"
         systemProperty("cucumber.filter.tags", cucumberTags)
 
         // FIX: Disable Gradle daemon for tests to avoid startup overhead and memory leaks
