@@ -5,76 +5,58 @@
 == État S-247 — PLT-OUT-2 (notes) ✅
 
 * `PlantumlNoteExtractor` couvre la note flottante quotée `note "text" as N`
-  (`quoted`, `singleLine`) : un `:` dans les guillemets n'ouvre plus de bloc et
-  n'avale plus le reste du diagramme ; `raw` = texte intérieur exact.
-* `PlantumlLabelIntegrity.escapeQuotes` (idempotent) : un guillemet introduit
-  par le fournisseur est échappé **avant écriture** (libellé et note quotés).
-* `PlantumlTranslationPortAdapter` : cible quotée exacte, alias préservé,
-  traduction blanche = échec fournisseur (source préservée), round-trip bloquant
-  (`PRESERVE` si le bloc ne re-parse pas).
-* Tests : unit (+14), functional (3, vrai validateur) + BDD `@plantuml-notes`
-  (+3 scénarios `@roundtrip`). Smoke réel `/tmp` : quote/note corrigées et
-  valides, `\n` littéral restauré.
-* Gates locaux : compile ×3, `ktlintCheck`, `assemble`, `validatePlugins`,
-  `publishToMavenLocal` VERT. Tests = CI.
+  (`quoted`, `singleLine`, `raw` intérieur exact) : un `:` dans les guillemets
+  n'ouvre plus de bloc et n'avale plus le diagramme.
+* `PlantumlLabelIntegrity.escapeQuotes` (idempotent) échappe un guillemet
+  introduit **avant écriture** (libellés + notes quotées).
+* `PlantumlTranslationPortAdapter` : alias préservé, traduction blanche refusée
+  par le contrat N0 (source préservée), round-trip note `PRESERVE`.
+* Tests : unit +14, functional 3 (vrai validateur), BDD `@plantuml-notes` +3
+  (`@roundtrip`). Smoke réel `/tmp` vert. Gates locaux VERT.
 
 == CI sharding (CNV-13.6)
 
-* TestKit aligné sur le wrapper **9.8.2** (fini le `withGradleVersion("9.4.1")`
-  qui téléchargeait une distribution non alignée) ; version dérivée de
-  `gradle-wrapper.properties` via `workspace.gradle.version`.
-* CI `.github/workflows/test.yml` : **1 unit + lint**, **2 functional shards**,
-  **7 BDD shards** (`cucumberTestShardA1/A2` scindent `File Edge Cases` par tags
-  `@bdd-content`/`@bdd-empty`, `B`→`F` par features) et **1 coverage mergée**
-  (`kover-ic-*`, `koverXmlReport koverThresholdCheck` sans rejouer les tests).
-  Garde `PlantumlCucumberShardCoverageTest` (exhaustif/disjoint). Image pgvector
-  uniquement sur `f-rag`. **Monde BDD via `withPluginClasspath`** (plus
-  d'`includeBuild` recompilé par build imbriqué) ; plus de
-  `publishToMavenLocal` dans les jobs de test. **Cache extensif** :
-  `gradle/actions/setup-gradle` avec `caches`, `wrapper` et `testkit` (Gradle
-  User Home + distribution 9.8.2 + builds TestKit) réutilisés entre jobs/runs ;
-  image pgvector cachée. **Mesuré run `42151678129` : 198 s (3m18) à cache
-  chaud, 319 s (5m19) à froid — budget < 5 min tenu une fois le cache tiède.**
-  Scénarios legacy `@skip` (checksum re-run impossible : la tâche supprime le
+* TestKit **9.8.2** dérivé du wrapper (`workspace.gradle.version`), fini le
+  `withGradleVersion("9.4.1")`.
+* CI : 1 unit + lint, 2 functional shards, 7 BDD shards (`A1/A2` scindent
+  `File Edge Cases` par tags, `B`→`F` par features), coverage mergée
+  `kover-ic-*` ; garde `PlantumlCucumberShardCoverageTest`.
+* BDD via `withPluginClasspath` ; plus de `publishToMavenLocal` dans les tests.
+* Cache `setup-gradle` (`caches`, `wrapper`, `testkit`) entre jobs/runs.
+* **Run `42151678129` : 198 s (3m18) à chaud, 319 s à froid** ; dernier run
+  `42153513979` 210 s. Budget < 5 min tenu.
+* Scénarios legacy `@skip` (checksum re-run impossible : la tâche supprime le
   prompt) exclus ; checksum couvert par `@rag-reindex`.
 
 == Publication — Portal (uploadée S-247, revue en attente)
 
-* Cible : **Gradle Plugin Portal**, compte **`cccp-education`**
-  (https://plugins.gradle.org/u/cccp-education).
-* **`publishPlugins` BUILD SUCCESSFUL** avec les clés
-  `~/.gradle/gradle.properties` (`gradle.publish.key`/`secret`) — l'artefact
-  `plantuml-plugin 0.0.16` est **uploadé**. Aucune clé affichée/commitée.
-* **Première publication du groupe** : page publique encore « Plugin Not Found »
-  (revue manuelle Portal en attente) ; `/m2/` redirige encore vers Central.
-  Vérifier `https://plugins.gradle.org/plugin/education.cccp.plantuml` et le
-  `/m2/` avant de considérer la propagation terminée.
+* `publishPlugins` **BUILD SUCCESSFUL** avec `~/.gradle/gradle.properties`
+  (`gradle.publish.key`/`secret`, compte `cccp-education`) ; artefact
+  `plantuml-plugin 0.0.16` **uploadé**. Aucune clé affichée/commitée.
+* Première publication du groupe : page `education.cccp.plantuml` encore
+  « Plugin Not Found » (revue manuelle Portal), `/m2/` redirige vers Central.
+  Vérifier la page + `/m2/` avant de conclure la propagation.
 * Caveat : `0.0.16` existe sur Central (contenu ancien) ; la version Portal
-  porte le HEAD (PLT-OUT-1/2). Pour une version identique par cible, bump
-  `0.0.17` via MEMPHIS (DAG) avant publication.
+  porte le HEAD (PLT-OUT-1/2). Bump `0.0.17` via MEMPHIS si identité stricte.
 
 == Mission Session 248 — PLT-OUT-3 (shield + langue)
 
-* Un placeholder `__PLT<n>__` perdu ⇒ `PRESERVE` (déjà partiel : le shield
-  retourne `null` ; vérifier que **toutes** les surfaces — labels, notes,
-  prose — préservent au lieu d'écrire un placeholder).
-* Un label court resté **français** après traduction est détecté (jamais de
-  faux `TRANSLATED`) : gate de langue déterministe (ratio de mots FR/EN,
-  dictionnaire minimal, pas de LLM) ; retry borné (1..N) sur échec.
-* Cadrer la détection avant de coder : seuil, faux positifs (noms propres,
-  termes techniques), surface (labels + notes + prose), interaction avec la
-  gate de corpus.
+* Placeholder `__PLT<n>__` perdu ⇒ `PRESERVE` sur toutes les surfaces (labels,
+  notes, prose), jamais un placeholder écrit.
+* Label court resté français détecté (ratio/dictionnaire déterministe, pas de
+  LLM) ⇒ jamais de faux `TRANSLATED` ; retry borné.
+* Cadrer seuil/faux positifs/surface/interaction gate corpus avant de coder.
 * Baby-step DDD/TDD/BDD : unit + functional + BDD `@plantuml-language`.
-* Puis `PLT-OUT-4` (preuve corpus S-076, reprise ciblée des 69 blocs EN).
+* Puis `PLT-OUT-4` (preuve corpus S-076, 69 blocs EN).
 
 == Résiduel
 
 * Gate P0.3 cross-borough (re-bake cheroliv.com) : pilotée hors plantuml.
-* `deepseek-v4.1-flash` préserve parfois un label court : c'est exactement le
-  faux `TRANSLATED` que `PLT-OUT-3` doit rendre impossible.
+* `deepseek-v4.1-flash` préserve parfois un label court : c'est le faux
+  `TRANSLATED` que `PLT-OUT-3` doit rendre impossible.
 
 == Rappels
 
 * Local = Build, Tests = CI ; un borough par session ; zéro Python ; zéro secret.
-* `publishToMavenLocal` après toute modification source avant test consommateur.
+* `publishToMavenLocal` après modification source avant test consommateur.
 * Version courante `0.0.16` (pin catalogue/BOM `0.0.121`).

@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-11-05 (Session 247 — **PLT-OUT-2** : notes couvertes et correction avant écriture — note flottante quotée, `escapeQuotes` idempotent, traduction blanche préservée, round-trip note `PRESERVE` ; unit + functional (vrai validateur) + BDD `@plantuml-notes`. Historique : S-246 PLT-OUT-1 ✅, S-235 PLT-CONTEXT ✅ 4/4, S-230 PLT-AGENT ✅ 7/7.)
+:last_update: 2026-11-05 (Session 247 — **PLT-OUT-2** : notes couvertes et correction avant écriture — note flottante quotée, `escapeQuotes` idempotent, traduction blanche refusée par le contrat N0, round-trip note `PRESERVE` ; unit + functional (vrai validateur) + BDD `@plantuml-notes`. Historique : S-246 PLT-OUT-1 ✅, S-235 PLT-CONTEXT ✅ 4/4, S-230 PLT-AGENT ✅ 7/7.)
 
 '''
 
