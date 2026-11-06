@@ -26,6 +26,11 @@ class PlantumlNoteSteps {
         source = "@startuml\nnote right of Car\n  line one\n  line two\nend note\n@enduml"
     }
 
+    @Given("a quoted note block followed by a sequence diagram")
+    fun aQuotedNoteBlockFollowedByASequenceDiagram() {
+        source = "@startuml\nnote \"Warning: see below\" as N1\nA -> B\n@enduml"
+    }
+
     @When("the note texts are extracted")
     fun theNoteTextsAreExtracted() {
         noteTexts = PlantumlNoteExtractor.notes(source)
@@ -39,5 +44,10 @@ class PlantumlNoteSteps {
     @Then("the note texts are empty")
     fun theNoteTextsAreEmpty() {
         assertThat(noteTexts).isEmpty()
+    }
+
+    @Then("the note extraction reports a quoted note")
+    fun theNoteExtractionReportsAQuotedNote() {
+        assertThat(PlantumlNoteExtractor.occurrences(source).single().quoted).isTrue()
     }
 }

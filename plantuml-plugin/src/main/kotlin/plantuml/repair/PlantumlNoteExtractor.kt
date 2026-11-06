@@ -5,14 +5,21 @@ package plantuml.repair
  * (the in-place region to replace) and its trimmed [text] (the translatable prose).
  *
  * [singleLine] is the grammar discriminator: the colon form `note right: text`
- * is one physical line (a real newline breaks the diagram), while the block form
- * `note right … end note` legitimately spans lines. The translation port must
- * escape newlines for the former and keep them for the latter.
+ * and the quoted form `note "text" as N` are one physical line (a real newline
+ * breaks the diagram), while the block form `note right … end note` legitimately
+ * spans lines. The translation port must escape newlines for the former and keep
+ * them for the latter.
+ *
+ * [quoted] marks the floating quoted form (`note "text" as N`): [raw] is the
+ * inner text **without** the quotes, so the port rewrites the quoted literal
+ * (`"text"`) and never touches the alias. A translated quote is re-escaped
+ * deterministically before writing.
  */
 data class PlantumlNote(
     val raw: String,
     val text: String,
     val singleLine: Boolean,
+    val quoted: Boolean = false,
 )
 
 /**
@@ -29,6 +36,8 @@ data class PlantumlNote(
  * Handled forms:
  *
  *  - single-line: `note left of A : text` → [PlantumlNote.raw] = `text` (trimmed)
+ *  - floating quoted: `note "text" as N` → [PlantumlNote.raw] = `text` (inner,
+ *    [PlantumlNote.quoted] true) — the alias and quotes are preserved
  *  - multi-line:  `note right of A` … `end note` → [PlantumlNote.raw] = the body
  *    exactly as in the source; [PlantumlNote.text] = the body with each line trimmed,
  *    blanks dropped
@@ -38,6 +47,7 @@ data class PlantumlNote(
  */
 object PlantumlNoteExtractor {
     private val NOTE_START = Regex("""^\s*note\b(.*)$""")
+    private val QUOTED_START = Regex("^\\s*note\\s+\"((?:[^\"\\\\]|\\\\.)*)\"")
     private val END_NOTE = Regex("""^\s*end\s*note\b""")
 
     /** The note occurrences of [source], in first-seen order. */
@@ -62,6 +72,19 @@ object PlantumlNoteExtractor {
                 if (trimmed.isNotEmpty()) {
                     if (textBody.isNotEmpty()) textBody.append('\n')
                     textBody.append(trimmed)
+                }
+                continue
+            }
+            val quoted = QUOTED_START.find(line)
+            if (quoted != null) {
+                // Floating quoted note: the text is on the `note` line itself. It
+                // must not open a block, otherwise the rest of the diagram would
+                // be swallowed as a note body (and a colon inside the quotes must
+                // not be read as the single-line separator).
+                val inner = quoted.groupValues[1]
+                val text = inner.trim()
+                if (text.isNotEmpty()) {
+                    collected.add(PlantumlNote(raw = inner, text = text, singleLine = true, quoted = true))
                 }
                 continue
             }

@@ -69,10 +69,15 @@ class PlantumlTranslationPortAdapter(
         var changed = false
         for (label in labels) {
             val resolved = translations[label] ?: continue
-            if (resolved == label) continue
+            // PLT-OUT-2 — a blank translation is a provider failure, never an
+            // instruction to erase the label/note.
+            if (resolved.isBlank() || resolved == label) continue
             val escaped = PlantumlLabelIntegrity.escapeNewlines(resolved)
-            // Quoted label (`class "Utilisateur"`) — replace the quoted form only.
-            val quotedReplaced = raw.replace("\"$label\"", "\"$escaped\"")
+            // Quoted label (`class "Utilisateur"`, `note "…" as N`) — replace the
+            // quoted form only. A quote introduced by the provider is escaped
+            // before writing: an unescaped quote would close the literal and
+            // break the diagram (PLT-OUT-2).
+            val quotedReplaced = raw.replace("\"$label\"", "\"${PlantumlLabelIntegrity.escapeQuotes(escaped)}\"")
             val quotedChanged = quotedReplaced != raw
             raw = quotedReplaced
             // Unquoted directive value (`title Évolution…`) — the label never
@@ -95,9 +100,17 @@ class PlantumlTranslationPortAdapter(
         // the CHE-DIAGRAM variant corruption (S-076).
         for (note in notes) {
             val resolved = translateProtected(note.text, request) ?: continue
-            if (resolved == note.text) continue
-            val replacement = if (note.singleLine) PlantumlLabelIntegrity.escapeNewlines(resolved) else resolved
-            val replaced = raw.replace(note.raw, replacement)
+            // PLT-OUT-2 — a blank translation is a provider failure, never an
+            // instruction to erase the note; the source is preserved.
+            if (resolved.isBlank() || resolved == note.text) continue
+            val corrected =
+                if (note.singleLine) PlantumlLabelIntegrity.escapeNewlines(resolved) else resolved
+            // A quoted note rewrites the quoted literal only: the alias (`as N`)
+            // and the quotes stay, an introduced quote is escaped before writing.
+            val target = if (note.quoted) "\"${note.raw}\"" else note.raw
+            val replacement =
+                if (note.quoted) "\"${PlantumlLabelIntegrity.escapeQuotes(corrected)}\"" else corrected
+            val replaced = raw.replace(target, replacement)
             if (replaced != raw) {
                 raw = replaced
                 changed = true

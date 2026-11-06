@@ -13,6 +13,8 @@ package plantuml.repair
  *
  *  - [escapeNewlines] — the canonical correction, applied to a translated label
  *    (the N0 translation port delegates here, D5);
+ *  - [escapeQuotes] — the correction of a quote introduced inside a quoted
+ *    literal (a quoted note or label must not be closed by the translation);
  *  - [hasBrokenQuotedLabel] — the source-level audit that finds a frozen block
  *    before a bake (a quoted label spanning a raw newline);
  *  - [repair] — the in-place correction of a whole block's quoted labels.
@@ -27,6 +29,32 @@ object PlantumlLabelIntegrity {
      * first so an already-escaped label is left untouched.
      */
     fun escapeNewlines(text: String): String = text.replace("\r\n", "\\n").replace("\n", "\\n").replace("\r", "\\n")
+
+    /**
+     * Escapes the quotes that a translator may introduce inside a **quoted**
+     * PlantUML literal (`note "text" as N`, `class "label"`). An unescaped quote
+     * closes the literal and breaks the diagram; an already-escaped quote is left
+     * untouched so the correction is idempotent.
+     */
+    fun escapeQuotes(text: String): String {
+        val out = StringBuilder(text.length)
+        var i = 0
+        while (i < text.length) {
+            val c = text[i]
+            when {
+                c == '\\' && i + 1 < text.length -> {
+                    out.append(c).append(text[i + 1])
+                    i += 2
+                    continue
+                }
+
+                c == '"' -> out.append("\\\"")
+                else -> out.append(c)
+            }
+            i++
+        }
+        return out.toString()
+    }
 
     /**
      * True when a quoted label spans a raw newline — the exact D2 break. Escaped

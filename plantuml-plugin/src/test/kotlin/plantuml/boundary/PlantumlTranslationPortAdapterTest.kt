@@ -85,6 +85,89 @@ class PlantumlTranslationPortAdapterTest {
         assertTrue(!raw.contains("Hello\\nWorld"), "a multi-line note body must not be escaped")
     }
 
+    // ── PLT-OUT-2 — quoted notes and note-specific correction/PRESERVE ──────
+
+    @Test
+    fun `translates a quoted floating note without corrupting the alias`() {
+        val adapter = port(mapOf("Bonjour" to "Hello"))
+        val block = PlantUmlBlock("@startuml\nnote \"Bonjour\" as N1\nA -> B\n@enduml")
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+        val raw = (outcome as PlantUmlTranslationOutcome.Translated).block.raw
+        assertTrue(raw.contains("note \"Hello\" as N1"), raw)
+    }
+
+    @Test
+    fun `a quoted note containing a colon is translated as one note`() {
+        val adapter = port(mapOf("Warning: see below" to "Attention : voir ci-dessous"))
+        val block = PlantUmlBlock("@startuml\nnote \"Warning: see below\" as N1\nA -> B\n@enduml")
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+        val raw = (outcome as PlantUmlTranslationOutcome.Translated).block.raw
+        assertTrue(raw.contains("note \"Attention : voir ci-dessous\" as N1"), raw)
+        assertTrue(raw.contains("A -> B"), "the rest of the diagram must be preserved")
+    }
+
+    @Test
+    fun `escapes a quote introduced by the provider inside a quoted note`() {
+        val adapter = port(mapOf("Bonjour" to "Hello \"World\""))
+        val block = PlantUmlBlock("@startuml\nnote \"Bonjour\" as N1\n@enduml")
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+        val raw = (outcome as PlantUmlTranslationOutcome.Translated).block.raw
+        assertTrue(raw.contains("note \"Hello \\\"World\\\"\" as N1"), raw)
+    }
+
+    @Test
+    fun `escapes a quote introduced by the provider inside a quoted label`() {
+        val adapter = port(mapOf("Utilisateur" to "User \"X\""))
+        val block = PlantUmlBlock("@startuml\nclass \"Utilisateur\"\n@enduml")
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+        val raw = (outcome as PlantUmlTranslationOutcome.Translated).block.raw
+        assertTrue(raw.contains("class \"User \\\"X\\\"\""), raw)
+    }
+
+    @Test
+    fun `a corrected quoted label passes the real syntax validator`() {
+        val adapter =
+            PlantumlTranslationPortAdapter(
+                translator(mapOf("Utilisateur" to "User \"X\"")),
+                validator = PlantumlSyntaxValidatorAdapter(),
+            )
+        val block = PlantUmlBlock("@startuml\nclass \"Utilisateur\"\n@enduml")
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+        assertTrue(outcome is PlantUmlTranslationOutcome.Translated)
+        assertTrue((outcome as PlantUmlTranslationOutcome.Translated).block.raw.contains("class \"User \\\"X\\\"\""))
+    }
+
+    @Test
+    fun `a blank note translation preserves the source note`() {
+        val adapter = port(mapOf("Bonjour" to "   "))
+        val block = PlantUmlBlock("@startuml\nnote right of B : Bonjour\n@enduml")
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+        assertTrue(outcome is PlantUmlTranslationOutcome.Preserved)
+        assertTrue((outcome as PlantUmlTranslationOutcome.Preserved).reason.isNotBlank())
+    }
+
+    @Test
+    fun `a literal newline escape in a note is shielded translated and restored`() {
+        val adapter = port(mapOf("query__PLT0__modèles" to "query__PLT0__models"))
+        val block = PlantUmlBlock("@startuml\nnote right of B : query\\nmodèles\n@enduml")
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+        val raw = (outcome as PlantUmlTranslationOutcome.Translated).block.raw
+        assertTrue(raw.contains("note right of B : query\\nmodels"), raw)
+    }
+
+    @Test
+    fun `a note translation that breaks syntax is preserved by the round-trip gate`() {
+        val adapter =
+            PlantumlTranslationPortAdapter(
+                translator(mapOf("Bonjour" to "end note")),
+                validator = validator(valid = false),
+            )
+        val block = PlantUmlBlock("@startuml\nnote right of B\n  Bonjour\nend note\n@enduml")
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+        assertTrue(outcome is PlantUmlTranslationOutcome.Preserved)
+        assertTrue((outcome as PlantUmlTranslationOutcome.Preserved).reason.contains("syntax"))
+    }
+
     @Test
     fun `a note-only block with a provider failure is preserved`() {
         val adapter = port(emptyMap())
@@ -234,9 +317,10 @@ class PlantumlTranslationPortAdapterTest {
         }
 
     @Test
-    fun `a translation that breaks syntax is rejected - source block preserved`() {
-        // A provider that returns a raw newline is escaped (valid); but a provider
-        // that injects an unbalanced quote must be caught by the round-trip gate.
+    fun `a translation rejected by the round-trip gate preserves the source block`() {
+        // The provider returns a quote: it is escaped before validation (PLT-OUT-2).
+        // The fake validator still rejects the block, proving the gate preserves
+        // the source when a correction cannot make the block valid.
         val adapter =
             PlantumlTranslationPortAdapter(
                 translator(mapOf("Utilisateur" to "User\" broken")),

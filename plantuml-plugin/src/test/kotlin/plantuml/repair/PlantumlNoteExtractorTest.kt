@@ -80,4 +80,38 @@ class PlantumlNoteExtractorTest {
         assertTrue(source.contains(occurrence.raw), "the raw region must be an exact substring of the source")
         assertFalse(occurrence.singleLine)
     }
+
+    @Test
+    fun `a quoted floating note is a single-line note`() {
+        val source = "@startuml\nnote \"Hello world\" as N1\nA -> B\n@enduml"
+        val occurrence = PlantumlNoteExtractor.occurrences(source).single()
+        assertEquals("Hello world", occurrence.text)
+        assertEquals("Hello world", occurrence.raw)
+        assertTrue(occurrence.singleLine)
+        assertTrue(occurrence.quoted)
+    }
+
+    @Test
+    fun `a quoted note containing a colon does not swallow the rest of the diagram`() {
+        val source = "@startuml\nnote \"Warning: see below\" as N1\nA -> B\n@enduml"
+        val occurrence = PlantumlNoteExtractor.occurrences(source).single()
+        assertEquals("Warning: see below", occurrence.text)
+        assertTrue(occurrence.quoted)
+        assertFalse(occurrence.text.contains("A -> B"), "the diagram must not become the note body")
+    }
+
+    @Test
+    fun `a quoted note keeps the inner raw text exactly for the quoted replacement`() {
+        val source = "@startuml\nnote \"  Hello world  \" as N1\n@enduml"
+        val occurrence = PlantumlNoteExtractor.occurrences(source).single()
+        assertEquals("Hello world", occurrence.text)
+        assertEquals("  Hello world  ", occurrence.raw)
+        assertTrue(source.contains("\"${occurrence.raw}\""))
+    }
+
+    @Test
+    fun `a literal newline escape is part of the note text`() {
+        val source = "@startuml\nnote right of Car : query\\nmodèles\n@enduml"
+        assertEquals(listOf("query\\nmodèles"), PlantumlNoteExtractor.notes(source))
+    }
 }

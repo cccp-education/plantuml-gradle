@@ -60,4 +60,14 @@ class PlantumlLabelIntegrityTest {
 
         assertThat(PlantumlLabelIntegrity.repair(source)).isEqualTo(source)
     }
+
+    @Test
+    fun `escapeQuotes escapes an introduced quote`() {
+        assertThat(PlantumlLabelIntegrity.escapeQuotes("Hello \"World\"")).isEqualTo("Hello \\\"World\\\"")
+    }
+
+    @Test
+    fun `escapeQuotes is idempotent on an already escaped quote`() {
+        assertThat(PlantumlLabelIntegrity.escapeQuotes("Hello \\\"World\\\"")).isEqualTo("Hello \\\"World\\\"")
+    }
 }

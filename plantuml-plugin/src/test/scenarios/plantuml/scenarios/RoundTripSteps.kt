@@ -32,6 +32,16 @@ class RoundTripSteps(
         block = PlantUmlBlock("@startuml\nclass \"$label\"\n@enduml")
     }
 
+    @Given("a PlantUML block with a single-line note {string}")
+    fun aPlantUmlBlockWithSingleLineNote(text: String) {
+        block = PlantUmlBlock("@startuml\nA -> B\nnote right of B : $text\n@enduml")
+    }
+
+    @Given("a PlantUML block with a multi-line note {string}")
+    fun aPlantUmlBlockWithMultiLineNote(text: String) {
+        block = PlantUmlBlock("@startuml\nnote right of B\n  $text\nend note\n@enduml")
+    }
+
     @Given("a label provider returning {string} for {string}")
     fun aLabelProviderReturning(
         replacement: String,
