@@ -190,6 +190,11 @@ dependencies {
     add(functionalTest.implementationConfigurationName, "education.cccp:i18n-contracts:0.0.5")
     add(functionalTest.implementationConfigurationName, "education.cccp:plantuml-contracts:0.0.1")
 
+    // PLT-OUT-2 — the functional note tests exercise the real N0 syntax validator.
+    // The custom functionalTest source set does not inherit the main `implementation`
+    // configuration, so the PlantUML engine must be declared explicitly.
+    add(functionalTest.implementationConfigurationName, libs.plantuml.engine)
+
     // Add testcontainers for RAG integration tests
     add(functionalTest.implementationConfigurationName, libs.testcontainers.pg)
     add(functionalTest.implementationConfigurationName, "org.testcontainers:testcontainers")
