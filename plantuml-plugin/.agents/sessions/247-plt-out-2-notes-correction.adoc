@@ -134,7 +134,15 @@ moteur PlantUML réel :
   bakery) — aucun test rejoué.
 * **Workflow** `.github/workflows/test.yml` : matrice parallèle (1 unit + 2
   functional + 7 BDD + 1 coverage) ; image pgvector chargée uniquement par le
-  shard RAG (`f-rag`). Objectif : mur < 5 min, mesuré au run CI suivant.
+  shard RAG (`f-rag`).
+* **Rééquilibrage mesuré** : `28_agent_loop` et `15_i18n_language_switch`
+  déplacés vers le shard E (les shards C/D étaient le chemin critique).
+* **Scénarios legacy `@skip`** : `Use checksum-based change detection` (comme
+  `Skip unchanged prompts on re-run`) suppose un re-run sur un prompt que
+  `GeneratePlantumlDiagramsTask` **supprime après succès** ; il ne pouvait
+  passer que par l'état partagé entre scénarios. Taggué `@skip`, exclu des
+  filtres (`DEFAULT_TAGS`) ; la détection de checksum reste couverte par les
+  scénarios `@rag-reindex`.
 * **Cache extensif** : `gradle/actions/setup-gradle@v4` avec
   `gradle-home-cache-includes: caches / wrapper / testkit` et
   `cache-cleanup: never` — le Gradle User Home, la distribution du wrapper
@@ -142,6 +150,11 @@ moteur PlantUML réel :
   sont réutilisés entre jobs et runs ; `actions/setup-java` ne duplique plus le
   cache Gradle ; l'image pgvector reste cachée pour `f-rag`. Plus de
   `publishToMavenLocal` dans les jobs de test.
+* **Résultat mesuré — run `42151678129`** : attempt 1 (cache froid) **319 s**
+  (5m19), attempt 2 (cache chaud) **198 s = 3m18** — **sous le budget de 5 min**.
+  Les jobs BDD passent de 230-279 s (froid) à 71-160 s (chaud), le functional à
+  29 s, l'unit à 45 s, la couverture à 35 s. Le wrapper 9.8.2 et le TestKit ne
+  sont plus re-téléchargés.
 
 == Prochaine session
 

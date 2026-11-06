@@ -33,7 +33,10 @@
   `publishToMavenLocal` dans les jobs de test. **Cache extensif** :
   `gradle/actions/setup-gradle` avec `caches`, `wrapper` et `testkit` (Gradle
   User Home + distribution 9.8.2 + builds TestKit) réutilisés entre jobs/runs ;
-  image pgvector cachée. Objectif mur < 5 min (mesurer le prochain run).
+  image pgvector cachée. **Mesuré run `42151678129` : 198 s (3m18) à cache
+  chaud, 319 s (5m19) à froid — budget < 5 min tenu une fois le cache tiède.**
+  Scénarios legacy `@skip` (checksum re-run impossible : la tâche supprime le
+  prompt) exclus ; checksum couvert par `@rag-reindex`.
 
 == Publication — action pilote (bloquée S-247)
 
