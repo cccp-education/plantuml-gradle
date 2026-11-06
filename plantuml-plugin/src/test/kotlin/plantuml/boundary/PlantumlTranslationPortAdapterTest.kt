@@ -138,12 +138,13 @@ class PlantumlTranslationPortAdapterTest {
     }
 
     @Test
-    fun `a blank note translation preserves the source note`() {
-        val adapter = port(mapOf("Bonjour" to "   "))
-        val block = PlantUmlBlock("@startuml\nnote right of B : Bonjour\n@enduml")
-        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
-        assertTrue(outcome is PlantUmlTranslationOutcome.Preserved)
-        assertTrue((outcome as PlantUmlTranslationOutcome.Preserved).reason.isNotBlank())
+    fun `the N0 contract rejects a blank translation before the adapter`() {
+        // TranslationResult.Success requires a non-blank text, so a provider can
+        // never hand a blank translation to the port. The adapter keeps a
+        // defensive blank guard on top of that contract.
+        org.junit.jupiter.api.assertThrows<IllegalArgumentException> {
+            TranslationResult.Success("   ")
+        }
     }
 
     @Test
