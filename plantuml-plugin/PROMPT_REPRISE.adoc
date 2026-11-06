@@ -30,8 +30,10 @@
   Garde `PlantumlCucumberShardCoverageTest` (exhaustif/disjoint). Image pgvector
   uniquement sur `f-rag`. **Monde BDD via `withPluginClasspath`** (plus
   d'`includeBuild` recompilé par build imbriqué) ; plus de
-  `publishToMavenLocal` dans les jobs de test. Objectif mur < 5 min (mesurer le
-  prochain run).
+  `publishToMavenLocal` dans les jobs de test. **Cache extensif** :
+  `gradle/actions/setup-gradle` avec `caches`, `wrapper` et `testkit` (Gradle
+  User Home + distribution 9.8.2 + builds TestKit) réutilisés entre jobs/runs ;
+  image pgvector cachée. Objectif mur < 5 min (mesurer le prochain run).
 
 == Publication — action pilote (bloquée S-247)
 

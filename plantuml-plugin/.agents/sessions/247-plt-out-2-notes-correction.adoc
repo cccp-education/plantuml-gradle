@@ -135,6 +135,13 @@ moteur PlantUML réel :
 * **Workflow** `.github/workflows/test.yml` : matrice parallèle (1 unit + 2
   functional + 7 BDD + 1 coverage) ; image pgvector chargée uniquement par le
   shard RAG (`f-rag`). Objectif : mur < 5 min, mesuré au run CI suivant.
+* **Cache extensif** : `gradle/actions/setup-gradle@v4` avec
+  `gradle-home-cache-includes: caches / wrapper / testkit` et
+  `cache-cleanup: never` — le Gradle User Home, la distribution du wrapper
+  (9.8.2) **et le home TestKit** (distribution + caches des builds imbriqués)
+  sont réutilisés entre jobs et runs ; `actions/setup-java` ne duplique plus le
+  cache Gradle ; l'image pgvector reste cachée pour `f-rag`. Plus de
+  `publishToMavenLocal` dans les jobs de test.
 
 == Prochaine session
 
