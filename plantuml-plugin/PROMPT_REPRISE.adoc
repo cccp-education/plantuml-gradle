@@ -38,19 +38,20 @@
   Scénarios legacy `@skip` (checksum re-run impossible : la tâche supprime le
   prompt) exclus ; checksum couvert par `@rag-reindex`.
 
-== Publication — action pilote (bloquée S-247)
+== Publication — Portal (uploadée S-247, revue en attente)
 
 * Cible : **Gradle Plugin Portal**, compte **`cccp-education`**
   (https://plugins.gradle.org/u/cccp-education).
-* `./gradlew publishPlugins --no-daemon` a été **refusé** :
-  `You are not the owner of group education.cccp` — les credentials
-  `GRADLE_PUBLISH_*` locaux ne sont pas ceux du compte propriétaire du groupe.
-  **Aucune version publiée.**
-* Action : générer l'API key/secret depuis le compte `cccp-education`, les
-  exporter en `GRADLE_PUBLISH_KEY`/`GRADLE_PUBLISH_SECRET`, puis relancer.
-* Caveat : `0.0.16` existe sur Central (contenu ancien), pas sur le Portal.
-  Pour une version identique par cible, bump `0.0.17` via MEMPHIS (DAG) avant
-  publication.
+* **`publishPlugins` BUILD SUCCESSFUL** avec les clés
+  `~/.gradle/gradle.properties` (`gradle.publish.key`/`secret`) — l'artefact
+  `plantuml-plugin 0.0.16` est **uploadé**. Aucune clé affichée/commitée.
+* **Première publication du groupe** : page publique encore « Plugin Not Found »
+  (revue manuelle Portal en attente) ; `/m2/` redirige encore vers Central.
+  Vérifier `https://plugins.gradle.org/plugin/education.cccp.plantuml` et le
+  `/m2/` avant de considérer la propagation terminée.
+* Caveat : `0.0.16` existe sur Central (contenu ancien) ; la version Portal
+  porte le HEAD (PLT-OUT-1/2). Pour une version identique par cible, bump
+  `0.0.17` via MEMPHIS (DAG) avant publication.
 
 == Mission Session 248 — PLT-OUT-3 (shield + langue)
 

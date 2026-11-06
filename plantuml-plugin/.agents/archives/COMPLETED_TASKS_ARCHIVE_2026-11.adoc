@@ -9,7 +9,7 @@
 - [x] Tests : unit (+14) + functional (3, vrai validateur) + BDD `@plantuml-notes` (+3 scénarios `@roundtrip`) ✅
 - [x] Smoke réel `/tmp` (build + contrats N0 + moteur PlantUML) : note quotée corrigée/valide, diagramme préservé, `\n` littéral restauré ✅
 - [x] **CI VERTE run `42143833102`** (commit `0f7bb05`) après corrections `d78c635` (moteur PlantUML au classpath functionalTest) et `0f7bb05` (contrat N0 : pas de `Success` blanc) ✅
-- [ ] **Publication Portal** : tentative `publishPlugins` refusée (`You are not the owner of group education.cccp`) — credentials locaux ≠ compte `cccp-education` ; aucune version publiée, action pilote (API key du compte `cccp-education`) à exécuter
+- [x] **Publication Portal** : `publishPlugins` **BUILD SUCCESSFUL** avec `~/.gradle/gradle.properties` (`gradle.publish.key`/`secret`) — artefact `plantuml-plugin 0.0.16` uploadé ; première publication du groupe en **revue manuelle** (page publique pas encore visible) ; aucune clé affichée/commitée ✅
 - [x] **CI shardée (< 5 min visé)** : 1 unit + lint, 2 functional shards, 7 BDD shards (`File Edge Cases` scindé par tags, garde `PlantumlCucumberShardCoverageTest`) + coverage mergée `kover-ic-*` ; TestKit aligné sur le wrapper 9.8.2 (fini le 9.4.1) ; cache `setup-gradle` (caches/wrapper/testkit) → **198 s (3m18) à chaud** (run `42151678129`), 319 s à froid ✅
 - [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 248 + TEST_COVERAGE + archive 2026-11 + BACKLOG + TODO + AGENTS racine ✅
 - [x] Gate local = Build (compile ×3 + `ktlintCheck` + `assemble` + `validatePlugins` + `publishToMavenLocal` VERT) ; zéro test local, zéro secret ✅

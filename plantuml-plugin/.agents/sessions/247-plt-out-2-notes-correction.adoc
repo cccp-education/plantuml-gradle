@@ -87,20 +87,24 @@ moteur PlantUML réel :
 
 * Cible (décision pilote 2026-11-05, rappelée par le pilote) : **Gradle Plugin
   Portal**, compte **`cccp-education`** — https://plugins.gradle.org/u/cccp-education.
-* Tentative `./gradlew publishPlugins --no-daemon` (2026-11-05) : **REFUSÉE** par
-  le Portal — `You are not the owner of group education.cccp`. Les credentials
-  `GRADLE_PUBLISH_KEY`/`GRADLE_PUBLISH_SECRET` présents localement ne sont pas
-  ceux du compte propriétaire du groupe. **Aucune version publiée.**
-* **Action pilote** : générer la clé API/secret depuis le compte
-  `cccp-education` (Portal → API Keys), les exporter en
-  `GRADLE_PUBLISH_KEY`/`GRADLE_PUBLISH_SECRET`, puis relancer
-  `./gradlew publishPlugins --no-daemon`.
+* Tentative 1 (env `GRADLE_PUBLISH_KEY`/`SECRET`) : **refusée** —
+  `You are not the owner of group education.cccp`. Ces clés ne sont pas celles
+  du compte propriétaire du groupe.
+* Tentative 2 (`configuration/settings/e3p0.yaml`, entrée `- gradle:` —
+  `Generated Key`, user `cheroliv-com`) : **`Unauthorized!`** — c'est une clé
+  Gradle Enterprise/Develocity, pas une clé du Plugin Portal.
+* Tentative 3 (`~/.gradle/gradle.properties`, `gradle.publish.key`/`secret` du
+  compte `cccp-education`) : **`publishPlugins` BUILD SUCCESSFUL** (2026-11-05).
+  L'artefact `plantuml-plugin 0.0.16` a été **uploadé** au Portal.
+  **Première publication du groupe** : la page publique
+  `https://plugins.gradle.org/plugin/education.cccp.plantuml` est encore
+  « Plugin Not Found » (revue manuelle Portal en attente — attendu pour un
+  premier claim) ; le `/m2/` redirige encore vers Maven Central. **Aucune clé
+  n'est affichée ni commitée.**
 * **Caveat version** : `0.0.16` existe déjà sur Maven Central (contenu plus
-  ancien) et n'existe pas sur le Portal. La première publication Portal de
-  `0.0.16` aurait donc un contenu différent de Central pour la même version.
-  Si le pilote veut une version strictement identique par cible, il faut un
-  bump `0.0.17` via le catalogue workspace MEMPHIS (DAG N0 → N2) avant de
-  publier.
+  ancien) ; la première publication Portal de `0.0.16` porte le contenu HEAD
+  (PLT-OUT-1/2). Pour une version strictement identique par cible, il faudrait
+  un bump `0.0.17` via le catalogue workspace MEMPHIS (DAG N0 → N2).
 
 == CI sharding (CNV-13.6 — budget < 5 min)
 
