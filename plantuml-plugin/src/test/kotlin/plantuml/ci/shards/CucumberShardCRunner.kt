@@ -13,7 +13,6 @@ import plantuml.ci.CucumberShardFeatures
 /** CI BDD shard C — i18n configuration, task descriptions, lifecycle, errors, boundary. */
 @Suite
 @IncludeEngines("cucumber")
-@SelectClasspathResource("features/15_i18n_language_switch.feature")
 @SelectClasspathResource("features/16_i18n_task_descriptions.feature")
 @SelectClasspathResource("features/17_i18n_lifecycle_messages.feature")
 @SelectClasspathResource("features/18_i18n_error_messages.feature")

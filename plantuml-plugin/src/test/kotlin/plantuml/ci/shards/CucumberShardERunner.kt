@@ -13,6 +13,8 @@ import plantuml.ci.CucumberShardFeatures
 /** CI BDD shard E — block status/correction, notes, term protection, corpus, syntax. */
 @Suite
 @IncludeEngines("cucumber")
+@SelectClasspathResource("features/15_i18n_language_switch.feature")
+@SelectClasspathResource("features/28_agent_loop.feature")
 @SelectClasspathResource("features/32_plantuml_block_status.feature")
 @SelectClasspathResource("features/33_plantuml_block_correction.feature")
 @SelectClasspathResource("features/34_plantuml_notes.feature")

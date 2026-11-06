@@ -18,7 +18,6 @@ import plantuml.ci.CucumberShardFeatures
 @SelectClasspathResource("features/25_provider_model_config.feature")
 @SelectClasspathResource("features/26_diagram_output_probe.feature")
 @SelectClasspathResource("features/27_plantuml_repair.feature")
-@SelectClasspathResource("features/28_agent_loop.feature")
 @SelectClasspathResource("features/29_plantuml_context.feature")
 @SelectClasspathResource("features/2_plantuml_processing.feature")
 @SelectClasspathResource("features/30_plantuml_provenance.feature")

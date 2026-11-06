@@ -33,7 +33,8 @@ Feature: Incremental Processing
     Given a prompt file with known content
     When I run generatePlantumlDiagrams task
     Then a checksum should be stored for the prompt
-    And on re-run, checksum should be compared
+    When I run generatePlantumlDiagrams task again
+    Then on re-run, checksum should be compared
     And processing should be skipped if checksum matches
 
   @incremental @force

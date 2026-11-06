@@ -25,8 +25,7 @@ object CucumberShardFeatures {
             "src/test/features/1_minimal.feature"
 
     const val SHARD_C_FEATURES =
-        "src/test/features/15_i18n_language_switch.feature," +
-            "src/test/features/16_i18n_task_descriptions.feature," +
+        "src/test/features/16_i18n_task_descriptions.feature," +
             "src/test/features/17_i18n_lifecycle_messages.feature," +
             "src/test/features/18_i18n_error_messages.feature," +
             "src/test/features/21_i18n_translation_boundary.feature"
@@ -37,14 +36,15 @@ object CucumberShardFeatures {
             "src/test/features/25_provider_model_config.feature," +
             "src/test/features/26_diagram_output_probe.feature," +
             "src/test/features/27_plantuml_repair.feature," +
-            "src/test/features/28_agent_loop.feature," +
             "src/test/features/29_plantuml_context.feature," +
             "src/test/features/2_plantuml_processing.feature," +
             "src/test/features/30_plantuml_provenance.feature," +
             "src/test/features/31_plantuml_context_wiring.feature"
 
     const val SHARD_E_FEATURES =
-        "src/test/features/32_plantuml_block_status.feature," +
+        "src/test/features/15_i18n_language_switch.feature," +
+            "src/test/features/28_agent_loop.feature," +
+            "src/test/features/32_plantuml_block_status.feature," +
             "src/test/features/33_plantuml_block_correction.feature," +
             "src/test/features/34_plantuml_notes.feature," +
             "src/test/features/35_plantuml_term_protection.feature," +
