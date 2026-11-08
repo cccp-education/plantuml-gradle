@@ -15,8 +15,8 @@ class ChecksumStore(
     private val checksumsDir: File,
 ) {
     init {
-        if (!checksumsDir.exists()) {
-            checksumsDir.mkdirs()
+        when {
+            !checksumsDir.exists() -> checksumsDir.mkdirs()
         }
     }
 

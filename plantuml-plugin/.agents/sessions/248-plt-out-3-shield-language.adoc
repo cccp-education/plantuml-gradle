@@ -56,7 +56,11 @@ frontière `plantuml.boundary` pure (zéro N0, zéro MEMPHIS, zéro tâche Gradl
 * `ktlintCheck`, `assemble`, `validatePlugins`, `publishToMavenLocal` VERTS.
 * Zéro test lancé en local (règle EAGER). Zéro secret. Zéro publication, zéro
   bump de version (release `0.0.17` = DAG MEMPHIS ultérieur, hors mission).
-* Preuve = CI verte du commit poussé.
+* **CI VERTE run `42536327290`** (commit `4becfdb`) — 11/11 jobs : `Unit + Lint`
+  (dont `SourceLanguageResidueTest`, bouclier +5, port +10, garde de partition
+  BDD), `Functional · B` (`PlantumlLanguageGuardFunctionalTest`), `BDD ·
+  e-repair` (`37_plantuml_language_guard.feature`, 6 scénarios), `Coverage
+  (merged)`. Preuve de la session acquise.
 
 == Prochaine session (249)
 

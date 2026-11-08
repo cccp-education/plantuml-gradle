@@ -28,6 +28,7 @@
 * Gates locaux (Local = Build) : compile ×3, `ktlintCheck`, `assemble`,
   `validatePlugins`, `publishToMavenLocal` VERTS. Zéro test local, zéro secret,
   zéro publication, zéro bump (release `0.0.17` = DAG MEMPHIS ultérieur).
+* **CI VERTE run `42536327290`** (commit `4becfdb`) — 11/11 jobs ✓.
 
 == Mission Session 249 — PLT-OUT-4 (preuve corpus)
 
