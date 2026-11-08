@@ -1,5 +1,30 @@
 = Historique des Sessions
 
+== Session 248 (2026-11-05) — PLT-OUT-3 : shield + langue ✅
+
+Deux invariants rendus impossibles (EPIC PLT-I18N-OUTPUT, 3/4 US) : un placeholder
+`__PLT<n>__` perdu n'est **jamais** écrit, et un label resté dans la langue source
+n'est **jamais** déclaré `TRANSLATED`. Domaine pur `plantuml.boundary.SourceLanguageResidue`
+(déterministe, aucun LLM : diacritiques français non ambigus + lexique non ambigu +
+ratio de mots-outils ≥ 0,30 ; placeholders ignorés ; `fr-FR` normalisé ; profils
+indexés par langue, seul `fr` livré — une autre source n'est jamais flaggée ; évidence
+`word:…`/`ratio:n/m`/`diacritic:…`). `PlantumlTermShield.leaksPlaceholder` +
+`introducesPlaceholder(translated, source)` (un fournisseur peut inventer un
+placeholder sur un label non bouclé, invisible du chemin `restore`). Le port applique
+la garde sur **toutes** les surfaces (labels quotés/directives, notes, prose non
+quotée), avec un retry **borné** (`maxTranslationAttempts` défaut 2, plancher 1 ;
+aucune re-tentative sur échec fournisseur ou placeholder perdu), abandonne un lot
+dont une partie est résiduelle au profit du chemin par label, et préserve le bloc si
+un placeholder a été introduit (défense en profondeur). Biais assumé : préférer
+`PRESERVE` à un faux `TRANSLATED` ; gate corpus inchangée (syntaxe ≠ langue).
+Tests : 17 unit (`SourceLanguageResidueTest`) + 5 unit (bouclier) + 10 unit (port) +
+3 functional (vrai `PlantumlSyntaxValidatorAdapter`) + BDD `@plantuml-language`
+(6 scénarios) intégrée au **shard E** (partition exhaustive gardée). Cadrage
+`.agents/CADRAGE_PLT_OUT_3_SHIELD_LANGUE.adoc`. Gates locaux (Local = Build) :
+compile ×3, `ktlintCheck`, `assemble`, `validatePlugins`, `publishToMavenLocal`
+VERTS ; zéro test local, zéro secret, zéro publication, zéro bump. Rapport
+`.agents/sessions/248-plt-out-3-shield-language.adoc`.
+
 == Session 247 (2026-11-05) — PLT-OUT-2 : notes couvertes et correction avant écriture ✅
 
 Le `PlantumlNoteExtractor` couvre la note flottante **quotée** `note "text" as N` :

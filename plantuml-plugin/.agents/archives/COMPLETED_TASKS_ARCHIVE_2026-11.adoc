@@ -1,5 +1,20 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-11
 
+== Session 248 (2026-11-05) — PLT-OUT-3 : shield + langue ✅
+
+=== Fait
+- [x] Domaine pur `plantuml.boundary.SourceLanguageResidue` — détection déterministe (sans LLM) d'un texte resté dans la langue source : diacritiques français non ambigus, lexique non ambigu, ratio de mots-outils ≥ 0,30 ; placeholders ignorés ; `fr-FR` normalisé ; profils indexés par langue (seul `fr`) ; évidence stable `word:`/`ratio:n/m`/`diacritic:` ✅
+- [x] `PlantumlTermShield.leaksPlaceholder` + `introducesPlaceholder(translated, source)` — un placeholder inventé sur un label non bouclé est détecté (invisible du chemin `restore`) ✅
+- [x] `PlantumlTranslationPortAdapter` — garde langue sur labels/notes/prose, retry borné `maxTranslationAttempts` (défaut 2, plancher 1, pas de retry sur échec/placeholder perdu), lot résiduel → repli par label, gate finale de fuite de placeholder → `PRESERVED` ✅
+- [x] Tests : 17 unit (`SourceLanguageResidueTest`) + 5 unit (bouclier) + 10 unit (port) + 3 functional (vrai validateur PlantUML) + BDD `@plantuml-language` (6 scénarios) dans le shard E ✅
+- [x] Cadrage `.agents/CADRAGE_PLT_OUT_3_SHIELD_LANGUE.adoc` (D1→D8 : surfaces, seuil, faux positifs, biais PRESERVE > faux TRANSLATED, gate corpus inchangée) ✅
+- [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 249 + TEST_COVERAGE + archive 2026-11 + BACKLOG + TODO + AGENTS racine ✅
+- [x] Gate local = Build (compile ×3 + `ktlintCheck` + `assemble` + `validatePlugins` + `publishToMavenLocal` VERT) ; zéro test local, zéro secret, zéro publication, zéro bump ✅
+
+=== Prochaine session (249)
+- **PLT-OUT-4** : preuve corpus (reprise ciblée des 69 blocs EN S-076 pilotée par la gate, zéro `@startuml` brut dans le HTML baké hors `[source,plantuml]`)
+- **Fichier à lire en priorité** : `BACKLOG.adoc` § PLT-I18N-OUTPUT + `PROMPT_REPRISE.adoc`
+
 == Session 247 (2026-11-05) — PLT-OUT-2 : notes couvertes et correction avant écriture ✅
 
 === Fait

@@ -548,6 +548,7 @@ val functionalTestShardB =
         includeTestsMatching("plantuml.CollectAugmentedContextFunctionalTest")
         includeTestsMatching("plantuml.GenerateAugmentedContextWiringFunctionalTest")
         includeTestsMatching("plantuml.PlantumlNoteTranslationFunctionalTest")
+        includeTestsMatching("plantuml.PlantumlLanguageGuardFunctionalTest")
         includeTestsMatching("plantuml.ValidatePlantumlCorpusFunctionalTest")
         includeTestsMatching("plantuml.PlantumlTermProtectionFunctionalTest")
         includeTestsMatching("plantuml.PreflightPlantumlDescriptionFunctionalTest")

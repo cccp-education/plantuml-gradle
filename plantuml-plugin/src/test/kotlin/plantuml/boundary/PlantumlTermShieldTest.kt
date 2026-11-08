@@ -140,4 +140,37 @@ class PlantumlTermShieldTest {
         assertEquals(listOf("getUser()", "call(x)"), shielded.terms)
         assertEquals("Call __PLT0__ and __PLT1__", shielded.text)
     }
+
+    // ── PLT-OUT-3 — a placeholder is never written ──────────────────────────
+
+    @Test
+    fun `a translated text without a placeholder does not leak`() {
+        assertFalse(PlantumlTermShield.leaksPlaceholder("The type integer is used"))
+    }
+
+    @Test
+    fun `a leftover placeholder is detected`() {
+        assertTrue(PlantumlTermShield.leaksPlaceholder("Hello __PLT0__"))
+        assertTrue(PlantumlTermShield.leaksPlaceholder("x __PLT12__ y"))
+    }
+
+    @Test
+    fun `a provider-invented placeholder is an introduction`() {
+        assertTrue(PlantumlTermShield.introducesPlaceholder("Hello __PLT0__", "Bonjour"))
+    }
+
+    @Test
+    fun `a placeholder already present in the source is not an introduction`() {
+        assertFalse(PlantumlTermShield.introducesPlaceholder("__PLT0__ kept", "__PLT0__ kept"))
+    }
+
+    @Test
+    fun `a fully restored text introduces nothing`() {
+        assertFalse(
+            PlantumlTermShield.introducesPlaceholder(
+                "The type integer is used",
+                "Le type __PLT0__ est utilisé",
+            ),
+        )
+    }
 }

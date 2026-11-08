@@ -151,6 +151,29 @@ class PlantumlTermShield(
         fun placeholder(index: Int): String = "__PLT${index}__"
 
         /**
+         * True when [text] still carries a shield placeholder.
+         *
+         * PLT-OUT-3 — a placeholder is an internal marker, never a diagram token:
+         * a text that still holds one must never be published.
+         */
+        fun leaksPlaceholder(text: String): Boolean = PLACEHOLDER.containsMatchIn(text)
+
+        /**
+         * True when [translated] carries a placeholder the [source] did not have.
+         *
+         * Defense in depth: a provider may invent a placeholder-shaped token for a
+         * label the shield did not touch at all (no term to restore, so the restore
+         * path has nothing to check). Such a block is preserved, never published.
+         */
+        fun introducesPlaceholder(
+            translated: String,
+            source: String,
+        ): Boolean {
+            val sourcePlaceholders = PLACEHOLDER.findAll(source).map { it.value }.toSet()
+            return PLACEHOLDER.findAll(translated).any { it.value !in sourcePlaceholders }
+        }
+
+        /**
          * Primitive/type names that are code in a diagram, never prose. Common
          * words that are also keywords (`class`, `object`, `return`…) are
          * deliberately absent: shielding them would break a prose sentence.

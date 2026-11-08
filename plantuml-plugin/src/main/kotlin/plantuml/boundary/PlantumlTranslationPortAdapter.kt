@@ -36,13 +36,23 @@ import plantuml.repair.PlantumlNoteExtractor
  * @param validator optional N0 syntax validator — when present, a translated
  *   block that no longer parses is **rejected** (the source block is preserved,
  *   D5/US-3): a translation must never produce an unrenderable diagram
+ * @param maxTranslationAttempts bounded provider attempts per surface (PLT-OUT-3):
+ *   a residue in the source language triggers one retry, then the source is
+ *   preserved — never an unbounded loop, never a false `TRANSLATED`
  */
 class PlantumlTranslationPortAdapter(
     private val translator: TranslationService,
     private val classifier: PlantUmlClassifier = PlantUmlClassifier(),
     private val validator: PlantUmlSyntaxValidator? = null,
     private val termShield: PlantumlTermShield = PlantumlTermShield(),
+    private val maxTranslationAttempts: Int = 2,
 ) : PlantUmlTranslationPort {
+    init {
+        require(maxTranslationAttempts >= 1) {
+            "maxTranslationAttempts must be at least 1 (got $maxTranslationAttempts)"
+        }
+    }
+
     override fun translate(request: PlantUmlTranslationRequest): PlantUmlTranslationOutcome {
         val block = request.block
         val labels = block.labels()
@@ -150,12 +160,18 @@ class PlantumlTranslationPortAdapter(
 
         return if (changed) {
             val translated = block.copy(raw = raw)
-            // US-3 — round-trip gate (D5): a translated block that no longer
-            // parses must NOT be published. The source block is preserved.
-            if (validator != null && validator.validate(translated.raw) is SyntaxValidationResult.Invalid) {
-                PlantUmlTranslationOutcome.Preserved("translation breaks PlantUML syntax — source block preserved")
-            } else {
-                PlantUmlTranslationOutcome.Translated(translated)
+            when {
+                // PLT-OUT-3 — a placeholder is an internal marker, never a diagram
+                // token. A provider can invent one for a label the shield did not
+                // touch (nothing to restore, so the restore path cannot see it);
+                // such a block is preserved as defense in depth.
+                PlantumlTermShield.introducesPlaceholder(raw, block.raw) ->
+                    PlantUmlTranslationOutcome.Preserved("placeholder leak — source block preserved")
+                // US-3 — round-trip gate (D5): a translated block that no longer
+                // parses must NOT be published. The source block is preserved.
+                validator != null && validator.validate(translated.raw) is SyntaxValidationResult.Invalid ->
+                    PlantUmlTranslationOutcome.Preserved("translation breaks PlantUML syntax — source block preserved")
+                else -> PlantUmlTranslationOutcome.Translated(translated)
             }
         } else {
             PlantUmlTranslationOutcome.Preserved("no label changed (PRESERVE / provider failure)")
@@ -192,7 +208,14 @@ class PlantumlTranslationPortAdapter(
                         .mapNotNull { (label, part) ->
                             termShield.restore(part, shields.getValue(label))?.let { label to it }
                         }.toMap()
-                if (restored.size == translatable.size) return restored
+                // PLT-OUT-3 — a batch that left a label in the source language is
+                // not accepted: the per-label path below applies the residue gate
+                // and the bounded retry, so a false `TRANSLATED` is impossible.
+                val residue =
+                    restored.values.any {
+                        SourceLanguageResidue.detect(it, request.sourceLanguage, request.targetLanguage).detected
+                    }
+                if (restored.size == translatable.size && !residue) return restored
             }
         }
         return translatable
@@ -206,6 +229,10 @@ class PlantumlTranslationPortAdapter(
      * restores the tokens. A fully shielded text (code only) is returned as-is —
      * no provider call, no metered cost. A lost placeholder returns `null` so the
      * caller preserves the source label (never a corrupted diagram).
+     *
+     * PLT-OUT-3 — when the provider leaves the text in the source language, the
+     * call is retried up to [maxTranslationAttempts] times; after the bound the
+     * source is preserved (never a false `TRANSLATED`, never an infinite loop).
      */
     private fun translateProtected(
         text: String,
@@ -214,8 +241,17 @@ class PlantumlTranslationPortAdapter(
         if (text.isBlank()) return null
         val shield = termShield.shield(text)
         if (shield.isFullyShielded) return text
-        val translated = translateLabel(shield.text, request.sourceLanguage, request.targetLanguage) ?: return null
-        return termShield.restore(translated, shield)
+        var attempt = 0
+        while (attempt < maxTranslationAttempts) {
+            attempt++
+            // A provider failure or a lost placeholder preserves the source right
+            // away: only a source-language residue is worth one bounded retry.
+            val translated = translateLabel(shield.text, request.sourceLanguage, request.targetLanguage) ?: return null
+            val restored = termShield.restore(translated, shield) ?: return null
+            if (SourceLanguageResidue.detect(restored, request.sourceLanguage, request.targetLanguage).detected) continue
+            return restored
+        }
+        return null
     }
 
     private fun translateLabel(

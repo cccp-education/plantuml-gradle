@@ -1,6 +1,34 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 247 (5 novembre 2026) — PLT-OUT-2 (notes)
+_Dernière mise à jour_ : Session 248 (5 novembre 2026) — PLT-OUT-3 (shield + langue)
+
+=== Session 248 — PLT-OUT-3 (shield + langue)
+
+* **+** `SourceLanguageResidueTest` (17 unit : label FR court, diacritique,
+  phrase à mots-outils, activité, anglais non flaggé, mot ambigu `Service`,
+  `comment`/`pour` anglais non flaggés, placeholders ignorés, source sans
+  profil, cible française, tags régionaux `fr-FR`/`en-US`, évidence stable,
+  texte blanc).
+* **+** `PlantumlTermShieldTest` (+5 unit : `leaksPlaceholder` (index
+  quelconque), `introducesPlaceholder` (inventé vs présent dans la source),
+  texte restauré sans introduction).
+* **+** `PlantumlTranslationPortAdapterTest` (+10 unit : label FR préservé,
+  résidu prose préservé sans bloquer la surface saine, retry récupère,
+  retry borné s'arrête, borne configurable + validation, cible française non
+  flaggée, placeholder inventé ⇒ bloc `PRESERVED`, placeholder perdu sur note,
+  lot résiduel → repli par label).
+* **+** `PlantumlLanguageGuardFunctionalTest` (3 functional, **vrai**
+  `PlantumlSyntaxValidatorAdapter` : résidu ⇒ préservé + source valide, bloc
+  mixte label/note ⇒ traduit sans `__PLT` et valide, retry récupère ⇒ valide).
+* **+** BDD `37_plantuml_language_guard.feature` (6 scénarios
+  `@plantuml-language`) + `PlantumlLanguageGuardSteps` (préfixes
+  `language guard`, anti-collision S-088) — enregistrée dans **shard E**
+  (`CucumberShardFeatures` + `CucumberShardERunner`).
+* Couverture des branches : profil présent/absent, source==cible, mots
+  forts/ratio/diacritiques, placeholder ignoré, retry 1→N, échec fournisseur
+  et placeholder perdu sans retry, fuite de placeholder au niveau bloc.
+* Local = Build (compile ×3 + `ktlintCheck` + `assemble` + `validatePlugins` +
+  `publishToMavenLocal` VERT) ; preuve = CI du commit poussé.
 
 === Session 247 — PLT-OUT-2 (notes couvertes et correction avant écriture)
 

@@ -1,0 +1,81 @@
+= Session 248 — PLT-OUT-3 : shield + langue
+:session: 248
+:date: 2026-11-05
+:type: feat + test (DDD/TDD/BDD)
+:epic: PLT-I18N-OUTPUT (3/4)
+
+== Mission
+
+Deuxième incrément actionnable de `PLT-I18N-OUTPUT` après la gate de corpus
+(PLT-OUT-1 ✅ S-246) et les notes (PLT-OUT-2 ✅ S-247). Rendre **impossibles**
+deux faux verts mesurés sur cheroliv.com :
+
+. un placeholder `__PLT<n>__` perdu par le fournisseur pouvait être écrit ;
+. un label resté en français pouvait être déclaré `TRANSLATED`.
+
+== Cadrage (`.agents/CADRAGE_PLT_OUT_3_SHIELD_LANGUE.adoc`)
+
+Décisions : préservation **par surface** (label/note/prose) + gate de fuite de
+placeholder au niveau du bloc ; détecteur de résidu **déterministe sans LLM**
+(diacritiques français non ambigus + lexique non ambigu + ratio de mots-outils
+≥ 0,30) ; biais assumé **préférer `PRESERVE` à un faux `TRANSLATED`** ; profil
+indexé par langue source (seul `fr` livré, une autre source ne déclenche rien) ;
+**retry borné à 2 tentatives** ; gate corpus **inchangée** (syntaxe ≠ langue) ;
+frontière `plantuml.boundary` pure (zéro N0, zéro MEMPHIS, zéro tâche Gradle).
+
+== Livré (baby-step DDD/TDD/BDD)
+
+. **Domaine pur `SourceLanguageResidue`** (`plantuml.boundary`) — `detect(text,
+  source, target): LanguageResidue(detected, evidence)`. Normalise `fr-FR` →
+  `fr`, ignore les placeholders, retourne une évidence stable (`word:…`,
+  `ratio:n/m`, `diacritic:…`). 17 unit.
+. **Invariants placeholder sur `PlantumlTermShield`** — `leaksPlaceholder`
+  et `introducesPlaceholder(translated, source)` (un fournisseur peut
+  *inventer* un placeholder sur un label que le bouclier n'a pas touché : le
+  chemin `restore` ne peut pas le voir). 5 unit.
+. **Câblage `PlantumlTranslationPortAdapter`** — garde langue dans
+  `translateProtected` (labels, notes, prose), rejet du lot si une partie est
+  résiduelle (repli par label pour porter le retry borné), gate finale
+  `introducesPlaceholder` → `Preserved("placeholder leak …")`, paramètre
+  `maxTranslationAttempts` (défaut 2, plancher 1), aucune re-tentative sur un
+  échec fournisseur ou un placeholder perdu (sémantique préservée). 10 unit.
+. **Functional** (`PlantumlLanguageGuardFunctionalTest`, vrai
+  `PlantumlSyntaxValidatorAdapter`) — résidu ⇒ bloc préservé et source valide ;
+  bloc mixte (label traduit + note résiduelle) ⇒ `Translated`, zéro `__PLT`,
+  bloc valide ; retry borné qui récupère ⇒ bloc valide.
+. **BDD `@plantuml-language`** (`37_plantuml_language_guard.feature`, 6
+  scénarios + `PlantumlLanguageGuardSteps` préfixés) — label court resté
+  français, label accentué, retry récupère, retry s'arrête, source EN→FR non
+  flaggée, placeholder inventé jamais écrit. Enregistrée dans le **shard E**
+  (`CucumberShardFeatures` + `CucumberShardERunner`) — partition exhaustive et
+  disjointe préservée (38 features, 37 assignées + `10_file_edge_cases` A1).
+
+== Gates locaux (Local = Build, Tests = CI)
+
+* `compileKotlin`, `compileTestKotlin`, `compileFunctionalTestKotlin` VERT.
+* `ktlintCheck`, `assemble`, `validatePlugins`, `publishToMavenLocal` VERTS.
+* Zéro test lancé en local (règle EAGER). Zéro secret. Zéro publication, zéro
+  bump de version (release `0.0.17` = DAG MEMPHIS ultérieur, hors mission).
+* Preuve = CI verte du commit poussé.
+
+== Prochaine session (249)
+
+**PLT-OUT-4** — preuve corpus : reprise ciblée des 69 blocs EN mesurés S-076
+pilotée par la gate, zéro `@startuml` brut dans le HTML baké (hors
+`[source,plantuml]`). Le détecteur `SourceLanguageResidue` peut être consommé
+côté rapport de corpus (mesure, pas de couplage bloquant).
+
+== Fichiers
+
+* `src/main/kotlin/plantuml/boundary/SourceLanguageResidue.kt` (nouveau)
+* `src/main/kotlin/plantuml/boundary/PlantumlTermShield.kt`
+* `src/main/kotlin/plantuml/boundary/PlantumlTranslationPortAdapter.kt`
+* `src/test/kotlin/plantuml/boundary/SourceLanguageResidueTest.kt` (nouveau)
+* `src/test/kotlin/plantuml/boundary/PlantumlTermShieldTest.kt`
+* `src/test/kotlin/plantuml/boundary/PlantumlTranslationPortAdapterTest.kt`
+* `src/functionalTest/kotlin/plantuml/PlantumlLanguageGuardFunctionalTest.kt` (nouveau)
+* `src/test/features/37_plantuml_language_guard.feature` (nouveau)
+* `src/test/scenarios/plantuml/scenarios/PlantumlLanguageGuardSteps.kt` (nouveau)
+* `src/test/kotlin/plantuml/ci/CucumberShardFeatures.kt`
+* `src/test/kotlin/plantuml/ci/shards/CucumberShardERunner.kt`
+* `.agents/CADRAGE_PLT_OUT_3_SHIELD_LANGUE.adoc` (nouveau)

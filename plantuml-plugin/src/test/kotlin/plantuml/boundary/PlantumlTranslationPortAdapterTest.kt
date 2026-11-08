@@ -409,4 +409,164 @@ class PlantumlTranslationPortAdapterTest {
         assertTrue(raw.contains("\"B\""), raw)
         assertEquals(3, calls.size, "one batch attempt then two per-label calls")
     }
+
+    // ── PLT-OUT-3 — source-language residue + bounded retry + placeholder leak ──
+
+    @Test
+    fun `a label left in French is never accepted as translated`() {
+        val adapter = port(mapOf("Utilisateur" to "Utilisateur."))
+        val block = PlantUmlBlock("@startuml\nclass \"Utilisateur\"\n@enduml")
+
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+
+        assertTrue(outcome is PlantUmlTranslationOutcome.Preserved)
+    }
+
+    @Test
+    fun `a French residue prose label preserves only that surface`() {
+        val adapter =
+            port(
+                mapOf(
+                    "Utilisateur" to "User",
+                    "Créer le fichier" to "Créer le fichier.",
+                ),
+            )
+        val block = PlantUmlBlock("@startuml\nclass \"Utilisateur\"\nA -> B : Créer le fichier\n@enduml")
+
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+
+        val raw = (outcome as PlantUmlTranslationOutcome.Translated).block.raw
+        assertTrue(raw.contains("class \"User\""), raw)
+        assertTrue(raw.contains("A -> B : Créer le fichier"), raw)
+    }
+
+    @Test
+    fun `a residue triggers one bounded retry then accepts the translation`() {
+        val calls = mutableListOf<String>()
+        val translator =
+            object : TranslationService {
+                override fun translate(request: TranslationRequest): TranslationResult {
+                    calls += request.sourceText
+                    return if (calls.size == 1) {
+                        TranslationResult.Success("Créer le fichier.")
+                    } else {
+                        TranslationResult.Success("Create the file")
+                    }
+                }
+            }
+        val block = PlantUmlBlock("@startuml\nA -> B : Créer le fichier\n@enduml")
+
+        val outcome =
+            PlantumlTranslationPortAdapter(translator)
+                .translate(PlantUmlTranslationRequest(block, "fr", "en"))
+
+        val raw = (outcome as PlantUmlTranslationOutcome.Translated).block.raw
+        assertTrue(raw.contains("A -> B : Create the file"), raw)
+        assertEquals(2, calls.size, "one attempt then one bounded retry")
+    }
+
+    @Test
+    fun `a permanent residue preserves the source after the bounded retries`() {
+        var calls = 0
+        val translator =
+            object : TranslationService {
+                override fun translate(request: TranslationRequest): TranslationResult {
+                    calls++
+                    return TranslationResult.Success("Le fichier est prêt.")
+                }
+            }
+        val block = PlantUmlBlock("@startuml\nA -> B : Le fichier est prêt\n@enduml")
+
+        val outcome =
+            PlantumlTranslationPortAdapter(translator)
+                .translate(PlantUmlTranslationRequest(block, "fr", "en"))
+
+        assertTrue(outcome is PlantUmlTranslationOutcome.Preserved)
+        assertEquals(2, calls, "the retry is bounded, never infinite")
+    }
+
+    @Test
+    fun `the retry bound is configurable and validated`() {
+        var calls = 0
+        val translator =
+            object : TranslationService {
+                override fun translate(request: TranslationRequest): TranslationResult {
+                    calls++
+                    return TranslationResult.Success("Le fichier")
+                }
+            }
+        val block = PlantUmlBlock("@startuml\nA -> B : Le fichier\n@enduml")
+
+        PlantumlTranslationPortAdapter(translator, maxTranslationAttempts = 3)
+            .translate(PlantUmlTranslationRequest(block, "fr", "en"))
+
+        assertEquals(3, calls)
+        org.junit.jupiter.api.assertThrows<IllegalArgumentException> {
+            PlantumlTranslationPortAdapter(translator, maxTranslationAttempts = 0)
+        }
+    }
+
+    @Test
+    fun `a French target text is never mistaken for a residue`() {
+        val adapter = port(mapOf("Create the file" to "Créer le fichier"))
+        val block = PlantUmlBlock("@startuml\nA -> B : Create the file\n@enduml")
+
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "en", "fr"))
+
+        val raw = (outcome as PlantUmlTranslationOutcome.Translated).block.raw
+        assertTrue(raw.contains("A -> B : Créer le fichier"), raw)
+    }
+
+    @Test
+    fun `a provider-invented placeholder on an unshielded label preserves the block`() {
+        val adapter = port(mapOf("Bonjour" to "Hello __PLT0__"))
+        val block = PlantUmlBlock("@startuml\nclass \"Bonjour\"\n@enduml")
+
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+
+        assertTrue(outcome is PlantUmlTranslationOutcome.Preserved)
+        assertTrue((outcome as PlantUmlTranslationOutcome.Preserved).reason.contains("placeholder"))
+    }
+
+    @Test
+    fun `a dropped placeholder on a note preserves the note and translates the label`() {
+        val adapter =
+            port(
+                mapOf(
+                    "Utilisateur" to "User",
+                    "Le type __PLT0__ est utilisé" to "The type is used",
+                ),
+            )
+        val block =
+            PlantUmlBlock(
+                "@startuml\nclass \"Utilisateur\"\nnote right: Le type integer est utilisé\n@enduml",
+            )
+
+        val outcome = adapter.translate(PlantUmlTranslationRequest(block, "fr", "en"))
+
+        val raw = (outcome as PlantUmlTranslationOutcome.Translated).block.raw
+        assertTrue(raw.contains("class \"User\""), raw)
+        assertTrue(raw.contains("note right: Le type integer est utilisé"), raw)
+        assertTrue(!raw.contains("__PLT"), "a placeholder must never be written: $raw")
+    }
+
+    @Test
+    fun `a batch that leaves French labels falls back to the bounded per-label path`() {
+        val calls = mutableListOf<String>()
+        val echoing =
+            object : TranslationService {
+                override fun translate(request: TranslationRequest): TranslationResult {
+                    calls += request.sourceText
+                    return TranslationResult.Success(request.sourceText)
+                }
+            }
+        val block = PlantUmlBlock("@startuml\nclass \"Utilisateur\"\nclass \"Connexion\"\n@enduml")
+
+        val outcome =
+            PlantumlTranslationPortAdapter(echoing)
+                .translate(PlantUmlTranslationRequest(block, "fr", "en"))
+
+        assertTrue(outcome is PlantUmlTranslationOutcome.Preserved)
+        assertEquals(5, calls.size, "one batch attempt then two bounded per-label paths")
+    }
 }

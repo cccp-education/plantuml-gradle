@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-11-05 (Session 247 — **PLT-OUT-2** : notes couvertes et correction avant écriture — note flottante quotée, `escapeQuotes` idempotent, traduction blanche refusée par le contrat N0, round-trip note `PRESERVE` ; unit + functional (vrai validateur) + BDD `@plantuml-notes`. Historique : S-246 PLT-OUT-1 ✅, S-235 PLT-CONTEXT ✅ 4/4, S-230 PLT-AGENT ✅ 7/7.)
+:last_update: 2026-11-05 (Session 248 — **PLT-OUT-3** : shield + langue — `SourceLanguageResidue` déterministe sans LLM, garde sur labels/notes/prose, retry borné 2, gate finale de fuite de placeholder, BDD `@plantuml-language`. Historique : S-247 PLT-OUT-2 ✅, S-246 PLT-OUT-1 ✅, S-235 PLT-CONTEXT ✅ 4/4, S-230 PLT-AGENT ✅ 7/7.)
 
 '''
 
@@ -158,7 +158,7 @@ garde anti-drift local↔CI préservée.
 *Dépend de* : `plantuml-contracts` (N0 ✅ 0.0.1). *Relie* : `PLT-DIAGRAM-OWNERSHIP`,
 `PLT-CR3-2` (`DiagramOutputProbe` ✅).
 
-== 🟡 EPIC PLT-I18N-OUTPUT — Le validateur de syntaxe devient une gate de corpus (EN COURS S-247, 2/4 US)
+== 🟡 EPIC PLT-I18N-OUTPUT — Le validateur de syntaxe devient une gate de corpus (EN COURS S-248, 3/4 US)
 
 *Source* : revue externe `foundry/public/bakery-gradle/bakery-plugin/.agents/i18n_review.adoc`
 (S-263) ; mesure cheroliv.com S-077 (`diagram-count-drift` 125, 69 blocs EN
@@ -202,7 +202,7 @@ validation + version). document/bakery ne réimplémentent rien.
   PRESERVE ; un label court resté français est détecté (pas de faux `TRANSLATED`) ;
   retry borné, jamais infini
 | 2
-| 🟡 À FAIRE
+| ✅ TERMINÉ S-248 — `plantuml.boundary.SourceLanguageResidue` (déterministe, sans LLM : diacritiques FR non ambigus + lexique non ambigu + ratio de mots-outils ≥ 0,30 ; placeholders ignorés ; profils indexés par langue, seul `fr`) + `PlantumlTermShield.leaksPlaceholder`/`introducesPlaceholder` + port (garde labels/notes/prose, `maxTranslationAttempts` défaut 2 plancher 1, lot résiduel → repli par label, gate finale de fuite → `PRESERVED`). 17 unit + 5 unit + 10 unit + 3 functional (vrai validateur) + BDD `@plantuml-language` 6 scénarios (shard E). Cadrage `.agents/CADRAGE_PLT_OUT_3_SHIELD_LANGUE.adoc`. Rapport `.agents/sessions/248-plt-out-3-shield-language.adoc`
 
 | PLT-OUT-4
 | **Preuve corpus** — reprise ciblée des blocs résiduels S-076 (69 EN) pilotée par

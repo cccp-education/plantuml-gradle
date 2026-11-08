@@ -1,0 +1,109 @@
+= Cadrage — PLT-OUT-3 Shield + langue
+:session: 248
+:date: 2026-11-05
+:statut: 🟡 EN COURS
+
+== Objet
+
+Deuxième incrément actionnable de l'EPIC `PLT-I18N-OUTPUT` (PLT-OUT-1 gate
+corpus ✅ S-246, PLT-OUT-2 notes ✅ S-247). Deux invariants à rendre
+**impossibles à violer**, pas seulement « probables » :
+
+. **Aucun placeholder `__PLT<n>__` n'est jamais écrit** dans un diagramme
+   publié — sur **toutes** les surfaces de traduction (labels quotés, notes,
+   prose non quotée).
+. **Aucun bloc n'est déclaré `TRANSLATED` avec un label encore dans la langue
+   source** (faux vert mesuré cheroliv.com : résidus FR dans les `alt`/labels).
+
+== Surfaces couvertes (état réel du port)
+
+[cols="2,3,2", options="header"]
+|===
+| Surface | Extracteur | Traduction
+| Labels quotés + directives | `PlantUmlBlock.labels()` (N0) | batch `PlantumlLabelBatch` / repli par label
+| Notes (`note … : …`, `note "…" as N`, `note … end note`) | `PlantumlNoteExtractor` | `translateProtected` (bouclier)
+| Prose non quotée (séquence, activité, état, use case, mindmap) | `PlantumlProseLabelExtractor` | `translateProtected` (bouclier)
+|===
+
+Le bouclier `PlantumlTermShield` est déjà appliqué partout (S-244). Ce qui
+manque n'est pas le bouclier : c'est le **verdict** sur son résultat et sur la
+langue de sortie.
+
+== Décisions
+
+[cols="1,4", options="header"]
+|===
+| # | Décision
+
+| D1
+| **Placeholder perdu ⇒ surface préservée**, pas bloc entier : le label/la
+  note/la prose dont le placeholder a été perdu garde sa source, les autres
+  surfaces du même bloc peuvent être traduites. L'invariant dur reste
+  *« aucun `__PLT` en sortie »* ; la gate de fin de bloc (`introducesPlaceholder`)
+  transforme une fuite résiduelle en `PRESERVED` (défense en profondeur).
+| D2
+| **Détecteur de résidu déterministe, sans LLM** (`SourceLanguageResidue`) :
+  diacritiques spécifiques au français + lexique de mots français non ambigus
+  + ratio de mots-outils. Aucun appel provider, aucun coût.
+| D3
+| **Biais assumé : préférer `PRESERVE` à un faux `TRANSLATED`.** Un faux
+  positif (ex. `café` emprunté en anglais) préserve la source — sortie sûre,
+  jamais corrompue. Le détecteur ne s'applique **que** `source=fr` et
+  `target≠fr` (une cible française est légitime).
+| D4
+| **Profil par langue source extensible** : la table de marqueurs est indexée
+  par code langue ; seul `fr` est livré. Une autre source (`en`, `es`…) ne
+  déclenche rien — pas de faux positif faute de lexique.
+| D5
+| **Retry borné = 2 tentatives** (`maxTranslationAttempts` par défaut) : une
+  seule re-invocation quand le résidu est détecté, puis `PRESERVE`. Jamais
+  infini, jamais un coût LLM non borné. Paramètre de constructeur pour la
+  testabilité, plancher `1`. Un lot (`PlantumlLabelBatch`) contenant **un seul**
+  label résiduel est abandonné au profit du chemin par label (qui porte le
+  retry borné) : correction exacte plutôt que lot partiellement faux.
+| D6
+| **Gate corpus inchangée** : `validatePlantumlCorpus` (PLT-OUT-1) reste une
+  gate **syntaxique**. La langue est orthogonale à la syntaxe (un bloc
+  français est syntaxiquement valide). PLT-OUT-4 (preuve corpus) consommera
+  le détecteur pour mesurer les 69 blocs EN résiduels — pas de couplage
+  aujourd'hui.
+| D7
+| **Frontière** : tout vit dans `plantuml.boundary` (domaine pur). Zéro
+  modification N0, zéro nouveau contrat MEMPHIS, zéro tâche Gradle.
+| D8
+| **Méthode** : baby-step DDD/TDD/BDD — unit (détecteur, bouclier, port),
+  functional (port + validateur PlantUML réel), BDD `@plantuml-language`
+  (shard E). Local = Build, Tests = CI.
+|===
+
+== Seuil et faux positifs (D2/D3)
+
+* **Diacritiques français non ambigus** : `ç œ æ ê ë î ï ô û ù` + `é è à`
+  (ces trois derniers sont aussi espagnols, mais la source est `fr` par
+  hypothèse — un résidu français les porte dans l'immense majorité des cas).
+* **Mots français non ambigus** (forme non anglaise, sans accent) :
+  `utilisateur(s)`, `fichier(s)`, `parametre(s)`, `gestion`, `connexion`,
+  `recherche`, `requete(s)`, `reponse(s)`, `erreur(s)`, `systeme(s)`,
+  `sauvegarde`, `chargement`, `enregistrement`, `traitement`, `ajout`,
+  `affichage`, `afficher`, `supprimer`, `modifier`, `valider`, `envoyer`,
+  `recevoir`.
+* **Mots-outils** (ratio ≥ 0,30 sur ≥ 2 tokens) : `le la les un une des du
+  de et ou où pour avec dans sur sous par au aux ce cet cette ces qui que
+  quoi dont est sont être fait faire plus moins très votre notre vous nous
+  il elle ils elles se ses leur leurs mais donc ni comme tout tous toute
+  toutes chaque sans entre vers chez avant après pendant depuis lors alors
+  ainsi puis quand comment pourquoi`.
+* **Exclus volontairement** : `service`, `document`, `configuration`,
+  `validation`, `projection`, `on`, `or`, `car`, `si`, `son`, `sa`, `a`,
+  `but` — ambigus avec l'anglais ; le ratio évite les faux positifs sur une
+  phrase anglaise (« turn on the light » reste sous le seuil).
+
+== Critères d'acceptation
+
+* [ ] `SourceLanguageResidue.detect` pur, déterministe, sans LLM (unit).
+* [ ] `PlantumlTermShield.leaksPlaceholder` + `introducesPlaceholder` (unit).
+* [ ] Port : résidu ⇒ surface préservée ; retry borné (2) ; fuite de
+  placeholder ⇒ bloc `PRESERVED` (unit + functional).
+* [ ] BDD `@plantuml-language` (6 scénarios) dans le shard E exhaustif.
+* [ ] Gates locaux : compiles ×3, `assemble`, `validatePlugins`,
+  `publishToMavenLocal` VERTS. Preuve = CI verte du commit poussé.
