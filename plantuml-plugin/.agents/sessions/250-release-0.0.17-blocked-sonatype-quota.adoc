@@ -39,6 +39,9 @@ lignes de gouvernance périmées (INDEX roadmap `PLT-DIAGRAM-OWNERSHIP`, PL-3 li
 . **Revert** (`b1c9910`, poussé) : `main` MEMPHIS revient à l'état **publié**
   `0.0.128` / plantuml `0.0.16` (aucune version fantôme dans le catalogue).
 
+* **CI** : plantuml `42542306785` ✅ (commit `a8ab02f`, docs S-250) ;
+  MEMPHIS `42542306739` ✅ 21/21 (commit `ebc1bc4`, revert + docs S-347).
+
 == Décision
 
 La release est **bloquée par un quota externe** jusqu'au **2026-12-01** — la
