@@ -280,3 +280,6 @@ Projets gérant la même méthodologie opencode (EAGER/LAZY, procédure de fin d
 | jhipster-gradle-plugins | `~/workspace/foundry/OSS/jhipster-gradle-plugins` | 9 | TEST_COVERAGE_ANALYSIS.adoc | 2026-06-11
 | quizz-benchmark-gradle | `~/workspace/foundry/OSS/quizz-benchmark-gradle/quizz-benchmark-plugin` | Audit session 053 | TEST_COVERAGE_ANALYSIS.adoc | 2026-04-30
 |===
+== Session 251 — JitPack mirror (CNV-16)
+
+Publication JitPack de plantuml-plugin 0.0.16. JitPack : 0.0.16 — POM HTTP 200.

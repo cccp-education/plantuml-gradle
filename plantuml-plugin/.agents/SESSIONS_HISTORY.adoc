@@ -280,3 +280,9 @@ repli (CTX-04). Local = Build (`compileKotlin`/`compileTestKotlin` VERT, contrat
 preuve = CI. **PLT-CONTEXT 2/4**. Zéro secret, zéro Python. Rapport
 `.agents/sessions/233-plt-context-us1-us2.adoc`.
 
+
+== Session 251 — JitPack mirror (CNV-16) — 2026-11-09
+
+Publication JitPack de plantuml-plugin 0.0.16. JitPack : 0.0.16 — POM HTTP 200. Shim `useModule` pour
+`education.cccp.build.*` (tag JitPack `0.0.15`). Rapport
+`plantuml-plugin/.agents/sessions/251-jitpack-mirror.adoc`.
