@@ -8,6 +8,7 @@
 - [x] Publication Central tentée : **bloquée** par le quota Sonatype (reset **2026-12-01**) ; aucun artefact publié ; Portal non viable (groupe en revue manuelle) ✅
 - [x] Revert `b1c9910` → MEMPHIS `main` à l'état publié `0.0.128`/`0.0.16` ✅
 - [x] Aucun code plantuml modifié, zéro bump, zéro publication ✅
+- [x] **Addendum — audit vision PLT-AGENT** (`ollama show`, zéro inférence) : `gemma4:31b-cloud` et `deepseek-v4.1-flash:cloud` exposent `vision`, `gpt-oss:120b-cloud` texte seul → DIA-01 utilisable, modèle choisi par le consommateur (aucun hardcode, SEC-1) ✅
 
 === Prochaine session (251)
 - **Release `plantuml-plugin 0.0.17` dès le 2026-12-01** (procédure prête dans `PROMPT_REPRISE`)

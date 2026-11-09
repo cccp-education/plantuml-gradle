@@ -16,7 +16,11 @@ repo1). Contournement Portal impossible : le groupe `education.cccp.plantuml` es
 en revue manuelle (m2 marker `0.0.16` 404). **Revert** `b1c9910` → MEMPHIS `main`
 reste à l'état publié `0.0.128`/`0.0.16`. Aucun code plantuml modifié, zéro bump,
 zéro publication. Le DAG est prêt et rejouable dès le 2026-12-01 (procédure dans
-`PROMPT_REPRISE`). Rapport `.agents/sessions/250-release-0.0.17-blocked-sonatype-quota.adoc`.
+`PROMPT_REPRISE`). **Addendum** : audit du dernier TODO PLT-AGENT (`ollama show`,
+zéro inférence) — `gemma4:31b-cloud` et `deepseek-v4.1-flash:cloud` exposent
+`vision`, `gpt-oss:120b-cloud` est texte seul → DIA-01 utilisable avec un modèle
+configuré par le consommateur (aucun hardcode, SEC-1). Rapport
+`.agents/sessions/250-release-0.0.17-blocked-sonatype-quota.adoc`.
 
 == Session 249 (2026-11-05) — PLT-OUT-4 : preuve corpus (langue) ✅ — EPIC PLT-I18N-OUTPUT TERMINÉ 4/4
 

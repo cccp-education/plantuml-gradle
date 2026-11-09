@@ -45,7 +45,7 @@ interface Gradle. *Ne pas réintroduire* : MCP, CLI, Kroki, Python/LiteLLM, Dock
 . [x] US-6 (`DIA-05` exemples canoniques) ✅ S-230.
 . [x] US-7 (BDD `28_agent_loop.feature` 18 scénarios) ✅ S-230.
 . [x] (optionnel) test fonctionnel TestKit `preflightPlantumlDescription` + mock LLM. ✅ S-238 (`PreflightPlantumlDescriptionFunctionalTest`, WireMock).
-. [ ] Vérifier qu'au moins un modèle du pool HTOWN expose la **vision** (sinon DIA-01 dégrade).
+. [x] Vérifier qu'au moins un modèle du pool HTOWN expose la **vision** (sinon DIA-01 dégrade). ✅ S-250 (addendum) — `ollama show` (manifeste local, zéro inférence) : **`gemma4:31b-cloud`** et **`deepseek-v4.1-flash:cloud`** exposent `vision` ; `gpt-oss:120b-cloud` est **texte seul**. DIA-01 est opt-in et dégrade ; configurer le modèle vision via `-Plangchain4j.modelName=gemma4:31b-cloud` (aucun hardcode — SEC-1).
 
 == EPIC PLT-DIAGRAM-OWNERSHIP (cadré S-219)
 

@@ -45,8 +45,9 @@ metered, accord pilote) + 1 finding syntaxique `0095:80`.
 
 == Résiduel
 
-* TODO PLT-AGENT : vérifier qu'un modèle du pool HTOWN expose la vision
-  (sinon DIA-01 dégrade).
+* ✅ TODO PLT-AGENT : audit vision fait (S-250 addendum, `ollama show`) —
+  `gemma4:31b-cloud` et `deepseek-v4.1-flash:cloud` exposent `vision`,
+  `gpt-oss:120b-cloud` texte seul (DIA-01 dégrade sur ce dernier).
 * Portal : première publication du groupe en revue manuelle.
 * Pin drift assumé : catalogue plantuml `0.0.121` vs ws courant `0.0.128`
   (à réaligner avec la release).

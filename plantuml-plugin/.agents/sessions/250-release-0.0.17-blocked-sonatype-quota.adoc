@@ -66,3 +66,22 @@ plantuml modifié, zéro bump, zéro publication. Le DAG est **prêt** et rejoua
 * `INDEX.adoc` (roadmap PLT-DIAGRAM-OWNERSHIP), `BACKLOG.adoc` (PL-3 + intro)
 * MEMPHIS : `gradle/libs.versions.toml` + `PlatformCatalogAlignmentTest`
   (commit `433f1c9` puis revert `b1c9910`)
+
+== Addendum — audit vision du pool (TODO PLT-AGENT, S-250)
+
+Vérification du dernier item ouvert de `TODO.adoc` (PLT-AGENT) avec
+`ollama show` (lecture du manifeste local, **zéro inférence, zéro LLM
+metered**) :
+
+[cols="2,1,3", options="header"]
+|===
+| Modèle (pool autorisé) | Vision | Source
+| `gemma4:31b-cloud` | ✅ | capabilities : completion, thinking, tools, **vision**
+| `deepseek-v4.1-flash:cloud` | ✅ | capabilities : completion, thinking, tools, **vision**
+| `gpt-oss:120b-cloud` | ❌ | capabilities : completion, thinking, tools (texte seul)
+|===
+
+Conclusion : **au moins deux modèles autorisés exposent la vision** → DIA-01 est
+utilisable. Le modèle est **choisi par le consommateur** (`-Plangchain4j.modelName=…`,
+aucun hardcode — SEC-1) ; un modèle texte seul fait **dégrader** la revue design
+(comportement documenté, jamais un prérequis de `check`). TODO coché ✅.
