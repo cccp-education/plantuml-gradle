@@ -33,12 +33,16 @@ import java.nio.file.Path
  * ./gradlew validatePlantumlCorpus -Pplantuml.corpusDir=docs
  * ./gradlew validatePlantumlCorpus -Pplantuml.corpusBaseline=plantuml-corpus-baseline.txt
  * ./gradlew validatePlantumlCorpus -Pplantuml.corpusStrict=false
+ * ./gradlew validatePlantumlCorpus -Pplantuml.corpusSourceLanguage=fr
  * ```
  *
  * Artefacts:
  * - `build/plantuml/plantuml-corpus-report.txt` — human-readable report;
  * - `build/plantuml/plantuml-corpus-baseline.txt` — suggested baseline of the
- *   current findings (copy the accepted lines into the named baseline).
+ *   current findings (copy the accepted lines into the named baseline);
+ * - `build/plantuml/plantuml-corpus-language.json` — **non-blocking** language
+ *   measurement (PLT-OUT-4): the blocks whose prose still looks like the source
+ *   language, so a re-translation session is piloted by a number.
  */
 @DisableCachingByDefault(because = "Corpus gate reflects the consumer working tree and must never be replayed from cache")
 abstract class ValidatePlantumlCorpusTask : DefaultTask() {
@@ -67,6 +71,10 @@ abstract class ValidatePlantumlCorpusTask : DefaultTask() {
     @get:Input
     abstract val strict: Property<Boolean>
 
+    /** Source language of the corpus for the non-blocking language measurement. */
+    @get:Input
+    abstract val sourceLanguage: Property<String>
+
     /** Human-readable, deterministic corpus report. */
     @get:OutputFile
     abstract val reportFile: RegularFileProperty
@@ -74,6 +82,10 @@ abstract class ValidatePlantumlCorpusTask : DefaultTask() {
     /** Suggested baseline built from the current findings. */
     @get:OutputFile
     abstract val suggestedBaselineFile: RegularFileProperty
+
+    /** Non-blocking language measurement (PLT-OUT-4), pretty-printed JSON. */
+    @get:OutputFile
+    abstract val languageReportFile: RegularFileProperty
 
     @TaskAction
     fun validateCorpus() {
@@ -85,7 +97,13 @@ abstract class ValidatePlantumlCorpusTask : DefaultTask() {
                 .sortedBy { it.absolutePath }
                 .associate { relativeDocument(root, it.toPath()) to it.readText() }
 
-        val report = PlantumlCorpusGate.evaluate(documents, PlantumlSyntaxValidatorAdapter(), baseline)
+        val report =
+            PlantumlCorpusGate.evaluate(
+                documents,
+                PlantumlSyntaxValidatorAdapter(),
+                baseline,
+                sourceLanguage = sourceLanguage.get(),
+            )
         write(reportFile.get().asFile, report.render())
         write(
             suggestedBaselineFile.get().asFile,
@@ -93,6 +111,7 @@ abstract class ValidatePlantumlCorpusTask : DefaultTask() {
                 it.baselineKey
             },
         )
+        write(languageReportFile.get().asFile, report.languageReport.toJson())
 
         if (documents.isEmpty()) {
             logger.lifecycle(PlantumlMessages.get("corpus.no_blocks", lang))

@@ -1,0 +1,102 @@
+= Session 249 — PLT-OUT-4 : preuve corpus (langue)
+:session: 249
+:date: 2026-11-05
+:type: feat + test + dogfooding (DDD/TDD/BDD)
+:epic: PLT-I18N-OUTPUT (4/4 — TERMINÉ)
+
+== Mission
+
+Dernière US de `PLT-I18N-OUTPUT` : transformer le détecteur de résidu
+(`SourceLanguageResidue`, S-248) en **mesure sur corpus réel**, non bloquante,
+et produire la **preuve** « avant » des blocs EN encore français. Aucun run LLM
+metered (la re-traduction reste une session `cheroliv.com`).
+
+== Cadrage (`.agents/CADRAGE_PLT_OUT_4_CORPUS_LANGUAGE_PROOF.adoc`)
+
+Périmètre : `office/sites/cheroliv.com/jbake/i18n/en` (lecture seule) mesuré par
+la gate de corpus. Décisions : la langue **ne bloque jamais** (`isClean` reste
+la gate syntaxique) ; **mêmes surfaces** que le port (labels/directives, notes,
+prose) ; source configurable (`-Pplantuml.corpusSourceLanguage`, défaut `fr`) ;
+findings triés + JSON déterministe ; frontière `plantuml.corpus` pure, zéro LLM ;
+les gates « zéro `@startuml` baké » / SVG sont **site/bakery** (hors plantuml).
+
+== Livré (baby-step DDD/TDD/BDD)
+
+. **`PlantumlCorpusLanguageProbe`** (pur) — un finding par bloc dont une surface
+  est restée dans la langue source ; mêmes extracteurs que le port
+  (`PlantUmlBlock.labels()`, `PlantumlNoteExtractor`, `PlantumlProseLabelExtractor`) ;
+  évidence `word:`/`ratio:n/m`/`diacritic:` dédupliquée. 11 unit.
+. **`PlantumlCorpusLanguageReport`** (texte + JSON Jackson) intégré à
+  `PlantumlCorpusReport.languageReport` — `isClean` **inchangé** (syntaxe).
+  5 unit (gate) : non-blocage, rendu, document FR jamais mesuré, source
+  configurable, JSON déterministe.
+. **Tâche `validatePlantumlCorpus` étendue** — `sourceLanguage` (input, défaut
+  `fr`), `languageReportFile` (output `build/plantuml/plantuml-corpus-language.json`),
+  wiring `-Pplantuml.corpusSourceLanguage` ; le succès est **indépendant** des
+  findings de langue. 5 functional TestKit.
+. **BDD `@plantuml-corpus-language`** (`38_plantuml_corpus_language.feature`,
+  5 scénarios + `PlantumlCorpusLanguageSteps` préfixés) — **shard E** (partition
+  exhaustive gardée : 39 features, 38 assignées + `10_file_edge_cases` A1).
+
+== Preuve corpus (dogfooding réel, lecture seule, zéro LLM)
+
+Consommateur transitoire `/tmp/opencode/plt-corpus-proof` (plugin 0.0.16 HEAD
+via `publishToMavenLocal`) ; racine montée avec le segment `en/` (le
+`CorpusLanguageResolver` lit la langue dans le chemin) :
+
+[source,shell]
+----
+./gradlew validatePlantumlCorpus \
+  -Pplantuml.corpusDir=/tmp/opencode/plt-corpus-root \
+  -Pplantuml.corpusStrict=false
+----
+
+* **112 documents / 256 blocs** AsciiDoc EN mesurés.
+* **43 blocs** portent un résidu de langue source, sur **23 documents** —
+  concentration `0108` (8), `0106` (4), `0105`/`0110`/`0122` (3 chacun), plus les
+  copies `pilot-batch` de `0100`/`0105`.
+* **1 finding syntaxique** réel (`0095 line-80 — Missing or mismatched diagram
+  delimiters`) : la gate syntaxique reste opérante, non bloquante ici via
+  `strict=false`.
+* Écart avec les **69 blocs** de S-076 : mesure différente (détecteur site
+  `DiagramFrenchResidue` sur le **store** de blocs, 3 passes LLM, snapshot 2026-09)
+  vs notre mesure sur le corpus AsciiDoc courant (surfaces du port, snapshot
+  2026-11-05). Les deux mesurent le même phénomène ; la mesure plantuml est
+  reproductible, gratuite, et fournit le « avant » du chantier cheroliv.
+* **Commande « après »** (session cheroliv) : la même commande sur le même
+  corpus, comparer `language residue (non-blocking)` et le JSON.
+
+== Gates locaux (Local = Build, Tests = CI)
+
+* `compileKotlin`, `compileTestKotlin`, `compileFunctionalTestKotlin` VERT.
+* `ktlintCheck`, `assemble`, `validatePlugins`, `publishToMavenLocal` VERTS.
+* Zéro test lancé en local ; zéro secret ; zéro LLM ; zéro publication ; zéro
+  bump de version.
+* Preuve = CI verte du commit poussé.
+
+== Prochaine session (250) — décision pilote
+
+`PLT-I18N-OUTPUT` est **TERMINÉ 4/4**. Deux candidats :
+. **Release `plantuml-plugin 0.0.17`** via MEMPHIS (BOM/catalog → consommateur
+  bakery/document) pour propager PLT-OUT-1/2/3 (garde langue + notes + corpus) ;
+  vérifier la page Portal `education.cccp.plantuml` (`0.0.16` en revue manuelle).
+. **PLT-DIAGRAM-OWNERSHIP US-6/US-7** (cross-borough bakery + cheroliv,
+  déjà cadré S-241) — hors plantuml.
+Recommandation : la release DAG d'abord (les consommateurs Central ne voient
+pas encore PLT-OUT-2/3).
+
+== Fichiers
+
+* `src/main/kotlin/plantuml/corpus/PlantumlCorpusLanguageProbe.kt` (nouveau)
+* `src/main/kotlin/plantuml/corpus/PlantumlCorpusGate.kt`
+* `src/main/kotlin/plantuml/tasks/ValidatePlantumlCorpusTask.kt`
+* `src/main/kotlin/plantuml/PlantumlManager.kt`
+* `src/test/kotlin/plantuml/corpus/PlantumlCorpusLanguageProbeTest.kt` (nouveau)
+* `src/test/kotlin/plantuml/corpus/PlantumlCorpusGateTest.kt`
+* `src/functionalTest/kotlin/plantuml/ValidatePlantumlCorpusLanguageFunctionalTest.kt` (nouveau)
+* `src/test/features/38_plantuml_corpus_language.feature` (nouveau)
+* `src/test/scenarios/plantuml/scenarios/PlantumlCorpusLanguageSteps.kt` (nouveau)
+* `src/test/kotlin/plantuml/ci/CucumberShardFeatures.kt`
+* `src/test/kotlin/plantuml/ci/shards/CucumberShardERunner.kt`
+* `build.gradle.kts` (functional shard B)
+* `.agents/CADRAGE_PLT_OUT_4_CORPUS_LANGUAGE_PROOF.adoc` (nouveau)

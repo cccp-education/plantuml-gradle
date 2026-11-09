@@ -171,11 +171,18 @@ object PlantumlManager {
                     project.findProperty("plantuml.corpusStrict")?.toString()?.toBooleanStrictOrNull()
                         ?: true,
                 )
+                task.sourceLanguage.set(
+                    project.findProperty("plantuml.corpusSourceLanguage")?.toString()
+                        ?: CORPUS_DEFAULT_SOURCE_LANGUAGE,
+                )
                 task.reportFile.set(
                     project.layout.buildDirectory.file("plantuml/plantuml-corpus-report.txt"),
                 )
                 task.suggestedBaselineFile.set(
                     project.layout.buildDirectory.file("plantuml/plantuml-corpus-baseline.txt"),
+                )
+                task.languageReportFile.set(
+                    project.layout.buildDirectory.file("plantuml/plantuml-corpus-language.json"),
                 )
             }
             project.tasks.configureEach { check ->
@@ -187,6 +194,7 @@ object PlantumlManager {
 
         private const val CORPUS_DEFAULT_DIR = "docs"
         private const val CORPUS_DEFAULT_BASELINE = "plantuml-corpus-baseline.txt"
+        private const val CORPUS_DEFAULT_SOURCE_LANGUAGE = "fr"
 
         /**
          * Registers `collectPlantumlAugmentedContext` (EPIC PLT-CONTEXT, CTX-03).

@@ -1,0 +1,71 @@
+= Cadrage — PLT-OUT-4 Preuve corpus (langue)
+:session: 249
+:date: 2026-11-05
+:statut: 🟡 EN COURS
+
+== Objet
+
+Dernière US de `PLT-I18N-OUTPUT`. PLT-OUT-3 a livré le détecteur de résidu
+(`SourceLanguageResidue`) et la garde du **port** ; PLT-OUT-4 apporte la
+**preuve sur corpus** : mesurer les blocs `[plantuml]` dont la prose est restée
+dans la langue source, sur le corpus **réel**, sans LLM.
+
+== Périmètre exact (le « 69 blocs EN »)
+
+* Mesure d'origine : `.agents/sessions/076-...` de `cheroliv.com` — 69 blocs EN
+  encore détectés par `DiagramFrenchResidue` sur le **store** de blocs (site).
+* Côté plantuml, la mesure porte sur le **corpus AsciiDoc réel** :
+  `office/sites/cheroliv.com/jbake/i18n/en/` (47 fichiers `.adoc`, 303 blocs
+  `[plantuml]` mesurés au 2026-11-05). Le corpus est **lu en lecture seule**.
+* La **re-traduction** des blocs résiduels reste une session `cheroliv.com`
+  (LLM metered, accord pilote) — interdite ici. Cette session livre l'outil de
+  mesure et la preuve avant reprise ; la même commande fournira le « après ».
+
+== Décisions
+
+[cols="1,4", options="header"]
+|===
+| # | Décision
+
+| D1
+| **La langue ne bloque jamais** : `PlantumlCorpusReport.isClean` reste la gate
+  **syntaxique** (PLT-OUT-1). Les résidus de langue sont un rapport **séparé,
+  non bloquant**, rendu dans le rapport texte + un artefact JSON machine.
+| D2
+| **Même surface que le port** : la sonde examine les labels quotés/directives
+  (`PlantUmlBlock.labels()`), les notes (`PlantumlNoteExtractor`) et la prose non
+  quotée (`PlantumlProseLabelExtractor`), comme `PlantumlTranslationPortAdapter`.
+  Zéro divergence de périmètre entre la garde de génération et la mesure corpus.
+| D3
+| **Source configurable** (`-Pplantuml.corpusSourceLanguage`, défaut `fr`). Le
+  profil `fr` est le seul livré ; une autre source ne déclenche rien (honnête,
+  pas de faux positif sans lexique).
+| D4
+| **Déterministe et reproductible** : findings triés (document, ligne, id),
+  évidence `word:`/`ratio:n/m`/`diacritic:` dédupliquée, JSON pretty-printé.
+| D5
+| **Frontière** : domaine pur `plantuml.corpus` (réutilise `boundary`/`repair`),
+  zéro N0, zéro nouvelle tâche Gradle (extension de `validatePlantumlCorpus`),
+  zéro LLM, zéro réseau.
+| D6
+| **Hors scope plantuml** : la gate « zéro `@startuml` brut dans le HTML baké »
+  et le `σ>0` sur les SVG sont des gates **site/bakery** (cheroliv.com). Le
+  plantuml prouve sa feuille : la mesure de langue sur le corpus source.
+| D7
+| **Méthode** : baby-step DDD/TDD/BDD — unit (sonde, gate, rapport), functional
+  TestKit (artefact JSON, non-blocage, option source), BDD
+  `@plantuml-corpus-language` (shard E). Local = Build, Tests = CI.
+|===
+
+== Critères d'acceptation
+
+* [ ] `PlantumlCorpusLanguageProbe` pur : un finding par bloc résiduel, mêmes
+  surfaces que le port, source/doc language normalisées, évidence stable.
+* [ ] `PlantumlCorpusLanguageReport` (texte + JSON) intégré à
+  `PlantumlCorpusReport` **sans changer** `isClean`.
+* [ ] `validatePlantumlCorpus` expose `-Pplantuml.corpusSourceLanguage` et écrit
+  `build/plantuml/plantuml-corpus-language.json` ; succès même avec findings.
+* [ ] BDD `@plantuml-corpus-language` (5 scénarios) dans le shard E.
+* [ ] Preuve dogfooding sur `jbake/i18n/en` (lecture seule, `-Pplantuml.corpusStrict=false`)
+  consignée (compteur avant) ; commande « après » documentée pour cheroliv.
+* [ ] Gates locaux VERT ; preuve = CI verte du commit poussé.

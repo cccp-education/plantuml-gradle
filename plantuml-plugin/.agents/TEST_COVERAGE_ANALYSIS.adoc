@@ -1,6 +1,26 @@
 = Test Coverage Analysis — PlantUML Gradle Plugin
 
-_Dernière mise à jour_ : Session 248 (5 novembre 2026) — PLT-OUT-3 (shield + langue)
+_Dernière mise à jour_ : Session 249 (5 novembre 2026) — PLT-OUT-4 (preuve corpus langue)
+
+=== Session 249 — PLT-OUT-4 (preuve corpus langue)
+
+* **+** `PlantumlCorpusLanguageProbeTest` (11 unit : label FR, note FR, message
+  de séquence FR, bloc EN propre, document FR non mesuré, source sans profil,
+  source vide, langue document vide, bloc structurel, évidence dédupliquée).
+* **+** `PlantumlCorpusGateTest` (+5 unit : finding langue non bloquant,
+  section rendue, document FR non mesuré, source configurable, JSON déterministe).
+* **+** `ValidatePlantumlCorpusLanguageFunctionalTest` (5 FT TestKit : résidu
+  mesuré non bloquant + JSON, bloc EN propre → 0, source `de` → 0, document FR
+  → 0, artefact `plantuml-corpus-language.json`).
+* **+** BDD `38_plantuml_corpus_language.feature` (5 scénarios
+  `@plantuml-corpus-language`) + `PlantumlCorpusLanguageSteps` (préfixes
+  `language corpus` / `corpus language`, S-088) — **shard E**.
+* Couverture des branches : source/doc language (blank, identique, sans profil),
+  surfaces (labels, notes, prose), non-blocage de `isClean`, rendu texte et JSON.
+* Dogfooding réel (hors tests) : `jbake/i18n/en` — 112 docs / 256 blocs /
+  43 findings / 23 documents, 1 finding syntaxique réel.
+* Local = Build (compile ×3 + `ktlintCheck` + `assemble` + `validatePlugins` +
+  `publishToMavenLocal` VERT) ; preuve = CI du commit poussé.
 
 === Session 248 — PLT-OUT-3 (shield + langue)
 

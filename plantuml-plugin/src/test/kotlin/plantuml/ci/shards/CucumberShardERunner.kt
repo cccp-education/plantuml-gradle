@@ -21,6 +21,7 @@ import plantuml.ci.CucumberShardFeatures
 @SelectClasspathResource("features/35_plantuml_term_protection.feature")
 @SelectClasspathResource("features/36_plantuml_corpus.feature")
 @SelectClasspathResource("features/37_plantuml_language_guard.feature")
+@SelectClasspathResource("features/38_plantuml_corpus_language.feature")
 @SelectClasspathResource("features/3_syntax_validation.feature")
 @SelectClasspathResource("features/4_attempt_history.feature")
 @ConfigurationParameter(key = FEATURES_PROPERTY_NAME, value = CucumberShardFeatures.SHARD_E_FEATURES)

@@ -58,6 +58,9 @@ class PlantumlCorpusBaseline private constructor(
 
 /**
  * Deterministic outcome of a corpus gate run.
+ *
+ * @property languageReport the non-blocking language measurement (PLT-OUT-4) —
+ *   it never influences [isClean], which stays the syntax gate
  */
 data class PlantumlCorpusReport(
     val totalDocuments: Int,
@@ -65,6 +68,7 @@ data class PlantumlCorpusReport(
     val findings: List<PlantumlCorpusFinding>,
     val baselined: List<PlantumlCorpusFinding>,
     val blocking: List<PlantumlCorpusFinding>,
+    val languageReport: PlantumlCorpusLanguageReport = PlantumlCorpusLanguageReport.EMPTY,
 ) {
     val isClean: Boolean get() = blocking.isEmpty()
 
@@ -82,6 +86,7 @@ data class PlantumlCorpusReport(
                 appendLine("--- suggested baseline")
                 findings.forEach { appendLine(it.baselineKey) }
             }
+            append(languageReport.render())
         }
 }
 
@@ -92,6 +97,11 @@ data class PlantumlCorpusReport(
  * of **every** document — no longer only to a unit fixture. Findings are
  * ordered by document, line and block id so the report is reproducible; a
  * finding is blocking unless the named [PlantumlCorpusBaseline] accepts it.
+ *
+ * PLT-OUT-4 adds a **non-blocking** language measurement: every block is probed
+ * for source-language prose with [PlantumlCorpusLanguageProbe]. A residue is
+ * reported (text + JSON), never a blocking finding — the syntax gate's verdict
+ * is unchanged.
  */
 object PlantumlCorpusGate {
     fun evaluate(
@@ -99,6 +109,7 @@ object PlantumlCorpusGate {
         validator: PlantUmlSyntaxValidator,
         baseline: PlantumlCorpusBaseline = PlantumlCorpusBaseline.EMPTY,
         supportedCodes: Set<String> = LanguageCatalog.supportedCodes(),
+        sourceLanguage: String = "fr",
     ): PlantumlCorpusReport {
         val blocks =
             documents.entries
@@ -123,12 +134,25 @@ object PlantumlCorpusGate {
                     }
                 }.sortedWith(compareBy({ it.document }, { it.line }, { it.blockId }))
 
+        val languageFindings =
+            blocks
+                .mapNotNull { (block, language) ->
+                    PlantumlCorpusLanguageProbe.examine(block, language, sourceLanguage)
+                }.sortedWith(compareBy({ it.document }, { it.line }, { it.blockId }))
+
         return PlantumlCorpusReport(
             totalDocuments = documents.size,
             totalBlocks = blocks.size,
             findings = findings,
             baselined = findings.filter { baseline.accepts(it) },
             blocking = findings.filterNot { baseline.accepts(it) },
+            languageReport =
+                PlantumlCorpusLanguageReport(
+                    sourceLanguage = sourceLanguage,
+                    totalDocuments = documents.size,
+                    totalBlocks = blocks.size,
+                    findings = languageFindings,
+                ),
         )
     }
 

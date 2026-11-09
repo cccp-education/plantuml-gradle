@@ -186,4 +186,73 @@ class PlantumlCorpusGateTest {
         val finding = PlantumlCorpusFinding("en/article.adoc", "en", "diagram-2", 1, "Broken diagram")
         assertTrue(baseline.accepts(finding))
     }
+
+    // ── PLT-OUT-4 — language residue is measured, never blocking ─────────────
+
+    @Test
+    fun `a language residue is reported but never blocking`() {
+        val report =
+            PlantumlCorpusGate.evaluate(
+                mapOf("en/article.adoc" to document("diagram", "class \"Utilisateur\"")),
+                validator,
+            )
+
+        assertTrue(report.isClean, "the syntax gate must stay clean")
+        assertEquals(1, report.languageReport.findings.size)
+        val finding = report.languageReport.findings.single()
+        assertEquals("en/article.adoc", finding.document)
+        assertEquals("en", finding.language)
+        assertEquals("fr", report.languageReport.sourceLanguage)
+    }
+
+    @Test
+    fun `the language report is rendered as a non-blocking section`() {
+        val report =
+            PlantumlCorpusGate.evaluate(
+                mapOf("en/article.adoc" to document("diagram", "class \"Utilisateur\"")),
+                validator,
+            )
+
+        val rendered = report.render()
+        assertTrue(rendered.contains("language residue (non-blocking): 1"), rendered)
+        assertTrue(rendered.contains("source-language: fr"), rendered)
+    }
+
+    @Test
+    fun `a French document has no language finding`() {
+        val report =
+            PlantumlCorpusGate.evaluate(
+                mapOf("fr/article.adoc" to document("diagram", "class \"Utilisateur\"")),
+                validator,
+            )
+
+        assertTrue(report.languageReport.findings.isEmpty())
+    }
+
+    @Test
+    fun `the source language is configurable`() {
+        val report =
+            PlantumlCorpusGate.evaluate(
+                mapOf("en/article.adoc" to document("diagram", "class \"Utilisateur\"")),
+                validator,
+                sourceLanguage = "de",
+            )
+
+        assertTrue(report.languageReport.findings.isEmpty())
+        assertEquals("de", report.languageReport.sourceLanguage)
+    }
+
+    @Test
+    fun `the language report serializes deterministically`() {
+        val report =
+            PlantumlCorpusGate.evaluate(
+                mapOf("en/article.adoc" to document("diagram", "class \"Utilisateur\"")),
+                validator,
+            )
+
+        val json = report.languageReport.toJson()
+        assertTrue(json.contains("\"sourceLanguage\" : \"fr\""), json)
+        assertTrue(json.contains("\"total\" : 1"), json)
+        assertTrue(json.contains("\"document\" : \"en/article.adoc\""), json)
+    }
 }

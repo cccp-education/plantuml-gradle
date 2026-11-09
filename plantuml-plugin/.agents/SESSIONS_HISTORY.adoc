@@ -1,5 +1,30 @@
 = Historique des Sessions
 
+== Session 249 (2026-11-05) — PLT-OUT-4 : preuve corpus (langue) ✅ — EPIC PLT-I18N-OUTPUT TERMINÉ 4/4
+
+Le détecteur de résidu (S-248) devient une **mesure non bloquante sur corpus réel**.
+Domaine pur `plantuml.corpus` : `PlantumlCorpusLanguageProbe` (un finding par bloc dont
+une **surface du port** — labels quotés/directives, notes, prose non quotée — est restée
+dans la langue source ; mêmes extracteurs que `PlantumlTranslationPortAdapter`, évidence
+`word:`/`ratio:n/m`/`diacritic:` dédupliquée) + `PlantumlCorpusLanguageReport` (rendu
+texte + JSON Jackson) intégré à `PlantumlCorpusReport.languageReport` sans changer
+`isClean` (la langue ne bloque jamais). Tâche `validatePlantumlCorpus` étendue :
+`-Pplantuml.corpusSourceLanguage` (défaut `fr`), sortie
+`build/plantuml/plantuml-corpus-language.json` ; succès indépendant des findings de
+langue. Tests : 11 unit (sonde) + 5 unit (gate : non-blocage, rendu, document FR non
+mesuré, source configurable, JSON déterministe) + 5 functional TestKit + BDD
+`@plantuml-corpus-language` (5 scénarios) intégrée au **shard E** (partition gardée,
+39 features). **Preuve dogfooding** (lecture seule, zéro LLM) sur
+`office/sites/cheroliv.com/jbake/i18n/en` via un consommateur transitoire `/tmp` :
+**112 documents / 256 blocs / 43 blocs à résidu FR / 23 documents** (concentration
+0108=8, 0106=4) + 1 finding syntaxique réel (`0095:80 — Missing or mismatched diagram
+delimiters`) ; écart avec les 69 de S-076 expliqué (détecteur site/store/3 passes LLM
+vs surfaces du port sur le corpus AsciiDoc courant). Gates locaux (Local = Build) :
+compile ×3, `ktlintCheck`, `assemble`, `validatePlugins`, `publishToMavenLocal` VERTS ;
+zéro test local, zéro secret, zéro LLM, zéro publication, zéro bump. Cadrage
+`.agents/CADRAGE_PLT_OUT_4_CORPUS_LANGUAGE_PROOF.adoc`. Rapport
+`.agents/sessions/249-plt-out-4-corpus-language-proof.adoc`.
+
 == Session 248 (2026-11-05) — PLT-OUT-3 : shield + langue ✅
 
 Deux invariants rendus impossibles (EPIC PLT-I18N-OUTPUT, 3/4 US) : un placeholder

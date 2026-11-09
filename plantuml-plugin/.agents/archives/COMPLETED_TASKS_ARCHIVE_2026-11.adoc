@@ -1,5 +1,21 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-11
 
+== Session 249 (2026-11-05) — PLT-OUT-4 : preuve corpus (langue) ✅ — EPIC PLT-I18N-OUTPUT TERMINÉ 4/4
+
+=== Fait
+- [x] `PlantumlCorpusLanguageProbe` (pur) : finding par bloc dont une surface du port (labels/directives, notes, prose) est restée dans la langue source ; évidence dédupliquée ✅
+- [x] `PlantumlCorpusLanguageReport` (texte + JSON Jackson) intégré à `PlantumlCorpusReport` — `isClean` inchangé (la langue ne bloque jamais) ✅
+- [x] `validatePlantumlCorpus` : `-Pplantuml.corpusSourceLanguage` (défaut `fr`) + `build/plantuml/plantuml-corpus-language.json` (output) ✅
+- [x] Tests : 11 unit (sonde) + 5 unit (gate) + 5 functional TestKit + BDD `@plantuml-corpus-language` 5 scénarios (shard E) ✅
+- [x] **Preuve dogfooding** (lecture seule, zéro LLM) `jbake/i18n/en` : 112 docs / 256 blocs / **43 blocs à résidu FR / 23 documents** (0108=8, 0106=4) + 1 finding syntaxique réel (`0095:80`) ; écart avec les 69 S-076 expliqué ✅
+- [x] Cadrage `.agents/CADRAGE_PLT_OUT_4_CORPUS_LANGUAGE_PROOF.adoc` (D1→D7, périmètre, mesure, hors scope site) ✅
+- [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 250 + TEST_COVERAGE + archive 2026-11 + BACKLOG + TODO + AGENTS racine ✅
+- [x] Gate local = Build (compile ×3 + `ktlintCheck` + `assemble` + `validatePlugins` + `publishToMavenLocal` VERT) ; zéro test local, zéro secret, zéro LLM, zéro publication, zéro bump ✅
+
+=== Prochaine session (250)
+- Décision pilote : **release `plantuml-plugin 0.0.17`** via MEMPHIS (propager PLT-OUT-1/2/3 + vérifier le Portal) **ou** PLT-DIAGRAM-OWNERSHIP US-6/US-7 (cross-borough)
+- **Fichier à lire en priorité** : `PROMPT_REPRISE.adoc` + `BACKLOG.adoc` § EPIC PUB / PLT-DIAGRAM-OWNERSHIP
+
 == Session 248 (2026-11-05) — PLT-OUT-3 : shield + langue ✅
 
 === Fait

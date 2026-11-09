@@ -3,7 +3,7 @@
 _Voir BACKLOG.adoc section "Prochains EPICs — pistes consolidées" pour le
 détail priorisé et les sources (code review, audit code)._
 
-== 🟡 EPIC PLT-I18N-OUTPUT (PLT-OUT-1/2/3 ✅ S-246/S-247/S-248, reste 1 US)
+== ✅ EPIC PLT-I18N-OUTPUT (TERMINÉ 4/4 — PLT-OUT-1/2/3/4 ✅ S-246/S-247/S-248/S-249)
 
 Contrat de sortie : le validateur de syntaxe devient une gate de corpus
 (`i18n_review.adoc` S-263, mesure cheroliv S-076). BACKLOG § PLT-I18N-OUTPUT.
@@ -11,7 +11,7 @@ Contrat de sortie : le validateur de syntaxe devient une gate de corpus
 . [x] **PLT-OUT-1** — tâche `validatePlantumlCorpus` : scan pur des vrais `[plantuml]` (ignore `[source,plantuml]`/littéraux/commentaires), validation N0 de chaque bloc, rapport déterministe langue+article+id+raison, baseline nommée, câblage `check`, i18n 10 langues. 24 unit + 7 FT + 5 BDD `@plantuml-corpus`. ✅ S-246.
 . [x] **PLT-OUT-2** — notes couvertes (note flottante quotée, `:` dans les guillemets non avalant), `escapeQuotes` idempotent avant écriture, traduction blanche préservée, round-trip note `PRESERVE`. Unit +14, functional 3 (vrai validateur), BDD `@plantuml-notes` +3. ✅ S-247.
 . [x] **PLT-OUT-3** — shield + langue : placeholder perdu ⇒ `PRESERVE` sur toutes les surfaces (`leaksPlaceholder`/`introducesPlaceholder` + gate finale) ; label resté français détecté sans LLM (`SourceLanguageResidue`) ; retry borné 2. 17 unit + 5 unit + 10 unit + 3 FT + BDD `@plantuml-language` 6 scénarios (shard E). ✅ S-248.
-. [ ] **PLT-OUT-4** — preuve corpus : reprise ciblée des 69 blocs EN S-076 pilotée par la gate ; zéro `@startuml` brut dans le HTML baké (hors `[source,plantuml]`).
+. [x] **PLT-OUT-4** — preuve corpus : mesure langue **non bloquante** (`PlantumlCorpusLanguageProbe` + JSON `plantuml-corpus-language.json` + `-Pplantuml.corpusSourceLanguage`), 11 unit + 5 unit + 5 FT + BDD `@plantuml-corpus-language` 5 scénarios (shard E) ; dogfooding réel `jbake/i18n/en` 112 docs / 256 blocs / **43 blocs résiduels / 23 docs**. ✅ S-249.
 
 == ✅ EPIC PLT-CONTEXT (cadré S-231, TERMINÉ S-235, 4/4)
 

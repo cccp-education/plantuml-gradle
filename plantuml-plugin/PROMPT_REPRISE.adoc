@@ -1,54 +1,50 @@
-= PROMPT_REPRISE — Plantuml — Session 249
-:session: 249
+= PROMPT_REPRISE — Plantuml — Session 250
+:session: 250
 :date: 2026-11-05
 
-== État S-248 — PLT-OUT-3 (shield + langue) ✅
+== État S-249 — PLT-OUT-4 (preuve corpus) ✅ — EPIC PLT-I18N-OUTPUT TERMINÉ 4/4
 
-* Domaine pur `plantuml.boundary.SourceLanguageResidue` : détection
-  **déterministe sans LLM** d'un texte resté dans la langue source
-  (diacritiques français non ambigus + lexique non ambigu + ratio de
-  mots-outils ≥ 0,30 ; placeholders ignorés ; `fr-FR` normalisé ;
-  profils indexés par langue — seul `fr` livré, autre source = jamais flaggée).
-  Évidence stable `word:…` / `ratio:n/m` / `diacritic:…`.
-* `PlantumlTermShield.leaksPlaceholder` + `introducesPlaceholder(translated,
-  source)` — un fournisseur peut **inventer** un `__PLT<n>__` sur un label non
-  bouclé (le chemin `restore` ne le voit pas).
-* `PlantumlTranslationPortAdapter` : garde langue sur **toutes** les surfaces
-  (labels, notes, prose), retry **borné** (`maxTranslationAttempts` défaut 2,
-  plancher 1, aucune re-tentative sur échec/placeholder perdu), un lot dont une
-  partie est résiduelle est abandonné au profit du chemin par label, gate finale
-  `introducesPlaceholder` → `Preserved("placeholder leak …")`.
-* Tests : `SourceLanguageResidueTest` (17 unit), `PlantumlTermShieldTest`
-  (+5), `PlantumlTranslationPortAdapterTest` (+10), functional
-  `PlantumlLanguageGuardFunctionalTest` (3, **vrai** validateur PlantUML),
-  BDD `37_plantuml_language_guard.feature` (`@plantuml-language`, 6 scénarios)
-  + `PlantumlLanguageGuardSteps` — **shard E** (partition gardée).
-* Cadrage : `.agents/CADRAGE_PLT_OUT_3_SHIELD_LANGUE.adoc` (D1→D8, seuil, faux
-  positifs, biais `PRESERVE` > faux `TRANSLATED`, gate corpus inchangée).
-* Gates locaux (Local = Build) : compile ×3, `ktlintCheck`, `assemble`,
-  `validatePlugins`, `publishToMavenLocal` VERTS. Zéro test local, zéro secret,
-  zéro publication, zéro bump (release `0.0.17` = DAG MEMPHIS ultérieur).
-* **CI VERTE run `42536327290`** (commit `4becfdb`) — 11/11 jobs ✓.
+* `PlantumlCorpusLanguageProbe` (pur) : un finding par bloc `[plantuml]` dont
+  une **surface du port** (labels/directives, notes, prose) est restée dans la
+  langue source ; mêmes extracteurs que `PlantumlTranslationPortAdapter`.
+  Évidence `word:`/`ratio:n/m`/`diacritic:` dédupliquée.
+* `PlantumlCorpusLanguageReport` (texte + JSON Jackson) intégré à
+  `PlantumlCorpusReport.languageReport` ; **`isClean` inchangé** (la langue ne
+  bloque jamais).
+* Tâche `validatePlantumlCorpus` étendue : `-Pplantuml.corpusSourceLanguage`
+  (défaut `fr`) + sortie `build/plantuml/plantuml-corpus-language.json`.
+* Tests : 11 unit (sonde) + 5 unit (gate) + 5 functional TestKit + BDD
+  `@plantuml-corpus-language` 5 scénarios (shard E).
+* **Preuve dogfooding** (lecture seule, zéro LLM) sur `jbake/i18n/en` :
+  **112 documents / 256 blocs / 43 blocs à résidu FR / 23 documents**
+  (concentration 0108=8, 0106=4) + 1 finding syntaxique réel (`0095:80`).
+  Écart avec les 69 de S-076 expliqué (détecteur/store/snapshot différents).
+  La même commande fournira le « après » cheroliv.
+* Gates locaux VERT (compile ×3, `ktlintCheck`, `assemble`, `validatePlugins`,
+  `publishToMavenLocal`) ; zéro test local, zéro secret, zéro LLM, zéro bump.
+* Cadrage `.agents/CADRAGE_PLT_OUT_4_CORPUS_LANGUAGE_PROOF.adoc` ; rapport
+  `.agents/sessions/249-plt-out-4-corpus-language-proof.adoc`.
 
-== Mission Session 249 — PLT-OUT-4 (preuve corpus)
+== Mission Session 250 — décision pilote
 
-* **Reprise ciblée des 69 blocs EN résiduels mesurés S-076** pilotée par la
-  gate `validatePlantumlCorpus` ; zéro `@startuml` brut dans le HTML baké
-  (hors `[source,plantuml]`).
-* Cadrer d'abord : périmètre exact (quels articles/langues), source des 69
-  blocs, mesure avant/après. `SourceLanguageResidue` peut alimenter un
-  **rapport** de corpus (mesure non bloquante) — ne pas rendre la langue
-  bloquante dans `validatePlantumlCorpus` sans décision.
-* Baby-step DDD/TDD/BDD : unit + functional + BDD (`@plantuml-corpus` ou
-  nouveau tag), preuve par CI. Aucun run LLM metered sans accord pilote.
+Deux candidats (aucun EPIC plantuml ouvert hors cross-borough) :
+. **Release `plantuml-plugin 0.0.17`** via MEMPHIS (DAG N0→N2) pour propager
+  0.0.16+PLT-OUT-1/2/3 aux consommateurs bakery/document ; vérifier la page
+  Portal `education.cccp.plantuml` (`0.0.16` uploadé S-247, revue manuelle).
+. **PLT-DIAGRAM-OWNERSHIP US-6/US-7** (cross-borough bakery + cheroliv, cadré
+  S-241 : `.agents/CADRAGE_PLT_DIAGRAM_OWNERSHIP_US6_US7.adoc`).
+**Recommandation** : la release DAG d'abord — le Central ne contient pas encore
+la garde langue (les consommateurs ne voient pas PLT-OUT-2/3).
 
 == Résiduel / dette
 
-* Gate P0.3 cross-borough (re-bake cheroliv.com) : pilotée hors plantuml.
-* Release consommateur (bakery/document) : `0.0.17` via MEMPHIS → catalogue →
-  consommateurs ; hors mission tant que PLT-OUT-4 n'est pas clos.
-* Portal : `0.0.16` uploadé S-247, première publication du groupe en revue
-  manuelle (vérifier la page `education.cccp.plantuml` + `/m2/`).
+* Release consommateur : bump `plantuml = 0.0.17` + MEMPHIS BOM/catalog + pins
+  bakery/document (Règle 2, ordre DAG, CI verte du code inchangé).
+* Gate P0.3 site (zéro `@startuml` baké, σ>0 SVG) : hors plantuml, pilotée
+  cheroliv/bakery.
+* `pilot-batch` duplique `0100`/`0105` dans le corpus EN → findings dupliqués
+  attendus (mesure brute, non dédupliquée).
+* Portal : première publication du groupe en revue manuelle (vérifier la page).
 
 == Rappels
 

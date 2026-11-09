@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-11-05 (Session 248 — **PLT-OUT-3** : shield + langue — `SourceLanguageResidue` déterministe sans LLM, garde sur labels/notes/prose, retry borné 2, gate finale de fuite de placeholder, BDD `@plantuml-language`. Historique : S-247 PLT-OUT-2 ✅, S-246 PLT-OUT-1 ✅, S-235 PLT-CONTEXT ✅ 4/4, S-230 PLT-AGENT ✅ 7/7.)
+:last_update: 2026-11-05 (Session 249 — **PLT-OUT-4** : preuve corpus langue — `PlantumlCorpusLanguageProbe` non bloquante, JSON `plantuml-corpus-language.json`, `-Pplantuml.corpusSourceLanguage`, dogfooding EN **43 blocs / 23 docs / 256 blocs** ; **EPIC PLT-I18N-OUTPUT ✅ TERMINÉ 4/4**. Historique : S-248 PLT-OUT-3 ✅, S-247 PLT-OUT-2 ✅, S-246 PLT-OUT-1 ✅, S-235 PLT-CONTEXT ✅ 4/4, S-230 PLT-AGENT ✅ 7/7.)
 
 '''
 
@@ -158,7 +158,7 @@ garde anti-drift local↔CI préservée.
 *Dépend de* : `plantuml-contracts` (N0 ✅ 0.0.1). *Relie* : `PLT-DIAGRAM-OWNERSHIP`,
 `PLT-CR3-2` (`DiagramOutputProbe` ✅).
 
-== 🟡 EPIC PLT-I18N-OUTPUT — Le validateur de syntaxe devient une gate de corpus (EN COURS S-248, 3/4 US)
+== ✅ EPIC PLT-I18N-OUTPUT — Le validateur de syntaxe devient une gate de corpus (TERMINÉ S-249, 4/4 US)
 
 *Source* : revue externe `foundry/public/bakery-gradle/bakery-plugin/.agents/i18n_review.adoc`
 (S-263) ; mesure cheroliv.com S-077 (`diagram-count-drift` 125, 69 blocs EN
@@ -208,7 +208,7 @@ validation + version). document/bakery ne réimplémentent rien.
 | **Preuve corpus** — reprise ciblée des blocs résiduels S-076 (69 EN) pilotée par
   la gate ; zéro `@startuml` brut dans le HTML baké (hors `[source,plantuml]`)
 | 2
-| 🟡 À FAIRE
+| ✅ TERMINÉ S-249 — mesure **non bloquante** : `PlantumlCorpusLanguageProbe` (mêmes surfaces que le port : labels/directives, notes, prose) + `PlantumlCorpusLanguageReport` (texte + JSON `plantuml-corpus-language.json`) + `-Pplantuml.corpusSourceLanguage` (défaut `fr`) ; `isClean` inchangé. 11 unit + 5 unit + 5 FT + BDD `@plantuml-corpus-language` 5 scénarios (shard E). **Dogfooding réel** `jbake/i18n/en` (zéro LLM) : 112 docs / 256 blocs / **43 blocs résiduels / 23 docs** (0108=8, 0106=4) + 1 finding syntaxique (`0095:80`) ; écart 69 S-076 expliqué (détecteur/store/snapshot). Re-traduction = session cheroliv (LLM, accord pilote) ; gates « zéro `@startuml` baké »/SVG = site. Rapport `.agents/sessions/249-plt-out-4-corpus-language-proof.adoc`
 |===
 
 *Total* : 4 US ~9 pts. *Dépend de* : `plantuml-contracts` (N0 ✅), `PLT-DIAGRAM-OWNERSHIP`

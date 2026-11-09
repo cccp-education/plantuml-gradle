@@ -50,6 +50,7 @@ object CucumberShardFeatures {
             "src/test/features/35_plantuml_term_protection.feature," +
             "src/test/features/36_plantuml_corpus.feature," +
             "src/test/features/37_plantuml_language_guard.feature," +
+            "src/test/features/38_plantuml_corpus_language.feature," +
             "src/test/features/3_syntax_validation.feature," +
             "src/test/features/4_attempt_history.feature"
 
