@@ -72,7 +72,11 @@ via `publishToMavenLocal`) ; racine montée avec le segment `en/` (le
 * `ktlintCheck`, `assemble`, `validatePlugins`, `publishToMavenLocal` VERTS.
 * Zéro test lancé en local ; zéro secret ; zéro LLM ; zéro publication ; zéro
   bump de version.
-* Preuve = CI verte du commit poussé.
+* **CI VERTE run `42539686786`** (commit `65aa36e`) — 11/11 jobs (Unit + Lint,
+  Functional A/B, 7 shards BDD, Coverage mergée). Le premier run `42539306659`
+  (commit `960ad8b`) était **rouge** sur le shard E : les expressions Cucumber
+  avec texte optionnel `finding(s)` ne sont pas résolues par la version du
+  projet → scindées en deux steps littéraux (`finding` / `findings`), puis vert.
 
 == Prochaine session (250) — décision pilote
 

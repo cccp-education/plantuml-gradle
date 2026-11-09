@@ -22,6 +22,9 @@
   La même commande fournira le « après » cheroliv.
 * Gates locaux VERT (compile ×3, `ktlintCheck`, `assemble`, `validatePlugins`,
   `publishToMavenLocal`) ; zéro test local, zéro secret, zéro LLM, zéro bump.
+* **CI VERTE run `42539686786`** (commit `65aa36e`) — 11/11 jobs ✓ (le run
+  initial `960ad8b` était rouge sur un step Cucumber `finding(s)` non résolu →
+  steps littéraux `finding`/`findings`).
 * Cadrage `.agents/CADRAGE_PLT_OUT_4_CORPUS_LANGUAGE_PROOF.adoc` ; rapport
   `.agents/sessions/249-plt-out-4-corpus-language-proof.adoc`.
 
