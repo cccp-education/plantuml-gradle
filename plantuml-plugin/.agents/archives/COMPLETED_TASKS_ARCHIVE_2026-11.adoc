@@ -1,5 +1,19 @@
 = COMPLETED_TASKS_ARCHIVE — 2026-11
 
+== Session 250 (2026-11-09) — Release 0.0.17 préparée, bloquée quota Sonatype
+
+=== Fait
+- [x] Gouvernance corrigée : roadmap `PLT-DIAGRAM-OWNERSHIP` 6/8 US (reste US-6/US-7) ; PL-3 lint de facto résolu (`education.cccp.build.lint:0.0.14` + `ktlintCheck` CI) ✅
+- [x] DAG MEMPHIS préparé : `workspace-bom 0.0.129` + `plantuml-plugin 0.0.17` + garde `PlatformCatalogAlignmentTest` ; `assemble` + compile N0 VERT ; commit `433f1c9`, **CI `42541458784` ✅ 21/21** ✅
+- [x] Publication Central tentée : **bloquée** par le quota Sonatype (reset **2026-12-01**) ; aucun artefact publié ; Portal non viable (groupe en revue manuelle) ✅
+- [x] Revert `b1c9910` → MEMPHIS `main` à l'état publié `0.0.128`/`0.0.16` ✅
+- [x] Aucun code plantuml modifié, zéro bump, zéro publication ✅
+
+=== Prochaine session (251)
+- **Release `plantuml-plugin 0.0.17` dès le 2026-12-01** (procédure prête dans `PROMPT_REPRISE`)
+- ou US-6/US-7 (cross-borough) / re-traduction des 43 blocs EN
+- **Fichier à lire en priorité** : `PROMPT_REPRISE.adoc`
+
 == Session 249 (2026-11-05) — PLT-OUT-4 : preuve corpus (langue) ✅ — EPIC PLT-I18N-OUTPUT TERMINÉ 4/4
 
 === Fait

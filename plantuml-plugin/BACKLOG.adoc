@@ -1,6 +1,6 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-11-05 (Session 249 — **PLT-OUT-4** : preuve corpus langue — `PlantumlCorpusLanguageProbe` non bloquante, JSON `plantuml-corpus-language.json`, `-Pplantuml.corpusSourceLanguage`, dogfooding EN **43 blocs / 23 docs / 256 blocs** ; **EPIC PLT-I18N-OUTPUT ✅ TERMINÉ 4/4**. Historique : S-248 PLT-OUT-3 ✅, S-247 PLT-OUT-2 ✅, S-246 PLT-OUT-1 ✅, S-235 PLT-CONTEXT ✅ 4/4, S-230 PLT-AGENT ✅ 7/7.)
+:last_update: 2026-11-09 (Session 250 — **release 0.0.17 préparée, BLOQUÉE quota Sonatype** : DAG MEMPHIS `0.0.129` prêt (CI `42541458784` ✅), publication Central refusée « monthly release count limit … resets 2026-12-01 », revert `b1c9910` ; gouvernance corrigée (PLT-DIAGRAM-OWNERSHIP 6/8, PL-3 lint résolu). Historique : S-249 PLT-OUT-4 ✅, S-248 PLT-OUT-3 ✅, S-247 PLT-OUT-2 ✅, S-246 PLT-OUT-1 ✅.)
 
 '''
 
@@ -213,6 +213,10 @@ validation + version). document/bakery ne réimplémentent rien.
 
 *Total* : 4 US ~9 pts. *Dépend de* : `plantuml-contracts` (N0 ✅), `PLT-DIAGRAM-OWNERSHIP`
 (✅). *Doc* : `.agents/i18n_review.adoc` (S-263), `CADRAGE_EPIC_GBL_010_ARBRE_TRADUCTION_SITE.adoc`.
+
+*Release* : `plantuml-plugin 0.0.17` **préparée** (DAG MEMPHIS `0.0.129` prêt) mais
+**bloquée par le quota Sonatype jusqu'au 2026-12-01** (S-250, revert `b1c9910`) ;
+procédure prête dans `PROMPT_REPRISE`.
 
 == 🟡 EPIC PLT-DIAGRAM-OWNERSHIP — Le borough plantuml possède le bloc diagramme (CADRÉ S-219, US-1→US-3 + US-5 ✅)
 
@@ -863,7 +867,9 @@ _Sources_ : BACKLOG S172, TODO.adoc, CODE_REVIEW_2026-04.adoc (v3, 8.2/10),
 GLOBAL_CODE_REVIEW_v7 (2026-05-13), audit code actuel S172.
 
 *Tous les EPICs métier sont TERMINÉS.* Le plugin est en mode maintenance/dormant.
-Seul PL-3 (ktlint/detekt) reste — BLOQUÉ ABIDJAN (conventions-gradle sans plugin lint).
+Aucun EPIC métier ouvert côté plantuml ; PL-3 (lint) est de facto résolu (voir
+ci-dessous) et le seul EPIC encore ouvert (`PLT-DIAGRAM-OWNERSHIP`) est
+cross-borough (US-6/US-7, bakery/cheroliv).
 
 === ✅ Quick wins (soldées)
 
@@ -953,7 +959,9 @@ Seul PL-3 (ktlint/detekt) reste — BLOQUÉ ABIDJAN (conventions-gradle sans plu
   Si conventions-gradle (ABIDJAN) ajoute un plugin lint, plantuml devrait le
   consommer. Source : GLOBAL_CODE_REVIEW_v7.
 | `build.gradle.kts` (conventions)
-| ❌ BLOQUÉ ABIDJAN
+| ✅ **DE FACTO RÉSOLU** — `education.cccp.build.lint:0.0.14` est appliqué
+  (`build.gradle.kts:24`) et le job CI `Unit + Lint` exécute `ktlintCheck`
+  (S-246→S-249). detekt non requis (`ktlint` satisfait « ktlint ou detekt »).
 
 | PL-4
 | **Consulter `PLAN_GLOBAL.adoc`** — racine workspace. Identifier les EPICs

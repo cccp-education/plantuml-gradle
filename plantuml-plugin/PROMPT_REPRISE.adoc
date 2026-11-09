@@ -1,57 +1,59 @@
-= PROMPT_REPRISE — Plantuml — Session 250
-:session: 250
-:date: 2026-11-05
+= PROMPT_REPRISE — Plantuml — Session 251
+:session: 251
+:date: 2026-11-09
 
-== État S-249 — PLT-OUT-4 (preuve corpus) ✅ — EPIC PLT-I18N-OUTPUT TERMINÉ 4/4
+== État S-250 — Release 0.0.17 préparée, BLOQUÉE quota Sonatype
 
-* `PlantumlCorpusLanguageProbe` (pur) : un finding par bloc `[plantuml]` dont
-  une **surface du port** (labels/directives, notes, prose) est restée dans la
-  langue source ; mêmes extracteurs que `PlantumlTranslationPortAdapter`.
-  Évidence `word:`/`ratio:n/m`/`diacritic:` dédupliquée.
-* `PlantumlCorpusLanguageReport` (texte + JSON Jackson) intégré à
-  `PlantumlCorpusReport.languageReport` ; **`isClean` inchangé** (la langue ne
-  bloque jamais).
-* Tâche `validatePlantumlCorpus` étendue : `-Pplantuml.corpusSourceLanguage`
-  (défaut `fr`) + sortie `build/plantuml/plantuml-corpus-language.json`.
-* Tests : 11 unit (sonde) + 5 unit (gate) + 5 functional TestKit + BDD
-  `@plantuml-corpus-language` 5 scénarios (shard E).
-* **Preuve dogfooding** (lecture seule, zéro LLM) sur `jbake/i18n/en` :
-  **112 documents / 256 blocs / 43 blocs à résidu FR / 23 documents**
-  (concentration 0108=8, 0106=4) + 1 finding syntaxique réel (`0095:80`).
-  Écart avec les 69 de S-076 expliqué (détecteur/store/snapshot différents).
-  La même commande fournira le « après » cheroliv.
-* Gates locaux VERT (compile ×3, `ktlintCheck`, `assemble`, `validatePlugins`,
-  `publishToMavenLocal`) ; zéro test local, zéro secret, zéro LLM, zéro bump.
-* **CI VERTE run `42539686786`** (commit `65aa36e`) — 11/11 jobs ✓ (le run
-  initial `960ad8b` était rouge sur un step Cucumber `finding(s)` non résolu →
-  steps littéraux `finding`/`findings`).
-* Cadrage `.agents/CADRAGE_PLT_OUT_4_CORPUS_LANGUAGE_PROOF.adoc` ; rapport
-  `.agents/sessions/249-plt-out-4-corpus-language-proof.adoc`.
+* Gouvernance corrigée : roadmap `PLT-DIAGRAM-OWNERSHIP` **6/8 US** (reste
+  US-6/US-7, cross-borough) ; PL-3 lint **de facto résolu**
+  (`education.cccp.build.lint:0.0.14` + `ktlintCheck` CI).
+* DAG MEMPHIS **préparé** (commit `433f1c9`, CI `42541458784` ✅ 21/21) :
+  `workspace-bom 0.0.129` + `plantuml-plugin 0.0.17`.
+* **Publication Central bloquée** :
+  `Publishing blocked: … monthly release count limit. Grace period ended
+  2026-11-05. Usage resets 2026-12-01.` (org `cccp.education`). Aucun artefact
+  publié (`0.0.129` = 404 repo1). **Revert** `b1c9910` → MEMPHIS `main` reste à
+  l'état publié `0.0.128` / plantuml `0.0.16`.
+* Portal non viable en contournement : groupe `education.cccp.plantuml` en revue
+  manuelle (m2 marker `0.0.16` = 404, page 400) → seul Central sert les
+  consommateurs.
+* Aucun code plantuml modifié, zéro bump, zéro publication.
+* Rapport `.agents/sessions/250-release-0.0.17-blocked-sonatype-quota.adoc`.
 
-== Mission Session 250 — décision pilote
+== Mission Session 251 — à partir du 2026-12-01
 
-Deux candidats (aucun EPIC plantuml ouvert hors cross-borough) :
-. **Release `plantuml-plugin 0.0.17`** via MEMPHIS (DAG N0→N2) pour propager
-  0.0.16+PLT-OUT-1/2/3 aux consommateurs bakery/document ; vérifier la page
-  Portal `education.cccp.plantuml` (`0.0.16` uploadé S-247, revue manuelle).
-. **PLT-DIAGRAM-OWNERSHIP US-6/US-7** (cross-borough bakery + cheroliv, cadré
-  S-241 : `.agents/CADRAGE_PLT_DIAGRAM_OWNERSHIP_US6_US7.adoc`).
-**Recommandation** : la release DAG d'abord — le Central ne contient pas encore
-la garde langue (les consommateurs ne voient pas PLT-OUT-2/3).
+**Option A (recommandée) — release `plantuml-plugin 0.0.17`** dès le reset
+quota Sonatype :
+. MEMPHIS : `workspace-bom = 0.0.129`, `plantuml-plugin = 0.0.17`, garde
+   `PlatformCatalogAlignmentTest` `0.0.129` ; CI verte ;
+   `publishAggregationToCentralPortal --no-daemon` ; repo1 200 ×2.
+. plantuml : `settings.gradle.kts` catalogue `0.0.121 → 0.0.129`,
+   `build.gradle.kts` platform `workspace-bom:0.0.121 → 0.0.129`, toml
+   `plantuml = 0.0.17` ; compile ×3 + `ktlintCheck` + `validatePlugins` +
+   `publishToMavenLocal` ; `publishAggregationToCentralPortal` (Central) et/ou
+   `publishPlugins` (Portal) selon décision pilote post-2026-12-01 ; repo1 200.
+. Consommateurs (sessions dédiées) : bakery `workspaceVersion 0.0.125 → 0.0.129`,
+   document catalogue `0.0.122 → 0.0.129`.
 
-== Résiduel / dette
+**Option B — US-6/US-7 `PLT-DIAGRAM-OWNERSHIP`** (cross-borough, cadrées S-241) :
+- US-6 : E2E bakery→document→port→plantuml (labels traduits + round-trip +
+  rendu non blanc) — `bakery-gradle`.
+- US-7 : re-bake `cheroliv.com` + garde `DiagramIntegrity` — `cheroliv.com`.
 
-* Release consommateur : bump `plantuml = 0.0.17` + MEMPHIS BOM/catalog + pins
-  bakery/document (Règle 2, ordre DAG, CI verte du code inchangé).
-* Gate P0.3 site (zéro `@startuml` baké, σ>0 SVG) : hors plantuml, pilotée
-  cheroliv/bakery.
-* `pilot-batch` duplique `0100`/`0105` dans le corpus EN → findings dupliqués
-  attendus (mesure brute, non dédupliquée).
-* Portal : première publication du groupe en revue manuelle (vérifier la page).
+**Option C — re-traduction des 43 blocs EN** mesurés S-249 (site cheroliv, LLM
+metered, accord pilote) + 1 finding syntaxique `0095:80`.
+
+== Résiduel
+
+* TODO PLT-AGENT : vérifier qu'un modèle du pool HTOWN expose la vision
+  (sinon DIA-01 dégrade).
+* Portal : première publication du groupe en revue manuelle.
+* Pin drift assumé : catalogue plantuml `0.0.121` vs ws courant `0.0.128`
+  (à réaligner avec la release).
 
 == Rappels
 
 * Local = Build, Tests = CI ; un borough par session ; zéro Python ; zéro secret.
 * `publishToMavenLocal` après modification source avant test consommateur.
-* Version courante `0.0.16` (pin catalogue/BOM `0.0.121` — catalogue ws courant
-  `0.0.128`, pin non réaligné, dette assumée).
+* Version courante `0.0.16` (Central) ; `0.0.17` prête mais non publiable avant
+  le 2026-12-01.

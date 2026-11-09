@@ -1,5 +1,23 @@
 = Historique des Sessions
 
+== Session 250 (2026-11-09) — Release 0.0.17 préparée, bloquée quota Sonatype
+
+Tentative de propagation de PLT-OUT-1→4 via le DAG MEMPHIS. **Gouvernance corrigée**
+d'abord : la roadmap `PLT-DIAGRAM-OWNERSHIP` était périmée (`62% 5/8`, « reste US-4 »)
+→ **6/8 US** (US-4 ✅ S-283/S-284, reste US-6/US-7) ; PL-3 « ktlint/detekt BLOQUÉ
+ABIDJAN » était périmé → **de facto résolu** (`education.cccp.build.lint:0.0.14` +
+`ktlintCheck` dans le job CI `Unit + Lint`). **DAG préparé** : MEMPHIS
+`workspace-bom = 0.0.129` + `plantuml-plugin = 0.0.17` + littéral
+`PlatformCatalogAlignmentTest` réaligné, `assemble` + compile N0 VERT, commit
+`433f1c9`, **CI `42541458784` ✅ 21/21 jobs**. **Publication Central refusée** par
+Sonatype : « monthly release count limit. Grace period ended 2026-11-05. Usage
+resets 2026-12-01 » (org `cccp.education`) — aucun artefact publié (`0.0.129` 404
+repo1). Contournement Portal impossible : le groupe `education.cccp.plantuml` est
+en revue manuelle (m2 marker `0.0.16` 404). **Revert** `b1c9910` → MEMPHIS `main`
+reste à l'état publié `0.0.128`/`0.0.16`. Aucun code plantuml modifié, zéro bump,
+zéro publication. Le DAG est prêt et rejouable dès le 2026-12-01 (procédure dans
+`PROMPT_REPRISE`). Rapport `.agents/sessions/250-release-0.0.17-blocked-sonatype-quota.adoc`.
+
 == Session 249 (2026-11-05) — PLT-OUT-4 : preuve corpus (langue) ✅ — EPIC PLT-I18N-OUTPUT TERMINÉ 4/4
 
 Le détecteur de résidu (S-248) devient une **mesure non bloquante sur corpus réel**.

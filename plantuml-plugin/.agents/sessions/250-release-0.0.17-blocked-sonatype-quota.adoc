@@ -1,0 +1,65 @@
+= Session 250 — Release 0.0.17 : préparée, bloquée par le quota Sonatype
+:session: 250
+:date: 2026-11-09
+:type: release (tentée) + gouvernance
+:epic: PLT-I18N-OUTPUT (propagation)
+
+== Mission
+
+Propager PLT-OUT-1/2/3/4 aux consommateurs : release `plantuml-plugin 0.0.17`
+via le DAG MEMPHIS (BOM/catalog → plugin → consommateurs), et corriger deux
+lignes de gouvernance périmées (INDEX roadmap `PLT-DIAGRAM-OWNERSHIP`, PL-3 lint).
+
+== Gouvernance corrigée (fait)
+
+* `INDEX.adoc` roadmap `PLT-DIAGRAM-OWNERSHIP` : `62% (5/8)` **périmé** (il
+  annonçait encore « reste US-4 ») → **`75% (6/8)`**, US-4 ✅ S-283/S-284,
+  reste **US-6/US-7** (cross-borough, hors plantuml).
+* `BACKLOG.adoc` PL-3 « ktlint/detekt **BLOQUÉ ABIDJAN** » **périmé** :
+  `education.cccp.build.lint:0.0.14` est appliqué (`build.gradle.kts:24`) et le
+  job CI `Unit + Lint` exécute `ktlintCheck` depuis S-246 → **de facto résolu**
+  (`ktlint` satisfait « ktlint ou detekt »). Intro « Prochains EPICs » alignée.
+
+== Release tentée — DAG MEMPHIS
+
+. **MEMPHIS** : `workspace-bom = 0.0.128 → 0.0.129`, `plantuml-plugin = 0.0.16
+  → 0.0.17`, littéral `PlatformCatalogAlignmentTest` réaligné (`0.0.129`) ;
+  `assemble` racine + `agent-contracts:compileTestKotlin` VERT ;
+  commit `433f1c9` poussé, **CI `42541458784` ✅ 21/21 jobs** (dont
+  `N0 · contracts` 10 builds et les 21 shards bakery).
+. **Publication Central** : `./gradlew publishAggregationToCentralPortal
+  --no-daemon` → **BLOQUÉE** par Sonatype :
+  `Publishing blocked: your organization has reached its monthly release count
+  limit. Grace period ended 2026-11-05. Usage resets 2026-12-01.`
+  (org `cccp.education`). Aucun artefact publié (`workspace-bom/catalog 0.0.129`
+  restent **404** sur repo1, vérifié).
+. **Reconnaissance Portal** : le groupe `education.cccp.plantuml` n'est pas
+  encore validé (m2 marker `0.0.16` = **404**, page `400`) — le Portal ne peut
+  donc pas servir de contournement pour les consommateurs ; seul Central le peut.
+. **Revert** (`b1c9910`, poussé) : `main` MEMPHIS revient à l'état **publié**
+  `0.0.128` / plantuml `0.0.16` (aucune version fantôme dans le catalogue).
+
+== Décision
+
+La release est **bloquée par un quota externe** jusqu'au **2026-12-01** — la
+date même de la politique publication (Portal/Central) du 2026-11-05. Aucun code
+plantuml modifié, zéro bump, zéro publication. Le DAG est **prêt** et rejouable :
+
+. MEMPHIS `0.0.129` (`plantuml-plugin 0.0.17`) → Central ;
+. plantuml re-pin `workspace-catalog`/`workspace-bom` `0.0.129`, toml
+  `plantuml = 0.0.17`, `publishToMavenLocal` + publication (Portal et/ou
+  Central `both` après le 2026-12-01, décision pilote) ;
+. consommateurs : bakery `workspaceVersion 0.0.125 → 0.0.129`, document
+  catalogue `0.0.122 → 0.0.129` (sessions dédiées).
+
+== État
+
+* `plantuml-plugin` HEAD `0.0.16` (Central), code PLT-OUT-1→4 prêt non publié.
+* MEMPHIS `main` : `0.0.128` / plantuml `0.0.16` (état publié) — revert `b1c9910`.
+* Prochaine fenêtre : **2026-12-01** (reset quota Sonatype).
+
+== Fichiers
+
+* `INDEX.adoc` (roadmap PLT-DIAGRAM-OWNERSHIP), `BACKLOG.adoc` (PL-3 + intro)
+* MEMPHIS : `gradle/libs.versions.toml` + `PlatformCatalogAlignmentTest`
+  (commit `433f1c9` puis revert `b1c9910`)
