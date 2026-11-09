@@ -58,7 +58,12 @@ class PlantumlCorpusLanguageSteps {
             )
     }
 
-    @Then("the corpus language report has {int} finding(s)")
+    @Then("the corpus language report has {int} finding")
+    fun theCorpusLanguageReportHasFinding(expected: Int) {
+        assertThat(report!!.languageReport.findings).hasSize(expected)
+    }
+
+    @Then("the corpus language report has {int} findings")
     fun theCorpusLanguageReportHasFindings(expected: Int) {
         assertThat(report!!.languageReport.findings).hasSize(expected)
     }
