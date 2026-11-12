@@ -123,10 +123,13 @@ niveau FT « contrat » (re-parse + labels) **sans** bake, et un niveau « rendu
 . [x] **US-6a** (contrat) ✅ **S-271 (bakery)** — `PlantUmlTranslationChainTest` :
    article AsciiDoc réel → `ContentTranslationService` → port N0 réel + validateur
    N0 réel ; labels traduits, `@startuml`/`@enduml` préservés, bloc re-parsable.
-. [ ] **US-6b** (rendu non blanc, gaté toolchain) — session bakery dédiée.
+
 . [ ] **US-7** (re-bake cheroliv + `DiagramIntegrity`) — session cheroliv dédiée.
 . [ ] Clore `PLT-DIAGRAM-OWNERSHIP` **8/8** après US-6b/US-7.
 
 *Rappel d'état des US antérieures* (vérifié) : US-0 ✅ S-219 · US-1 ✅
 (`plantuml-contracts:0.0.1` publié) · US-2 ✅ S-220 · US-3 ✅ S-221 · US-4 ✅
 (document délègue ; bakery injecte le port N0, S-251) · US-5 ✅ S-222.
+. [x] **US-6b** (rendu) ✅ **S-271 (bakery)** — `PlantUmlTranslationChainTest` :
+   `PlantumlService.renderPng` + `DiagramOutputProbe` → `Rendered` (PNG réel,
+   jamais le fallback textuel). CI verte `43148851600`.
