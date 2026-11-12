@@ -108,7 +108,7 @@ configurations.configureEach {
 
 // CNV-13.6 — the TestKit builds must run the workspace Gradle (the wrapper),
 // never a hardcoded stale version: a `withGradleVersion("9.4.1")` forced CI to
-// download and exercise an untested distribution (9.8.2 is the workspace one).
+// download and exercise an untested distribution (9.9.1 is the workspace one).
 val workspaceGradleVersion =
     layout.projectDirectory
         .file("gradle/wrapper/gradle-wrapper.properties")

@@ -72,7 +72,7 @@ class PlantumlWorld {
          * A hardcoded version here made CI download an untested distribution.
          */
         private val gradleTestVersion: String =
-            System.getProperty("workspace.gradle.version") ?: "9.8.2"
+            System.getProperty("workspace.gradle.version") ?: "9.9.1"
         private val pluginVersion: String by lazy {
             val projectRoot = File(System.getProperty("user.dir"))
             val tomlFile = File(projectRoot, "gradle/libs.versions.toml")
