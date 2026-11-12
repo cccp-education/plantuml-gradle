@@ -286,3 +286,7 @@ preuve = CI. **PLT-CONTEXT 2/4**. Zéro secret, zéro Python. Rapport
 Publication JitPack de plantuml-plugin 0.0.16. JitPack : 0.0.16 — POM HTTP 200. Shim `useModule` pour
 `education.cccp.build.*` (tag JitPack `0.0.15`). Rapport
 `plantuml-plugin/.agents/sessions/251-jitpack-mirror.adoc`.
+
+== Session transverse 271/091 — PLT-DIAGRAM-OWNERSHIP US-6a/US-6b/US-7 — 2026-11-12
+
+Clôture **8/8**. **US-6a** (bakery S-271) : test E2E contrat (`PlantUmlTranslationChainTest`) — article réel → `ContentTranslationService` → port N0 + validateur N0 → labels traduits + bloc re-parsable. **US-6b** (bakery S-271) : rendu `PlantumlService.renderPng` + `DiagramOutputProbe` → `Rendered` (jamais le fallback textuel). **US-7** (cheroliv.com S-091) : Saxon-HE 11.4 exclu du classpath du site ; `stack-architecture.svg` re-rendu (`xmlns=''`=0, σ=0,133) + 21 variantes ; baseline vide. CI bakery verte (`43147892547`, `43148851600`). Rapports `.agents/sessions/271-…` (bakery) et `.agents/sessions/091-…` (site).
