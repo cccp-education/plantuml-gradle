@@ -71,7 +71,7 @@ _Raison_ : Le projet parent (`plantuml-gradle/`) consomme le plugin via `mavenLo
 * Commit/push/merge autorisés (décision pilote 2026-09-17). Ne JAMAIS commiter de secret.
 
 * ✅ _Autorisé_ : `git status`, `git diff`, `git log`, `git show` (lecture seule)
-* ❌ _Interdit_ : `git add`, `git commit`, `git push`, `git merge`, `git rebase` (sauf ordre explicite)
+* ✅ _Autorisé_ (décision pilote 2026-11-11) : `git add`, `git commit`, `git push` ; `merge/rebase` sur ordre explicite
 
 _Procédure obligatoire avant tout commit_ :
 . Montrer les modifications (`git diff --stat`)
