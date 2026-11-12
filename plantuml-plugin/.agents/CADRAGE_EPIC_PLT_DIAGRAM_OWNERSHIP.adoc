@@ -466,3 +466,11 @@ grep -rn "TranslateLabels\|BorrowVocabulary" document-gradle/…/PlantUmlClassif
 * `document.translation.plantuml.PlantUmlTranslationAdapter` (document, à retirer)
 * `plantuml.boundary.TranslationResolver` (plantuml, à exposer via port)
 * `bakery.SiteManager.createJBakeRuntimeConfiguration` (version toolchain, à gouverner)
+
+'''
+== État réel (2026-11-12)
+
+US-0 ✅ S-219 · US-1 ✅ (`plantuml-contracts:0.0.1`) · US-2 ✅ S-220 · US-3 ✅ S-221 ·
+US-4 ✅ (document délègue ; bakery injecte le port N0 S-251) · US-5 ✅ S-222 ·
+**US-6a ✅ S-271** (test E2E contrat bakery) · US-6b 🟡 (rendu non blanc) · US-7 🟡
+(re-bake cheroliv). Voir `CADRAGE_PLT_DIAGRAM_OWNERSHIP_US6_US7.adoc` §8.

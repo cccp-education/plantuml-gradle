@@ -728,7 +728,7 @@ koverConventions {
 gradlePlugin {
     plugins {
         vcsUrl = "https://github.com/cccp-education/plantuml-gradle.git"
-        website = "https://cheroliv.com"
+        website = "https://cccp.education/"
         create("plantuml") {
             id =
                 libs.plugins.plantuml
