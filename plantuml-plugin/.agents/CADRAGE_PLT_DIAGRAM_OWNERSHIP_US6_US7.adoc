@@ -124,8 +124,8 @@ niveau FT « contrat » (re-parse + labels) **sans** bake, et un niveau « rendu
    article AsciiDoc réel → `ContentTranslationService` → port N0 réel + validateur
    N0 réel ; labels traduits, `@startuml`/`@enduml` préservés, bloc re-parsable.
 
-. [ ] **US-7** (re-bake cheroliv + `DiagramIntegrity`) — session cheroliv dédiée.
-. [ ] Clore `PLT-DIAGRAM-OWNERSHIP` **8/8** après US-6b/US-7.
+. [x] **US-7** (re-bake cheroliv + `DiagramIntegrity`) ✅ **S-091 (cheroliv.com)** : Saxon-HE 11.4 (via epubcheck) exclu du classpath du site ; `stack-architecture.svg` re-rendu (''=0, σ=0,133) + 21 variantes ; baseline vide.
+. [x] **`PLT-DIAGRAM-OWNERSHIP` clos 8/8** (US-7 ✅ S-091).
 
 *Rappel d'état des US antérieures* (vérifié) : US-0 ✅ S-219 · US-1 ✅
 (`plantuml-contracts:0.0.1` publié) · US-2 ✅ S-220 · US-3 ✅ S-221 · US-4 ✅
