@@ -166,7 +166,7 @@ PlantUML consomme les convention plugins centralises `education.cccp.build` v0.0
 |===
 | Plugin ID | Role
 | `education.cccp.build.gradle-plugin` | java-gradle-plugin + kotlin-jvm + test JUnit + withSourcesJar/JavadocJar + mavenLocal + deps junit test
-| `education.cccp.build.publishing` | POM Maven Central + signing conditionnel + relocation + publicationType
+| `education.cccp.build.publishing` | POM (licence/dev/scm) + signing conditionnel + relocation + publicationType
 | `education.cccp.build.cucumber` | Source set features/scenarios + cucumberTest task + exclusion jupiter + CucumberTaskSpec
 | `education.cccp.build.functional-test` | Source set functionalTest + GradleTestKit + task + check.dependsOn
 |===
