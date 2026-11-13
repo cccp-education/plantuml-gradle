@@ -1,6 +1,6 @@
-= PROMPT_REPRISE — Plantuml — Session 251
-:session: 251
-:date: 2026-11-09
+= PROMPT_REPRISE — Plantuml — Session 253
+:session: 253
+:date: 2026-11-13
 
 == État S-250 — Release 0.0.17 préparée, BLOQUÉE quota Sonatype
 
@@ -20,7 +20,13 @@
 * Aucun code plantuml modifié, zéro bump, zéro publication.
 * Rapport `.agents/sessions/250-release-0.0.17-blocked-sonatype-quota.adoc`.
 
-== Mission Session 251 — à partir du 2026-12-01
+== Session 252 (TERMINÉE) — `MEM-WARN-ZERO` US-4
+
+* 2 délégués `registering` → `register` (6 warnings Gradle 9.6 → 0) ; graphe
+  `dependsOn` inchangé ; CI `43357880558` verte. Rapport
+  `.agents/sessions/252-mem-warn-zero-us4-plantuml.adoc`.
+
+== Mission Session 253 — à partir du 2026-12-01
 
 **Option A (recommandée) — release `plantuml-plugin 0.0.17`** dès le reset
 quota Sonatype :
