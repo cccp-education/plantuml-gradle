@@ -588,60 +588,62 @@ val pythonResourceDir =
     layout.projectDirectory
         .dir("src/functionalTest/resources/python")
 
-val buildFineTuningImage by tasks.registering {
-    description = "Builds the Docker image for SmolLM2 fine-tuning tests"
-    group = "verification"
+val buildFineTuningImage =
+    tasks.register("buildFineTuningImage") {
+        description = "Builds the Docker image for SmolLM2 fine-tuning tests"
+        group = "verification"
 
-    inputs.dir(pythonResourceDir)
-    outputs.upToDateWhen {
-        val result =
-            ProcessBuilder("docker", "image", "inspect", "plantuml-fine-tune:latest")
-                .redirectErrorStream(true)
-                .start()
-                .inputStream
-                .bufferedReader()
-                .use { it.readText() }
-        result.contains("plantuml-fine-tune:latest")
-    }
+        inputs.dir(pythonResourceDir)
+        outputs.upToDateWhen {
+            val result =
+                ProcessBuilder("docker", "image", "inspect", "plantuml-fine-tune:latest")
+                    .redirectErrorStream(true)
+                    .start()
+                    .inputStream
+                    .bufferedReader()
+                    .use { it.readText() }
+            result.contains("plantuml-fine-tune:latest")
+        }
 
-    doLast {
-        val dockerfile = pythonResourceDir.asFile.resolve("Dockerfile")
-        val pb =
-            ProcessBuilder(
-                "docker",
-                "build",
-                "-t",
-                "plantuml-fine-tune:latest",
-                "-f",
-                dockerfile.absolutePath,
-                dockerfile.parent,
-            ).inheritIO()
-        val exit = pb.start().waitFor()
-        if (exit != 0) {
-            throw GradleException("Docker build failed with exit code $exit")
+        doLast {
+            val dockerfile = pythonResourceDir.asFile.resolve("Dockerfile")
+            val pb =
+                ProcessBuilder(
+                    "docker",
+                    "build",
+                    "-t",
+                    "plantuml-fine-tune:latest",
+                    "-f",
+                    dockerfile.absolutePath,
+                    dockerfile.parent,
+                ).inheritIO()
+            val exit = pb.start().waitFor()
+            if (exit != 0) {
+                throw GradleException("Docker build failed with exit code $exit")
+            }
         }
     }
-}
 
-val downloadFineTuningModel by tasks.registering {
-    description = "Downloads HuggingFaceTB/SmolLM2-135M-Instruct for fine-tuning tests"
-    group = "verification"
+val downloadFineTuningModel =
+    tasks.register("downloadFineTuningModel") {
+        description = "Downloads HuggingFaceTB/SmolLM2-135M-Instruct for fine-tuning tests"
+        group = "verification"
 
-    outputs.dir(fineTuningModelDir)
+        outputs.dir(fineTuningModelDir)
 
-    doLast {
-        val modelDir = fineTuningModelDir.asFile
-        val safetensors = File(modelDir, "model.safetensors")
-        if (safetensors.exists()) {
-            logger.lifecycle("Model already present at ${modelDir.absolutePath} — skipping download")
-            return@doLast
-        }
-        logger.lifecycle("Downloading HuggingFaceTB/SmolLM2-135M-Instruct with plantuml-fine-tune:latest ...")
-        modelDir.mkdirs()
+        doLast {
+            val modelDir = fineTuningModelDir.asFile
+            val safetensors = File(modelDir, "model.safetensors")
+            if (safetensors.exists()) {
+                logger.lifecycle("Model already present at ${modelDir.absolutePath} — skipping download")
+                return@doLast
+            }
+            logger.lifecycle("Downloading HuggingFaceTB/SmolLM2-135M-Instruct with plantuml-fine-tune:latest ...")
+            modelDir.mkdirs()
 
-        val downloadScript = File(temporaryDir, "download.py")
-        downloadScript.writeText(
-            """
+            val downloadScript = File(temporaryDir, "download.py")
+            downloadScript.writeText(
+                """
 import sys, time
 from huggingface_hub import snapshot_download
 for attempt in range(1, 4):
@@ -661,39 +663,39 @@ for attempt in range(1, 4):
         if attempt == 3:
             sys.exit(1)
         time.sleep(5)
-            """.trimIndent(),
-        )
-
-        val hfCache = File(temporaryDir, "hf-cache").also { it.mkdirs() }
-
-        val dockerCmd =
-            listOf(
-                "docker",
-                "run",
-                "--rm",
-                "-v",
-                "${modelDir.absolutePath}:/out",
-                "-v",
-                "${hfCache.absolutePath}:/root/.cache/huggingface",
-                "-v",
-                "${downloadScript.absolutePath}:/scripts/download.py:ro",
-                "-e",
-                "HF_HUB_ENABLE_HF_TRANSFER=1",
-                "plantuml-fine-tune:latest",
-                "python3",
-                "/scripts/download.py",
+                """.trimIndent(),
             )
 
-        val pb = ProcessBuilder(dockerCmd).inheritIO()
-        val exit = pb.start().waitFor()
-        if (exit != 0) {
-            throw GradleException("Model download failed with exit code $exit")
-        }
-        check(safetensors.exists()) {
-            "Download failed — model.safetensors missing in ${modelDir.absolutePath}"
+            val hfCache = File(temporaryDir, "hf-cache").also { it.mkdirs() }
+
+            val dockerCmd =
+                listOf(
+                    "docker",
+                    "run",
+                    "--rm",
+                    "-v",
+                    "${modelDir.absolutePath}:/out",
+                    "-v",
+                    "${hfCache.absolutePath}:/root/.cache/huggingface",
+                    "-v",
+                    "${downloadScript.absolutePath}:/scripts/download.py:ro",
+                    "-e",
+                    "HF_HUB_ENABLE_HF_TRANSFER=1",
+                    "plantuml-fine-tune:latest",
+                    "python3",
+                    "/scripts/download.py",
+                )
+
+            val pb = ProcessBuilder(dockerCmd).inheritIO()
+            val exit = pb.start().waitFor()
+            if (exit != 0) {
+                throw GradleException("Model download failed with exit code $exit")
+            }
+            check(safetensors.exists()) {
+                "Download failed — model.safetensors missing in ${modelDir.absolutePath}"
+            }
         }
     }
-}
 
 // Attach model + image build as dependencies of functionalTest — ONLY when the
 // fine-tune suite is requested. The fine-tune tests are tag-gated (excluded by

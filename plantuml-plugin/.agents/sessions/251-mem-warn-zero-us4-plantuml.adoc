@@ -1,0 +1,50 @@
+= Session 251 — `MEM-WARN-ZERO` US-4 : `registering` → `register` (plantuml)
+:toc:
+
+:_date_: 2026-11-13
+:_borough_: HTOWN (plantuml-gradle, N2)
+:_session_precedente_: 249 (PLT-OUT-4 preuve de langue du corpus)
+:_statut_: ✅ 2 délégués dépréciés supprimés — iso-comportement
+
+'''
+
+== EPIC rattaché
+
+`MEM-WARN-ZERO` US-4 (porteur MEMPHIS, cadrage
+`workspace-bom/.agents/CADRAGE_EPIC_MEM_WARN_ZERO.adoc`).
+
+'''
+
+== Livré
+
+`plantuml-plugin/build.gradle.kts` — `buildFineTuningImage` et
+`downloadFineTuningModel` (tâches de test fine-tuning, `dependsOn` aux lignes
+`711`/`716`) :
+
+[source,kotlin]
+----
+// avant
+val buildFineTuningImage by tasks.registering { … }
+// après
+val buildFineTuningImage =
+    tasks.register("buildFineTuningImage") { … }
+----
+
+Les `dependsOn(buildFineTuningImage, downloadFineTuningModel)` restent valides
+(`TaskProvider`). Corps des blocs inchangé (docker build / download HF,
+`outputs.upToDateWhen`, messages).
+
+'''
+
+== Mesure
+
+* **Avant** : 2 × `by tasks.registering` = 6 lignes `w:`.
+* **Après** : `grep -c "by tasks.registering"` = **0**. Preuve = log CI.
+* Local = Build : `compileKotlin`, `compileTestKotlin`, `ktlintCheck` — VERTS
+  (`ktlintFormat` n'a touché que `build.gradle.kts`).
+
+'''
+
+== Reste `MEM-WARN-ZERO`
+
+`buildDir` (US-5/US-6) puis gate statique (US-7). F1 terminée (4 dépôts).
