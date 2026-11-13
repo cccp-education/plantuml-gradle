@@ -594,3 +594,10 @@ Couverture : +8 fichiers production (`plantuml.agent.*` + `DesignReviewer` port 
 `VisionDesignReviewer` adapter + `PlantumlService.renderPng`), +7 fichiers test unit,
 +1 feature, +1 steps. Config opt-in (défaut off). Correctif dette : drift toolchain
 S-227 (`PlantUmlToolchain.reference`).
+
+== GBL-013 US-5 (S-254) — delta tests
+
+* `CollectPlantumlIndexTaskBranchTest` — cas `should throw exception when RAG
+  directory cannot be read` rendu **root-safe** (`assumeTrue` quand
+  `user.name == root`, l'image tourne en root). Aucun test métier modifié ;
+  couverture inchangée (CI `43508921960`).
