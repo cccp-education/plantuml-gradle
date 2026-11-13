@@ -29,7 +29,7 @@ plugins {
 
 // Apply the BOM
 dependencies {
-    implementation(platform("education.cccp:workspace-bom:0.0.121"))
+    implementation(platform("com.github.cccp-education.workspace-bom:workspace-bom:0.0.136"))
 }
 
 group = "education.cccp"
@@ -51,17 +51,17 @@ dependencies {
     implementation(libs.bundles.plantuml.ai)
 
     // N0 contracts — i18n (cross-borough translation alliance)
-    implementation("education.cccp:i18n-contracts:0.0.5")
+    implementation("com.github.cccp-education.workspace-bom:i18n-contracts:0.0.136")
 
     // N0 contracts — PlantUML diagram block (EPIC PLT-DIAGRAM-OWNERSHIP US-2).
     // The port + model + validation types live in the contract; this borough
     // provides the implementation (D1/D2/D3).
-    implementation("education.cccp:plantuml-contracts:0.0.1")
+    implementation("com.github.cccp-education.workspace-bom:plantuml-contracts:0.0.136")
 
     // N0 contracts — augmented context (EPIC PLT-CONTEXT CTX-01). The shared
     // CompositeContext / ContextChannel / ChannelBudget seam, fed by the N1
     // codebase; plantuml consumes the contract, never an N2 type.
-    implementation("education.cccp:codebase-contracts:0.0.2")
+    implementation("com.github.cccp-education.workspace-bom:codebase-contracts:0.0.136")
 
     // Testcontainers for RAG integration (CollectPlantumlIndexTask uses PostgreSQLContainer)
     implementation(libs.testcontainers.pg)
@@ -206,8 +206,8 @@ dependencies {
     add(functionalTest.implementationConfigurationName, sourceSets.main.get().output)
 
     // N0 contracts used by the PlantUML translation port (PLT-TERM-PROTECTION FT).
-    add(functionalTest.implementationConfigurationName, "education.cccp:i18n-contracts:0.0.5")
-    add(functionalTest.implementationConfigurationName, "education.cccp:plantuml-contracts:0.0.1")
+    add(functionalTest.implementationConfigurationName, "com.github.cccp-education.workspace-bom:i18n-contracts:0.0.136")
+    add(functionalTest.implementationConfigurationName, "com.github.cccp-education.workspace-bom:plantuml-contracts:0.0.136")
 
     // PLT-OUT-2 — the functional note tests exercise the real N0 syntax validator.
     // The custom functionalTest source set does not inherit the main `implementation`
