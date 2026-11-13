@@ -1,0 +1,60 @@
+= Session 253 — CNV-17 : JitPack canal unique (plantuml)
+:toc:
+
+:_date_: 2026-11-13
+:_borough_: HTOWN (plantuml-gradle, N2 — diagrammes)
+:_session_precedente_: 252 (`MEM-WARN-ZERO` US-4)
+:_statut_: ✅ migration CNV-17
+
+== Contexte
+
+Décision pilote S-045 : JitPack devient le canal **unique** des artefacts
+publics `education.cccp` — un artefact = un canal = un nom = une version.
+Maven Central et le Gradle Plugin Portal cessent d'être publiés pour
+`foundry/public/**` ; `foundry/private/**` et `office/**` restent hors périmètre.
+Cadrage : `conventions-gradle/conventions-plugin/.agents/CADRAGE_EPIC_CNV_17_JITPACK_PRIMARY.adoc`.
+
+N0 de référence : `workspace-bom 0.0.136` (BOM + catalogue + 10 contrats) et
+`conventions-plugin 0.0.17`.
+
+== Mission
+
+Aligner le borough sur le canal unique : coordonnées JitPack, BOM `0.0.136`,
+garde de publication et injection de versions ; zéro modification métier.
+
+== Changements
+
+* `build.gradle.kts` — plateforme
+  `com.github.cccp-education.workspace-bom:workspace-bom:0.0.136` ; contrats N0
+  (`i18n-contracts`, `plantuml-contracts`, `codebase-contracts`) et leurs
+  déclinaisons `functionalTest` en coordonnées JitPack `0.0.136` ; version
+  injectée `ws.versions.workspace.bom`.
+* `settings.gradle.kts` — catalogue `ws` lu depuis JitPack `0.0.136` + dépôt
+  `https://jitpack.io`.
+* `PlantumlPluginPublicationTest` — la garde de plateforme attend la coordonnée
+  JitPack (`com.github.cccp-education.workspace-bom:workspace-bom:$bomVersion`).
+* `gradle/libs.versions.toml` inchangé (`plantuml = 0.0.16`).
+* Aucun code de production métier modifié ; aucun test exécuté en local.
+
+== Preuves CI
+
+* `Test` run `43473410522` ✅ — commit `9e70d59` (`test(publication): align
+  guards with the JitPack channel (CNV-17)`). Les commits `caebcce` et `6b87c1a`
+  étaient rouges avant l'alignement.
+* Local = Build : compiles + `ktlintCheck` VERTS ; preuve = CI du commit poussé.
+* Zéro secret, zéro publication, zéro bump.
+
+== Fichiers touchés
+
+* `settings.gradle.kts`
+* `build.gradle.kts`
+* `src/test/kotlin/plantuml/PlantumlPluginPublicationTest.kt`
+
+== Suite
+
+**Release `plantuml-plugin 0.0.17` depuis HEAD (canal JitPack, US-3c).** La
+garde de langue `PLT-OUT-3` est postérieure au commit qui a produit l'artefact
+JitPack `0.0.16` (contenu ≠ `0.0.16` Central), ce qui a conduit au **revert de
+la consommation bakery**. La `0.0.17` depuis HEAD rétablit l'alignement et
+débloque la consommation bakery. Alternative : US-6/US-7
+(`PLT-DIAGRAM-OWNERSHIP`, cross-borough).

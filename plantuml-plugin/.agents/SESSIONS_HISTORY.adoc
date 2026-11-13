@@ -297,3 +297,17 @@ Clôture **8/8**. **US-6a** (bakery S-271) : test E2E contrat (`PlantUmlTranslat
 `val x = tasks.register("x") { }` (6 warnings Gradle 9.6 → 0) ;
 `dependsOn(provider)` inchangé. CI `43357880558` verte. Rapport
 `.agents/sessions/252-mem-warn-zero-us4-plantuml.adoc`.
+
+== Session 253 — CNV-17 : JitPack canal unique — 2026-11-13
+
+Décision pilote S-045 : JitPack = canal unique des artefacts publics
+(`foundry/private/**` et `office/**` exclus). Contrats N0 (`i18n-contracts`,
+`plantuml-contracts`, `codebase-contracts`) et leurs déclinaisons
+`functionalTest` en coordonnées JitPack `0.0.136` ; plateforme BOM JitPack
+`0.0.136` ; `PlantumlPluginPublicationTest` attend la coordonnée JitPack ;
+version injectée `ws.versions.workspace.bom`. **CI verte** : `Test`
+`43473410522` (commit `9e70d59`). Réserve : l'artefact JitPack `0.0.16` est
+construit depuis un commit antérieur à la garde de langue `PLT-OUT-3`
+(contenu ≠ Central) → revert de la consommation bakery ; la release `0.0.17`
+depuis HEAD est planifiée (US-3c). Zéro bump, zéro publication, zéro secret.
+Rapport `.agents/sessions/253-cnv-17-jitpack-channel.adoc`.

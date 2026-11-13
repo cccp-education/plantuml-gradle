@@ -1,6 +1,7 @@
 = BACKLOG — PlantUML Gradle Plugin (HTOWN)
 :toc:
-:last_update: 2026-11-09 (Session 250 — **release 0.0.17 préparée, BLOQUÉE quota Sonatype** : DAG MEMPHIS `0.0.129` prêt (CI `42541458784` ✅), publication Central refusée « monthly release count limit … resets 2026-12-01 », revert `b1c9910` ; gouvernance corrigée (PLT-DIAGRAM-OWNERSHIP 6/8, PL-3 lint résolu). Historique : S-249 PLT-OUT-4 ✅, S-248 PLT-OUT-3 ✅, S-247 PLT-OUT-2 ✅, S-246 PLT-OUT-1 ✅.)
+:last_update: 2026-11-13 (Session 253 — **CNV-17 : JitPack canal unique** : contrats N0 + plateforme BOM en coordonnées JitPack `0.0.136`, garde alignée, CI `43473410522` verte ; réserve `0.0.16` ≠ Central → release `0.0.17` depuis HEAD en US-3c. Historique : S-252 MEM-WARN-ZERO US-4 ✅, S-250 release 0.0.17 préparée/bloquée quota Sonatype.
+_Historique 250_ : 2026-11-09 — Session 250 (**release 0.0.17 préparée, BLOQUÉE quota Sonatype** : DAG MEMPHIS `0.0.129` prêt (CI `42541458784` ✅), publication Central refusée « monthly release count limit … resets 2026-12-01 », revert `b1c9910` ; gouvernance corrigée (PLT-DIAGRAM-OWNERSHIP 6/8, PL-3 lint résolu). Historique : S-249 PLT-OUT-4 ✅, S-248 PLT-OUT-3 ✅, S-247 PLT-OUT-2 ✅, S-246 PLT-OUT-1 ✅.)
 
 '''
 
@@ -1071,3 +1072,20 @@ Version du plugin depuis la source unique de vérité (`ws.versions.*`)
 - [x] Garde `PlantumlPluginPublicationTest` 3/3 (RED → GREEN, pattern Document S-244)
 - [x] Gate : `test` 2531/0 VERT + `functionalTest` 85/1 = baseline exacte (`PlantumlFunctionalSuite$FilePermission` préexistant, stash avant=après)
 - [x] `publishToMavenLocal` VERT — POM `0.0.4` + platform `0.0.30` vérifiés
+
+'''
+
+== Session 253 — CNV-17 (JitPack canal unique)
+
+_Note de gouvernance (aucune US créée)._ Décision pilote S-045 : JitPack devient
+le **canal unique** des artefacts publics `education.cccp` (`foundry/private/**`
+et `office/**` exclus) — un artefact = un canal = un nom = une version. Le
+borough est aligné sur le N0 `workspace-bom 0.0.136` et
+`conventions-plugin 0.0.17` : contrats N0 et plateforme BOM en coordonnées
+JitPack `0.0.136`, `PlantumlPluginPublicationTest` aligné, version injectée
+`ws.versions.workspace.bom`. CI verte `43473410522` (commit `9e70d59`). Zéro
+bump, zéro publication. **Réserve** : l'artefact JitPack `0.0.16` est construit
+depuis un commit antérieur à la garde de langue `PLT-OUT-3` (contenu ≠ Central)
+→ revert de la consommation bakery ; release `0.0.17` depuis HEAD planifiée
+(US-3c). Rapport `.agents/sessions/253-cnv-17-jitpack-channel.adoc`. EPIC
+transversal : `conventions-plugin/.agents/CADRAGE_EPIC_CNV_17_JITPACK_PRIMARY.adoc`.
