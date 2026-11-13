@@ -47,7 +47,7 @@ class PlantumlPluginPublicationTest {
 
         assertThat(compactBuildScript)
             .withFailMessage("workspace-bom platform pin must use the ws catalog BOM version ($wsBomVersion)")
-            .contains("""platform("education.cccp:workspace-bom:$wsBomVersion")""")
+            .contains("""platform("com.github.cccp-education.workspace-bom:workspace-bom:$wsBomVersion")""")
     }
 
     /**
