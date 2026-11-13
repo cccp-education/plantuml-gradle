@@ -8,3 +8,4 @@
 * `CollectPlantumlIndexTaskBranchTest` rendu root-safe (`assumeTrue` root).
 * Run `43508921960` VERT (commit `5d0a2ea`).
 * Rapport `.agents/sessions/254-gbl-013-wave2.adoc`.
+* Session 255 — EAGER : publication JitPack canal unique (AGENT/PROMPT_REPRISE alignés ; Central/Portal retirés) — 2026-11-14.
