@@ -287,3 +287,9 @@ Projets gérant la même méthodologie opencode (EAGER/LAZY, procédure de fin d
 == Session 251 — JitPack mirror (CNV-16)
 
 Publication JitPack de plantuml-plugin 0.0.16. JitPack : 0.0.16 — POM HTTP 200.
+
+== Session 255 — EAGER : publication JitPack canal unique (2026-11-14)
+
+Alignement EAGER (AGENT/PROMPT_REPRISE) : JitPack canal unique ;
+Central/Portal retirés. Zéro code. Rapport
+`.agents/sessions/255-eager-publication-jitpack-only.adoc`.

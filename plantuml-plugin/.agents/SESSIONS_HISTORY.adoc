@@ -320,3 +320,9 @@ Rapport `.agents/sessions/253-cnv-17-jitpack-channel.adoc`.
 shards functional/BDD et couverture restent hôte. Run `43508921960` **VERT**
 (commit `5d0a2ea`). Rapport `.agents/sessions/254-gbl-013-wave2.adoc`.
 
+
+== Session 255 — EAGER : publication JitPack canal unique — 2026-11-14
+
+Alignement EAGER : JitPack canal unique ; Maven Central/Sonatype et
+Gradle Plugin Portal **retirés**. Aucun code, aucun test, aucune
+publication. Rapport `.agents/sessions/255-eager-publication-jitpack-only.adoc`.
