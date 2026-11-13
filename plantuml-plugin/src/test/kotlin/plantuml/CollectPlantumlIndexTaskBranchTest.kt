@@ -2,6 +2,7 @@ package plantuml
 
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -87,6 +88,12 @@ class CollectPlantumlIndexTaskBranchTest {
 
     @Test
     fun `should throw exception when RAG directory cannot be read`() {
+        // GBL-013 US-5 — the runtime image runs as root, where chmod does not
+        // prevent reads. The scenario is skipped rather than asserting a
+        // permission failure that root cannot produce.
+        assumeTrue(System.getProperty("user.name") != "root") {
+            "running as root: chmod cannot make a directory unreadable — scenario skipped"
+        }
         // Given: RAG directory with no read permissions
         val ragDir = File(tempDir, "rag-no-read")
         ragDir.mkdirs()
