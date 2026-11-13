@@ -1,0 +1,24 @@
+= Session 254 — GBL-013 vague 2 : gate unit/lint dans l'image de runtime
+:date: 2026-11-14
+:borough: HTOWN (plantuml-gradle)
+
+== Livré
+
+* `ci/run.sh` — `fast`/`test` = `test ktlintCheck validatePlugins`.
+* `.github/workflows/test.yml` : job `unit` épinglé sur
+  `cccpeducation/cccp-ci-base@sha256:4722c1bc…` ; `setup-java` et `defaults`
+  supprimés, délégation à `ci/run.sh test`.
+* Test de permission rendu **root-safe** : `CollectPlantumlIndexTaskBranchTest`
+  « RAG directory cannot be read » passe par `assumeTrue` quand l'utilisateur
+  est root (l'image tourne en root, `chmod` n'empêche pas la lecture).
+* Shards functional/BDD (pgvector) et couverture restent sur l'hôte.
+* Run `43508921960` **VERT** (commit `5d0a2ea`), après un premier run rouge
+  `43507438912` (échec root du test de permission).
+
+== Notes
+
+Aucune publication, zéro code métier modifié.
+
+== Suivant
+
+US-5 se poursuit sur les dépôts restants.

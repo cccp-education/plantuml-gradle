@@ -311,3 +311,12 @@ construit depuis un commit antérieur à la garde de langue `PLT-OUT-3`
 (contenu ≠ Central) → revert de la consommation bakery ; la release `0.0.17`
 depuis HEAD est planifiée (US-3c). Zéro bump, zéro publication, zéro secret.
 Rapport `.agents/sessions/253-cnv-17-jitpack-channel.adoc`.
+
+== Session 254 — GBL-013 vague 2 : gate unit/lint dans l'image — 2026-11-14
+
+`ci/run.sh` (`fast`/`test` = `test ktlintCheck validatePlugins`) ; job `unit`
+épinglé sur `cccpeducation/cccp-ci-base@sha256:4722c1bc…` ; test de permission
+`CollectPlantumlIndexTaskBranchTest` rendu **root-safe** (`assumeTrue` root) ;
+shards functional/BDD et couverture restent hôte. Run `43508921960` **VERT**
+(commit `5d0a2ea`). Rapport `.agents/sessions/254-gbl-013-wave2.adoc`.
+

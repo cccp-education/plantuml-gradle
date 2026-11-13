@@ -1,87 +1,10 @@
-= COMPLETED_TASKS_ARCHIVE — 2026-11
+= Archive des tâches terminées — Novembre 2026 (plantuml-gradle)
 
-== Session 250 (2026-11-09) — Release 0.0.17 préparée, bloquée quota Sonatype
+== S-254 — GBL-013 vague 2 : gate unit/lint dans l'image ✅
 
-=== Fait
-- [x] Gouvernance corrigée : roadmap `PLT-DIAGRAM-OWNERSHIP` 6/8 US (reste US-6/US-7) ; PL-3 lint de facto résolu (`education.cccp.build.lint:0.0.14` + `ktlintCheck` CI) ✅
-- [x] DAG MEMPHIS préparé : `workspace-bom 0.0.129` + `plantuml-plugin 0.0.17` + garde `PlatformCatalogAlignmentTest` ; `assemble` + compile N0 VERT ; commit `433f1c9`, **CI `42541458784` ✅ 21/21** ✅
-- [x] Publication Central tentée : **bloquée** par le quota Sonatype (reset **2026-12-01**) ; aucun artefact publié ; Portal non viable (groupe en revue manuelle) ✅
-- [x] Revert `b1c9910` → MEMPHIS `main` à l'état publié `0.0.128`/`0.0.16` ✅
-- [x] Aucun code plantuml modifié, zéro bump, zéro publication ✅
-- [x] **Addendum — audit vision PLT-AGENT** (`ollama show`, zéro inférence) : `gemma4:31b-cloud` et `deepseek-v4.1-flash:cloud` exposent `vision`, `gpt-oss:120b-cloud` texte seul → DIA-01 utilisable, modèle choisi par le consommateur (aucun hardcode, SEC-1) ✅
-
-=== Prochaine session (251)
-- **Release `plantuml-plugin 0.0.17` dès le 2026-12-01** (procédure prête dans `PROMPT_REPRISE`)
-- ou US-6/US-7 (cross-borough) / re-traduction des 43 blocs EN
-- **Fichier à lire en priorité** : `PROMPT_REPRISE.adoc`
-
-== Session 249 (2026-11-05) — PLT-OUT-4 : preuve corpus (langue) ✅ — EPIC PLT-I18N-OUTPUT TERMINÉ 4/4
-
-=== Fait
-- [x] `PlantumlCorpusLanguageProbe` (pur) : finding par bloc dont une surface du port (labels/directives, notes, prose) est restée dans la langue source ; évidence dédupliquée ✅
-- [x] `PlantumlCorpusLanguageReport` (texte + JSON Jackson) intégré à `PlantumlCorpusReport` — `isClean` inchangé (la langue ne bloque jamais) ✅
-- [x] `validatePlantumlCorpus` : `-Pplantuml.corpusSourceLanguage` (défaut `fr`) + `build/plantuml/plantuml-corpus-language.json` (output) ✅
-- [x] Tests : 11 unit (sonde) + 5 unit (gate) + 5 functional TestKit + BDD `@plantuml-corpus-language` 5 scénarios (shard E) ✅
-- [x] **Preuve dogfooding** (lecture seule, zéro LLM) `jbake/i18n/en` : 112 docs / 256 blocs / **43 blocs à résidu FR / 23 documents** (0108=8, 0106=4) + 1 finding syntaxique réel (`0095:80`) ; écart avec les 69 S-076 expliqué ✅
-- [x] Cadrage `.agents/CADRAGE_PLT_OUT_4_CORPUS_LANGUAGE_PROOF.adoc` (D1→D7, périmètre, mesure, hors scope site) ✅
-- [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 250 + TEST_COVERAGE + archive 2026-11 + BACKLOG + TODO + AGENTS racine ✅
-- [x] Gate local = Build (compile ×3 + `ktlintCheck` + `assemble` + `validatePlugins` + `publishToMavenLocal` VERT) ; zéro test local, zéro secret, zéro LLM, zéro publication, zéro bump ✅
-
-=== Prochaine session (250)
-- Décision pilote : **release `plantuml-plugin 0.0.17`** via MEMPHIS (propager PLT-OUT-1/2/3 + vérifier le Portal) **ou** PLT-DIAGRAM-OWNERSHIP US-6/US-7 (cross-borough)
-- **Fichier à lire en priorité** : `PROMPT_REPRISE.adoc` + `BACKLOG.adoc` § EPIC PUB / PLT-DIAGRAM-OWNERSHIP
-
-== Session 248 (2026-11-05) — PLT-OUT-3 : shield + langue ✅
-
-=== Fait
-- [x] Domaine pur `plantuml.boundary.SourceLanguageResidue` — détection déterministe (sans LLM) d'un texte resté dans la langue source : diacritiques français non ambigus, lexique non ambigu, ratio de mots-outils ≥ 0,30 ; placeholders ignorés ; `fr-FR` normalisé ; profils indexés par langue (seul `fr`) ; évidence stable `word:`/`ratio:n/m`/`diacritic:` ✅
-- [x] `PlantumlTermShield.leaksPlaceholder` + `introducesPlaceholder(translated, source)` — un placeholder inventé sur un label non bouclé est détecté (invisible du chemin `restore`) ✅
-- [x] `PlantumlTranslationPortAdapter` — garde langue sur labels/notes/prose, retry borné `maxTranslationAttempts` (défaut 2, plancher 1, pas de retry sur échec/placeholder perdu), lot résiduel → repli par label, gate finale de fuite de placeholder → `PRESERVED` ✅
-- [x] Tests : 17 unit (`SourceLanguageResidueTest`) + 5 unit (bouclier) + 10 unit (port) + 3 functional (vrai validateur PlantUML) + BDD `@plantuml-language` (6 scénarios) dans le shard E ✅
-- [x] Cadrage `.agents/CADRAGE_PLT_OUT_3_SHIELD_LANGUE.adoc` (D1→D8 : surfaces, seuil, faux positifs, biais PRESERVE > faux TRANSLATED, gate corpus inchangée) ✅
-- [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 249 + TEST_COVERAGE + archive 2026-11 + BACKLOG + TODO + AGENTS racine ✅
-- [x] Gate local = Build (compile ×3 + `ktlintCheck` + `assemble` + `validatePlugins` + `publishToMavenLocal` VERT) ; zéro test local, zéro secret, zéro publication, zéro bump ✅
-
-=== Prochaine session (249)
-- **PLT-OUT-4** : preuve corpus (reprise ciblée des 69 blocs EN S-076 pilotée par la gate, zéro `@startuml` brut dans le HTML baké hors `[source,plantuml]`)
-- **Fichier à lire en priorité** : `BACKLOG.adoc` § PLT-I18N-OUTPUT + `PROMPT_REPRISE.adoc`
-
-== Session 247 (2026-11-05) — PLT-OUT-2 : notes couvertes et correction avant écriture ✅
-
-=== Fait
-- [x] `PlantumlNoteExtractor` : note flottante quotée `note "text" as N` (`quoted`, `singleLine`, `raw` intérieur exact) ; un `:` dans les guillemets n'avale plus le diagramme ✅
-- [x] `PlantumlLabelIntegrity.escapeQuotes` (idempotent) : guillemet introduit échappé avant écriture (libellés + notes quotées) ✅
-- [x] `PlantumlTranslationPortAdapter` : cible quotée exacte + alias préservé, traduction blanche refusée par le contrat N0 (source préservée), round-trip note `PRESERVE` ✅
-- [x] Tests : unit (+14) + functional (3, vrai validateur) + BDD `@plantuml-notes` (+3 scénarios `@roundtrip`) ✅
-- [x] Smoke réel `/tmp` (build + contrats N0 + moteur PlantUML) : note quotée corrigée/valide, diagramme préservé, `\n` littéral restauré ✅
-- [x] **CI VERTE run `42143833102`** (commit `0f7bb05`) après corrections `d78c635` (moteur PlantUML au classpath functionalTest) et `0f7bb05` (contrat N0 : pas de `Success` blanc) ✅
-- [x] **Publication Portal** : `publishPlugins` **BUILD SUCCESSFUL** avec `~/.gradle/gradle.properties` (`gradle.publish.key`/`secret`) — artefact `plantuml-plugin 0.0.16` uploadé ; première publication du groupe en **revue manuelle** (page publique pas encore visible) ; aucune clé affichée/commitée ✅
-- [x] **CI shardée (< 5 min visé)** : 1 unit + lint, 2 functional shards, 7 BDD shards (`File Edge Cases` scindé par tags, garde `PlantumlCucumberShardCoverageTest`) + coverage mergée `kover-ic-*` ; TestKit aligné sur le wrapper 9.8.2 (fini le 9.4.1) ; cache `setup-gradle` (caches/wrapper/testkit) → **198 s (3m18) à chaud** (run `42151678129`), 319 s à froid ✅
-- [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 248 + TEST_COVERAGE + archive 2026-11 + BACKLOG + TODO + AGENTS racine ✅
-- [x] Gate local = Build (compile ×3 + `ktlintCheck` + `assemble` + `validatePlugins` + `publishToMavenLocal` VERT) ; zéro test local, zéro secret ✅
-
-=== Prochaine session (248)
-- **PLT-OUT-3** : shield + langue (placeholder perdu ⇒ `PRESERVE`, label resté français détecté, retry borné)
-- **Fichier à lire en priorité** : `BACKLOG.adoc` § PLT-I18N-OUTPUT + `PROMPT_REPRISE.adoc`
-
-== Session 246 (2026-11-05) — PLT-OUT-1 : gate de corpus PlantUML ✅
-
-=== Fait
-- [x] Domaine pur `plantuml.corpus` : `AsciiDocPlantumlCorpusScanner` (vrais `[plantuml]`, ignore `[source,plantuml]`/littéraux/commentaires), `CorpusLanguageResolver`, `PlantumlCorpusGate`, `PlantumlCorpusBaseline`, `PlantumlCorpusReport` ✅
-- [x] Tâche `validatePlantumlCorpus` (`-Pplantuml.corpusDir`/`corpusBaseline`/`corpusStrict`), rapport écrit avant échec, suggestions de baseline, `@DisableCachingByDefault`, câblage `check` ✅
-- [x] i18n `task.corpus.*` + `corpus.*` dans les 10 langues ✅
-- [x] Tests : 24 unit (14 scanner + 10 gate) + 7 functional TestKit + 5 scénarios BDD `@plantuml-corpus` + `PlantumlCorpusSteps` ✅
-- [x] Dogfooding consommateur `/tmp` (mavenLocal) : échec nommé article/langue/id/ligne/raison, baseline verte, UP-TO-DATE ; bug regex de groupe de capture trouvé et corrigé ✅
-- [x] Réalité versions réintégrée : Central `0.0.13`→`0.0.16` HTTP 200 ; `0.0.14` PRESERVE, `0.0.15` S-083, `0.0.16` courante (`24a0d41`, pin `0.0.121`) ✅
-- [x] Gouvernance : INDEX + SESSIONS_HISTORY + PROMPT_REPRISE 247 + TEST_COVERAGE + archive 2026-11 + BACKLOG + TODO + AGENTS racine ✅
-- [x] Gate local = Build (compile ×3 + `ktlintCheck` + `assemble` + `validatePlugins` + `publishToMavenLocal` VERT) ; **CI VERTE run `42102198075`** (commit `dd6c229`, 13m10s, `check` ✓ ; run initial `42099810732` rouge sur une assertion de test ligne 4 vs 3, corrigée) ; zéro test local, zéro secret, zéro publication ✅
-
-=== Prochaine session (247)
-- **PLT-OUT-2** : notes non quotées corrigées avant écriture (multi-lignes, round-trip, `PRESERVE` si non corrigeable)
-- **Fichier à lire en priorité** : `BACKLOG.adoc` § PLT-I18N-OUTPUT + `PROMPT_REPRISE.adoc`
-
-== S-252 — `MEM-WARN-ZERO` US-4 ✅
-
-* 2 `val x by tasks.registering {}` → `val x = tasks.register("x") {}`
-  (6 warnings Gradle 9.6 → 0), graphe `dependsOn` inchangé.
-* CI `43357880558` verte.
+* `ci/run.sh` (`fast`/`test` = `test ktlintCheck validatePlugins`).
+* Job `unit` épinglé sur `cccpeducation/cccp-ci-base@sha256:4722c1bc…` ;
+  `setup-java` supprimé ; shards functional/BDD et couverture restent hôte.
+* `CollectPlantumlIndexTaskBranchTest` rendu root-safe (`assumeTrue` root).
+* Run `43508921960` VERT (commit `5d0a2ea`).
+* Rapport `.agents/sessions/254-gbl-013-wave2.adoc`.

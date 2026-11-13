@@ -1,6 +1,16 @@
-= PROMPT_REPRISE — Plantuml — Session 254
-:session: 254
-:date: 2026-11-13
+= PROMPT_REPRISE — Plantuml — Session 255
+:session: 255
+:date: 2026-11-14
+
+== Session 254 (TERMINÉE) — GBL-013 vague 2 : gate unit/lint dans l'image
+
+* `ci/run.sh` (`fast`/`test` = `test ktlintCheck validatePlugins`).
+* Job `unit` épinglé sur `cccpeducation/cccp-ci-base@sha256:4722c1bc…` ;
+  `setup-java` supprimé ; shards functional/BDD et couverture restent hôte.
+* `CollectPlantumlIndexTaskBranchTest` « RAG directory cannot be read » rendu
+  **root-safe** (`assumeTrue` root).
+* Run `43508921960` **VERT** (commit `5d0a2ea`). Rapport
+  `.agents/sessions/254-gbl-013-wave2.adoc`.
 
 == Session 253 (TERMINÉE) — CNV-17 : JitPack canal unique
 
