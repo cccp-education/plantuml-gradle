@@ -79,3 +79,9 @@
 === Prochaine session (247)
 - **PLT-OUT-2** : notes non quotées corrigées avant écriture (multi-lignes, round-trip, `PRESERVE` si non corrigeable)
 - **Fichier à lire en priorité** : `BACKLOG.adoc` § PLT-I18N-OUTPUT + `PROMPT_REPRISE.adoc`
+
+== S-252 — `MEM-WARN-ZERO` US-4 ✅
+
+* 2 `val x by tasks.registering {}` → `val x = tasks.register("x") {}`
+  (6 warnings Gradle 9.6 → 0), graphe `dependsOn` inchangé.
+* CI `43357880558` verte.

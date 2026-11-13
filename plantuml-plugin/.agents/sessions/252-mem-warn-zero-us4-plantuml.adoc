@@ -1,4 +1,4 @@
-= Session 251 — `MEM-WARN-ZERO` US-4 : `registering` → `register` (plantuml)
+= Session 252 — `MEM-WARN-ZERO` US-4 : `registering` → `register` (plantuml)
 :toc:
 
 :_date_: 2026-11-13
