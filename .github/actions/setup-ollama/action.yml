@@ -29,7 +29,7 @@ runs:
     # ~1.6 GB each time. We cache a `docker save` tar instead.
     - name: Restore cached Ollama image
       id: image-cache
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: ${{ runner.temp }}/ollama-image.tar
         key: ollama-image-${{ runner.os }}-${{ inputs.image }}
@@ -53,7 +53,7 @@ runs:
     # and are archived between runs.
     - name: Restore cached Ollama models
       id: model-cache
-      uses: actions/cache@v4
+      uses: actions/cache@v6
       with:
         path: ~/.ollama/models
         key: ollama-models-${{ runner.os }}-${{ inputs.model }}

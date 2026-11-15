@@ -16,18 +16,18 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Verify Gradle wrapper version
         uses: cccp-education/conventions-gradle/.github/actions/verify-gradle-wrapper@main
       - name: Set up JDK 25
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           java-version: '25'
           distribution: 'temurin'
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
 
@@ -35,7 +35,7 @@ jobs:
         run: pip install "huggingface_hub[hf_transfer]>=0.25"
 
       - name: Cache HuggingFace models
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/huggingface
           key: hf-smollm2-135m-instruct-${{ hashFiles('plantuml-plugin/src/functionalTest/resources/python/requirements.txt') }}
@@ -44,14 +44,14 @@ jobs:
             hf-smollm2-135m-
 
       - name: Cache Gradle wrapper
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.gradle/wrapper
           key: gradle-wrapper-${{ hashFiles('plantuml-plugin/gradle/wrapper/gradle-wrapper.properties') }}
           restore-keys: gradle-wrapper-
 
       - name: Cache Gradle dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: |
             ~/.gradle/caches
@@ -69,7 +69,7 @@ jobs:
 
       - name: Upload test reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: fine-tune-test-results
           path: |
