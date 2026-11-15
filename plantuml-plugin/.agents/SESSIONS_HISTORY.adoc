@@ -326,3 +326,16 @@ shards functional/BDD et couverture restent hôte. Run `43508921960` **VERT**
 Alignement EAGER : JitPack canal unique ; Maven Central/Sonatype et
 Gradle Plugin Portal **retirés**. Aucun code, aucun test, aucune
 publication. Rapport `.agents/sessions/255-eager-publication-jitpack-only.adoc`.
+
+== Session 256 — GBL-014-5 rollout du canal + GBL-014-4 + GBL-013-10 — 2026-11-15
+
+Session globale 229. `settings.gradle.kts` (racine + sous-build) conditionnels
+sur `-Pchannel` (`jitpack` par défaut) : dépôt JitPack + shim `useModule(...)`
+**seulement** en `jitpack` ; `ci/run.sh` passe `-Pchannel` et ajoute
+`verifyChannel` (`test ktlintCheck validatePlugins verifyChannel`) ; shim
+conventions `0.0.19` ; actions `node24`-natives (`test.yml`,
+`fine_tune_test.yml`, `real_llm_test.yml`, action composite `setup-ollama`,
+5 `.yml.disabled`) ; image `cccp-ci-base` re-pinée `sha256:03ead378…` (Node
+26.13.1). **CI `Test` verte** sur les 5 commits (`43660608028`→`43690096381`).
+Zéro code métier, zéro bump, zéro publication, zéro secret. Rapport
+`.agents/sessions/256-gbl-014-5-channel-rollout.adoc`.

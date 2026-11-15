@@ -9,3 +9,13 @@
 * Run `43508921960` VERT (commit `5d0a2ea`).
 * Rapport `.agents/sessions/254-gbl-013-wave2.adoc`.
 * Session 255 — EAGER : publication JitPack canal unique (AGENT/PROMPT_REPRISE alignés ; Central/Portal retirés) — 2026-11-14.
+
+== S-256 — GBL-014-5 rollout du canal + GBL-014-4 + GBL-013-10 ✅
+
+* Settings channel-conditionnels (`-Pchannel`, défaut `jitpack`) racine et
+  sous-build ; `ci/run.sh` `-Pchannel` + `verifyChannel`.
+* Shim conventions `0.0.19` ; actions `node24`-natives (y compris 5 workflows
+  désactivés et l'action `setup-ollama`).
+* Image `cccp-ci-base` Node 26.13.1 (`sha256:03ead378…`).
+* CI `Test` verte sur les 5 commits (`43660608028`→`43690096381`).
+* Rapport `.agents/sessions/256-gbl-014-5-channel-rollout.adoc`.

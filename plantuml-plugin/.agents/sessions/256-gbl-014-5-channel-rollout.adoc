@@ -1,0 +1,77 @@
+= Session 256 — GBL-014-5 / GBL-014-4 / GBL-013-10 : rollout du canal, shim conventions, Node 26 (plantuml)
+:toc:
+
+:_date_: 2026-11-15
+:_borough_: HTOWN (plantuml-gradle, N2)
+:_session_precedente_: 255 (EAGER : publication JitPack canal unique)
+:_statut_: ✅ rollout livré, CI verte
+
+== Contexte
+
+Session globale 229 (2026-11-15). Trois chantiers transverses touchant le
+borough :
+
+. **GBL-014-5** — le canal de publication devient une **propriété du build**
+   (`-Pchannel`, défaut `jitpack`), jamais une branche.
+. **GBL-014-4** — shim `conventions-plugin` `0.0.17|0.0.18 → 0.0.19`.
+. **GBL-013-10** — dernière LTS Node : actions `node24`-natives et image CI
+   `cccp-ci-base` rebâtie sur Node 26.13.1.
+
+Cadrages : `.agents/CADRAGE_EPIC_GBL_014_DUAL_CHANNEL.adoc` et
+`.agents/CADRAGE_EPIC_GBL_013_PORTABILITE_CI.adoc` (racine workspace).
+
+== Changements
+
+* `c5c85e7` — **GBL-014-5** : `settings.gradle.kts` (racine **et**
+  `plantuml-plugin`) conditionnels sur
+  `providers.gradleProperty("channel").getOrElse("jitpack")` ; dépôt JitPack +
+  shim `useModule(...)` **seulement** en `jitpack` ; `ci/run.sh` passe
+  `-Pchannel` et `verifyChannel` (`fast|test` = `test ktlintCheck
+  validatePlugins verifyChannel`).
+* `89e9233` — **GBL-014-4** : shim `conventions-plugin` `0.0.18 → 0.0.19`
+  (racine + sous-build).
+* `cfd064e` — **GBL-013-10** : `actions/checkout@v4 → v7`,
+  `actions/setup-java@v4 → v6`, `gradle/actions/setup-gradle@v4 → v6`,
+  `actions/upload-artifact@v4 → v7`, `actions/cache@v4 → v6` dans
+  `test.yml`, `fine_tune_test.yml`, `real_llm_test.yml` et l'action composite
+  `.github/actions/setup-ollama/action.yml`.
+* `a35bc59` — **GBL-013-10** : alignement des workflows désactivés
+  (`integration_test.yml.disabled`, `plantuml-processing.yml.disabled`,
+  `readme_action.yml.disabled`, `readme_plantuml.yml.disabled`,
+  `readme_truth.yml.disabled`).
+* `0330bab` — **GBL-013-10** : image `cccp-ci-base` re-pinée
+  `sha256:03ead3787ed8f09068cc582191e4cd8f5e48e3ce696fe53836ecd826de57ea1f`
+  (Node 26.13.1).
+* Aucun code de production modifié ; aucun test exécuté en local
+  (Local = Build, Tests = CI).
+
+== Preuves CI
+
+| Commit | Workflow | Run | Résultat
+| `c5c85e7` | `Test` | `43660608028` | ✅
+| `89e9233` | `Test` | `43672575259` | ✅
+| `cfd064e` | `Test` | `43683424158` | ✅
+| `a35bc59` | `Test` | `43688246729` | ✅
+| `0330bab` | `Test` | `43690096381` | ✅
+
+Zéro secret, zéro publication, zéro bump de version.
+
+== Fichiers touchés
+
+* `settings.gradle.kts`
+* `plantuml-plugin/settings.gradle.kts`
+* `ci/run.sh`
+* `.github/workflows/{test,fine_tune_test,real_llm_test}.yml`
+* `.github/workflows/*.yml.disabled` (5 fichiers)
+* `.github/actions/setup-ollama/action.yml`
+
+== Reste à faire (transverse, hors borough)
+
+* **`bakery`** — dette du catalogue relabellé `0.0.136` (revertée : les tags
+  JitPack de `document`/`codebase`/`graphify`/`plantuml` ne pointent pas les
+  commits Central du même numéro ; JitPack `plantuml 0.0.16` ≠ Central).
+* **`container-provision-plugin`** et racines agrégateurs : aucune gate
+  `verifyChannel`.
+* **Sonatype 130791** — republication `central` après le reset du 2026-12-01
+  (GBL-014 US-6/US-7) ; release `0.0.17` depuis HEAD (US-3c) encore à faire.
+* **GBL-013 US-7** — workflows `office` bloqués (secrets + image privée).

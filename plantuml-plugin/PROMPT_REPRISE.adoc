@@ -1,51 +1,47 @@
-= PROMPT_REPRISE — Plantuml — Session 255
-:session: 255
-:date: 2026-11-14
+= PROMPT_REPRISE — Plantuml — Session 256
+:session: 256
+:date: 2026-11-15
+:etat: S-256 — **GBL-014-5 rollout + GBL-014-4 + GBL-013-10** ✅ — settings channel-conditionnels (`-Pchannel`, défaut `jitpack`), `ci/run.sh` (`test ktlintCheck validatePlugins verifyChannel`), shim conventions `0.0.19`, actions `node24`-natives (y compris workflows désactivés et action `setup-ollama`), image `cccp-ci-base` Node 26.13.1. CI `Test` verte sur les 5 commits.
+
+== Session 256 (TERMINÉE) — rollout du canal + Node 26
+
+* `c5c85e7` — settings channel-conditionnels (racine + `plantuml-plugin`) ;
+  JitPack + shim seulement en `jitpack` ; `ci/run.sh` `-Pchannel` +
+  `verifyChannel`.
+* `89e9233` — shim `conventions-plugin` `0.0.19`.
+* `cfd064e` / `a35bc59` — actions `node24`-natives (`test.yml`,
+  `fine_tune_test.yml`, `real_llm_test.yml`, action composite `setup-ollama`,
+  5 `.yml.disabled`).
+* `0330bab` — image `cccp-ci-base@sha256:03ead378…` (Node 26.13.1).
+* Run `43690096381` **VERT** (commit `0330bab`). Rapport
+  `.agents/sessions/256-gbl-014-5-channel-rollout.adoc`.
 
 == Session 254 (TERMINÉE) — GBL-013 vague 2 : gate unit/lint dans l'image
 
 * `ci/run.sh` (`fast`/`test` = `test ktlintCheck validatePlugins`).
 * Job `unit` épinglé sur `cccpeducation/cccp-ci-base@sha256:4722c1bc…` ;
   `setup-java` supprimé ; shards functional/BDD et couverture restent hôte.
-* `CollectPlantumlIndexTaskBranchTest` « RAG directory cannot be read » rendu
-  **root-safe** (`assumeTrue` root).
 * Run `43508921960` **VERT** (commit `5d0a2ea`). Rapport
   `.agents/sessions/254-gbl-013-wave2.adoc`.
 
-== Session 253 (TERMINÉE) — CNV-17 : JitPack canal unique
-
-* Décision pilote S-045 : JitPack = canal **unique** des artefacts publics
-  (`foundry/private/**` et `office/**` exclus) — un artefact = un canal = un nom
-  = une version.
-* `build.gradle.kts` : plateforme BOM JitPack `workspace-bom:0.0.136` ;
-  contrats N0 (`i18n-contracts`, `plantuml-contracts`, `codebase-contracts`) et
-  leurs déclinaisons `functionalTest` en `com.github.cccp-education...:0.0.136` ;
-  version injectée `ws.versions.workspace.bom`.
-* `settings.gradle.kts` : catalogue `ws` JitPack `0.0.136` + dépôt JitPack.
-* `PlantumlPluginPublicationTest` : garde de plateforme alignée sur JitPack.
-* `gradle/libs.versions.toml` inchangé (`plantuml = 0.0.16`).
-* **CI verte** : `Test` `43473410522` (commit `9e70d59`).
-* Rapport `.agents/sessions/253-cnv-17-jitpack-channel.adoc`.
-
-== Mission Session 254 — release `0.0.17` depuis HEAD (JitPack, US-3c)
+== Mission Session 257 — release `0.0.17` depuis HEAD (JitPack, US-3c)
 
 **Constat** : l'artefact JitPack `plantuml 0.0.16` est construit depuis un commit
-**antérieur** à la garde de langue `PLT-OUT-3` — son contenu diffère donc du
-`0.0.16` historiquement publié sur Central. C'est ce décalage qui a conduit au
-**revert de la consommation bakery**. La release `0.0.17` depuis HEAD rétablit
+**antérieur** à la garde de langue `PLT-OUT-3` — son contenu diffère du `0.0.16`
+historiquement publié sur Central ; c'est ce décalage qui a conduit au **revert
+de la consommation bakery**. La release `0.0.17` depuis HEAD rétablit
 l'alignement unique (nom + contenu + version).
 
 . Bump `gradle/libs.versions.toml` : `plantuml = "0.0.16"` → `"0.0.17"`.
-. Vérifier que le N0 `workspace-bom 0.0.136` déclare `plantuml-plugin 0.0.17`
-   (si le catalogue doit être avancé, la session MEMPHIS est préalable).
+. Vérifier que le N0 `workspace-bom` déclare `plantuml-plugin 0.0.17` (sinon
+   session MEMPHIS préalable).
 . Compiles ×3 (`compileKotlin`, `compileTestKotlin`,
    `compileFunctionalTestKotlin`) + `ktlintCheck` + `validatePlugins` +
    `publishToMavenLocal` (Local = Build ; aucun test local).
 . Commit + tag annoté `v0.0.17` : le build JitPack force
    `-Pversion="${VERSION#v}"`, signature désactivée (`CI=true`) ; vérifier
    POM/jar/marker **HTTP 200** et le contenu (garde `PLT-OUT-3` présente).
-. Consommation bakery : à traiter dans la session bakery (US-3c) après
-   propagation.
+. Consommation bakery : à traiter dans la session bakery (US-3c).
 
 == Option alternative
 
@@ -55,11 +51,12 @@ S-249 (LLM metered, accord pilote).
 
 == Résiduel
 
-* Portal/Central : désactivés pour les dépôts publics (CNV-17) ; plus de
-  contournement quota Sonatype à planifier.
-* Pin drift assumé : catalogue plantuml `0.0.121` (le `ws` courant est `0.0.136`),
-  à réaligner lors de la release.
+* Canal = propriété `-Pchannel` (`jitpack` défaut, `central` opt-in après le
+  reset du 2026-12-01).
+* Pin drift assumé : catalogue plantuml `0.0.121` (le `ws` courant est
+  `0.0.136`), à réaligner lors de la release.
 * `MEM-WARN-ZERO` F1 soldé (S-252) ; reste F2 `buildDir` (côté MEMPHIS).
+* Dette transverse : `bakery` relabel `0.0.136`, Sonatype 130791, GBL-013 US-7.
 
 == Rappels
 
